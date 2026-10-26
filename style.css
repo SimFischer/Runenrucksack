@@ -742,3 +742,5 @@ h2 .hint { font-size: 12px; font-weight: 400; color: var(--ink-soft); }
 }
 .f-armor .ok { color: var(--green); }
 .bad-word { font-family: "Courier New", monospace; color: var(--red); font-size: 1.2em; }
+.fate-rune { font-size: 90px !important; filter: drop-shadow(0 0 18px var(--accent)); }
+.fate-text { font-size: 22px !important; font-weight: 700; }

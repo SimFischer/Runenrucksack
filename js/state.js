@@ -12,6 +12,7 @@ export const G = {
   RECIPES: null,
   REGIONS: [],
   HEROES: [],
+  FATES: [],       // Schicksalsrunen
   ENCOUNTERS: null, // encounters.json
   EXERCISES: null,  // exercises.json
   run: null,
@@ -35,6 +36,7 @@ export async function loadData() {
   G.ENEMIES = enemyData.gegner;
   G.REGIONS = regions.gebiete;
   G.HEROES = heroes.helden;
+  G.FATES = heroes.schicksalsrunen;
   G.ENCOUNTERS = encounters;
   G.EXERCISES = exercises;
 }
@@ -66,4 +68,4 @@ export const itemsIn = (area, exceptUid) => G.run.items.filter((p) => p.area ===
 export const gridOf = (area) => (area === 'bag' ? bagGrid(G.run) : STORE_GRID);
 export const region = () => regionOf(G.run.day, G.REGIONS);
 export const hero = () => G.HEROES.find((h) => h.id === G.run.hero);
-export const playerCtx = () => playerContext(G.run, { heroes: G.HEROES });
+export const playerCtx = () => playerContext(G.run, { heroes: G.HEROES, fates: G.FATES });

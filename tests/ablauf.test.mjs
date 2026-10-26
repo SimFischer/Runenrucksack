@@ -79,3 +79,35 @@ test('Ork-Rüstungen: 3–5 Fehler, je genau eine richtige Schreibung', () => {
     }
   }
 });
+
+test('Schicksalsrunen und Unterklassen wirken', async () => {
+  const { playerContext } = await import('../js/mods.js');
+  const { seededRng } = await import('../js/logic.js');
+  const H = json('heroes.json');
+  assert.equal(H.schicksalsrunen.length, 6);
+  for (const h of H.helden) assert.equal(h.unterklassen.length, 2, h.id);
+
+  // Jede Schicksalsrune kommt vor, der Lauf beginnt mit ihrer Anzeige.
+  const seen = new Set();
+  for (let s = 1; s < 200 && seen.size < 6; s++) seen.add(newRun(ITEMS, REGIONS, { fates: H.schicksalsrunen, rng: seededRng(s) }).fate);
+  assert.equal(seen.size, 6);
+  const markt = newRun(ITEMS, REGIONS, { fates: [H.schicksalsrunen.find((f) => f.id === 'markt')] });
+  assert.equal(markt.shop.length, 6);
+  assert.deepEqual(markt.queue, ['schicksal', 'gebiet']);
+  const gold = newRun(ITEMS, REGIONS, { fates: [H.schicksalsrunen.find((f) => f.id === 'gold')] });
+  const before = gold.gold;
+  finishBattle(gold, ITEMS, REGIONS, true, 'Ork');
+  assert.equal(gold.gold - before, 8 + 2 + 2, 'Einkommen Tag 2 plus 2 Gold');
+
+  const data = { heroes: H.helden, fates: H.schicksalsrunen };
+  assert.equal(playerContext({ fate: 'leben', day: 4 }, data).leben, 20);
+  assert.equal(playerContext({ fate: 'siegel', day: 1 }, data).siegelBonus, 0.5);
+  assert.equal(playerContext({ hero: 'eadrun', unterklasse: 'sturmreiterin', day: 6 }, data).tempo, 15);
+  assert.equal(playerContext({ hero: 'borga', unterklasse: 'wortweberin', fate: 'worte', day: 6 }, data).runeMult, 4);
+
+  // Unterklasse wird bei der Ankunft in Hrossmark (Tag 6) gewählt.
+  const run = newRun(ITEMS, REGIONS);
+  for (let d = 1; d < 6; d++) finishBattle(run, ITEMS, REGIONS, true, 'Ork');
+  assert.equal(run.day, 6);
+  assert.deepEqual(run.queue, ['gebiet', 'unterklasse', 'begegnung', 'verschmelzen']);
+});

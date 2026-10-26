@@ -144,7 +144,16 @@ export function newRun(items, regions, opts = {}) {
     lernen: { richtig: 0, falsch: 0 },
     hero: opts.hero?.id || null,
     mods: [], // dauerhafte Boni aus Begegnungen
+    fate: null, // Schicksalsrune
+    unterklasse: null,
   };
+  if (opts.fates?.length) {
+    const fate = pickOne(opts.fates, rng);
+    run.fate = fate.id;
+    if (fate.effekt.ladenPlaetze) run.shopSlots = fate.effekt.ladenPlaetze;
+    if (fate.effekt.goldProTag) run.goldBonus = fate.effekt.goldProTag;
+    run.queue.unshift('schicksal');
+  }
   // Start-Items der Figur
   for (const s of opts.hero?.start || []) run.items.push({ uid: run.nextUid++, id: s.id, area: 'bag', x: s.x, y: s.y, rot: s.rot || 0 });
   rollShop(run, items, regions, true, rng);
@@ -199,11 +208,13 @@ export function finishBattle(run, items, regions, won, enemyName, rng = Math.ran
   if (run.hearts <= 0) { run.over = 'lost'; return; }
   if (run.day >= CFG.lastDay) { run.over = 'won'; return; }
   run.day++;
-  run.gold += income(run.day);
+  run.gold += income(run.day) + (run.goldBonus || 0);
   rollShop(run, items, regions, false, rng);
   for (const s of run.shop) if (s) s.locked = false;
   run.queue = [];
   if (isRegionStart(run.day, regions)) run.queue.push('gebiet');
+  // Ankunft im zweiten Gebiet: Unterklasse wählen
+  if (regions[1] && run.day === regions[1].tage[0]) run.queue.push('unterklasse');
   run.queue.push('begegnung', 'verschmelzen');
 }
 

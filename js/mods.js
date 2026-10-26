@@ -26,14 +26,27 @@ export function applyMod(def, mod) {
   return out;
 }
 
-// Spieler-Kontext für Kampf und Info-Feld. data: { heroes } aus den JSON-Dateien.
+// Wirkung einer Unterklasse oder Schicksalsrune auf den Kontext.
+function applyEffekt(ctx, e = {}, day = 1) {
+  if (e.mod) ctx.mods.push(e.mod);
+  if (e.tempo) ctx.tempo += e.tempo;
+  if (e.lebenProTag) ctx.leben += e.lebenProTag * day;
+  if (e.siegelBonus) ctx.siegelBonus = e.siegelBonus;
+  if (e.runenFaktor) ctx.runeMult *= e.runenFaktor;
+}
+
+// Spieler-Kontext für Kampf und Info-Feld. data: { heroes, fates } aus heroes.json.
 export function playerContext(run, data = {}) {
-  const ctx = { mods: [], siegelBonus: undefined, runeMult: 1, tempo: 0, leben: 0, hero: null };
+  const ctx = { mods: [], siegelBonus: undefined, runeMult: 1, tempo: 0, leben: 0, hero: null, fate: null, unterklasse: null };
   const hero = data.heroes?.find((h) => h.id === run?.hero);
   if (hero) {
     ctx.hero = hero;
     if (hero.bonus) ctx.mods.push(hero.bonus);
+    ctx.unterklasse = hero.unterklassen?.find((u) => u.id === run.unterklasse) || null;
+    if (ctx.unterklasse) applyEffekt(ctx, ctx.unterklasse.effekt, run.day);
   }
+  ctx.fate = data.fates?.find((f) => f.id === run?.fate) || null;
+  if (ctx.fate) applyEffekt(ctx, ctx.fate.effekt, run.day);
   for (const mod of run?.mods || []) ctx.mods.push(mod);
   // Verfluchte Kobold-Geschenke schaden zu Kampfbeginn.
   ctx.selbstschaden = 2 * (run?.items || []).filter((p) => p.area === 'bag' && p.fluch).length;

@@ -65,7 +65,7 @@ function showHeroes() {
 
 function startNewRun(h) {
   if (!h?.id) { showHeroes(); return; }
-  G.run = newRun(G.ITEMS, G.REGIONS, { hero: h });
+  G.run = newRun(G.ITEMS, G.REGIONS, { hero: h, fates: G.FATES });
   selected = null;
   showGame();
   continueFlow();
@@ -89,6 +89,8 @@ function continueFlow() {
   if (!step) return;
   const next = () => { G.run.queue.shift(); continueFlow(); };
   if (step === 'gebiet') showRegion(next);
+  else if (step === 'schicksal') showFate(next);
+  else if (step === 'unterklasse') chooseSubclass(next);
   else if (step === 'begegnung') runEncounter(next, render);
   else if (step === 'verschmelzen') runFusions(next);
   else next();
@@ -116,6 +118,42 @@ function showRegion(next) {
       ${boss.emoji} Am ${reg.tage[1]}. Tag wartet: <b>${boss.name}</b></p>
       <div class="row"><button class="btn primary big" data-act="go">Los geht's</button></div>
     </div>`, { go: next }, 'region');
+}
+
+function showFate(next) {
+  const f = playerCtx().fate;
+  if (!f) { next(); return; }
+  modal(`
+    <p class="region-over">Die Schicksalsrune für deine Reise</p>
+    <div class="big-emoji fate-rune">${f.emoji}</div>
+    <h2>${f.name}</h2>
+    <p class="fate-text">${f.text}</p>
+    <p class="muted">Sie gilt für den ganzen Lauf. Im Info-Feld siehst du sie jederzeit.</p>
+    <div class="row"><button class="btn primary big" data-act="go">Aufbrechen</button></div>`, { go: next });
+}
+
+// Ankunft in Hrossmark: Unterklasse aus zwei Angeboten passend zur Figur.
+function chooseSubclass(next) {
+  const h = hero();
+  if (!h?.unterklassen?.length || G.run.unterklasse) { next(); return; }
+  const card = openModal(`
+    <div class="enc-top">${h.emoji} ${h.name}</div>
+    <h2>Wähle deinen Weg</h2>
+    <p>In Hrossmark lernst du dazu. Welche Unterklasse nimmst du?</p>
+    <div class="enc-choices">${h.unterklassen.map((u) => `
+      <button class="enc-choice" data-id="${u.id}">
+        <span class="enc-emoji">${u.emoji}</span><b>${u.name}</b>
+        <span class="enc-reward">${u.text}</span>
+      </button>`).join('')}
+    </div>`, 'wide');
+  card.querySelectorAll('[data-id]').forEach((b) => {
+    b.onclick = () => {
+      G.run.unterklasse = b.dataset.id;
+      closeModal();
+      toast(`Du bist jetzt ${h.unterklassen.find((u) => u.id === b.dataset.id).name}!`);
+      next();
+    };
+  });
 }
 
 // ---------- Größen ----------
@@ -157,7 +195,8 @@ function render() {
 
 function renderTop() {
   const run = G.run, reg = region();
-  $('stat-hero').textContent = `${hero()?.emoji || ''} ${hero()?.kurz || ''}`;
+  const c = playerCtx();
+  $('stat-hero').textContent = `${hero()?.emoji || ''} ${hero()?.kurz || ''}${c.unterklasse ? ` · ${c.unterklasse.name}` : ''}${c.fate ? ` ${c.fate.emoji}` : ''}`;
   $('stat-day').textContent = `${reg.emoji} ${reg.name} · Tag ${run.day} / ${CFG.lastDay}`;
   $('stat-hearts').textContent = '❤️'.repeat(Math.max(0, run.hearts)) + '🤍'.repeat(CFG.hearts - Math.max(0, run.hearts));
   $('stat-wins').textContent = `🏆 ${run.wins}`;
@@ -452,6 +491,8 @@ function renderSummary(box) {
   box.innerHTML = `
     <h2>Dein Rucksack</h2>
     ${ctx.hero ? `<p class="gram">${ctx.hero.emoji} <b>${ctx.hero.name}</b>: ${ctx.hero.staerke}</p>` : ''}
+    ${ctx.unterklasse ? `<p class="gram">${ctx.unterklasse.emoji} <b>${ctx.unterklasse.name}</b>: ${ctx.unterklasse.text}</p>` : ''}
+    ${ctx.fate ? `<p class="gram">${ctx.fate.emoji} <b>Schicksalsrune</b>: ${ctx.fate.text}</p>` : ''}
     <ul class="stats">${rows.map(([a, b]) => `<li><span>${a}</span><b>${b}</b></li>`).join('')}</ul>
     ${fusions.length ? `<p class="gram ok">✓ Morgen verschmelzen: ${fusions.map((f) => G.DEFS[f.id].name).join(', ')}</p>` : ''}
     ${steig.length ? `<p class="gram ok">✓ Morgen gesteigert: ${steig.map((s) => G.DEFS[s.id].name).join(', ')}</p>` : ''}
@@ -459,7 +500,7 @@ function renderSummary(box) {
     <h3>So geht's</h3>
     <p class="muted">Ziehe Items aus dem Laden in den Rucksack. Tippe ein Item an für Infos, tippe nochmal zum Drehen. Beim Ziehen dreht ein zweiter Finger das Item.</p>
     <p class="muted">🔥 Kraft links neben oder über einen Träger legen → verschmilzt morgen. ${genusChip('der')} ${genusChip('die')} ${genusChip('das')} Siegel neben ein passendes Nomen. ➤ Runen-Pfeil auf ein passendes Nomen richten.</p>
-    <p class="muted">${run.day < CFG.lastDay ? `Morgen gibt es ${income(run.day + 1)} 🪙. ` : 'Heute ist der letzte Tag deiner Reise! '}Mit 🔓 reservierst du ein Item im Laden.</p>`;
+    <p class="muted">${run.day < CFG.lastDay ? `Morgen gibt es ${income(run.day + 1) + (run.goldBonus || 0)} 🪙. ` : 'Heute ist der letzte Tag deiner Reise! '}Mit 🔓 reservierst du ein Item im Laden.</p>`;
 }
 
 // ---------- Aktionen ----------

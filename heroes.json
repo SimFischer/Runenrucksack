@@ -1,5 +1,5 @@
 {
-  "_hinweis": "Startfiguren. bonus gilt den ganzen Lauf: filter wählt Items aus (art, id, kraft, traeger, wortfeld), prozent verstärkt ihre Wirkung, abklingzeit verändert die Abklingzeit in Prozent (negativ = schneller). start: Items mit Position im Rucksack.",
+  "_hinweis": "Startfiguren, Unterklassen und Schicksalsrunen. bonus gilt den ganzen Lauf: filter wählt Items aus (art, id, kraft, traeger, wortfeld), prozent verstärkt ihre Wirkung, abklingzeit verändert die Abklingzeit in Prozent (negativ = schneller). start: Items mit Position im Rucksack. effekt (Unterklassen und Schicksalsrunen) kann enthalten: mod (wie bonus), tempo (Prozent für alle Items), lebenProTag, siegelBonus (0.5 = +50 %), runenFaktor, ladenPlaetze, goldProTag.",
   "helden": [
     {
       "id": "borga",
@@ -9,10 +9,50 @@
       "emoji": "🧔‍♀️",
       "farbe": "#c0612b",
       "staerke": "Meisterin der Komposita: Alle Komposita wirken 20 % stärker.",
-      "bonus": { "filter": { "art": "kompositum" }, "prozent": 20, "text": "Borga Eisenfaust: Komposita +20 %" },
+      "bonus": {
+        "filter": {
+          "art": "kompositum"
+        },
+        "prozent": 20,
+        "text": "Borga Eisenfaust: Komposita +20 %"
+      },
       "start": [
-        { "id": "feuer", "x": 0, "y": 0 },
-        { "id": "axt", "x": 1, "y": 0 }
+        {
+          "id": "feuer",
+          "x": 0,
+          "y": 0
+        },
+        {
+          "id": "axt",
+          "x": 1,
+          "y": 0
+        }
+      ],
+      "unterklassen": [
+        {
+          "id": "feuerschmiedin",
+          "name": "Feuerschmiedin",
+          "emoji": "⚒️",
+          "text": "Alle Feuer-Komposita wirken 50 % stärker.",
+          "effekt": {
+            "mod": {
+              "filter": {
+                "kraft": "feuer"
+              },
+              "prozent": 50,
+              "text": "Feuerschmiedin: Feuer-Komposita +50 %"
+            }
+          }
+        },
+        {
+          "id": "wortweberin",
+          "name": "Wortweberin",
+          "emoji": "🧶",
+          "text": "Adjektiv-Runen wirken doppelt so stark.",
+          "effekt": {
+            "runenFaktor": 2
+          }
+        }
       ]
     },
     {
@@ -23,11 +63,113 @@
       "emoji": "🏇",
       "farbe": "#3f8a4a",
       "staerke": "Schnelle Reiterin: Verb-Schriftrollen laden 20 % schneller.",
-      "bonus": { "filter": { "art": "verb" }, "abklingzeit": -20, "text": "Eadrun die Reiterin: Schriftrollen laden 20 % schneller" },
+      "bonus": {
+        "filter": {
+          "art": "verb"
+        },
+        "abklingzeit": -20,
+        "text": "Eadrun die Reiterin: Schriftrollen laden 20 % schneller"
+      },
       "start": [
-        { "id": "stuermen", "x": 0, "y": 0 },
-        { "id": "speer", "x": 1, "y": 0 }
+        {
+          "id": "stuermen",
+          "x": 0,
+          "y": 0
+        },
+        {
+          "id": "speer",
+          "x": 1,
+          "y": 0
+        }
+      ],
+      "unterklassen": [
+        {
+          "id": "sturmreiterin",
+          "name": "Sturmreiterin",
+          "emoji": "🌪️",
+          "text": "Alle Items laden 15 % schneller.",
+          "effekt": {
+            "tempo": 15
+          }
+        },
+        {
+          "id": "lanzenfuehrerin",
+          "name": "Lanzenführerin",
+          "emoji": "🔱",
+          "text": "Speere und Speer-Komposita wirken 50 % stärker.",
+          "effekt": {
+            "mod": {
+              "filter": {
+                "traeger": "speer"
+              },
+              "prozent": 50,
+              "text": "Lanzenführerin: Speer-Items +50 %"
+            }
+          }
+        }
       ]
+    }
+  ],
+  "schicksalsrunen": [
+    {
+      "id": "feuer",
+      "name": "Rune des Feuers",
+      "emoji": "🔥",
+      "text": "Feuer-Komposita sind doppelt so stark.",
+      "effekt": {
+        "mod": {
+          "filter": {
+            "kraft": "feuer"
+          },
+          "prozent": 100,
+          "text": "Schicksalsrune: Feuer-Komposita doppelt so stark"
+        }
+      }
+    },
+    {
+      "id": "markt",
+      "name": "Rune des Marktes",
+      "emoji": "🛒",
+      "text": "Der Laden hat 6 Plätze statt 5.",
+      "effekt": {
+        "ladenPlaetze": 6
+      }
+    },
+    {
+      "id": "leben",
+      "name": "Rune des Lebens",
+      "emoji": "🌱",
+      "text": "Jeden Tag +5 Leben mehr im Kampf.",
+      "effekt": {
+        "lebenProTag": 5
+      }
+    },
+    {
+      "id": "siegel",
+      "name": "Rune der Siegel",
+      "emoji": "🔵",
+      "text": "Artikel-Siegel geben +50 % statt +25 %.",
+      "effekt": {
+        "siegelBonus": 0.5
+      }
+    },
+    {
+      "id": "gold",
+      "name": "Rune des Goldes",
+      "emoji": "🪙",
+      "text": "Jeden Morgen 2 Gold extra.",
+      "effekt": {
+        "goldProTag": 2
+      }
+    },
+    {
+      "id": "worte",
+      "name": "Rune der Worte",
+      "emoji": "✨",
+      "text": "Adjektiv-Runen wirken doppelt so stark.",
+      "effekt": {
+        "runenFaktor": 2
+      }
     }
   ]
 }
