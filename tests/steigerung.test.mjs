@@ -2,7 +2,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
-import { analyze, buildRuneLevels, findSteigerungen, adjectiveForm, phraseFor } from '../js/grammar.js';
+import { analyze, buildRuneLevels, adjectiveForm, phraseFor } from '../js/grammar.js';
+import { findTriples } from '../js/sterne.js';
 
 const json = (f) => JSON.parse(readFileSync(new URL('../' + f, import.meta.url)));
 const ITEMS = json('items.json').items;
@@ -41,16 +42,15 @@ test('Formen vor dem Nomen: scharfes, schärferes, das schärfste Schwert', () =
   assert.equal(adjectiveForm(DEFS['rune-edel@2'], 'das'), 'edleres');
 });
 
-test('Drei gleiche Runen in einer Reihe oder Spalte werden erkannt', () => {
-  const row = findSteigerungen([P('rune-scharf', 0, 0), P('rune-scharf', 1, 0), P('rune-scharf', 2, 0)], DEFS);
+test('Drei gleiche Runen irgendwo in Rucksack oder Lager werden erkannt', () => {
+  const runes = (list) => findTriples(list, DEFS).filter((g) => g.typ === 'rune');
+  const row = runes([P('rune-scharf', 0, 0), P('rune-scharf', 1, 0), P('rune-scharf', 2, 0)]);
   assert.equal(row.length, 1);
-  assert.equal(row[0].id, 'rune-scharf@2');
-  const col = findSteigerungen([P('rune-gut@2', 1, 0), P('rune-gut@2', 1, 1), P('rune-gut@2', 1, 2)], DEFS);
-  assert.equal(col[0].id, 'rune-gut@3');
-  assert.equal(findSteigerungen([P('rune-scharf', 0, 0), P('rune-scharf', 1, 0), P('rune-scharf', 1, 1)], DEFS).length, 0, 'Ecke zählt nicht');
-  assert.equal(findSteigerungen([P('rune-scharf', 0, 0), P('rune-scharf@2', 1, 0), P('rune-scharf', 2, 0)], DEFS).length, 0, 'gleiche Stufe nötig');
-  assert.equal(findSteigerungen([P('rune-scharf', 0, 0), P('rune-schwer', 1, 0), P('rune-scharf', 2, 0)], DEFS).length, 0);
-  assert.equal(findSteigerungen([P('rune-scharf@3', 0, 0), P('rune-scharf@3', 1, 0), P('rune-scharf@3', 2, 0)], DEFS).length, 0, 'Superlativ ist das Ende');
+  assert.equal(row[0].neu.id, 'rune-scharf@2');
+  assert.equal(runes([P('rune-gut@2', 1, 0), P('rune-gut@2', 3, 2), { ...P('rune-gut@2', 0, 0), area: 'store' }])[0].neu.id, 'rune-gut@3', 'verstreut und im Lager');
+  assert.equal(runes([P('rune-scharf', 0, 0), P('rune-scharf@2', 1, 0), P('rune-scharf', 2, 0)]).length, 0, 'gleiche Stufe nötig');
+  assert.equal(runes([P('rune-scharf', 0, 0), P('rune-schwer', 1, 0), P('rune-scharf', 2, 0)]).length, 0);
+  assert.equal(runes([P('rune-scharf@3', 0, 0), P('rune-scharf@3', 1, 0), P('rune-scharf@3', 2, 0)]).length, 0, 'Superlativ ist das Ende');
 });
 
 test('Jede Stufe wirkt 50 % stärker, falsch gerichtet wirkt keine', () => {

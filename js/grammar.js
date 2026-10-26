@@ -212,27 +212,6 @@ export function buildRuneLevels(defs) {
 
 export const nextLevelId = (d) => (d.stufe === 3 ? null : `${runeBase(d)}@${(d.stufe || 1) + 1}`);
 
-// Drei gleiche Runen (gleiche Stufe) direkt nebeneinander in einer Reihe oder Spalte.
-export function findSteigerungen(placed, defs) {
-  const map = new Map(placed.map((p) => [`${p.x},${p.y}`, p]));
-  const used = new Set();
-  const out = [];
-  const sorted = [...placed].sort((a, b) => a.y - b.y || a.x - b.x);
-  for (const p of sorted) {
-    const d = defs[p.id];
-    if (!isRune(d) || !d.steigerung || d.stufe === 3 || used.has(p.uid)) continue;
-    for (const [dx, dy] of [[1, 0], [0, 1]]) {
-      const a = map.get(`${p.x + dx},${p.y + dy}`), b = map.get(`${p.x + 2 * dx},${p.y + 2 * dy}`);
-      if (a && b && a.id === p.id && b.id === p.id && !used.has(a.uid) && !used.has(b.uid)) {
-        used.add(p.uid).add(a.uid).add(b.uid);
-        out.push({ runen: [p, a, b], mitte: a, id: nextLevelId(d) });
-        break;
-      }
-    }
-  }
-  return out;
-}
-
 // Wertet einen Rucksack aus: wirksame Werte jedes Items und Erklärungen für das Info-Feld.
 // Ergebnis: Map uid → { def, siegel: [{uid, genus, ok}], runen: [{uid, def, ok}], phrase, ziele }
 export function analyze(placed, defs, opts = {}) {

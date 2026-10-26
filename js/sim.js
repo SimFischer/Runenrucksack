@@ -4,7 +4,8 @@ import {
   CFG, newRun, finishBattle, rollShop, pickEnemy, makeEnemy, findSpot, bagGrid, STORE_GRID,
   growBag, addItem, attachTasche, enemyPool, shopPool, pickEncounters, pickOne, sellValue, seededRng, ARMOR_BONUS,
 } from './logic.js';
-import { buildCompounds, buildRuneLevels, findFusions, findSteigerungen } from './grammar.js';
+import { buildCompounds, buildRuneLevels, findFusions } from './grammar.js';
+import { findTriples, applyMerge } from './sterne.js';
 import { playerContext, evaluateBag } from './mods.js';
 import { Battle, makeFighter, runToEnd } from './battle.js';
 
@@ -44,7 +45,7 @@ function shop(run, data, rng) {
           const weakest = bag.filter((p) => !p.fluch).sort((a, b) => worth(defs[a.id]) - worth(defs[b.id]))[0];
           if (!weakest || worth(defs[weakest.id]) * 1.3 >= worth(o.d)) continue;
           run.items = run.items.filter((p) => p !== weakest);
-          run.gold += sellValue(defs[weakest.id]);
+          run.gold += sellValue(defs[weakest.id], weakest.stern || 1);
           spot = findSpot(run.items.filter((p) => p.area === 'bag'), defs, o.d, bagGrid(run));
           if (!spot) continue;
         }
@@ -56,6 +57,16 @@ function shop(run, data, rng) {
       }
     }
     if (run.gold >= CFG.rerollCost + 3) { run.gold -= CFG.rerollCost; rollShop(run, items, regions, false, rng); } else break;
+  }
+}
+
+// Drei gleiche sofort verschmelzen (falsche Antwort kostet 1 Gold).
+function mergeAll(run, defs, rng, skill) {
+  for (let i = 0; i < 10; i++) {
+    const [g] = findTriples(run.items, defs);
+    if (!g) return;
+    if (rng() > skill) run.gold = Math.max(0, run.gold - 1);
+    applyMerge(run, g, defs);
   }
 }
 
@@ -91,11 +102,7 @@ function morning(run, data, rng, skill) {
         run.items = run.items.filter((p) => p.uid !== f.kraft.uid);
         f.traeger.id = f.id;
       }
-      for (const s of findSteigerungen(run.items.filter((p) => p.area === 'bag'), defs)) {
-        const keep = s.mitte;
-        run.items = run.items.filter((p) => !s.runen.includes(p) || p === keep);
-        keep.id = s.id;
-      }
+      mergeAll(run, defs, rng, skill);
     }
   }
   run.queue = [];

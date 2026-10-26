@@ -4,12 +4,13 @@ import {
   canPlace, overlapping, findSpot, sizeOf, shuffle, attachTasche,
 } from './logic.js';
 import {
-  GENUS, SIEGEL_BONUS, findFusions, findSteigerungen, wrongOrderNeighbor, canRotate, nextRot, isNoun, isRune, runeBase,
+  GENUS, SIEGEL_BONUS, findFusions, wrongOrderNeighbor, canRotate, nextRot, isNoun, isRune, runeBase,
 } from './grammar.js';
+import { findTriples, mergeQuestion, applyMerge } from './sterne.js';
 import { G, loadData, save, loadRun, placedOf, itemsIn, gridOf, region, hero, playerCtx, emit } from './state.js';
 import { evaluateBag } from './mods.js';
 import {
-  $, fmt, fullName, genusChip, toast, bump, openModal, closeModal, modal, itemEl, buildGrid, drawItems,
+  $, fmt, fullName, genusChip, toast, bump, openModal, closeModal, modal, itemEl, buildGrid, drawItems, mergeAnimation,
 } from './ui.js';
 import { startNight } from './battle-ui.js';
 import { runEncounter } from './encounters.js';
@@ -226,6 +227,7 @@ function render() {
   renderInfo();
   save();
   emit('render');
+  setTimeout(checkMerges, 0);
 }
 
 function renderTop() {
@@ -405,7 +407,7 @@ function renderInfo() {
     if (canRotate(base)) btn(isRune(base) ? '⟳ Pfeil drehen' : '⟳ Drehen', () => rotateInPlace(uid));
     if (selected.src === 'bag') btn('📦 Ins Lager', () => moveAuto(uid, 'store'));
     else btn('🎒 In den Rucksack', () => moveAuto(uid, 'bag'));
-    btn(`Verkaufen <span class="price">+${sellValue(base)} 🪙</span>`, () => sell(uid), 'danger');
+    btn(`Verkaufen <span class="price">+${sellValue(G.DEFS[placedOf(uid).id], placedOf(uid).stern || 1)} 🪙</span>`, () => sell(uid), 'danger');
   }
   box.append(actions);
 }
@@ -533,7 +535,6 @@ function renderSummary(box) {
   const reg = region();
   const boss = G.ENEMIES.find((e) => e.id === reg.boss);
   const fusions = findFusions(itemsIn('bag'), G.DEFS, G.RECIPES);
-  const steig = findSteigerungen(itemsIn('bag'), G.DEFS);
   box.innerHTML = `
     <h2>Dein Rucksack</h2>
     ${ctx.hero ? `<p class="gram">${ctx.hero.emoji} <b>${ctx.hero.name}</b>: ${ctx.hero.staerke}</p>` : ''}
@@ -541,7 +542,6 @@ function renderSummary(box) {
     ${ctx.fate ? `<p class="gram">${ctx.fate.emoji} <b>Schicksalsrune</b>: ${ctx.fate.text}</p>` : ''}
     <ul class="stats">${rows.map(([a, b]) => `<li><span>${a}</span><b>${b}</b></li>`).join('')}</ul>
     ${fusions.length ? `<p class="gram ok">✓ Morgen verschmelzen: ${fusions.map((f) => G.DEFS[f.id].name).join(', ')}</p>` : ''}
-    ${steig.length ? `<p class="gram ok">✓ Morgen gesteigert: ${steig.map((s) => G.DEFS[s.id].name).join(', ')}</p>` : ''}
     ${run.day === reg.tage[1] ? `<p class="gram bad"><b>Heute Nacht wartet der Anführer: ${boss.emoji} ${boss.name}!</b></p>` : `<p class="muted">${boss.emoji} ${boss.name} wartet am ${reg.tage[1]}. Tag.</p>`}
     <h3>So geht's</h3>
     <p class="muted">Ziehe Items aus dem Laden in den Rucksack. Tippe ein Item an für Infos, tippe nochmal zum Drehen. Beim Ziehen dreht ein zweiter Finger das Item.</p>
@@ -602,10 +602,11 @@ function buyTasche(slot) {
 function sell(uid) {
   const p = placedOf(uid);
   const def = G.DEFS[p.id];
+  const wert = sellValue(def, p.stern || 1);
   G.run.items = G.run.items.filter((i) => i !== p);
-  G.run.gold += sellValue(def);
+  G.run.gold += wert;
   selected = null;
-  toast(`${fullName(def)} verkauft: +${sellValue(def)} 🪙`);
+  toast(`${fullName(def)} verkauft: +${wert} 🪙`);
   bump('stat-gold');
   render();
 }
@@ -690,28 +691,30 @@ function confirmNew() {
 // ---------- Verschmelzen (zu Beginn des Tages) ----------
 
 function runFusions(done) {
-  showFusion(findFusions(itemsIn('bag'), G.DEFS, G.RECIPES), 0, () => runSteigerungen(done));
+  showFusion(findFusions(itemsIn('bag'), G.DEFS, G.RECIPES), 0, done);
 }
 
-// Drei gleiche Runen nebeneinander: Grundform → Komparativ → Superlativ.
-function runSteigerungen(done) {
-  const list = findSteigerungen(itemsIn('bag'), G.DEFS);
-  if (list.length) emit('tipp', { key: 'steigerung' });
-  showSteigerung(list, 0, done);
+// ---------- Drei gleiche ergeben einen besseren (Sternstufen) ----------
+
+let merging = false;
+
+// Prüft nach jeder Änderung, ob drei gleiche Gegenstände im Besitz sind (Rucksack + Lager).
+function checkMerges() {
+  if (merging || !G.run || G.run.over || !$('modal').hidden || drag || $('game').hidden) return;
+  const groups = findTriples(G.run.items, G.DEFS);
+  if (!groups.length) return;
+  merging = true;
+  showMerge(groups[0]);
 }
 
-function showSteigerung(list, i, done) {
+function showMerge(group) {
   const run = G.run;
-  if (i >= list.length) { render(); done(); return; }
-  const s = list[i];
-  if (s.runen.some((r) => placedOf(r.uid)?.area !== 'bag')) { showSteigerung(list, i + 1, done); return; }
-  const from = G.DEFS[s.runen[0].id], to = G.DEFS[s.id];
-  const base = G.DEFS[runeBase(from)];
-  const st = base.steigerung;
-  const toSup = to.stufe === 3;
-  const options = shuffle([to.name, ...(toSup ? st.falschS : st.falschK)]);
-  const stufeName = toSup ? 'Superlativ (höchste Stufe)' : 'Komparativ (Vergleichsstufe)';
-  const regel = `${base.name} → ${st.komparativ} → ${st.superlativ}${st.unregelmaessig ? ' – eine unregelmäßige Steigerung!' : ''}`;
+  const d = G.DEFS[group.ziel.id];
+  const q = mergeQuestion(group, G.DEFS);
+  const sternNeu = group.neu.stern;
+  const ziel = sternNeu ? '★'.repeat(sternNeu) : G.DEFS[group.neu.id].abzeichen;
+  if (group.typ === 'rune') emit('tipp', { key: 'steigerung' });
+  else emit('tipp', { key: 'sterne' });
   let tries = 0, feedback = '';
   const wrong = new Set();
 
@@ -719,47 +722,46 @@ function showSteigerung(list, i, done) {
     const paid = tries > 0 && !run.tutorial;
     const broke = paid && run.gold < 1;
     const card = openModal(`
-      <div class="fusion-eq">${[0, 1, 2].map(() => `<span class="fi">${from.emoji}<small>${from.name}</small></span>`).join('<span class="op">+</span>')}</div>
-      <p class="enc-progress">Drei gleiche Runen werden zur nächsten Stufe: ${stufeName}</p>
-      <h2 class="enc-q">${from.name} → <span class="blank">___</span></h2>
-      <div class="row wrap">${options.map((o, k) => `<button class="btn opt-btn" data-k="${k}" ${wrong.has(k) || broke ? 'disabled' : ''}>${o}</button>`).join('')}</div>
-      <p class="cost">${paid ? `Jeder weitere Versuch kostet 1 🪙 · du hast ${run.gold} 🪙` : 'Erster Versuch kostenlos'}</p>
+      <div class="fusion-eq">${[0, 1, 2].map(() => `<span class="fi">${d.emoji}<small>${d.name}</small></span>`).join('<span class="op">+</span>')}
+        <span class="op">=</span><span class="fi glowing merge-goal" style="--glow:#ffd65a">${d.emoji}<em class="goal-stars">${ziel}</em></span></div>
+      <p class="enc-progress">Drei gleiche werden zu einem stärkeren! ${q.titel}</p>
+      <h2 class="enc-q">${q.prompt}</h2>
+      <div class="row wrap">${q.options.map((o, k) => `<button class="btn opt-btn" data-k="${k}" ${wrong.has(k) || broke ? 'disabled' : ''}>${o}</button>`).join('')}</div>
+      <p class="cost">${run.tutorial ? (tries ? 'Probier es noch einmal!' : '') : paid ? `Jeder weitere Versuch kostet 1 🪙 · du hast ${run.gold} 🪙` : 'Erster Versuch kostenlos'}</p>
       ${feedback ? `<p class="feedback">${feedback}</p>` : ''}
-      ${broke ? '<p class="feedback">Kein Gold für einen weiteren Versuch.</p>' : ''}
-      <div class="row"><button class="btn small" data-later>Heute nicht steigern</button></div>`);
-    card.querySelectorAll('[data-k]').forEach((b) => { b.onclick = () => guess(options[+b.dataset.k], +b.dataset.k); });
-    card.querySelector('[data-later]').onclick = () => { closeModal(); showSteigerung(list, i + 1, done); };
+      ${broke ? '<div class="row"><button class="btn primary" data-anyway>Trotzdem verschmelzen</button></div>' : ''}`, 'merge-card');
+    card.querySelectorAll('[data-k]').forEach((b) => { b.onclick = () => guess(+b.dataset.k); });
+    card.querySelector('[data-anyway]')?.addEventListener('click', () => doMerge());
   };
 
-  const guess = (o, k) => {
-    if (tries > 0) {
+  const guess = (k) => {
+    if (tries > 0 && !run.tutorial) {
       if (run.gold < 1) return;
       run.gold -= 1;
       bump('stat-gold');
     }
     tries++;
-    if (o === to.name) {
-      run.lernen.richtig++;
-      const keep = placedOf(s.mitte.uid);
-      const others = new Set(s.runen.filter((r) => r.uid !== keep.uid).map((r) => r.uid));
-      run.items = run.items.filter((p) => !others.has(p.uid));
-      keep.id = to.id;
-      selected = { src: 'bag', uid: keep.uid };
-      render();
-      const card = openModal(`
-        <div class="big-emoji">${to.emoji}<sup class="lvl">${to.abzeichen}</sup></div>
-        <h2>${to.name}</h2>
-        <p>Richtig! ${regel}</p>
-        <p class="muted">Die Rune wirkt jetzt 50 % stärker.</p>
-        <div class="row"><button class="btn primary big" data-next>Weiter</button></div>`);
-      card.querySelector('[data-next]').onclick = () => { closeModal(); showSteigerung(list, i + 1, done); };
-      return;
-    }
+    if (q.options[k] === q.correct) { run.lernen.richtig++; doMerge(); return; }
     run.lernen.falsch++;
     wrong.add(k);
-    feedback = `✗ ${regel}`;
+    feedback = `✗ ${q.explain}`;
     save();
     draw();
+  };
+
+  const doMerge = () => {
+    const rects = group.teile.map((p) => document.querySelector(`.item[data-uid="${p.uid}"]`)?.getBoundingClientRect()).filter(Boolean);
+    closeModal();
+    const p = applyMerge(run, group, G.DEFS);
+    selected = p && !run.tutorial ? { src: p.area, uid: p.uid } : null;
+    merging = false;
+    render();
+    if (p) {
+      const nd = G.DEFS[p.id];
+      mergeAnimation(rects, document.querySelector(`.item[data-uid="${p.uid}"]`), nd.emoji);
+      toast(p.stern ? `${'★'.repeat(p.stern)} ${nd.name}: jetzt viel stärker!` : `Rune gesteigert: ${nd.name}!`);
+      emit('verschmolzen', { id: p.id, stern: p.stern || 1 });
+    }
   };
 
   draw();
@@ -809,6 +811,8 @@ function showFusion(list, i, done) {
       run.lernen.richtig++;
       run.items = run.items.filter((p) => p !== k);
       t.id = cd.id;
+      const st = Math.max(k.stern || 1, t.stern || 1);
+      if (st > 1) t.stern = st;
       selected = { src: 'bag', uid: t.uid };
       render();
       const card = openModal(`
@@ -899,7 +903,7 @@ function startDrag() {
 
 function makeGhost() {
   drag.ghost?.remove();
-  drag.ghost = itemEl(drag.def, drag.rot, cell);
+  drag.ghost = itemEl(drag.def, drag.rot, cell, drag.ref.uid ? placedOf(drag.ref.uid).stern || 1 : 1);
   drag.ghost.classList.add('ghost');
   document.body.append(drag.ghost);
 }

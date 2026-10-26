@@ -889,3 +889,26 @@ h2 .hint { font-size: 12px; font-weight: 400; color: var(--ink-soft); }
 #tut-bubble.compact .tut-tip { font-size: 14px; }
 #modal.tut-shift { justify-content: flex-end; padding-right: 16px; }
 #modal.tut-shift .modal-card { min-width: 0; max-width: min(520px, calc(100vw - 300px)); padding: 18px 20px; }
+
+/* ---------- Sternstufen ---------- */
+.item .stars {
+  position: absolute;
+  top: 1px; left: 50%;
+  transform: translateX(-50%);
+  color: #ffd23f;
+  font-weight: 900;
+  letter-spacing: -1px;
+  line-height: 1;
+  text-shadow: 0 0 2px #7a4a00, 0 1px 0 #7a4a00, 0 0 8px rgba(255,200,40,.9);
+  pointer-events: none;
+  z-index: 2;
+  white-space: nowrap;
+}
+.item.s2 { border-color: #e0a526; box-shadow: 0 3px 0 var(--line), 0 0 12px rgba(255,200,40,.75); }
+.item.s3 { border-color: #ffcf33; background: linear-gradient(160deg, #fff7d6, #ffd977); box-shadow: 0 3px 0 var(--line), 0 0 20px rgba(255,190,0,1); }
+.item.merged { animation: mergedGlow 1.2s ease-out; }
+@keyframes mergedGlow { 0% { transform: scale(1.35); filter: brightness(1.8); } 100% { transform: scale(1); filter: none; } }
+.merge-fly { position: fixed; left: 0; top: 0; z-index: 500; font-family: var(--emoji); font-size: 44px; pointer-events: none; filter: drop-shadow(0 0 10px #ffd65a); }
+.merge-star { position: fixed; left: 0; top: 0; z-index: 500; font-size: 24px; color: #ffd23f; pointer-events: none; text-shadow: 0 0 8px #ffb800; }
+.goal-stars { font-family: var(--font) !important; color: #e0a526; font-size: .32em !important; top: 4px !important; right: 6px !important; text-shadow: 0 0 4px #fff; }
+.modal-card.merge-card .enc-q small { font-size: .6em; color: var(--ink-soft); }

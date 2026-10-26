@@ -1,6 +1,6 @@
 // Gemeinsame Bausteine der Oberfläche: Fenster, Hinweise, Item-Kacheln und Raster.
 import { sizeOf } from './logic.js';
-import { GENUS, findFusions, findSteigerungen, isRune, runeTargetCell } from './grammar.js';
+import { GENUS, findFusions, isRune, runeTargetCell } from './grammar.js';
 import { G } from './state.js';
 
 export const $ = (id) => document.getElementById(id);
@@ -58,7 +58,7 @@ export function modal(html, handlers = {}, cls = '') {
 
 // ---------- Items ----------
 
-export function itemEl(def, rot, size) {
+export function itemEl(def, rot, size, stern = 1) {
   const s = sizeOf(def, rot);
   const el = document.createElement('div');
   const passive = !def.abklingzeit && def.art !== 'siegel' && def.art !== 'rune';
@@ -70,6 +70,16 @@ export function itemEl(def, rot, size) {
   const cd = document.createElement('div');
   cd.className = 'cd';
   el.append(cd);
+
+  if (stern > 1) {
+    // Sternstufe gut sichtbar oben in der Mitte
+    el.classList.add('s' + stern);
+    const st = document.createElement('span');
+    st.className = 'stars';
+    st.textContent = '★'.repeat(stern);
+    st.style.fontSize = Math.max(12, Math.round(size * 0.2)) + 'px';
+    el.append(st);
+  }
 
   if (def.art === 'siegel') {
     // Artikel-Siegel: Wort auf Genusfarbe
@@ -152,12 +162,11 @@ export function drawItems(gridEl, grid, placed, size, info, area) {
   const fusing = new Set();
   if (area === 'bag') {
     for (const f of findFusions(placed, G.DEFS, G.RECIPES)) fusing.add(f.kraft.uid).add(f.traeger.uid);
-    for (const s of findSteigerungen(placed, G.DEFS)) for (const r of s.runen) fusing.add(r.uid);
   }
 
   for (const p of placed) {
     const def = G.DEFS[p.id];
-    const it = itemEl(def, p.rot, size);
+    const it = itemEl(def, p.rot, size, p.stern || 1);
     it.dataset.tut = 'item-' + p.id;
     it.style.left = p.x * size + 'px';
     it.style.top = p.y * size + 'px';
@@ -216,4 +225,39 @@ function drawRuneLines(gridEl, grid, placed, size, info) {
     svg.append(l);
   }
   gridEl.append(svg);
+}
+
+// Verschmelz-Animation: die drei Teile fliegen zusammen, Glanz, Sterne erscheinen.
+export function mergeAnimation(fromRects, toEl, emoji) {
+  if (!toEl) return;
+  const to = toEl.getBoundingClientRect();
+  const cx = to.left + to.width / 2, cy = to.top + to.height / 2;
+  for (const r of fromRects) {
+    const f = document.createElement('div');
+    f.className = 'merge-fly';
+    f.textContent = emoji;
+    document.body.append(f);
+    const sx = r.left + r.width / 2, sy = r.top + r.height / 2;
+    f.animate?.([
+      { transform: `translate(${sx - 24}px, ${sy - 24}px) scale(1)`, opacity: 1 },
+      { transform: `translate(${cx - 24}px, ${cy - 24}px) scale(.6)`, opacity: 1, offset: 0.8 },
+      { transform: `translate(${cx - 24}px, ${cy - 24}px) scale(.2)`, opacity: 0 },
+    ], { duration: 700, easing: 'ease-in' });
+    setTimeout(() => f.remove(), 720);
+  }
+  setTimeout(() => {
+    toEl.classList.add('merged');
+    for (let i = 0; i < 10; i++) {
+      const s = document.createElement('div');
+      s.className = 'merge-star';
+      s.textContent = i % 2 ? '★' : '✨';
+      document.body.append(s);
+      const a = (i / 10) * Math.PI * 2;
+      s.animate?.([
+        { transform: `translate(${cx - 12}px, ${cy - 12}px) scale(.4)`, opacity: 1 },
+        { transform: `translate(${cx - 12 + Math.cos(a) * 90}px, ${cy - 12 + Math.sin(a) * 90}px) scale(1.2)`, opacity: 0 },
+      ], { duration: 900, easing: 'ease-out' });
+      setTimeout(() => s.remove(), 920);
+    }
+  }, 650);
 }
