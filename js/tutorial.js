@@ -97,6 +97,7 @@ function stop() {
   try { speechSynthesis.cancel(); } catch { /* ohne Sprachausgabe */ }
   el['tut-layer'].hidden = true;
   el['tut-layer'].classList.remove('finale');
+  document.getElementById('modal').classList.remove('tut-shift');
   closeModal();
   G.run = loadRun(); // der gespeicherte normale Lauf (oder keiner)
 }
@@ -210,6 +211,8 @@ function draw() {
 // Spotlight-Löcher, Leuchtrahmen und Sprechblase neben den Zielen.
 function layout() {
   if (!active) return;
+  const modal = document.getElementById('modal');
+  if (modal.hidden) modal.classList.remove('tut-shift');
   const s = step();
   const rects = shown ? targetsOf(s).map((e) => e.getBoundingClientRect()) : [];
   const pad = 8;
@@ -220,6 +223,24 @@ function layout() {
 
 function placeBubble(rects) {
   const b = el['tut-bubble'];
+  // Erst in normaler Größe versuchen, dann kompakt; reicht der Platz neben einem Fenster nicht,
+  // rückt das Fenster zur Seite – die Sprechblase soll nie etwas Wichtiges verdecken.
+  for (const compact of [false, true]) {
+    b.classList.toggle('compact', compact);
+    if (tryPlace(b, rects, false)) return;
+  }
+  const modal = document.getElementById('modal');
+  if (rects.length && !modal.hidden && !modal.classList.contains('tut-shift')) {
+    modal.classList.add('tut-shift');
+    requestAnimationFrame(layout);
+    return;
+  }
+  tryPlace(b, rects, true);
+}
+
+// Setzt die Sprechblase neben die Ziele. Ohne Platz: false (oder mit force in die beste Ecke).
+
+function tryPlace(b, rects, force) {
   const W = window.innerWidth, H = window.innerHeight, m = 12;
   b.style.left = '0px';
   b.style.top = '0px';
@@ -227,7 +248,7 @@ function placeBubble(rects) {
   if (!rects.length) {
     b.style.left = `${(W - bw) / 2}px`;
     b.style.top = `${(H - bh) / 2}px`;
-    return;
+    return true;
   }
   const u = rects.reduce((a, r) => ({
     left: Math.min(a.left, r.left), top: Math.min(a.top, r.top), right: Math.max(a.right, r.right), bottom: Math.max(a.bottom, r.bottom),
@@ -242,6 +263,7 @@ function placeBubble(rects) {
     { x: cx, y: u.top - 20 - bh, fits: u.top - 20 - m - 50 >= bh },
   ];
   let best = options.find((o) => o.fits);
+  if (!best && !force) return false;
   if (!best) {
     // Kein Platz neben den Zielen: die Ecke wählen, die am wenigsten Ziele verdeckt.
     const corners = [[m, H - bh - m], [W - bw - m, H - bh - m], [m, 60], [W - bw - m, 60]];
@@ -251,6 +273,7 @@ function placeBubble(rects) {
   }
   b.style.left = `${clampX(best.x)}px`;
   b.style.top = `${clampY(best.y)}px`;
+  return true;
 }
 
 // ---------- Hand ----------

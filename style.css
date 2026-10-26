@@ -880,3 +880,12 @@ h2 .hint { font-size: 12px; font-weight: 400; color: var(--ink-soft); }
 }
 #tip-bubble p { margin: 0; font-size: 16px; line-height: 1.4; font-weight: 700; flex: 1; }
 .tip-fenwick { font-family: var(--emoji); font-size: 36px; }
+
+/* Tutorial auf kleinen Bildschirmen: kompakte Sprechblase, Fenster rückt zur Seite */
+#tut-bubble.compact { width: min(270px, calc(100vw - 24px)); padding: 10px 12px; gap: 8px; }
+#tut-bubble.compact .tut-fenwick { font-size: 34px; }
+#tut-bubble.compact .tut-fenwick img { width: 44px; height: 44px; }
+#tut-bubble.compact .tut-text { font-size: 16px; }
+#tut-bubble.compact .tut-tip { font-size: 14px; }
+#modal.tut-shift { justify-content: flex-end; padding-right: 16px; }
+#modal.tut-shift .modal-card { min-width: 0; max-width: min(520px, calc(100vw - 300px)); padding: 18px 20px; }

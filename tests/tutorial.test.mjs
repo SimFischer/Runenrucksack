@@ -170,7 +170,7 @@ test('Nach dem Tutorial startet ein normaler Lauf ohne Tutorial-Reste', () => {
   const run = newRun(ITEMS, REGIONS, { hero: json('heroes.json').helden[0], fates: json('heroes.json').schicksalsrunen });
   assert.equal(run.tutorial, undefined);
   assert.equal(run.gold, 12);
-  assert.equal(run.shop.filter(Boolean).length, 5);
+  assert.ok(run.shop.filter(Boolean).length >= 5, 'voller Laden (6 Plätze mit der Rune des Marktes)');
   assert.ok(run.queue.includes('gebiet'));
 });
 

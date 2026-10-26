@@ -2,9 +2,49 @@
 
 Ein Fantasy-Backpack-Battler fürs iPad (Querformat) als Web-App, in dem Grammatik das Regelwerk der Kombos ist. Das vollständige Spielkonzept steht in [konzept.md](konzept.md).
 
-**Stand: Etappe 3 – Pfad 1 vollständig**
+**Stand: Etappe 3 – Pfad 1 vollständig, mit Tutorial „Der erste Tag“**
 
 Spielen: <https://simfischer.github.io/Runenrucksack/> – auf dem iPad in Safari öffnen, **Teilen → Zum Home-Bildschirm**, dann startet es wie eine App im Vollbild und läuft auch offline.
+
+## Der erste Tag (Tutorial)
+
+Beim Öffnen fragt das Spiel: **„Ich bin zum ersten Mal hier“** (startet das Tutorial) oder **„Ich kenne das schon“** (Startmenü). Hat das Gerät das Tutorial schon einmal abgeschlossen, ist „Ich kenne das schon“ hervorgehoben – gefragt wird trotzdem, weil sich oft mehrere Kinder ein iPad teilen.
+
+Meister Fenwick 🧙 führt in 3–4 Minuten durch einen echten, aber festgelegten Lauf: Schwert kaufen, Infos ansehen, drehen, Lager, Feuer-Kristall verschmelzen (mit Artikelwahl), das-Siegel, Rune „scharf“, Kampf gegen den Strohpuppen-Ork, Sieg und Herzen, eine leichte Begegnung. Alles außer dem Ziel ist abgedunkelt, eine Hand zeigt Tippen und Ziehen, nach 8 Sekunden ohne Aktion kommt ein Zusatz-Tipp, 🔊 liest vor (wenn das Gerät eine deutsche Stimme hat). Falsche Aktionen werden freundlich zurückgesetzt. Der Tutorial-Lauf wird nicht gespeichert und zählt nicht.
+
+Jederzeit: **„Tutorial überspringen“** oben rechts. Im Menü: **„Tutorial wiederholen“**, **„So geht's“** (Übersicht zum Nachschlagen) und **„Erste-Mal-Tipps“** an/aus (Fenwick meldet sich einmal pro Lauf beim ersten Boss, Gebietswechsel, der ersten Steigerung und der Unterklasse).
+
+### Tutorial-Texte ändern und Schritte ergänzen
+
+Alles steht in `tutorial.json`:
+
+- **Texte ändern:** Bei einem Schritt `text` (höchstens zwei kurze Sätze), `tipp` (erscheint nach 8 Sekunden ohne Aktion) und die `falsch`-Hinweise anpassen. Die Karten für „So geht's“ stehen im Feld `hilfe` des jeweiligen Schritts, die Erste-Mal-Tipps unter `tipps`.
+- **Neuer Schritt:** ein Objekt in `schritte` einfügen – an der Stelle, an der er im Ablauf kommen soll:
+
+  ```json
+  {
+    "id": "taschen",
+    "voraussetzung": "taschen",
+    "text": "Taschen machen deinen Rucksack größer.",
+    "ziel": ["rucksack"],
+    "aktion": { "typ": "weiter" },
+    "hilfe": { "titel": "Taschen", "emoji": "🧺", "animation": "pulsieren", "text": "Eine Tasche gibt dir zwei Felder mehr." }
+  }
+  ```
+
+| Feld | Bedeutung |
+| --- | --- |
+| `ziel` | Namen aus `data-tut`-Attributen; nur diese Elemente sind hell und bedienbar. Fest im HTML: `gold`, `herzen`, `siege`, `laden`, `rucksack`, `lager`, `info`, `kampf`, `menue`, `tempo`, `kampf-rucksack`, `fenster` (das offene Fenster). Für Items: `item-<id>` im Rucksack, `laden-<id>` im Laden. |
+| `aktion.typ` | `weiter` (Knopf), `kaufen`, `antippen`, `drehen`, `neben` (Kristall links neben Träger), `verschmelzen`, `siegel`, `rune`, `ereignis` (z. B. `kampfStart`, `nachKampf`, `begegnungFertig`), `abschluss` |
+| `laden` | fester Laden-Inhalt ab diesem Schritt (Item-ids) |
+| `hand` | `{ "typ": "tippen", "auf": "<ziel>" }` oder `{ "typ": "ziehen", "von": "<ziel>", "nach": "rucksack" | "links-von:<id>" | "neben:<id>" }` |
+| `falsch` | Liste von `{ "wenn": { "item", "bereich" }, "text", "zuruecksetzen" }` – freundlicher Hinweis, bei `zuruecksetzen` wandert das Item zurück in den Laden |
+| `voraussetzung` | Schritt nur, wenn es die Funktion gibt. Die vorhandenen Funktionen stehen in `FEATURES` in `js/tutorial-logic.js`; `buch` und `heldencode` fehlen noch, darum werden diese Schritte übersprungen. Etappe 4 trägt sie dort ein. |
+| `kampfPause`, `zeigenBei` | Kampf kurz anhalten und erklären; Sprechblase erst bei einem Ereignis zeigen (z. B. `kampfEnde`) |
+
+Der Übungsgegner (`uebungsgegner`) steht in `enemies.json` mit `"uebung": true` und festen Gegenständen (`ausruestung`). Ein Bild für Fenwick wird automatisch benutzt, sobald es unter `assets/figur-fenwick.webp` liegt.
+
+Nach Änderungen: `node --test` prüft, dass jeder Schritt erreichbar ist und höchstens zwei Sätze hat; `node tools/tutorial-browsertest.mjs` spielt das Tutorial im Browser durch (siehe unten).
 
 ## So läuft ein Lauf
 
@@ -44,6 +84,7 @@ Alle Inhalte stehen in JSON-Dateien. Jede Datei hat oben ein Feld `_hinweis`, da
 | `enemies.json` | Die Orks: Vorlieben beim Packen und die falschen Wörter auf ihren Rüstungen |
 | `regions.json` | Die Gebiete: Tage, Farben, Wortfeld, Gegner, Boss |
 | `heroes.json` | Startfiguren mit Bonus, Start-Items und Unterklassen; die sechs Schicksalsrunen |
+| `tutorial.json` | Tutorial „Der erste Tag“: Schritte, Texte, Hilfe-Karten für „So geht's“, Erste-Mal-Tipps |
 
 ### Beispiele
 
@@ -80,6 +121,15 @@ node --test
 | `tests/begegnungen.test.mjs` | Begegnungen, Aufgaben (genau eine Lösung), Rucksack-Wachstum, Kobold-Fluch |
 | `tests/ablauf.test.mjs` | Gebiete, Bosse, Figuren, Schicksalsrunen, Unterklassen, Taschen, Ork-Rüstungen |
 | `tests/balance.test.mjs` | 200 simulierte Läufe: Siegquote pro Tag, Siege und Spielzeit |
+| `tests/tutorial.test.mjs` | Tutorial komplett durchspielen, Zurücksetzen, Überspringen fehlender Funktionen, danach normaler Lauf |
+
+Das Tutorial in einem echten Browser per Touch durchspielen (braucht Chrome oder Edge; Server vorher mit `node tools/serve.mjs` starten):
+
+```bash
+node tools/tutorial-browsertest.mjs http://localhost:8080/ 1180 820
+```
+
+Breite und Höhe lassen sich ändern, z. B. `1024 768` für kleinere iPads.
 
 Aktuelle Balance (200 Läufe, einfache Kaufstrategie, Aufgaben zu 75 % richtig): Tag 1 etwa 82 % Siegchance, im Schnitt 6,8 Siege, geschätzt 13–14 Minuten pro Lauf, Kämpfe etwa 12 Sekunden. Die Stellschrauben (Startgold, Gold pro Tag, Leben pro Tag, Gegnerbudget) stehen oben und im Abschnitt „Gegner“ in `js/logic.js`.
 
@@ -96,6 +146,8 @@ Aktuelle Balance (200 Läufe, einfache Kaufstrategie, Aufgaben zu 75 % richtig):
 | `index.html`, `style.css` | Bildschirme und Aussehen |
 | `js/main.js` | Ablauf eines Laufs, Laden, Rucksack (Ziehen und Drehen), Info-Feld, Verschmelzen und Steigern |
 | `js/encounters.js` | Begegnungen am Morgen mit ihren Aufgaben |
+| `js/tutorial.js` | Tutorial: Spotlight, Sprechblase, Hand, Vorlesen, „So geht's“, Erste-Mal-Tipps |
+| `js/tutorial-logic.js` | Tutorial ohne Darstellung: aktive Schritte, Prüfen, Zurücksetzen (testbar) |
 | `js/battle-ui.js` | Kampfanzeige und Fehler auf der Ork-Rüstung |
 | `js/ui.js` | Gemeinsame Bausteine: Fenster, Item-Kacheln, Raster |
 | `js/state.js` | Geladene Inhalte und Speichern im Browser |
@@ -107,5 +159,6 @@ Aktuelle Balance (200 Läufe, einfache Kaufstrategie, Aufgaben zu 75 % richtig):
 | `sw.js`, `manifest.webmanifest`, `icons/` | PWA (offline, Home-Bildschirm) |
 | `tools/serve.mjs` | lokaler Testserver |
 | `tools/make-icons.mjs` | erzeugt die App-Symbole neu |
+| `tools/tutorial-browsertest.mjs` | spielt das Tutorial im Browser per Touch durch |
 
 Kein Server, keine Accounts, keine externen Dienste. Der laufende Lauf wird nur im Browser gemerkt.
