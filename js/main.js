@@ -12,6 +12,7 @@ import {
   $, fmt, fullName, genusChip, toast, bump, openModal, closeModal, modal, itemEl, buildGrid, drawItems,
 } from './ui.js';
 import { startNight } from './battle-ui.js';
+import { runEncounter } from './encounters.js';
 
 let selected = null;   // { src: 'bag'|'store'|'shop', uid?, slot? }
 let drag = null;
@@ -88,6 +89,7 @@ function continueFlow() {
   if (!step) return;
   const next = () => { G.run.queue.shift(); continueFlow(); };
   if (step === 'gebiet') showRegion(next);
+  else if (step === 'begegnung') runEncounter(next, render);
   else if (step === 'verschmelzen') runFusions(next);
   else next();
 }
@@ -119,13 +121,18 @@ function showRegion(next) {
 // ---------- Größen ----------
 
 function layout() {
+  computeCell();
+  if (!$('game').hidden) render();
+}
+
+// Feldgröße aus Fenstergröße und aktueller Rucksackgröße.
+function computeCell() {
   const w = window.innerWidth, h = window.innerHeight;
   const bag = G.run ? gridOf('bag') : { cols: 4, rows: 3 };
   const byW = (w - 380) / (bag.cols + CFG.storeCols);
   const byH = (h - 280) / (Math.max(bag.rows, CFG.storeRows) + 1.1);
   cell = Math.max(52, Math.min(130, Math.floor(Math.min(byW, byH))));
   document.documentElement.style.setProperty('--cell', cell + 'px');
-  if (!$('game').hidden) render();
 }
 
 // ---------- Hilfsfunktionen ----------
@@ -138,6 +145,7 @@ const sameRef = (a, b) => a && b && a.src === b.src && a.uid === b.uid && a.slot
 function render() {
   if (!G.run) return;
   applyTheme();
+  computeCell();
   bagInfo = evaluateBag(itemsIn('bag'), G.DEFS, playerCtx());
   renderTop();
   renderGrid('bag');
@@ -285,6 +293,8 @@ function renderInfo() {
   for (const k of Object.keys(EXPLAIN)) if (def[k]) notes.push(EXPLAIN[k]);
   for (const n of notes) box.insertAdjacentHTML('beforeend', `<p class="muted">${n}</p>`);
   for (const b of ana?.boni || []) box.insertAdjacentHTML('beforeend', `<p class="gram ok">${b}</p>`);
+  const cursed = selected.uid && placedOf(selected.uid)?.fluch;
+  if (cursed) box.insertAdjacentHTML('beforeend', `<p class="gram bad">😈 Verflucht: Der Kobold hat den Namen falsch geschrieben („${cursed}“). Solange es im Rucksack liegt, kostet es dich zu Kampfbeginn 2 Leben.</p>`);
 
   const gram = grammarNotes(base, ana, selected);
   if (gram.length) {

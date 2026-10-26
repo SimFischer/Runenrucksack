@@ -12,6 +12,8 @@ export const G = {
   RECIPES: null,
   REGIONS: [],
   HEROES: [],
+  ENCOUNTERS: null, // encounters.json
+  EXERCISES: null,  // exercises.json
   run: null,
 };
 
@@ -19,8 +21,9 @@ const SAVE_KEY = 'runenrucksack.lauf.v2';
 
 export async function loadData() {
   const get = (f) => fetch(f).then((r) => r.json());
-  const [itemData, enemyData, recipes, regions, heroes] = await Promise.all([
+  const [itemData, enemyData, recipes, regions, heroes, encounters, exercises] = await Promise.all([
     get('items.json'), get('enemies.json'), get('recipes.json'), get('regions.json'), get('heroes.json'),
+    get('encounters.json'), get('exercises.json'),
   ]);
   G.ITEMS = itemData.items;
   G.RAR = itemData.seltenheiten;
@@ -31,6 +34,8 @@ export async function loadData() {
   G.ENEMIES = enemyData.gegner;
   G.REGIONS = regions.gebiete;
   G.HEROES = heroes.helden;
+  G.ENCOUNTERS = encounters;
+  G.EXERCISES = exercises;
 }
 
 // ---------- Speichern (Komfort, nur in diesem Browser) ----------

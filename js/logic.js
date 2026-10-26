@@ -143,6 +143,7 @@ export function newRun(items, regions, opts = {}) {
     queue: ['gebiet'], // Schritte am Morgen, bevor der Laden öffnet
     lernen: { richtig: 0, falsch: 0 },
     hero: opts.hero?.id || null,
+    mods: [], // dauerhafte Boni aus Begegnungen
   };
   // Start-Items der Figur
   for (const s of opts.hero?.start || []) run.items.push({ uid: run.nextUid++, id: s.id, area: 'bag', x: s.x, y: s.y, rot: s.rot || 0 });
@@ -203,7 +204,7 @@ export function finishBattle(run, items, regions, won, enemyName, rng = Math.ran
   for (const s of run.shop) if (s) s.locked = false;
   run.queue = [];
   if (isRegionStart(run.day, regions)) run.queue.push('gebiet');
-  run.queue.push('verschmelzen');
+  run.queue.push('begegnung', 'verschmelzen');
 }
 
 // ---------- Gegner ----------
@@ -275,4 +276,99 @@ function randomSpot(placed, defs, def, grid, rng) {
       for (let x = 0; x < grid.cols; x++)
         if (canPlace(placed, defs, def, x, y, rot, grid)) spots.push({ x, y, rot });
   return spots.length ? pickOne(spots, rng) : null;
+}
+
+// ---------- Begegnungen ----------
+
+// Reihenfolge, in der der Rucksack durch die Eulenbibliothekarin wächst (bis 5×4).
+export const GROW_ORDER = [[4, 0], [4, 1], [4, 2], [0, 3], [1, 3], [2, 3], [3, 3], [4, 3]];
+
+export function growBag(run) {
+  for (const [x, y] of GROW_ORDER) {
+    const key = `${x},${y}`;
+    if (!run.bagCells.includes(key)) {
+      run.bagCells.push(key);
+      return { x, y };
+    }
+  }
+  return null;
+}
+
+export function shuffle(list, rng = Math.random) {
+  const a = [...list];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// Legt ein neues Item in den Rucksack, sonst ins Lager. Gibt das platzierte Item zurück oder null.
+export function addItem(run, defs, id, extra = {}) {
+  for (const [area, grid] of [['bag', bagGrid(run)], ['store', STORE_GRID]]) {
+    const placed = run.items.filter((p) => p.area === area);
+    const spot = findSpot(placed, defs, defs[id], grid);
+    if (spot) {
+      const p = { uid: run.nextUid++, id, area, ...spot, ...extra };
+      run.items.push(p);
+      return p;
+    }
+  }
+  return null;
+}
+
+// Wählt die Begegnungen für den Morgen (passend zum Gebiet, nicht dieselbe wie gestern zuerst).
+export function pickEncounters(run, data, regions, rng = Math.random) {
+  const reg = regionOf(run.day, regions).id;
+  const ok = data.begegnungen.filter((b) => !b.gebiete || b.gebiete.includes(reg));
+  const last = run.history.at(-1)?.begegnung;
+  const fresh = shuffle(ok.filter((b) => b.id !== last), rng);
+  return fresh.slice(0, data.auswahl || 3).map((b) => b.id);
+}
+
+// Baut die Fragen einer Aufgabe aus exercises.json.
+// Auswahl-Fragen: { prompt, options, correct, explain }. Tipp-Aufgaben: { tap: true, zeilen, ziel, explain }.
+export function makeTask(aufgabe, ex, rng = Math.random) {
+  const n = aufgabe.anzahl || 3;
+  switch (aufgabe.typ) {
+    case 'plural':
+      return shuffle(ex.plural, rng).slice(0, n).map((q) => ({
+        prompt: `Mehrzahl von <b>„${q.wort}“</b>?`,
+        options: shuffle([q.richtig, ...q.falsch], rng), correct: q.richtig, explain: q.regel,
+      }));
+    case 'artikel':
+      return shuffle(ex.artikel, rng).slice(0, n).map((q) => ({
+        prompt: `<span class="blank">___</span> <b>${q.wort}</b>`,
+        options: ['der', 'die', 'das'], correct: q.artikel, explain: `Es heißt ${q.artikel} ${q.wort}.`, genus: true,
+      }));
+    case 'personalform':
+      return shuffle(ex.personalformen, rng).slice(0, n).map((q) => ({
+        prompt: q.satz.replace('___', '<span class="blank">___</span>'),
+        options: shuffle([q.richtig, ...q.falsch], rng), correct: q.richtig, explain: q.regel,
+      }));
+    case 'speisekarte': {
+      const k = pickOne(ex.speisekarten, rng);
+      return [tapTask(k.zeilen.map((z) => z.split(' ')), k.erklaerung)];
+    }
+    default:
+      return [];
+  }
+}
+
+// Tipp-Aufgabe: genau ein Wort hat die Form "falsch|richtig".
+export function tapTask(zeilen, explain) {
+  let ziel = null;
+  const clean = zeilen.map((tokens, li) => tokens.map((t, ti) => {
+    if (!t.includes('|')) return t;
+    const [falsch, richtig] = t.split('|');
+    ziel = { zeile: li, wort: ti, falsch, richtig };
+    return falsch;
+  }));
+  return { tap: true, zeilen: clean, ziel, explain };
+}
+
+// Kobold: Name in Wortteilen, ein Teil ist falsch geschrieben.
+export function koboldTask(entry) {
+  const tokens = entry.teile.map((t, i) => (i === entry.fehler ? `${t}|${entry.richtig}` : t));
+  return { ...tapTask([tokens], entry.erklaerung), item: entry.item, falscherName: entry.teile.join(''), richtig: entry.richtig };
 }

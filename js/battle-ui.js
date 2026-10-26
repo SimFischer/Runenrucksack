@@ -7,7 +7,7 @@ import { evaluateBag } from './mods.js';
 import { $, fmt, buildGrid, drawItems } from './ui.js';
 
 let battle = null, enemy = null, speed = 1, rafId = 0, lastFrame = 0, itemEls = {}, onDone = null;
-let bcell = 100;
+let bcell = 100, selfHit = 0;
 
 function enemyPool(day) {
   const base = G.ITEMS.filter((d) => d.art !== 'siegel' && d.art !== 'rune' && d.art !== 'tasche');
@@ -31,8 +31,9 @@ export function startNight(done) {
   const ctx = playerCtx();
   const bag = itemsIn('bag');
   const player = makeFighter(hero()?.name || 'Dein Rucksack', bag, G.DEFS, run.day, {
-    info: evaluateBag(bag, G.DEFS, ctx), leben: ctx.leben, tempo: ctx.tempo,
+    info: evaluateBag(bag, G.DEFS, ctx), leben: ctx.leben, tempo: ctx.tempo, selbstschaden: ctx.selbstschaden,
   });
+  selfHit = ctx.selbstschaden;
   const foe = makeFighter(enemy.name, enemy.items, G.DEFS, run.day);
   battle = new Battle(player, foe);
   itemEls = { player: {}, enemy: {} };
@@ -81,6 +82,7 @@ function setSpeed(s) {
 
 function beginBattle() {
   $('btn-start-battle').hidden = true;
+  if (selfHit) floater($('fighter-player'), `😈 -${selfHit} Fluch`, 'gift');
   lastFrame = performance.now();
   rafId = requestAnimationFrame(frame);
 }

@@ -1,0 +1,59 @@
+{
+  "_hinweis": "Begegnungen am Morgen. Nach jedem Kampf (außer dem letzten) stehen 'auswahl' zufällige Begegnungen zur Wahl. gebiete: nur in diesen Gebieten (fehlt = überall). aufgabe.typ: plural, artikel, speisekarte, personalform, kobold, tausch – die Wörter dazu stehen in exercises.json. belohnung.typ: feld, item, gold, mod, kobold, tausch.",
+  "auswahl": 3,
+  "begegnungen": [
+    {
+      "id": "eule",
+      "name": "Eulenbibliothekarin",
+      "emoji": "🦉",
+      "text": "„Huhu! Meine Bücher sind durcheinander. Hilfst du mir mit der Mehrzahl? Dann nähe ich dir eine neue Ecke an deinen Rucksack.“",
+      "aufgabe": { "typ": "plural", "anzahl": 3 },
+      "belohnung": { "typ": "feld", "text": "Rucksack +1 Feld" }
+    },
+    {
+      "id": "zwerg",
+      "name": "Rätselzwerg",
+      "emoji": "⛏️",
+      "text": "„Drei Rätsel, drei Wörter! Sag mir den richtigen Artikel, dann gebe ich dir etwas Seltenes aus meiner Truhe.“",
+      "aufgabe": { "typ": "artikel", "anzahl": 3 },
+      "belohnung": { "typ": "item", "seltenheit": "selten", "text": "ein seltenes Item" }
+    },
+    {
+      "id": "wirtin",
+      "name": "Wirtin vom „Krummen Kessel“",
+      "emoji": "🍲",
+      "text": "„Auf meiner Speisekarte hat sich ein Fehler versteckt! Findest du ihn? Dann gibt es Trinkgeld.“",
+      "aufgabe": { "typ": "speisekarte" },
+      "belohnung": { "typ": "gold", "menge": 4, "text": "4 Gold" }
+    },
+    {
+      "id": "haendler",
+      "name": "Fahrender Händler",
+      "emoji": "🐫",
+      "text": "„Tauschen, tauschen! Gib mir ein Item aus deinem Gepäck, und du bekommst eines meiner Schätze.“",
+      "aufgabe": { "typ": "tausch", "angebote": 3 },
+      "belohnung": { "typ": "tausch", "text": "ein Item tauschen" }
+    },
+    {
+      "id": "hirtin",
+      "name": "Pferdehirtin",
+      "emoji": "🐴",
+      "gebiete": ["hrossmark"],
+      "text": "„Meine Pferde verstehen nur richtige Verbformen. Hilf mir beim Zurufen, dann zeige ich dir, wie man schneller liest!“",
+      "aufgabe": { "typ": "personalform", "anzahl": 3 },
+      "belohnung": {
+        "typ": "mod",
+        "mod": { "filter": { "art": "verb" }, "abklingzeit": -15, "text": "Pferdehirtin: Schriftrollen laden 15 % schneller" },
+        "text": "alle Schriftrollen 15 % schneller"
+      }
+    },
+    {
+      "id": "kobold",
+      "name": "Zwielichtiger Kobold",
+      "emoji": "😈",
+      "text": "„Ein Geschenk für dich, hihi! Ein episches Item … aber in seinem Namen steckt ein Fehler. Findest du ihn nicht, beißt es dich!“",
+      "aufgabe": { "typ": "kobold" },
+      "belohnung": { "typ": "kobold", "text": "ein episches Item (mit Haken)" }
+    }
+  ]
+}

@@ -6,6 +6,14 @@ import { G } from './state.js';
 export const $ = (id) => document.getElementById(id);
 export const fmt = (n) => n.toLocaleString('de-DE', { maximumFractionDigits: 1 });
 export const fullName = (d) => (d.artikel ? `${d.artikel} ${d.name}` : d.name);
+// Name im Akkusativ, z. B. „den Speer“, „die Schriftrolle „stürmen““.
+export function nameAkk(d) {
+  if (d.art === 'verb') return `die Schriftrolle „${d.name}“`;
+  if (d.art === 'siegel') return `das Siegel „${d.name}“`;
+  if (d.art === 'rune') return `die Rune „${d.name}“`;
+  if (d.art === 'tasche') return `die ${d.name}`;
+  return d.artikel ? `${d.artikel === 'der' ? 'den' : d.artikel} ${d.name}` : d.name;
+}
 export const genusChip = (g) => `<span class="genus" style="--genus:${GENUS[g].farbe}">${g}</span>`;
 
 export function toast(text) {
@@ -160,6 +168,15 @@ export function drawItems(gridEl, grid, placed, size, info, area) {
       if (idle) it.classList.add('idle');
     }
     if (fusing.has(p.uid)) it.classList.add('fuses');
+    if (p.fluch) {
+      it.classList.add('cursed');
+      const l = it.querySelector('.label');
+      if (l) l.textContent = p.fluch;
+      const m = document.createElement('span');
+      m.className = 'mark-fluch';
+      m.textContent = '😈';
+      it.append(m);
+    }
     gridEl.append(it);
     els[p.uid] = it;
   }

@@ -1,0 +1,73 @@
+{
+  "_hinweis": "Aufgaben für die Begegnungen. Hier kannst du Wörter ändern oder ergänzen. Jede Aufgabe hat genau eine richtige Lösung. Bei der Speisekarte steht das falsch geschriebene Wort als falsch|richtig. Beim Kobold ist teile der falsch geschriebene Name in Wortteilen, fehler die Nummer des falschen Teils (ab 0).",
+
+  "plural": [
+    { "wort": "das Buch",   "richtig": "die Bücher",   "falsch": ["die Buchs", "die Buche"],    "regel": "Buch → Bücher: aus u wird ü, dazu kommt -er." },
+    { "wort": "der Apfel",  "richtig": "die Äpfel",    "falsch": ["die Apfels", "die Apfeln"],  "regel": "Apfel → Äpfel: nur der Umlaut ä kommt dazu." },
+    { "wort": "die Maus",   "richtig": "die Mäuse",    "falsch": ["die Mausen", "die Mäuser"],  "regel": "Maus → Mäuse: aus au wird äu, dazu kommt -e." },
+    { "wort": "das Haus",   "richtig": "die Häuser",   "falsch": ["die Hause", "die Hauses"],   "regel": "Haus → Häuser: aus au wird äu, dazu kommt -er." },
+    { "wort": "der Garten", "richtig": "die Gärten",   "falsch": ["die Gartens", "die Gartene"], "regel": "Garten → Gärten: nur der Umlaut ä kommt dazu." },
+    { "wort": "die Tür",    "richtig": "die Türen",    "falsch": ["die Türe", "die Türs"],      "regel": "Tür → Türen: dazu kommt -en." },
+    { "wort": "das Pferd",  "richtig": "die Pferde",   "falsch": ["die Pferder", "die Pferds"], "regel": "Pferd → Pferde: dazu kommt -e." },
+    { "wort": "der Sattel", "richtig": "die Sättel",   "falsch": ["die Sattels", "die Satteln"], "regel": "Sattel → Sättel: nur der Umlaut ä kommt dazu." },
+    { "wort": "die Kuh",    "richtig": "die Kühe",     "falsch": ["die Kuhs", "die Kuhen"],     "regel": "Kuh → Kühe: aus u wird ü, dazu kommt -e." },
+    { "wort": "das Schwert","richtig": "die Schwerter","falsch": ["die Schwerte", "die Schwerts"], "regel": "Schwert → Schwerter: dazu kommt -er." },
+    { "wort": "der Baum",   "richtig": "die Bäume",    "falsch": ["die Baums", "die Baumen"],   "regel": "Baum → Bäume: aus au wird äu, dazu kommt -e." },
+    { "wort": "die Blume",  "richtig": "die Blumen",   "falsch": ["die Blumes", "die Blümer"],  "regel": "Blume → Blumen: dazu kommt -n." },
+    { "wort": "das Ei",     "richtig": "die Eier",     "falsch": ["die Eis", "die Eie"],        "regel": "Ei → Eier: dazu kommt -er." },
+    { "wort": "der Wolf",   "richtig": "die Wölfe",    "falsch": ["die Wolfs", "die Wolfe"],    "regel": "Wolf → Wölfe: aus o wird ö, dazu kommt -e." }
+  ],
+
+  "artikel": [
+    { "wort": "Löffel",   "artikel": "der" },
+    { "wort": "Gabel",    "artikel": "die" },
+    { "wort": "Messer",   "artikel": "das" },
+    { "wort": "Kürbis",   "artikel": "der" },
+    { "wort": "Zwiebel",  "artikel": "die" },
+    { "wort": "Beet",     "artikel": "das" },
+    { "wort": "Zaun",     "artikel": "der" },
+    { "wort": "Schaufel", "artikel": "die" },
+    { "wort": "Fenster",  "artikel": "das" },
+    { "wort": "Sattel",   "artikel": "der" },
+    { "wort": "Mähne",    "artikel": "die" },
+    { "wort": "Fohlen",   "artikel": "das" },
+    { "wort": "Huf",      "artikel": "der" },
+    { "wort": "Weide",    "artikel": "die" },
+    { "wort": "Zaumzeug", "artikel": "das" },
+    { "wort": "Kessel",   "artikel": "der" },
+    { "wort": "Truhe",    "artikel": "die" },
+    { "wort": "Werkzeug", "artikel": "das" }
+  ],
+
+  "speisekarten": [
+    { "zeilen": ["Kürbissuppe mit Brot", "Pilzpfanne mit Kreutern|Kräutern", "Apfelkuchen mit Sahne"], "erklaerung": "Kräuter kommt von Kraut – darum schreibt man äu." },
+    { "zeilen": ["Bratkartoffeln mit Speck", "Gemüse aus dem Gahrten|Garten", "Honigbrot mit Butter"], "erklaerung": "Garten schreibt man ohne h." },
+    { "zeilen": ["Erdbeeren mit Quark", "Ofenkartofel|Ofenkartoffel mit Kräutern", "Zwiebelsuppe"], "erklaerung": "Kartoffel schreibt man mit ff." },
+    { "zeilen": ["Haferbrei mit Beeren", "Linseneintopf", "Fisch mit Salaht|Salat"], "erklaerung": "Salat schreibt man ohne h." },
+    { "zeilen": ["Spiegelei mit Speck", "Pflaumenkuchen mit Schlagsane|Schlagsahne", "Rübensuppe"], "erklaerung": "Sahne schreibt man mit h." },
+    { "zeilen": ["Brötchen mit Honig", "frische Milch vom Hoff|Hof", "Bohneneintopf"], "erklaerung": "Hof schreibt man mit einem f." },
+    { "zeilen": ["Gemüsesuppe", "Nudeln mit Kese|Käse", "Kirschkuchen"], "erklaerung": "Käse schreibt man mit ä." }
+  ],
+
+  "personalformen": [
+    { "satz": "du ___ (reiten)",        "richtig": "reitest",      "falsch": ["reitet", "reite"],        "regel": "Bei du endet das Verb auf -st: du reitest." },
+    { "satz": "ich ___ (reiten)",       "richtig": "reite",        "falsch": ["reitest", "reiten"],      "regel": "Bei ich endet das Verb auf -e: ich reite." },
+    { "satz": "sie ___ (traben)",       "richtig": "trabt",        "falsch": ["traben", "trabst"],       "regel": "Bei er, sie, es endet das Verb auf -t: sie trabt." },
+    { "satz": "wir ___ (galoppieren)",  "richtig": "galoppieren",  "falsch": ["galoppiert", "galoppierst"], "regel": "Bei wir bleibt die Grundform: wir galoppieren." },
+    { "satz": "du ___ (füttern)",       "richtig": "fütterst",     "falsch": ["füttert", "füttern"],     "regel": "Bei du endet das Verb auf -st: du fütterst." },
+    { "satz": "er ___ (springen)",      "richtig": "springt",      "falsch": ["springst", "springe"],    "regel": "Bei er, sie, es endet das Verb auf -t: er springt." },
+    { "satz": "ihr ___ (führen)",       "richtig": "führt",        "falsch": ["führst", "führen"],       "regel": "Bei ihr endet das Verb auf -t: ihr führt." },
+    { "satz": "ich ___ (bürsten)",      "richtig": "bürste",       "falsch": ["bürstet", "bürsten"],     "regel": "Bei ich endet das Verb auf -e: ich bürste." },
+    { "satz": "es ___ (wiehern)",       "richtig": "wiehert",      "falsch": ["wiehern", "wieherst"],    "regel": "Bei er, sie, es endet das Verb auf -t: es wiehert." },
+    { "satz": "du ___ (rufen)",         "richtig": "rufst",        "falsch": ["ruft", "rufe"],           "regel": "Bei du endet das Verb auf -st: du rufst." }
+  ],
+
+  "kobold": [
+    { "item": "drachenschuppe", "teile": ["Drachen", "schupe"],  "fehler": 1, "richtig": "Drachenschuppe", "erklaerung": "Schuppe schreibt man mit pp." },
+    { "item": "feuer+hammer",   "teile": ["Feuer", "hamer"],     "fehler": 1, "richtig": "Feuerhammer",    "erklaerung": "Hammer schreibt man mit mm." },
+    { "item": "blitz+hammer",   "teile": ["Bliz", "hammer"],     "fehler": 0, "richtig": "Blitzhammer",    "erklaerung": "Blitz schreibt man mit tz." },
+    { "item": "mond+laterne",   "teile": ["Mond", "latterne"],   "fehler": 1, "richtig": "Mondlaterne",    "erklaerung": "Laterne schreibt man mit einem t." },
+    { "item": "eis+speer",      "teile": ["Eis", "schpeer"],     "fehler": 1, "richtig": "Eisspeer",       "erklaerung": "Speer schreibt man mit Sp – man spricht schp, schreibt aber sp." },
+    { "item": "gift+speer",     "teile": ["Gieft", "speer"],     "fehler": 0, "richtig": "Giftspeer",      "erklaerung": "Gift schreibt man mit kurzem i – ohne ie." }
+  ]
+}

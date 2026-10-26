@@ -34,6 +34,9 @@ export function playerContext(run, data = {}) {
     ctx.hero = hero;
     if (hero.bonus) ctx.mods.push(hero.bonus);
   }
+  for (const mod of run?.mods || []) ctx.mods.push(mod);
+  // Verfluchte Kobold-Geschenke schaden zu Kampfbeginn.
+  ctx.selbstschaden = 2 * (run?.items || []).filter((p) => p.area === 'bag' && p.fluch).length;
   return ctx;
 }
 
