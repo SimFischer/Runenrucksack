@@ -159,6 +159,7 @@ export function newRun(items, regions, opts = {}) {
     mods: [], // dauerhafte Boni aus Begegnungen
     fate: null, // Schicksalsrune
     unterklasse: null,
+    freieItems: opts.freieItems || [], // freigeschaltete Items (z. B. Drachenfeuerschwert)
   };
   if (opts.fates?.length) {
     const fate = pickOne(opts.fates, rng);
@@ -177,7 +178,8 @@ export function newRun(items, regions, opts = {}) {
 export function shopPool(run, items, regions) {
   const region = regionOf(run.day, regions).id;
   return items.filter((d) => d.laden !== false && (!d.gebiete || d.gebiete.includes(region))
-    && !(d.art === 'tasche' && run.taschen?.[d.id]));
+    && !(d.art === 'tasche' && run.taschen?.[d.id])
+    && !(d.freischaltung && !run.freieItems?.includes(d.id))); // erst nach Freischaltung (js/fortschritt.js)
 }
 
 // Tasche kaufen: Der Rucksack bekommt ihre Felder dazu.

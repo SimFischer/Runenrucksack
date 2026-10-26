@@ -45,6 +45,7 @@ export function playerContext(run, data = {}) {
     ctx.unterklasse = hero.unterklassen?.find((u) => u.id === run.unterklasse) || null;
     if (ctx.unterklasse) applyEffekt(ctx, ctx.unterklasse.effekt, run.day);
   }
+  Object.assign(ctx, hero?.extra || {}); // besondere Fähigkeit der Figur (fernsicht, siegelStartblock, runenZiele)
   ctx.fate = data.fates?.find((f) => f.id === run?.fate) || null;
   if (ctx.fate) applyEffekt(ctx, ctx.fate.effekt, run.day);
   for (const mod of run?.mods || []) ctx.mods.push(mod);
@@ -69,10 +70,15 @@ export function tascheOf(p, defs, taschenFelder = {}) {
 }
 
 export function evaluateBag(placed, defs, ctx = {}) {
-  const info = analyze(placed, defs, { siegelBonus: ctx.siegelBonus, runeMult: ctx.runeMult });
+  const info = analyze(placed, defs, { siegelBonus: ctx.siegelBonus, runeMult: ctx.runeMult, runenZiele: ctx.runenZiele });
   for (const p of placed) {
     const i = info.get(p.uid);
     i.boni = [];
+    // Hauptmann Theron: Nomen mit passendem Artikel-Siegel bekommen Startblock.
+    if (ctx.siegelStartblock && i.siegel.some((s) => s.ok)) {
+      i.def = { ...i.def, startblock: (i.def.startblock || 0) + ctx.siegelStartblock };
+      i.boni.push(`Hauptmann Theron: passendes Siegel, +${ctx.siegelStartblock} Startblock`);
+    }
     for (const mod of ctx.mods || []) {
       if (!matches(mod.filter, i.base)) continue;
       i.def = applyMod(i.def, mod);

@@ -103,3 +103,52 @@ export function laufAbschluss(profil, run, data) {
   const nachher = rangVon(profil.xp, ach.raenge);
   return { xp, vorher, nachher, aufgestiegen: nachher.nr > vorher.nr, gewonnen, neu: [...p.neu] };
 }
+
+// ---------- Freischaltungen ----------
+// Bedingung (aus heroes.json, items.json, achievements.json): { rang } | { gewonnen } | { buch } | { seite } | { erfolg }.
+// ctx: { achievements, buch (Buch der Wörter) }
+
+export function erfuellt(bed, profil, ctx) {
+  if (!bed) return true;
+  if (bed.rang) return rangVon(profil.xp, ctx.achievements.raenge).nr >= bed.rang;
+  if (bed.gewonnen) return (profil.stats.gewonnen || 0) >= bed.gewonnen;
+  if (bed.buch) return profil.buch.length >= bed.buch;
+  if (bed.seite) {
+    const s = ctx.buch.seiten.find((x) => x.id === bed.seite);
+    const da = new Set(profil.buch);
+    return !!s && s.eintraege.every((e) => da.has(e.id));
+  }
+  if (bed.erfolg) return profil.erfolge.includes(bed.erfolg);
+  return false;
+}
+
+// Kindgerechter Hinweis, wie man etwas bekommt.
+export function bedingungText(bed, ctx) {
+  if (bed.rang) return `Erreiche den Rang „${ctx.achievements.raenge[bed.rang - 1].name}“.`;
+  if (bed.gewonnen) return `Gewinne ${bed.gewonnen} ${bed.gewonnen === 1 ? 'Lauf' : 'Läufe'} (alle zehn Tage geschafft).`;
+  if (bed.buch) return `Entdecke ${bed.buch} Einträge im Buch der Wörter.`;
+  if (bed.seite) return `Fülle die Seite „${ctx.buch.seiten.find((s) => s.id === bed.seite)?.titel}“ im Buch der Wörter.`;
+  if (bed.erfolg) return `Schaffe den Erfolg „${ctx.achievements.erfolge?.find((e) => e.id === bed.erfolg)?.name || bed.erfolg}“.`;
+  return '';
+}
+
+// Neu erfüllte Freischaltungen ins Profil übernehmen (Figuren und Designs bleiben für immer frei).
+// data: { heroes, achievements, buch }. Ergebnis: { figuren: [...], designs: [...] } – nur die neuen.
+export function pruefeFreischaltungen(profil, data) {
+  const neu = { figuren: [], designs: [] };
+  for (const h of data.heroes) {
+    if (!h.freischaltung || profil.figuren.includes(h.id)) continue;
+    if (erfuellt(h.freischaltung, profil, data)) { profil.figuren.push(h.id); neu.figuren.push(h.id); }
+  }
+  for (const d of data.achievements.designs || []) {
+    if (!d.freischaltung || profil.designs.includes(d.id)) continue;
+    if (erfuellt(d.freischaltung, profil, data)) { profil.designs.push(d.id); neu.designs.push(d.id); }
+  }
+  return neu;
+}
+
+export const figurFrei = (profil, h) => !h.freischaltung || profil.figuren.includes(h.id);
+export const designFrei = (profil, d) => !d.freischaltung || profil.designs.includes(d.id);
+
+// Items mit Freischaltung, die im Laden schon erscheinen dürfen.
+export const freieItems = (profil, items, ctx) => items.filter((d) => d.freischaltung && erfuellt(d.freischaltung, profil, ctx)).map((d) => d.id);

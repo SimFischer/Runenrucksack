@@ -3,6 +3,7 @@ import { CFG } from './logic.js';
 import { G, region } from './state.js';
 import { laufStand } from './fortschritt.js';
 import { modal, klang } from './ui.js';
+import { figurBild } from './state.js';
 
 const rangBalken = (r) => {
   const pct = r.naechster ? Math.round(((G.PROFIL.xp - r.ab) / (r.naechster.ab - r.ab)) * 100) : 100;
@@ -32,7 +33,11 @@ export function zeigeLaufende(run, abschluss, aktionen) {
         <div class="xp-zeile xp-summe"><span>Erfahrung</span><b>+${a.xp.gesamt}</b></div>
         ${rangBalken(a.nachher)}
       </div>` : '';
-  modal(`${kopf}${xp}
+  const frei = a?.frei ? [
+    ...a.frei.figuren.map((id) => { const h = G.HEROES.find((x) => x.id === id); return `<div class="frei-neu">${figurBild(id) ? `<img src="${figurBild(id)}" alt="">` : h.emoji}<span><small>Neue Figur frei!</small><b>${h.name}</b></span></div>`; }),
+    ...a.frei.designs.map((id) => { const d = G.ACH.designs.find((x) => x.id === id); return `<div class="frei-neu"><span class="frei-emoji">${d.emoji}</span><span><small>Neues Rucksack-Design!</small><b>${d.name}</b></span></div>`; }),
+  ].join('') : '';
+  modal(`${kopf}${xp}${frei ? `<div class="frei-liste">${frei}</div>` : ''}
       <div class="row"><button class="btn primary big" data-act="neu">Neuer Lauf</button><button class="btn" data-act="home">Zum Start</button></div>`,
   { neu: aktionen.neu, home: aktionen.home }, 'wide ende');
   if (a?.aufgestiegen) setTimeout(() => rangFeier(a.nachher), 700);

@@ -13,7 +13,9 @@ export function zeigeBuch(zurueck = null) {
   const zeichne = () => {
     const entdeckt = new Set(G.PROFIL.buch);
     const gesamt = G.BUCH.eintraege.length;
-    const seite = G.BUCH.seiten.find((s) => s.id === seiteAktiv);
+    const seite = { ...G.BUCH.seiten.find((s) => s.id === seiteAktiv) };
+    const lohn = G.ACH.designs.find((d) => d.freischaltung?.seite === seite.id);
+    if (lohn) seite.belohnung = `Rucksack-Design „${lohn.name}“ ${lohn.emoji}`;
     const stand = seitenStand(seite, entdeckt);
     box.innerHTML = `
       <div class="buch-card" data-tut="buch-fenster">

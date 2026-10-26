@@ -305,6 +305,18 @@ export function analyze(placed, defs, opts = {}) {
       const ok = runeFits(d, td);
       info.get(p.uid).ziel = { uid: t.uid, def: td, ok };
       info.get(t.uid).runen.push({ uid: p.uid, def: d, ok });
+      // Ritterin Ysolde: Die Rune wirkt auch auf das nächste Nomen dahinter (in Pfeilrichtung).
+      if ((opts.runenZiele || 1) >= 2) {
+        const [dx, dy] = DIRS[(p.rot || 0) % 4];
+        let x = c.x, y = c.y;
+        while (map.get(`${x},${y}`) === t) { x += dx; y += dy; }
+        const t2 = map.get(`${x},${y}`);
+        if (t2 && t2 !== p) {
+          const ok2 = runeFits(d, defs[t2.id]);
+          info.get(p.uid).ziel2 = { uid: t2.uid, def: defs[t2.id], ok: ok2 };
+          info.get(t2.uid).runen.push({ uid: p.uid, def: d, ok: ok2 });
+        }
+      }
     } else if (isVerb(d) && d.formen) {
       const c = verbTargetCell(p, d);
       const t = map.get(`${c.x},${c.y}`);

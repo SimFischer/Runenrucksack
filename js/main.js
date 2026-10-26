@@ -21,7 +21,10 @@ import { startNight } from './battle-ui.js';
 import { runEncounter } from './encounters.js';
 import { initTutorial, startTutorial, tutorialDone, showHelp, tipsOn, setTips } from './tutorial.js';
 import { entdeckungenIn } from './buch.js';
-import { entdecke, merkeAntwort, laufStand, laufAbschluss, rangVon } from './fortschritt.js';
+import {
+  entdecke, merkeAntwort, laufStand, laufAbschluss, rangVon, pruefeFreischaltungen, figurFrei, freieItems, bedingungText,
+} from './fortschritt.js';
+import { zeigeSammlung, wendeDesignAn, fortschrittCtx } from './sammlung-ui.js';
 import { zeigeBuch, meldeNeu } from './buch-ui.js';
 import { zeigeLaufende } from './ende-ui.js';
 
@@ -42,6 +45,9 @@ async function boot() {
   $('btn-known').onclick = showStart;
   $('btn-help').onclick = () => showHelp();
   $('btn-buch').onclick = () => zeigeBuch();
+  $('btn-sammlung').onclick = () => zeigeSammlung();
+  pruefeFreischaltungen(G.PROFIL, fortschrittCtx());
+  wendeDesignAn();
   $('btn-buch-spiel').onclick = () => zeigeBuch();
   initTutorial({ render, showGame, showStart, showHeroes, continueSaved, hasSavedRun: () => !!loadRun() });
   showAsk();
@@ -130,16 +136,17 @@ function showHeroes() {
   const box = $('hero-cards');
   box.innerHTML = '';
   for (const h of G.HEROES) {
+    const frei = figurFrei(G.PROFIL, h);
     const card = document.createElement('button');
-    card.className = 'hero-card';
+    card.className = 'hero-card' + (frei ? '' : ' gesperrt');
     card.style.setProperty('--hero', h.farbe);
     card.innerHTML = `
-      <div class="hero-emoji">${figurBild(h.id) ? `<img src="${figurBild(h.id)}" alt="">` : h.emoji}</div>
+      <div class="hero-emoji">${figurBild(h.id) ? `<img src="${figurBild(h.id)}" alt="">` : h.emoji}${frei ? '' : '<span class="sam-schloss">🔒</span>'}</div>
       <div class="hero-name">${h.name}</div>
       <div class="hero-volk">${h.volk}</div>
-      <p class="hero-staerke">${h.staerke}</p>
-      <div class="hero-start">Start mit: ${h.start.map((s) => `<span>${iconHtml(G.DEFS[s.id])} ${fullName(G.DEFS[s.id])}</span>`).join('')}</div>`;
-    card.onclick = () => startNewRun(h);
+      <p class="hero-staerke">${frei ? h.staerke : `🔒 ${bedingungText(h.freischaltung, fortschrittCtx())}`}</p>
+      ${frei ? `<div class="hero-start">Start mit: ${h.start.map((s) => `<span>${iconHtml(G.DEFS[s.id])} ${fullName(G.DEFS[s.id])}</span>`).join('')}</div>` : ''}`;
+    card.onclick = () => (frei ? startNewRun(h) : toast(bedingungText(h.freischaltung, fortschrittCtx())));
     box.append(card);
   }
   showScreen('heroes');
@@ -147,9 +154,11 @@ function showHeroes() {
 
 function startNewRun(h) {
   if (!h?.id) { showHeroes(); return; }
-  G.run = newRun(G.ITEMS, G.REGIONS, { hero: h, fates: G.FATES });
+  G.run = newRun(G.ITEMS, G.REGIONS, { hero: h, fates: G.FATES, freieItems: freieItems(G.PROFIL, G.ITEMS, fortschrittCtx()) });
   selected = null;
   showGame();
+  // Start-Items, die schon richtig liegen (z. B. Feuer links neben der Axt), verbinden sich gleich.
+  pruefe(...G.run.items.map((p) => ({ uid: p.uid })));
   continueFlow();
 }
 
@@ -364,11 +373,20 @@ function renderShop() {
       it.classList.add('almost');
     }
     // Ketten-Symbol: ergibt mit etwas im Rucksack ein Kompositum
-    if (compoundPartner(def, itemsIn('bag'), G.DEFS, G.RECIPES)) {
+    const fern = playerCtx().fernsicht;
+    const cp = compoundPartner(def, fern ? G.run.items.filter((p) => p.area !== 'neu') : itemsIn('bag'), G.DEFS, G.RECIPES);
+    if (fern && cp) {
+      const l = document.createElement('span');
+      l.className = 'fern';
+      l.textContent = '→ ' + G.DEFS[cp.id].name;
+      l.title = 'Faelith sieht es von Weitem';
+      holder.append(l);
+    }
+    if (cp) {
       const chain = document.createElement('span');
       chain.className = 'chain';
       chain.textContent = '⛓️';
-      chain.title = 'Ergibt mit etwas in deinem Rucksack ein Kompositum';
+      chain.title = fern ? 'Ergibt mit etwas, das du besitzt, ein Kompositum' : 'Ergibt mit etwas in deinem Rucksack ein Kompositum';
       holder.append(chain);
     }
 
@@ -523,7 +541,7 @@ function collectNotes(base, ref) {
   }
   if (ref.src === 'shop' && canMerge(base)) {
     if (ownedCount(G.run, base.id) > 0) out.push('<p class="gram ok"><b>1/2 – Du hast schon eins davon. Kaufen = sofort ★★!</b></p>');
-    const c = compoundPartner(base, itemsIn('bag'), G.DEFS, G.RECIPES);
+    const c = compoundPartner(base, playerCtx().fernsicht ? G.run.items.filter((p) => p.area !== 'neu') : itemsIn('bag'), G.DEFS, G.RECIPES);
     if (c) out.push(`<p class="gram ok">⛓️ Mit ${dativ(c.mit).replace(/^(dem|der) /, (m) => m === 'dem ' ? 'deinem ' : 'deiner ')} wird daraus sofort: <b>${fullName(G.DEFS[c.id])}</b></p>`);
   }
   return out;
@@ -798,6 +816,7 @@ function openMenu() {
     </div>
     <div class="row">
       <button class="btn small" data-act="buch">📚 Buch der Wörter</button>
+      <button class="btn small" data-act="sammlung">🏆 Sammlung</button>
       <button class="btn small" data-act="help">📖 So geht's</button>
       <button class="btn small" data-act="tutorial">🧙 Tutorial wiederholen</button>
       <button class="btn small" data-act="tips">💡 Erste-Mal-Tipps: ${tipsOn() ? 'an' : 'aus'}</button>
@@ -807,6 +826,7 @@ function openMenu() {
     tutorial: startTutorial,
     help: () => showHelp(openMenu),
     buch: () => zeigeBuch(openMenu),
+    sammlung: () => zeigeSammlung(openMenu),
     tips: () => { setTips(!tipsOn()); toast(`Erste-Mal-Tipps sind jetzt ${tipsOn() ? 'an' : 'aus'}.`); openMenu(); },
     klang: () => { setPref('klang', klangAn() ? 'aus' : 'an'); toast(`Klang beim Verbinden ist jetzt ${klangAn() ? 'an' : 'aus'}.`); openMenu(); },
   });
@@ -1215,6 +1235,7 @@ function battleOver(won, enemyName) {
   if (run.over && !run.tutorial && !run.abgeschlossen) {
     run.abgeschlossen = true;
     G.abschluss = laufAbschluss(G.PROFIL, run, { achievements: G.ACH });
+    G.abschluss.frei = pruefeFreischaltungen(G.PROFIL, fortschrittCtx());
     saveProfil();
   }
   save();

@@ -15,6 +15,7 @@ const FILES = [
   'js/buch-ui.js',
   'js/fortschritt.js',
   'js/ende-ui.js',
+  'js/sammlung-ui.js',
   'js/mods.js',
   'js/battle.js',
   'js/battle-ui.js',
@@ -103,6 +104,9 @@ const FILES = [
   'assets/figur-borga.webp',
   'assets/figur-eadrun.webp',
   'assets/figur-fenwick.webp',
+  'assets/figur-faelith.webp',
+  'assets/figur-theron.webp',
+  'assets/figur-ysolde.webp',
 ];
 
 self.addEventListener('install', (e) => {

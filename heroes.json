@@ -1,5 +1,5 @@
 {
-  "_hinweis": "Startfiguren, Unterklassen und Schicksalsrunen. bonus gilt den ganzen Lauf: filter wählt Items aus (art, id, kraft, traeger, wortfeld), prozent verstärkt ihre Wirkung, abklingzeit verändert die Abklingzeit in Prozent (negativ = schneller). start: Items mit Position im Rucksack. effekt (Unterklassen und Schicksalsrunen) kann enthalten: mod (wie bonus), tempo (Prozent für alle Items), lebenProTag, siegelBonus (0.5 = +50 %), runenFaktor, ladenPlaetze, goldProTag.",
+  "_hinweis": "Startfiguren, Unterklassen und Schicksalsrunen. bonus gilt den ganzen Lauf: filter wählt Items aus (art, id, kraft, traeger, wortfeld), prozent verstärkt ihre Wirkung, abklingzeit verändert die Abklingzeit in Prozent (negativ = schneller). start: Items mit Position im Rucksack. extra: besondere Fähigkeit (fernsicht: Laden zeigt mögliche Komposita mit allem, was man besitzt; siegelStartblock: Startblock für Nomen mit passendem Siegel; runenZiele: auf wie viele Nomen eine Rune wirkt). freischaltung: Bedingung, ab der die Figur wählbar ist (rang: Rang-Nummer, gewonnen: gewonnene Läufe, buch: Einträge im Buch der Wörter); ohne freischaltung ist sie von Anfang an frei. effekt (Unterklassen und Schicksalsrunen) kann enthalten: mod (wie bonus), tempo (Prozent für alle Items), lebenProTag, siegelBonus (0.5 = +50 %), runenFaktor, ladenPlaetze, goldProTag.",
   "helden": [
     {
       "id": "borga",
@@ -106,6 +106,173 @@
               "prozent": 50,
               "text": "Lanzenführerin: Speer-Items +50 %"
             }
+          }
+        }
+      ]
+    },
+    {
+      "id": "faelith",
+      "name": "Faelith die Bogenschützin",
+      "kurz": "Faelith",
+      "volk": "Elbin vom Dornwald",
+      "emoji": "🏹",
+      "farbe": "#2f7a5a",
+      "staerke": "Scharfe Elbenaugen: Komposita mit „Bogen“ wirken 30 % stärker. Im Laden sieht sie mögliche Komposita schon von Weitem.",
+      "bonus": {
+        "filter": {
+          "art": "kompositum",
+          "traeger": "bogen"
+        },
+        "prozent": 30,
+        "text": "Faelith: Bogen-Komposita +30 %"
+      },
+      "extra": {
+        "fernsicht": true
+      },
+      "freischaltung": {
+        "rang": 2
+      },
+      "start": [
+        {
+          "id": "gift",
+          "x": 0,
+          "y": 0
+        },
+        {
+          "id": "bogen",
+          "x": 1,
+          "y": 0
+        }
+      ],
+      "unterklassen": [
+        {
+          "id": "waldlaeuferin",
+          "name": "Waldläuferin",
+          "emoji": "🌲",
+          "text": "Gift-Komposita wirken 50 % stärker.",
+          "effekt": {
+            "mod": {
+              "filter": {
+                "kraft": "gift"
+              },
+              "prozent": 50,
+              "text": "Waldläuferin: Gift-Komposita +50 %"
+            }
+          }
+        },
+        {
+          "id": "sternenschuetzin",
+          "name": "Sternenschützin",
+          "emoji": "✨",
+          "text": "Alle Items laden 15 % schneller.",
+          "effekt": {
+            "tempo": 15
+          }
+        }
+      ]
+    },
+    {
+      "id": "theron",
+      "name": "Hauptmann Theron",
+      "kurz": "Theron",
+      "volk": "Weiße Feste Aldamar",
+      "emoji": "🛡️",
+      "farbe": "#5a6c8a",
+      "staerke": "Ordnung ist alles: Nomen mit passendem Artikel-Siegel bekommen zusätzlich 3 Startblock.",
+      "extra": {
+        "siegelStartblock": 3
+      },
+      "freischaltung": {
+        "gewonnen": 3
+      },
+      "start": [
+        {
+          "id": "siegel-das",
+          "x": 0,
+          "y": 0
+        },
+        {
+          "id": "schwert",
+          "x": 1,
+          "y": 0
+        }
+      ],
+      "unterklassen": [
+        {
+          "id": "bannertraeger",
+          "name": "Bannerträger",
+          "emoji": "🚩",
+          "text": "Passende Artikel-Siegel geben +50 % statt +25 %.",
+          "effekt": {
+            "siegelBonus": 0.5
+          }
+        },
+        {
+          "id": "schildwache",
+          "name": "Schildwache",
+          "emoji": "🏰",
+          "text": "Schilde und Schild-Komposita wirken 50 % stärker.",
+          "effekt": {
+            "mod": {
+              "filter": {
+                "traeger": "schild"
+              },
+              "prozent": 50,
+              "text": "Schildwache: Schild-Items +50 %"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "id": "ysolde",
+      "name": "Ritterin Ysolde",
+      "kurz": "Ysolde",
+      "volk": "Reiherritter von Silberbucht",
+      "emoji": "🦢",
+      "farbe": "#7a8fb8",
+      "staerke": "Edle Worte: Adjektiv-Runen wirken auf zwei Nomen – auf das, auf das der Pfeil zeigt, und auf das dahinter.",
+      "extra": {
+        "runenZiele": 2
+      },
+      "freischaltung": {
+        "buch": 25
+      },
+      "start": [
+        {
+          "id": "rune-scharf",
+          "x": 0,
+          "y": 0
+        },
+        {
+          "id": "speer",
+          "x": 1,
+          "y": 0
+        }
+      ],
+      "unterklassen": [
+        {
+          "id": "reiherritterin",
+          "name": "Reiherritterin",
+          "emoji": "🪶",
+          "text": "Speere und Speer-Komposita wirken 50 % stärker.",
+          "effekt": {
+            "mod": {
+              "filter": {
+                "traeger": "speer"
+              },
+              "prozent": 50,
+              "text": "Reiherritterin: Speer-Items +50 %"
+            }
+          }
+        },
+        {
+          "id": "edelherz",
+          "name": "Edelherz",
+          "emoji": "💠",
+          "text": "Adjektiv-Runen wirken doppelt so stark.",
+          "effekt": {
+            "runenFaktor": 2
           }
         }
       ]

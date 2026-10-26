@@ -1,11 +1,84 @@
 {
-  "_hinweis": "Fortschritt zwischen den Läufen. erfahrung: Erfahrungspunkte am Ende eines Laufs (pro Sieg, pro neuer Entdeckung im Buch der Wörter, pro Grammatik-Frage beim ersten Versuch richtig). raenge: ab = nötige Erfahrung insgesamt.",
-  "erfahrung": { "sieg": 10, "entdeckung": 5, "ersterVersuch": 2 },
+  "_hinweis": "Fortschritt zwischen den Läufen. erfahrung: Erfahrungspunkte am Ende eines Laufs (pro Sieg, pro neuer Entdeckung im Buch der Wörter, pro Grammatik-Frage beim ersten Versuch richtig). raenge: ab = nötige Erfahrung insgesamt. designs: Rucksack-Designs (nur Optik); freischaltung wie bei Figuren (rang, gewonnen, buch, seite: volle Seite im Buch, erfolg).",
+  "erfahrung": {
+    "sieg": 10,
+    "entdeckung": 5,
+    "ersterVersuch": 2
+  },
   "raenge": [
-    { "id": "lehrling", "name": "Lehrling", "emoji": "🌱", "ab": 0 },
-    { "id": "wanderer", "name": "Wanderer", "emoji": "🥾", "ab": 350 },
-    { "id": "runenkundige", "name": "Runenkundige", "emoji": "🔮", "ab": 1200 },
-    { "id": "wortmeister", "name": "Wortmeister", "emoji": "📜", "ab": 2600 },
-    { "id": "hueter", "name": "Hüter der Sprache", "emoji": "👑", "ab": 4000 }
+    {
+      "id": "lehrling",
+      "name": "Lehrling",
+      "emoji": "🌱",
+      "ab": 0
+    },
+    {
+      "id": "wanderer",
+      "name": "Wanderer",
+      "emoji": "🥾",
+      "ab": 350
+    },
+    {
+      "id": "runenkundige",
+      "name": "Runenkundige",
+      "emoji": "🔮",
+      "ab": 1200
+    },
+    {
+      "id": "wortmeister",
+      "name": "Wortmeister",
+      "emoji": "📜",
+      "ab": 2600
+    },
+    {
+      "id": "hueter",
+      "name": "Hüter der Sprache",
+      "emoji": "👑",
+      "ab": 4000
+    }
+  ],
+  "designs": [
+    {
+      "id": "leder",
+      "name": "Leder",
+      "emoji": "🎒",
+      "text": "Der alte Rucksack aus Kleinwurzel."
+    },
+    {
+      "id": "zwergenstahl",
+      "name": "Zwergenstahl",
+      "emoji": "⚒️",
+      "text": "Genietete Stahlplatten aus Duramar.",
+      "freischaltung": {
+        "seite": "komposita"
+      }
+    },
+    {
+      "id": "elbenseide",
+      "name": "Elbenseide",
+      "emoji": "🍃",
+      "text": "Leichter, grün schimmernder Stoff aus Lindrael.",
+      "freischaltung": {
+        "seite": "steigerungen"
+      }
+    },
+    {
+      "id": "reiterleder",
+      "name": "Reiterleder",
+      "emoji": "🐎",
+      "text": "Gegerbtes Leder mit Pferdeknoten aus Hrossmark.",
+      "freischaltung": {
+        "seite": "saetze"
+      }
+    },
+    {
+      "id": "silberbanner",
+      "name": "Silberbanner",
+      "emoji": "🏳️",
+      "text": "Silberne Stickerei der Reiherritter.",
+      "freischaltung": {
+        "erfolg": "alle-figuren"
+      }
+    }
   ]
 }
