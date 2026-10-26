@@ -1335,3 +1335,84 @@ body[data-design="silberbanner"] #grid-bag { border-color: #c9d4ea; }
 .ende-code .code-kasten.klein { margin-top: 4px; grid-template-columns: 1fr 84px; }
 .ende-code .code-kasten.klein .code-qr { width: 84px; }
 .ende-code .code-kasten.klein .code-text { font-size: 14px; }
+
+/* ---------- Aufgaben (js/aufgaben) ---------- */
+#aufgabe { position: fixed; inset: 0; z-index: 205; background: rgba(10,6,3,.22); }
+#aufgabe.af-gross { display: flex; align-items: center; justify-content: center; padding: 14px; background: rgba(10,6,3,.55); }
+.af-fenster {
+  background: var(--parchment); color: var(--ink); border: 3px solid var(--line); border-radius: 16px; padding: 12px 16px;
+  box-shadow: 0 12px 34px rgba(0,0,0,.55); text-align: center; animation: pop .18s ease-out;
+}
+.af-klein .af-fenster { position: fixed; width: max-content; max-width: min(520px, calc(100vw - 16px)); }
+.af-gross .af-fenster { width: min(820px, 100%); max-height: 100%; overflow-y: auto; }
+.af-kopf { display: flex; align-items: center; justify-content: center; gap: 10px; font-size: 14px; font-weight: 800; color: var(--ink-soft); }
+.af-stufe { color: #e0a526; letter-spacing: 1px; }
+.af-frage { font-size: 19px; font-weight: 800; margin: 6px 0 8px; line-height: 1.3; }
+.af-text, .af-satz { font-size: 24px; font-weight: 800; margin: 4px 0 10px; line-height: 1.35; }
+.af-text .markiert, .af-satz b { background: #ffe58a; padding: 0 4px; border-radius: 6px; }
+.af-opts { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.af-opt { min-width: 110px; min-height: 58px; font-size: 22px; padding: 8px 16px; }
+.af-opts.af-vier .af-opt { min-width: 150px; }
+.af-opts.af-regeln { flex-direction: column; align-items: stretch; }
+.af-opts.af-regeln .af-opt { font-size: 16px; text-align: left; min-height: 50px; line-height: 1.3; }
+.af-beispiele { list-style: none; margin: 0 0 10px; padding: 8px 12px; background: #fff8e8; border: 2px solid var(--line); border-radius: 12px; font-size: 19px; font-weight: 700; display: grid; gap: 4px; }
+.af-rueck { margin: 8px 0 0; padding: 6px 10px; border-radius: 8px; font-size: 15px; line-height: 1.35; text-align: left; }
+.af-rueck.falsch { background: rgba(200,66,58,.12); border-left: 4px solid var(--red); }
+.af-rueck.richtig { background: rgba(79,154,74,.16); border-left: 4px solid var(--green); font-weight: 900; font-size: 18px; text-align: center; }
+.af-merke { font-size: 16px; line-height: 1.4; margin: 8px 4px; }
+.af-fuss { display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; flex-wrap: wrap; }
+.af-fuss .cost { color: var(--ink-soft); font-size: 13px; }
+/* Buchstaben ergänzen und Eintippen */
+.af-wort { font-size: 40px; font-weight: 900; letter-spacing: 2px; margin: 6px 0 12px; display: flex; justify-content: center; align-items: flex-end; gap: 2px; font-family: "Courier New", ui-monospace, monospace; }
+.af-vorsatz { font-size: 26px; color: var(--ink-soft); margin-right: 10px; font-family: var(--font); }
+.af-bst { min-width: 30px; }
+.af-luecke { display: inline-block; min-width: 38px; height: 50px; border-bottom: 5px solid var(--ink-soft); color: #1d6fb5; }
+.af-luecke.aktiv { border-bottom-color: #e0a526; animation: blink 1s steps(2) infinite; }
+@keyframes blink { 50% { border-bottom-color: transparent; } }
+.af-eingabe { min-height: 60px; font-size: 36px; font-weight: 900; letter-spacing: 2px; border: 3px solid var(--line); border-radius: 12px; background: #fff; margin: 4px auto 12px; padding: 6px 12px; max-width: 420px; font-family: "Courier New", ui-monospace, monospace; }
+.af-cursor { display: inline-block; width: 3px; height: 36px; background: #1d6fb5; vertical-align: middle; animation: blink 1s steps(2) infinite; }
+.af-tastatur { display: grid; gap: 8px; justify-content: center; }
+.af-tastenreihe { display: flex; gap: 8px; justify-content: center; }
+.af-taste { min-width: 64px; min-height: 64px; font-size: 28px; font-weight: 900; padding: 4px; }
+.af-tastatur.voll .af-taste { min-width: 54px; min-height: 58px; font-size: 24px; }
+.af-loeschen { min-width: 90px; }
+.af-fertig { min-width: 160px; font-size: 22px; }
+/* Baukasten */
+.af-bau { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 64px; flex-wrap: wrap; margin-bottom: 10px; font-size: 24px; font-weight: 900; }
+.af-baustein { background: #fff8e8; border: 2px solid var(--line); border-radius: 10px; padding: 6px 12px; }
+.af-baustein.fest { background: #eef4ff; }
+.af-fuge-slot { min-width: 54px; border-bottom: 4px dashed var(--ink-soft); color: transparent; }
+.af-bauwort { color: #2f7d32; margin-left: 8px; }
+/* Sortieren und Satz ordnen: Karten zum Ziehen */
+.af-ablage, .af-vorrat { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; min-height: 64px; padding: 8px; background: rgba(0,0,0,.05); border-radius: 12px; margin-bottom: 10px; }
+.af-karte { background: #fff; border: 2px solid var(--line); border-radius: 12px; padding: 10px 16px; font-size: 21px; font-weight: 800; min-height: 54px; display: flex; align-items: center; cursor: grab; box-shadow: 0 3px 0 var(--line); user-select: none; -webkit-user-select: none; touch-action: none; }
+.af-karte b { background: #ffe58a; border-radius: 4px; padding: 0 3px; }
+.af-karte.gewaehlt { outline: 4px solid #e0a526; }
+.af-karte.af-weg { opacity: .3; }
+.af-geist { position: fixed; z-index: 600; pointer-events: none; transform: rotate(3deg) scale(1.06); box-shadow: 0 10px 24px rgba(0,0,0,.4); }
+.af-kisten { display: flex; gap: 12px; justify-content: center; }
+.af-kiste { flex: 1; min-height: 150px; border: 3px dashed var(--ink-soft); border-radius: 14px; padding: 8px; background: #fff8e8; display: flex; flex-direction: column; gap: 8px; }
+.af-kiste.af-ueber { background: #fff1b8; border-color: #e0a526; border-style: solid; }
+.af-kiste-name { font-size: 22px; font-weight: 900; }
+.af-kiste-name.genus { color: #fff; background: var(--genus); border-radius: 10px; padding: 2px 0; }
+.af-kiste-inhalt { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.af-kiste-inhalt .af-karte { font-size: 17px; min-height: 44px; padding: 6px 10px; }
+.af-reihe { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; padding: 8px; border-radius: 12px; }
+.af-reihe.af-ueber { background: #fff1b8; }
+.af-slot { min-width: 120px; min-height: 54px; border: 3px dashed var(--ink-soft); border-radius: 12px; padding: 8px 12px; font-size: 21px; font-weight: 800; background: #fff; }
+.af-slot.fest { border-style: solid; background: #eef4ff; }
+.af-glieder { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+.af-glied { min-height: 58px; font-size: 22px; padding: 8px 16px; }
+/* Fehler finden */
+.af-tippsatz { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.af-tippwort { font: inherit; font-size: 24px; font-weight: 800; background: #fff; border: 2px solid var(--line); border-radius: 10px; padding: 6px 10px; min-height: 52px; color: var(--ink); }
+.af-tippwort.markiert { background: #ffe58a; border-color: #b8860b; }
+.af-verbessern { margin-top: 10px; }
+.af-hinweis { font-weight: 800; color: #2f7d32; margin: 0 0 8px; }
+.af-fertig-knopf { margin-top: 12px; min-width: 180px; min-height: 54px; font-size: 20px; }
+/* Paare */
+.af-paare { display: flex; gap: 40px; justify-content: center; }
+.af-spalte { display: flex; flex-direction: column; gap: 10px; }
+.af-paar { min-width: 200px; min-height: 54px; font-size: 20px; }
+.af-paar.gewaehlt { outline: 4px solid #e0a526; }
+.af-paar.verbunden { background: var(--paar); color: #fff; text-shadow: 0 1px 0 rgba(0,0,0,.4); }
