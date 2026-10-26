@@ -1,0 +1,11 @@
+{
+  "_hinweis": "Fortschritt zwischen den Läufen. erfahrung: Erfahrungspunkte am Ende eines Laufs (pro Sieg, pro neuer Entdeckung im Buch der Wörter, pro Grammatik-Frage beim ersten Versuch richtig). raenge: ab = nötige Erfahrung insgesamt.",
+  "erfahrung": { "sieg": 10, "entdeckung": 5, "ersterVersuch": 2 },
+  "raenge": [
+    { "id": "lehrling", "name": "Lehrling", "emoji": "🌱", "ab": 0 },
+    { "id": "wanderer", "name": "Wanderer", "emoji": "🥾", "ab": 350 },
+    { "id": "runenkundige", "name": "Runenkundige", "emoji": "🔮", "ab": 1200 },
+    { "id": "wortmeister", "name": "Wortmeister", "emoji": "📜", "ab": 2600 },
+    { "id": "hueter", "name": "Hüter der Sprache", "emoji": "👑", "ab": 4000 }
+  ]
+}

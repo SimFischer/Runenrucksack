@@ -7,6 +7,7 @@ import {
 import { GENUS } from './grammar.js';
 import { placeNew } from './sterne.js';
 import { G, save, region, emit } from './state.js';
+import { merkeAntwort } from './fortschritt.js';
 import { openModal, closeModal, toast, bump, fullName, nameAkk, iconHtml } from './ui.js';
 
 let done = null, rerender = null;
@@ -126,6 +127,7 @@ function runTasks(enc, tasks, end, opts = {}) {
     }
     tries++;
     const right = q.tap ? a === `${q.ziel.zeile}:${q.ziel.wort}` : q.options[a] === q.correct;
+    merkeAntwort(run, q.regel || 'rechtschreibung', right, tries === 1);
     if (right) {
       run.lernen.richtig++;
       solved = true;

@@ -21,8 +21,9 @@ import { startNight } from './battle-ui.js';
 import { runEncounter } from './encounters.js';
 import { initTutorial, startTutorial, tutorialDone, showHelp, tipsOn, setTips } from './tutorial.js';
 import { entdeckungenIn } from './buch.js';
-import { entdecke } from './fortschritt.js';
+import { entdecke, merkeAntwort, laufStand, laufAbschluss, rangVon } from './fortschritt.js';
 import { zeigeBuch, meldeNeu } from './buch-ui.js';
+import { zeigeLaufende } from './ende-ui.js';
 
 let selected = null;   // { src: 'bag'|'store'|'shop', uid?, slot? }
 let drag = null;
@@ -104,6 +105,17 @@ function showStart() {
   $('start-menu').hidden = false;
   $('btn-continue').hidden = !G.run;
   $('btn-new').classList.toggle('primary', !G.run);
+  zeigeRang();
+}
+
+// Rang und Erfahrung im Startmenü
+function zeigeRang() {
+  const r = rangVon(G.PROFIL.xp, G.ACH.raenge);
+  const box = $('start-rang');
+  const pct = r.naechster ? Math.round(((G.PROFIL.xp - r.ab) / (r.naechster.ab - r.ab)) * 100) : 100;
+  box.innerHTML = `<span class="rang-emoji">${r.emoji}</span><span><b>${r.name}</b>
+    <span class="rang-bar"><i style="width:${pct}%"></i></span>
+    <small>${r.naechster ? `${G.PROFIL.xp} Erfahrung · noch ${r.bisNaechster} bis ${r.naechster.name}` : `${G.PROFIL.xp} Erfahrung · höchster Rang!`}</small></span>`;
 }
 
 function continueSaved() {
@@ -863,7 +875,9 @@ function quiz(opts) {
       bump('stat-gold');
     }
     tries++;
-    if (q.options[k] === q.correct) { run.lernen.richtig++; opts.richtig(tries === 1); return; }
+    const right = q.options[k] === q.correct;
+    merkeAntwort(run, opts.regel, right, tries === 1);
+    if (right) { run.lernen.richtig++; opts.richtig(tries === 1); return; }
     run.lernen.falsch++;
     wrong.add(k);
     feedback = `✗ ${q.explain}`;
@@ -891,6 +905,7 @@ function askMerge(a, c) {
   }
   quiz({
     q,
+    regel: q.art,
     anchor: itemNode(a.typ === 'kompositum' ? a.traeger.uid : a.alt.uid),
     kopf,
     richtig: (ersterVersuch) => { if (ersterVersuch) merkeRichtig(run, q); doMerge(a); },
@@ -948,6 +963,8 @@ function doMerge(a, kurz = null) {
   const nd = G.DEFS[p.id];
   const st = sternVon(p);
   const gross = st >= 4;
+  if (a.typ === 'kompositum') laufStand(run).komposita++;
+  if (gross) laufStand(run).sterne4++;
   mergeAnimation(from, itemNode(p.uid), { icon, sterne: a.typ === 'kompositum' ? 0 : st, gewinn: gewinnText(a, p), gross });
   if (gross) toast(isRune(nd) ? `👑 ${nd.name}! Die Rune trägt jetzt die Krone.` : `★★★★ ${nd.name} – legendär!`);
   if (kurz) hinweisAm(itemNode(p.uid), kurz);
@@ -971,9 +988,10 @@ function askVerb(p) {
     merging = false;
     render();
     emit('satz', { ok, verb: p.id, subjekt: v.subjekt.id });
-    if (ok) toast(`„${v.satz}“ – jetzt wirkt die Rolle voll!`);
+    if (ok) { toast(`„${v.satz}“ – jetzt wirkt die Rolle voll!`); laufStand(run).saetze++; }
   };
   quiz({
+    regel: 'personalform',
     q: { titel: 'Wie heißt der Satz?', prompt: `${v.subjektText} <span class="blank">___</span>. <small>(${d.name})</small>`, options: shuffle([v.richtig, ...v.falsch]), correct: v.richtig, explain: v.regel },
     anchor: itemNode(p.uid),
     kopf: `<span class="quick-eq">${iconHtml(d, 'ic small')}<b>➤</b>${iconHtml(v.subjekt.def, 'ic small')}</span>`,
@@ -1194,6 +1212,11 @@ function tap(ref) {
 function battleOver(won, enemyName) {
   const run = G.run;
   finishBattle(run, G.ITEMS, G.REGIONS, won, enemyName);
+  if (run.over && !run.tutorial && !run.abgeschlossen) {
+    run.abgeschlossen = true;
+    G.abschluss = laufAbschluss(G.PROFIL, run, { achievements: G.ACH });
+    saveProfil();
+  }
   save();
   const heartsLeft = Math.max(0, run.hearts);
   modal(won ? `
@@ -1220,23 +1243,8 @@ function afterBattle() {
 }
 
 function showRunEnd() {
-  const run = G.run;
-  const won = run.over === 'won';
-  const stars = run.wins >= 10 ? '🌟🌟🌟' : run.wins >= 8 ? '⭐⭐⭐' : run.wins >= 6 ? '⭐⭐' : '⭐';
-  modal(won ? `
-      <div class="big-emoji">👑</div>
-      <h2>Reise geschafft!</h2>
-      <p>Du hast Kleinwurzel und Hrossmark durchquert: <b>${run.wins} von ${CFG.lastDay}</b> Kämpfen gewonnen.</p>
-      <p class="stars">${stars}</p>
-      <p>${run.wins >= 10 ? 'Kein einziger Kampf verloren – unglaublich!' : 'Die Wörter der Wanderlande sind ein Stück sicherer.'}</p>
-      <div class="row"><button class="btn primary big" data-act="new">Neuer Lauf</button><button class="btn" data-act="home">Zum Start</button></div>` : `
-      <div class="big-emoji">🪦</div>
-      <h2>Lauf verloren</h2>
-      <p>Alle Herzen sind weg – an Tag ${run.day} in ${region().name}. Du hast <b>${run.wins}</b> Kämpfe gewonnen.</p>
-      <p>Probier es gleich nochmal – jeder Lauf ist anders.</p>
-      <div class="row"><button class="btn primary big" data-act="new">Neuer Lauf</button><button class="btn" data-act="home">Zum Start</button></div>`,
-  {
-    new: showHeroes,
+  zeigeLaufende(G.run, G.abschluss, {
+    neu: showHeroes,
     home: () => {
       G.run = null;
       showStart();

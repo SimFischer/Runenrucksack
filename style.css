@@ -1209,3 +1209,26 @@ body {
 @keyframes buchGlanz { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
 .buch-eintrag > * { flex-shrink: 0; }
 .buch-grid { grid-auto-rows: max-content; }
+
+/* ---------- Rang und Erfahrung ---------- */
+.start-rang:empty { display: none; }
+.start-rang, .rang-zeile { display: flex; align-items: center; gap: 10px; text-align: left; background: rgba(255,246,226,.9); border: 2px solid var(--line); border-radius: 14px; padding: 8px 14px; color: var(--ink); }
+.rang-emoji { font-family: var(--emoji); font-size: 34px; }
+.start-rang b, .rang-zeile b { font-size: 18px; }
+.rang-bar { display: block; width: 240px; max-width: 50vw; height: 10px; border-radius: 99px; background: rgba(0,0,0,.15); overflow: hidden; margin: 3px 0; }
+.rang-bar i { display: block; height: 100%; background: linear-gradient(90deg, #e0a526, #ffd23f); }
+.start-rang small, .rang-zeile small { color: var(--ink-soft); font-size: 13px; }
+.xp-box { background: #fff6e2; border: 2px solid var(--line); border-radius: 14px; padding: 10px 14px; margin: 10px auto 0; max-width: 520px; display: grid; gap: 4px; }
+.xp-zeile { display: flex; justify-content: space-between; gap: 12px; font-size: 16px; text-align: left; }
+.xp-zeile b { color: #2f7d32; }
+.xp-summe { border-top: 2px dashed var(--line); padding-top: 4px; font-weight: 900; font-size: 18px; }
+.xp-box .rang-zeile { border: 0; background: transparent; padding: 4px 0 0; }
+.stars-inline { white-space: nowrap; }
+.modal-card.ende { max-width: 720px; }
+.rang-feier { position: fixed; inset: 0; z-index: 480; background: radial-gradient(circle, rgba(255,214,90,.45), rgba(10,6,3,.82) 60%); display: flex; align-items: center; justify-content: center; overflow: hidden; }
+.rang-feier-card { position: relative; z-index: 2; text-align: center; background: linear-gradient(180deg, #fff6d6, #ffd977); border: 4px solid #b8860b; border-radius: 22px; padding: 24px 40px; box-shadow: 0 0 60px #ffb800; animation: pop .35s ease-out; color: var(--ink); }
+.rang-feier-emoji { font-family: var(--emoji); font-size: 90px; line-height: 1; animation: bump 1.2s ease-in-out infinite; }
+.rang-feier-card small { display: block; font-weight: 900; color: #7a4a00; font-size: 16px; margin-top: 6px; }
+.rang-feier-card h2 { font-size: 36px; margin: 4px 0 8px; justify-content: center; }
+.rang-funke { position: absolute; left: 50%; top: 50%; font-size: 28px; color: #ffd23f; text-shadow: 0 0 10px #ffb800; animation: funke 1.6s ease-out infinite; }
+@keyframes funke { 0% { transform: rotate(var(--w)) translateY(0) scale(.4); opacity: 1; } 100% { transform: rotate(var(--w)) translateY(-46vh) scale(1.3); opacity: 0; } }

@@ -48,3 +48,15 @@ test('Gegner-Stufen: ★★ ab Tag 3, ★★★ ab Tag 6, der Boss an Tag 10 imm
     assert.ok(items.some((p) => p.stern === 4), `Boss Tag 10 (Seed ${s}) hat ein ★★★★-Item`);
   }
 });
+
+test('Ränge: Rang 2 nach etwa 2 Läufen, Rang 5 (Hüter der Sprache) nach etwa 25–30 Läufen', async (t) => {
+  const { simulateCareer } = await import('../js/sim.js');
+  const d = { ...data, achievements: json('achievements.json') };
+  for (const seed of [100, 300]) {
+    const c = simulateCareer(d, 32, seed);
+    const ab = (r) => c.raenge.indexOf(r) + 1;
+    t.diagnostic(`Karriere ${seed}: Rang 2 nach ${ab(2)}, Rang 3 nach ${ab(3)}, Rang 4 nach ${ab(4)}, Rang 5 nach ${ab(5)} Läufen`);
+    assert.ok(ab(2) >= 1 && ab(2) <= 3, `Rang 2 nach ${ab(2)} Läufen`);
+    assert.ok(ab(5) >= 22 && ab(5) <= 31, `Rang 5 nach ${ab(5)} Läufen`);
+  }
+});

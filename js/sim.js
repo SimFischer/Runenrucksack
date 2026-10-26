@@ -7,6 +7,8 @@ import {
 import { buildCompounds, buildRuneLevels } from './grammar.js';
 import { partnerOf, placeNew, verbindeAlles } from './sterne.js';
 import { playerContext, evaluateBag } from './mods.js';
+import { baueBuch, entdeckungenIn } from './buch.js';
+import { neuesProfil, entdecke, merkeAntwort, laufStand, laufAbschluss, rangVon } from './fortschritt.js';
 import { Battle, makeFighter, runToEnd } from './battle.js';
 
 export function prepareData(raw) {
@@ -15,7 +17,7 @@ export function prepareData(raw) {
   const compounds = buildCompounds(defs, raw.recipes);
   for (const d of compounds) defs[d.id] = d;
   for (const d of buildRuneLevels(defs)) defs[d.id] = d;
-  return { ...raw, defs, compounds };
+  return { ...raw, defs, compounds, buch: baueBuch(defs, raw.items, raw.recipes) };
 }
 
 // Grobe Stärke eines Items pro Sekunde (zum Einkaufen).
@@ -75,7 +77,10 @@ function shop(run, data, rng, skill) {
 function verbinde(run, data, rng, skill, p) {
   if (!p) return;
   verbindeAlles(run, data.defs, data.recipes, [{ uid: p.uid, paar: true }], (a, q) => {
-    if (q && rng() > skill) run.gold = Math.max(0, run.gold - 1);
+    if (!q) return 'richtig';
+    const erster = rng() <= skill;
+    if (!erster) { run.gold = Math.max(0, run.gold - 1); merkeAntwort(run, q.art, false); }
+    merkeAntwort(run, q.art, true, erster);
     return 'richtig';
   });
 }
@@ -92,6 +97,10 @@ function morning(run, data, rng, skill) {
       const enc = data.encounters.begegnungen.find((b) => b.id === id);
       const ok = rng() < skill;
       if (!ok) run.gold = Math.max(0, run.gold - 1);
+      // Aufgaben der Begegnung: bei „ok“ alle gleich richtig, sonst eine mit Fehler
+      const n = enc.aufgabe ? enc.aufgabe.anzahl || 1 : 0;
+      for (let i = 0; i < n; i++) merkeAntwort(run, 'mehrzahl', ok || i > 0, ok || i > 0);
+      if (n && !ok) merkeAntwort(run, 'mehrzahl', false);
       const b = enc.belohnung;
       if (b.typ === 'feld' && ok) growBag(run);
       if (b.typ === 'gold' && ok) run.gold += b.menge;
@@ -127,19 +136,35 @@ export function simulateRun(data, rng, opts = {}) {
     const foeDef = pickEnemy(run.day, data.regions, data.enemies, rng);
     const enemy = makeEnemy(run.day, foeDef, enemyPool(data.items, data.compounds, run.day), data.defs, rng);
     const armor = rng() < skill;
+    merkeAntwort(run, 'rechtschreibung', armor, true);
+    if (armor) laufStand(run).orkFehler++;
+    if (opts.profil) laufStand(run).neu.push(...entdecke(opts.profil, entdeckungenIn(run, data.defs, data.buch)));
     const foe = makeFighter('e', enemy.items, data.defs, run.day, { startHp: armor ? 1 - ARMOR_BONUS : 1, rng });
     const battle = new Battle(player, foe);
     const won = runToEnd(battle) === 'win';
     days.push({ day: run.day, won, time: battle.time, boss: !!foeDef.boss });
     finishBattle(run, data.items, data.regions, won, enemy.name, rng);
   }
-  return { wins: run.wins, won: run.over === 'won', days };
+  const abschluss = opts.profil && data.achievements ? laufAbschluss(opts.profil, run, data) : null;
+  return { wins: run.wins, won: run.over === 'won', days, abschluss };
 }
 
 // Geschätzte Spielzeit: Kampf in 1×-Tempo plus Zeit für Laden und Morgen (Annahmen in Sekunden).
 export const ZEIT = { laden: 45, morgen: 25, kampfExtra: 8 };
 export function estimateMinutes(days) {
   return days.reduce((s, d) => s + d.time + ZEIT.kampfExtra + ZEIT.laden + (d.day > 1 ? ZEIT.morgen : 0), 0) / 60;
+}
+
+// Viele Läufe nacheinander mit demselben Profil: Wann steigt man in welchen Rang auf?
+// Ergebnis: Rang-Nummer nach jedem Lauf und die Erfahrung.
+export function simulateCareer(data, n, seed = 1, opts = {}) {
+  const profil = neuesProfil();
+  const raenge = [];
+  for (let i = 0; i < n; i++) {
+    simulateRun(data, seededRng(seed + i * 7919), { ...opts, profil });
+    raenge.push(rangVon(profil.xp, data.achievements.raenge).nr);
+  }
+  return { raenge, xp: profil.xp, buch: profil.buch.length };
 }
 
 export function simulateMany(data, n, seed = 1, opts = {}) {

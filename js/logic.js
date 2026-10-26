@@ -403,17 +403,17 @@ export function makeTask(aufgabe, ex, rng = Math.random) {
     case 'plural':
       return shuffle(ex.plural, rng).slice(0, n).map((q) => ({
         prompt: `Mehrzahl von <b>„${q.wort}“</b>?`,
-        options: shuffle([q.richtig, ...q.falsch], rng), correct: q.richtig, explain: q.regel,
+        options: shuffle([q.richtig, ...q.falsch], rng), correct: q.richtig, explain: q.regel, regel: 'mehrzahl',
       }));
     case 'artikel':
       return shuffle(ex.artikel, rng).slice(0, n).map((q) => ({
         prompt: `<span class="blank">___</span> <b>${q.wort}</b>`,
-        options: ['der', 'die', 'das'], correct: q.artikel, explain: `Es heißt ${q.artikel} ${q.wort}.`, genus: true,
+        options: ['der', 'die', 'das'], correct: q.artikel, explain: `Es heißt ${q.artikel} ${q.wort}.`, genus: true, regel: 'artikel',
       }));
     case 'personalform':
       return shuffle(ex.personalformen, rng).slice(0, n).map((q) => ({
         prompt: q.satz.replace('___', '<span class="blank">___</span>'),
-        options: shuffle([q.richtig, ...q.falsch], rng), correct: q.richtig, explain: q.regel,
+        options: shuffle([q.richtig, ...q.falsch], rng), correct: q.richtig, explain: q.regel, regel: 'personalform',
       }));
     case 'speisekarte': {
       const k = pickOne(ex.speisekarten, rng);
@@ -433,7 +433,7 @@ export function tapTask(zeilen, explain) {
     ziel = { zeile: li, wort: ti, falsch, richtig };
     return falsch;
   }));
-  return { tap: true, zeilen: clean, ziel, explain };
+  return { tap: true, zeilen: clean, ziel, explain, regel: 'rechtschreibung' };
 }
 
 // Kobold: Name in Wortteilen, ein Teil ist falsch geschrieben.

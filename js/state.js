@@ -20,6 +20,7 @@ export const G = {
   ENCOUNTERS: null, // encounters.json
   EXERCISES: null,  // exercises.json
   TUTORIAL: null,   // tutorial.json
+  ACH: null,        // achievements.json: Erfahrung, Ränge, Erfolge, Designs
   BILDER: { items: {}, gegner: {}, figuren: {}, bosse: {}, hintergruende: {} }, // assets/zuordnung.json
   BUCH: null,       // Buch der Wörter (aus items.json und recipes.json erzeugt)
   PROFIL: null,     // dauerhafter Fortschritt (js/fortschritt.js)
@@ -30,9 +31,9 @@ const SAVE_KEY = 'runenrucksack.lauf.v2';
 
 export async function loadData() {
   const get = (f) => fetch(f).then((r) => r.json());
-  const [itemData, enemyData, recipes, regions, heroes, encounters, exercises, tutorial, bilder] = await Promise.all([
+  const [itemData, enemyData, recipes, regions, heroes, encounters, exercises, tutorial, ach, bilder] = await Promise.all([
     get('items.json'), get('enemies.json'), get('recipes.json'), get('regions.json'), get('heroes.json'),
-    get('encounters.json'), get('exercises.json'), get('tutorial.json'),
+    get('encounters.json'), get('exercises.json'), get('tutorial.json'), get('achievements.json'),
     get('assets/zuordnung.json').catch(() => null),
   ]);
   G.ITEMS = itemData.items;
@@ -50,6 +51,7 @@ export async function loadData() {
   G.ENCOUNTERS = encounters;
   G.EXERCISES = exercises;
   G.TUTORIAL = tutorial;
+  G.ACH = ach;
   if (bilder) Object.assign(G.BILDER, bilder);
   G.BUCH = baueBuch(G.DEFS, G.ITEMS, G.RECIPES);
   G.PROFIL = loadProfil();

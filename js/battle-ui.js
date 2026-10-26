@@ -4,6 +4,7 @@ import { Battle, makeFighter, runToEnd } from './battle.js';
 import { analyze } from './grammar.js';
 import { G, itemsIn, gridOf, region, hero, playerCtx, emit, figurBild, gegnerBild } from './state.js';
 import { evaluateBag } from './mods.js';
+import { merkeAntwort, laufStand } from './fortschritt.js';
 import { $, fmt, buildGrid, drawItems, openModal, closeModal } from './ui.js';
 
 let battle = null, enemy = null, speed = 1, rafId = 0, lastFrame = 0, itemEls = {}, onDone = null;
@@ -228,6 +229,8 @@ function openArmor() {
       const ok = options[+b.dataset.k] === armor.richtig;
       armor.status = ok ? 'richtig' : 'falsch';
       run.lernen[ok ? 'richtig' : 'falsch']++;
+      merkeAntwort(run, 'rechtschreibung', ok, true);
+      if (ok) laufStand(run).orkFehler++;
       if (ok) {
         const f = battle.sides.enemy;
         f.hp = Math.round(f.maxHp * (1 - ARMOR_BONUS));
