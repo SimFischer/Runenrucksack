@@ -1,6 +1,6 @@
 // Offline-Unterstützung: zuerst aus dem Netz laden (damit Änderungen an items.json sofort ankommen),
 // ohne Netz aus dem Zwischenspeicher. Bei neuen Dateien die Versionsnummer erhöhen.
-const CACHE = 'runenrucksack-v6';
+const CACHE = 'runenrucksack-v7';
 const FILES = [
   './',
   'index.html',
@@ -31,6 +31,16 @@ const FILES = [
   'icons/apple-touch-icon.png',
   // Bilder (nur die im Spiel verwendeten – nicht assets/roh/, nicht die Vorschau)
   'assets/zuordnung.json',
+  'assets/items/kuerbis.webp',
+  'assets/items/pfanne.webp',
+  'assets/items/honig.webp',
+  'assets/items/karotte.webp',
+  'assets/items/hafer.webp',
+  'assets/items/zaumzeug.webp',
+  'assets/items/stechen.webp',
+  'assets/items/schiessen.webp',
+  'assets/items/brennen.webp',
+  'assets/items/leuchten.webp',
   'assets/items/dolch.webp',
   'assets/items/helm.webp',
   'assets/items/laterne.webp',

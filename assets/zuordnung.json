@@ -27,6 +27,16 @@
     "schuetzen": "items/schuetzen.webp",
     "heilen": "items/heilen.webp",
     "stuermen": "items/stuermen.webp",
+    "stechen": "items/stechen.webp",
+    "schiessen": "items/schiessen.webp",
+    "brennen": "items/brennen.webp",
+    "leuchten": "items/leuchten.webp",
+    "kuerbis": "items/kuerbis.webp",
+    "pfanne": "items/pfanne.webp",
+    "honig": "items/honig.webp",
+    "karotte": "items/karotte.webp",
+    "hafer": "items/hafer.webp",
+    "zaumzeug": "items/zaumzeug.webp",
     "feuer": "items/feuer.webp",
     "gift": "items/gift.webp",
     "eis": "items/eis.webp",
@@ -521,6 +531,96 @@
         584,
         591,
         650
+      ]
+    },
+    "items/stechen.webp": {
+      "sheet": "rollen-nachtrag.webp",
+      "ausschnitt": [
+        25,
+        89,
+        414,
+        744
+      ]
+    },
+    "items/schiessen.webp": {
+      "sheet": "rollen-nachtrag.webp",
+      "ausschnitt": [
+        467,
+        89,
+        415,
+        743
+      ]
+    },
+    "items/brennen.webp": {
+      "sheet": "rollen-nachtrag.webp",
+      "ausschnitt": [
+        910,
+        88,
+        416,
+        745
+      ]
+    },
+    "items/leuchten.webp": {
+      "sheet": "rollen-nachtrag.webp",
+      "ausschnitt": [
+        1355,
+        88,
+        414,
+        744
+      ]
+    },
+    "items/kuerbis.webp": {
+      "sheet": "items-nachtrag.webp",
+      "ausschnitt": [
+        45,
+        57,
+        449,
+        434
+      ]
+    },
+    "items/pfanne.webp": {
+      "sheet": "items-nachtrag.webp",
+      "ausschnitt": [
+        549,
+        29,
+        546,
+        458
+      ]
+    },
+    "items/honig.webp": {
+      "sheet": "items-nachtrag.webp",
+      "ausschnitt": [
+        1117,
+        32,
+        368,
+        456
+      ]
+    },
+    "items/karotte.webp": {
+      "sheet": "items-nachtrag.webp",
+      "ausschnitt": [
+        27,
+        509,
+        482,
+        482
+      ]
+    },
+    "items/hafer.webp": {
+      "sheet": "items-nachtrag.webp",
+      "ausschnitt": [
+        528,
+        517,
+        507,
+        455
+      ]
+    },
+    "items/zaumzeug.webp": {
+      "sheet": "items-nachtrag.webp",
+      "ausschnitt": [
+        1081,
+        496,
+        425,
+        491
       ]
     }
   },

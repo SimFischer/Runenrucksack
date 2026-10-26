@@ -5,7 +5,7 @@
 //
 //   node tools/zerschneide.mjs
 //
-// Neue Bilder: Sheet in assets/roh/ legen und unten in SHEETS eintragen (Zeilen von oben nach unten,
+// Neue Bilder: Sheet (PNG oder WebP) in assets/roh/ legen und unten in SHEETS eintragen (Zeilen von oben nach unten,
 // Objekte von links nach rechts). Braucht Chrome oder Edge (Umgebungsvariable CHROME, falls nicht gefunden).
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { openChrome } from './chrome.mjs';
@@ -22,6 +22,13 @@ const SHEETS = [
   { datei: 'items-hochkant.png', ziel: 'items', reihen: [
     ['schwert', 'axt', 'bogen', 'stab', 'speer', 'stiefel'],
     ['schlagen', 'schuetzen', 'heilen', 'stuermen', 'verb-rufen', 'verb-reiten'],
+  ] },
+  { datei: 'rollen-nachtrag.webp', ziel: 'items', reihen: [
+    ['stechen', 'schiessen', 'brennen', 'leuchten'],
+  ] },
+  { datei: 'items-nachtrag.webp', ziel: 'items', reihen: [
+    ['kuerbis', 'pfanne', 'honig'],
+    ['karotte', 'hafer', 'zaumzeug'],
   ] },
   { datei: 'kristalle-siegel.png', ziel: 'items', reihen: [
     ['feuer', 'gift', 'eis', 'blitz'],
@@ -51,8 +58,8 @@ const groesse = (id, ziel) => {
 
 // Läuft in der Seite: teilt das Sheet in Reihen und Spalten (an den leersten Linien zwischen den
 // Objekten), schneidet jede Zelle eng auf ihr Objekt zu und passt es in die Zielgröße ein.
-const SEITE = String.raw`async (b64, reihen, groessen) => {
-  const img = new Image(); img.src = 'data:image/png;base64,' + b64; await img.decode();
+const SEITE = String.raw`async (b64, reihen, groessen, typ) => {
+  const img = new Image(); img.src = 'data:' + typ + ';base64,' + b64; await img.decode();
   const W = img.width, H = img.height;
   const cv = new OffscreenCanvas(W, H), g = cv.getContext('2d'); g.drawImage(img, 0, 0);
   const a = g.getImageData(0, 0, W, H).data;
@@ -120,7 +127,8 @@ let bytes = 0;
 for (const sheet of SHEETS) {
   const ids = sheet.reihen.flat();
   const b64 = readFileSync(ROH + sheet.datei).toString('base64');
-  const r = await chrome.run(`(${SEITE})(${JSON.stringify(b64)}, ${JSON.stringify(sheet.reihen)}, ${JSON.stringify(ids.map((id) => groesse(id, sheet.ziel)))})`);
+  const typ = sheet.datei.endsWith('.webp') ? 'image/webp' : 'image/png';
+  const r = await chrome.run(`(${SEITE})(${JSON.stringify(b64)}, ${JSON.stringify(sheet.reihen)}, ${JSON.stringify(ids.map((id) => groesse(id, sheet.ziel)))}, '${typ}')`);
   if (r.out.length !== ids.length) throw new Error(`${sheet.datei}: ${r.out.length} Objekte gefunden, ${ids.length} erwartet`);
   mkdirSync(`assets/${sheet.ziel}`, { recursive: true });
   ids.forEach((id, k) => {
