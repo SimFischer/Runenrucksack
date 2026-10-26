@@ -1,0 +1,321 @@
+# Runenrucksack – Spielkonzept
+
+Oct 26, 2026 · @Simon
+
+## Überblick
+
+Runenrucksack ist ein Fantasy-Backpack-Battler fürs iPad, in dem Wörter Gegenstände sind und Grammatik das Regelwerk der Kombos bildet. Wer stärker werden will, muss grammatisch richtig bauen – das Lernen steckt in der Mechanik, nicht in einem vorgeschalteten Quiz.
+
+| Punkt | Festlegung |
+| --- | --- |
+| Zielgruppe | Schnellere Schülerinnen und Schüler, Klassen 5, 6, 7 und 11 |
+| Hauptziel | Motivation: „noch ein Tag, noch ein Run, noch eine Kombination“ |
+| Nebenziel | Grammatik spielerisch üben und wiederholen |
+| Vorbilder | Backpack Battles (Rucksack, Laden, Kämpfe), Oaken Tower (Begegnungen, Boni, Aufwerten, Build-Codes), Heldensammler (Freischaltungen) |
+| Plattform | Web-App (PWA) auf GitHub Pages, läuft in Safari und als Symbol auf dem Home-Bildschirm |
+| Datenschutz | Keine Accounts, keine Namen; Fortschritt über Codes |
+| Länge eines Laufs | 10–15 Minuten, jederzeit unterbrechbar |
+
+Alle Namen, Orte und Wappen sind eigene Erfindungen. Die Stimmung lehnt sich an klassische High Fantasy an, ohne Namen oder Designs aus bestehenden Werken zu übernehmen.
+
+## Welt und Geschichte
+
+In den Wanderlanden zerfällt die Sprache: Der Wirrwarr, ein Schatten aus dem Aschland, lässt Wörter zerbrechen, und seine Orks tragen die Fehler auf ihren Rüstungen. Eine junge Heldin oder ein junger Held aus dem Hügeldorf Kleinwurzel zieht mit einem Runenrucksack los, um die Wörter zu retten.
+
+### Gebiete der Reise
+
+Die Reise ist die Karte. Jedes Gebiet bringt neue Items, Gegner, Begegnungen und ein Wortfeld.
+
+| Gebiet | Stimmung | Wortfeld | Boss |
+| --- | --- | --- | --- |
+| Kleinwurzel | grüne Hügel, runde Türen im Hang, Gärten | Haus und Garten | Ork-Plünderer |
+| Hrossmark | weite Graslande, Holzhallen mit goldenen Dächern | Pferd und Reiten | Wolfsreiter-Häuptling |
+| Tal Lindrael | Wasserfälle, helle Elbenhallen, Bibliotheken | Bücher und Wissen | Irrlicht-Hexer |
+| Dornwald | dunkler, wilder Wald, Baumhäuser, Netze | Wald und Tiere | Riesenspinne |
+| Khazrûm, die Verlorene Tiefe | leere Säulenhallen unter dem Berg | Höhle und Gestein | Höhlentroll |
+| Eisenberg Duramar | wiedergewonnenes Zwergenreich, Schmieden, Gold | Schmieden und Handwerk | Drachenwurm |
+| Weiße Feste Aldamar | weiße Stadt auf sieben Ringen, Banner | Burg und Rittertum | Ork-Kriegsherr |
+| Silberbucht | Hafenstadt der Reiherritter am Meer | Meer und Schiffe | Seeschlange |
+| Schattenturm im Aschland | Endgebiet | gemischt | Der Wirrwarr |
+
+### Völker
+
+- **Pferdesippen von Hrossmark:** nordisch, Langhäuser, grüne Mäntel, Rundschilde, Speere; Wappen: springendes Pferd und Sonne.
+- **Weiße Feste Aldamar:** erhabene Steinstadt, schwarz-silberne Plattenrüstung, Flügelhelme; Wappen: silberner Stern über einem Turm.
+- **Reiherritter von Silberbucht:** blaue Banner, silberne Rüstung, Lanzen; Wappen: silberner Reiher.
+- **Elben von Lindrael und vom Dornwald:** helle Hallen und dunkler Wald, Bögen, Lampen, Gift und Ranken.
+- **Zwerge von Khazrûm und Duramar:** verlorene und wiedergewonnene Bergreiche, Äxte, Hämmer, Runensteine.
+
+### Gegner
+
+Die Wirrwarr-Orks tragen falsch geschriebene Wörter auf der Rüstung („Schwerdt“, „das Axt“). Varianten: Späher-Ork (schnell), Schild-Ork (zäh), Ork-Schamane (verflucht Adjektive), Wolfsreiter. Wer vor dem Kampf einen Fehler auf dem Gegner korrigiert, schwächt ihn.
+
+## Spielablauf
+
+Ein Lauf besteht aus Tagen mit je drei Phasen und endet nach 10 Siegen oder wenn alle 5 Herzen verloren sind. Ein Lauf dauert 10–15 Minuten.
+
+&#91;embedded content: Ablauf eines Laufs · Morgen, Tag, Nacht\]
+
+### Morgen: Begegnung
+
+Man trifft eine Figur am Wegesrand und wählt aus zwei bis drei Boni. Jede Begegnung ist eine kleine Übung in Spielverpackung.
+
+| Begegnung | Aufgabe | Belohnung |
+| --- | --- | --- |
+| Eulenbibliothekarin (Lindrael) | Plural von drei Nomen bilden | Rucksack +1 Feld |
+| Rätselzwerg (Khazrûm) | richtigen Artikel oder Fall wählen | seltenes Rezept |
+| Wirtin vom „Krummen Kessel“ | Fehler auf der Speisekarte finden | Gold |
+| Fahrender Händler | – | ein Item tauschen |
+| Pferdehirtin (Hrossmark) | Verben dem richtigen Bild zuordnen | schnellere Schriftrollen |
+| Zwielichtiger Kobold | versteckten Fehler im Geschenk finden | sehr starkes Item, sonst schadet es dir |
+
+### Tag: Laden und Rucksack
+
+- Zu Beginn des Tages verschmelzen benachbarte Items nach Rezept.
+- Gold pro Tag, steigend mit den Tagen.
+- Laden mit 5 Items; neu würfeln kostet 1 Gold, Items lassen sich reservieren, gelegentlich ist eines im Angebot.
+- Items kaufen, verkaufen, verschieben, drehen.
+
+### Nacht: Kampf
+
+- Der Rucksack kämpft automatisch gegen einen Ork-Rucksack; zuschauen, Kombos feiern.
+- Vorher optional: einen Fehler auf der Gegnerrüstung korrigieren, um ihn zu schwächen.
+- Sieg = Trophäe, Niederlage = 1 Herz weniger.
+
+### Ende eines Laufs
+
+Neue Einträge im Buch der Wörter, Fortschritt bei Figuren und Rang, Heldencode und Rucksack-Code für die Arena.
+
+## Rucksack und Items
+
+Jede Wortart ist eine Item-Sorte mit eigener Form und Rolle, und die Stern-Felder der Items sind grammatische Beziehungen. Ein Adjektiv-Stern muss auf ein Nomen zeigen, ein Artikel wirkt nur beim passenden Genus.
+
+### Der Rucksack
+
+- Raster, anfangs etwa 4×3 Felder; Items lassen sich verschieben und drehen.
+- Daneben ein **Lager**: Items dort sind gesammelt, aber wirkungslos.
+- **Taschen** erweitern das Raster und sind Wortfelder: Die Waldtasche stärkt Wörter aus dem Wortfeld Wald, die Schmiedetasche Wörter rund ums Schmieden.
+
+### Item-Sorten
+
+| Wortart | Im Spiel | Form | Rolle |
+| --- | --- | --- | --- |
+| Nomen (Träger) | Schwert, Bogen, Schild, Stab, Axt, Helm, Stiefel, Laterne | groß (2×2, 1×3) | macht Schaden, blockt, heilt |
+| Nomen (Kraft) | Feuer, Gift, Eis, Blitz, Stein, Mond, Gold, Sturm | 1×1 Kristall | wird mit einem Träger zum Kompositum |
+| Adjektiv | Edelsteine und Runen: scharf, schwer, schnell, golden, edel | 1×1 | Stern zeigt auf ein Nomen und verändert es wörtlich |
+| Artikel | Siegel in Genusfarben: der, die, das | 1×1 | aktiviert ein benachbartes Nomen mit passendem Genus |
+| Verb | Schriftrollen: heilen, schlagen, schützen, rufen, reiten | 1×2 | das Verb bestimmt, was passiert |
+
+Bedeutung und Wirkung fallen zusammen: Ein scharfes Schwert macht mehr Schaden, schnelle Stiefel lassen alles schneller wirken, ein schwerer Schild blockt mehr.
+
+### Zeitformen als Wirkung (ab Pfad 2)
+
+- **Präsens:** wirkt sofort.
+- **Präteritum / Perfekt:** Echo, wiederholt eine bereits geschehene Wirkung.
+- **Futur:** lädt auf und wirkt später sehr stark.
+
+Beim Aufwerten wählt das Kind die richtige Form („heilen → er heilte“).
+
+### Seltenheit
+
+Gewöhnlich, selten, episch, legendär – jeweils mit eigenem Rahmen und Leuchten. Mit jeder Runde steigt die Chance auf seltenere Items im Laden.
+
+### Kampfwerte
+
+Abklingzeit, Schaden, Block, Heilung sowie Zustände, die zu den Kräften passen: Feuer = Brand (Schaden über Zeit), Gift = Gift, Eis = Kälte (Gegner langsamer), Blitz = Betäubung, Gold = Glück, Mond = Heilung über Zeit, Stein = Block, Sturm = Tempo.
+
+## Kombinieren
+
+Das Kombinieren ist die größte Stärke des Spiels: Benachbarte Items verschmelzen zu Beginn des nächsten Tages, und es entsteht immer etwas Neues. Die Regeln dahinter sind echte deutsche Grammatik.
+
+### Komposita: Kraft + Träger
+
+- **Bestimmungswort (vorne)** = die Kraft: Feuer, Gift, Eis, Blitz …
+- **Grundwort (hinten)** = der Gegenstand und sein Artikel: Schwert, Bogen, Schild …
+- Feuer + Schwert = **das Feuerschwert**, Gift + Bogen = **der Giftbogen**, Eis + Schild = **der Eisschild**.
+- Beim Verschmelzen wählt das Kind den Artikel. Merksatz im Feedback: „Das letzte Wort bestimmt den Artikel.“
+- **Reihenfolge zählt:** Schwert + Feuer ergibt ein Schwertfeuer – eine Feuerwand aus Klingen, also ein anderes Item. Das lädt zum Experimentieren ein.
+- **Dreifach-Komposita** sind legendär: Drache + Feuer + Schwert = das Drachenfeuerschwert.
+- **Unsinn-Kombinationen** dürfen witzig sein (Stiefelsuppe), sind aber schwach.
+
+### Steigerung: dreimal dasselbe Adjektiv
+
+- scharf → schärfer → am schärfsten
+- Unregelmäßige Formen (gut → besser → am besten, viel → mehr → am meisten) sind seltene, besonders starke Rezepte.
+
+### Weitere Rezepte (höhere Pfade)
+
+- Verb + Endungsrune „-ung“ → Nomen: heilen → die Heilung. Ab hier gilt Großschreibung – ein Aha-Moment zur Nominalisierung.
+- Fugenelemente: Liebe + Brief = der Liebesbrief, Sonne + Schild = der Sonnenschild.
+- Präfix-Runen bei Verben: rufen → herbeirufen, schlagen → zurückschlagen.
+
+### Grafiktrick: wenige Bilder, viele Kombinationen
+
+Nur die Träger werden als Bild gemalt (etwa 10–15 Bilder). Die Kräfte legt der Code als Effekt darüber: Flammen, grüne Gifttropfen, Eiskristalle, Blitzfunken, farbiges Leuchten. So entstehen hunderte Kombinationen mit wenigen generierten Bildern, und jede sieht anders aus.
+
+## Startfiguren
+
+Jede Figur steht für ein Volk und einen Spielstil, sodass man jede einmal ausprobieren will. Zu Beginn sind zwei Figuren frei, die übrigen werden freigeschaltet.
+
+| Figur | Volk | Stärke | Start-Items | Freischaltung |
+| --- | --- | --- | --- | --- |
+| Borga Eisenfaust | Zwerge von Duramar | Meisterin der Komposita: Verschmelzungen geben Bonusschaden | Axt, Feuerkristall | von Anfang an |
+| Eadrun die Reiterin | Pferdesippen von Hrossmark | Verb-Schriftrollen wirken schneller | Speer, Rolle „stürmen“ | von Anfang an |
+| Faelith die Bogenschützin | Elben vom Dornwald | Komposita mit „Bogen“ stärker, entdeckt Rezepte schneller | Bogen, Giftkristall | Dornwald erreichen |
+| Hauptmann Theron | Weiße Feste Aldamar | Nomen mit richtigem Artikel bekommen Rüstung | Langschwert, Turmschild | 3 Läufe gewinnen |
+| Ritterin Ysolde | Reiherritter von Silberbucht | Adjektive haben doppelte Sterne | Lanze, Rune „edel“ | 25 Einträge im Buch der Wörter |
+| Meister Fenwick | Wanderzauberer | darf einmal pro Kampf eine Zeitform umwandeln | Stab, Rolle „rufen“ | Pfad 2 |
+
+### Unterklasse ab Tag 8
+
+Ab Tag 8 wählt man eine Spezialisierung aus zwei Angeboten, z. B. „Feuerschmiedin“ (alle Feuer-Komposita +50 %), „Wortweber“ (Adjektive wirken auf zwei Nomen) oder „Zeitwandler“ (Futur lädt doppelt so schnell).
+
+## Motivation
+
+Der stärkste Antrieb ist die Entdeckung: Unbekannte Kombinationen stehen als „???“ mit Silhouette im Buch der Wörter, und jede leere Stelle will gefüllt werden. Dazu kommen kurze Läufe, die jedes Mal anders verlaufen, und dauerhafter Fortschritt zwischen den Läufen.
+
+### Innerhalb eines Laufs
+
+- Kurze, spannende Kämpfe unter einer Minute, mit Treffereffekten, Schadenszahlen und Geräuschen.
+- Zufälliger Laden, zufällige Begegnungen, zufällige **Schicksalsrune** zu Beginn (z. B. „Eis-Items heute doppelt so stark“).
+- Builds entstehen von selbst: Feuer-, Gift-, Eis-, Schild- oder Verb-Build.
+- Legendäre Funde mit besonderem Glanz.
+
+### Zwischen den Läufen
+
+- **Buch der Wörter:** Sammelalbum und persönliches Wörterbuch zugleich; Seiten pro Gebiet, Belohnung für volle Seiten.
+- **Neue Figuren** und neue Items, die künftig im Laden auftauchen.
+- **Neue Gebiete** auf der Karte.
+- **Rucksack-Designs** als kosmetische Belohnung.
+- **Ränge:** Lehrling → Wanderer → Runenkundige → Wortmeister → Hüter der Sprache.
+- **Erfolge** wie „Erstes Dreifach-Kompositum“ oder „Gewonnen ohne Fehlversuch“.
+
+### Bewusst weggelassen
+
+Keine täglichen Belohnungen, die man verpassen kann, keine Echtgeld-Mechaniken, keine Ranglisten mit Namen. Der Reiz soll aus dem Spiel kommen, nicht aus Druck.
+
+## Pfade für die Klassenstufen
+
+Der Spielablauf bleibt in allen Stufen gleich; es wechselt nur das Sprachpaket, also welche Grammatik in den Items steckt. Zu Beginn wählt man einen Pfad, jeder Pfad enthält auch alles aus den Pfaden darunter.
+
+| Pfad | Stufe | Neue Grammatik im Spiel |
+| --- | --- | --- |
+| Pfad des Lehrlings | 5 | Nomen, Artikel und Genus, Adjektive, Steigerung, einfache Komposita, Verben im Präsens |
+| Pfad des Wanderers | 6 | Zeitformen als Wirkungen, Fugenelemente, Plural, unregelmäßige Steigerung, Nominalisierung mit „-ung“ |
+| Pfad des Kundschafters | 7 | Präpositionen als Brücken zwischen Items (verbinden nur im richtigen Fall), Satzglieder, Aktiv und Passiv |
+| Pfad der Meister | 11 | Konjunktiv II als „Wunschzauber“ (wäre, hätte: Illusionen), Konjunktiv I als „Botenzauber“ (indirekte Rede: spiegelt gegnerische Fähigkeiten), Adjektivdeklination, Satzgefüge und Kommas |
+
+Auf jedem Pfad gibt es zusätzlich die Stufen **leicht / normal / schwer**. Sie steuern, wie oft Grammatik-Entscheidungen auftauchen und wie viel Hilfe angezeigt wird. Für die 11. Klasse ist der Reiz: dasselbe Spiel wie die Fünftklässler, aber mit deutlich anspruchsvolleren Items.
+
+## Speichern per Code und Klassenarena
+
+Das Spiel speichert nichts dauerhaft auf dem iPad, sondern erzeugt Codes, die die Kinder ins Heft schreiben oder fotografieren. So funktioniert es auch auf geteilten Geräten, ganz ohne Accounts.
+
+### Drei Codes
+
+| Code | Inhalt | Form | Beispiel |
+| --- | --- | --- | --- |
+| Heldencode | dauerhafter Fortschritt: Figuren, Rang, Gebiete, Buch der Wörter, Erfolge, gewählter Pfad | 4–5 Fantasy-Wörter + Zahl | Drache-Laterne-Moos-Eiche-47 |
+| Reisecode | ein laufender Lauf: Tag, Herzen, Siege, Gold, Rucksack mit Positionen | länger, nur zum Weiterspielen | Code aus Buchstaben und Zahlen |
+| Rucksack-Code | ein fertiger Rucksack für die Arena | mittellang | Code aus Buchstaben und Zahlen |
+
+- Eine **Prüfziffer** erkennt Tippfehler und meldet sie freundlich.
+- Der Code ist **komprimiert** (Bitfelder): jedes freigeschaltete Element ist ein Bit, so bleibt der Heldencode kurz.
+- **Wortliste** für den Heldencode: etwa 256 Fantasy-Wörter, jedes steht für 8 Bit.
+- Zusätzlich darf das Spiel den letzten Stand im Browser merken, als Komfort – maßgeblich ist aber der Code.
+- Fälschen ist möglich, aber unwichtig: Es gibt nichts zu gewinnen außer Spaß.
+
+### Klassenarena
+
+- **Duell:** Ein Kind gibt den Rucksack-Code eines anderen ein und kämpft gegen dessen Rucksack.
+- **Turnier am Beamer:** Die Lehrkraft sammelt Codes im Turniermodus, die Rucksäcke treten im K.-o.-System automatisch gegeneinander an, alle schauen zu.
+- **Champion der Woche:** Der beste Rucksack kann als fester Gegner ins Spiel eingetragen werden.
+- **Fairness:** Nur Rucksäcke vom gleichen Pfad und vom gleichen Tag treten gegeneinander an.
+- **Gegner ohne Server:** Im normalen Lauf kämpft man gegen vorgefertigte Ork-Rucksäcke, deren Stärke mit den Tagen wächst.
+
+## Lernsicherung und Lehrkraft-Modus
+
+Spaß hat Vorrang, aber eine Regel ist unverhandelbar: Eine grammatisch falsche Kombination darf nie stärker sein als eine richtige. Sonst lernen die Kinder, Grammatik zu ignorieren.
+
+### Damit Lernen passiert
+
+- **Raten bremsen:** Der erste Versuch bei einer Grammatik-Entscheidung ist frei, jeder weitere kostet 1 Gold.
+- **Kurzes Feedback** nach einem Fehler, eine Zeile mit der Regel: „Feuer**schwert** – das Schwert bestimmt den Artikel.“
+- **Lupe als Hilfe:** zeigt die Regel vorab, kostet aber einen kleinen Bonus.
+- **Lernaufgaben bleiben kurz** und stecken im Aufbau (Laden, Begegnungen, Verschmelzen), nie mitten im Kampf.
+- **Fehler auf Orks:** vor dem Kampf einen falschen Begriff auf der Gegnerrüstung antippen und korrigieren → Gegner geschwächt.
+- **Lernbericht am Ende eines Laufs:** welche Regeln sicher saßen, welche nicht – nur für das Kind sichtbar.
+
+### Lehrkraft-Modus
+
+- Alle Wörter, Rezepte und Begegnungen stehen in **JSON-Dateien** pro Pfad. Neue Wörter, etwa aus dem aktuellen Lesetext, lassen sich ohne Programmieren ergänzen.
+- **Freischalt-Code** pro Gebiet, damit niemand dem Unterricht vorauseilt.
+- **Turniermodus** für die Klassenarena am Beamer.
+- **Champion-Rucksack** per Code als festen Gegner eintragen.
+- Zugang über einen Lehrkraft-Code, nicht über ein Passwort.
+
+### Offene Fragen
+
+- Kennen die Kinder Genusfarben aus der Grundschule (z. B. blau = der, rot = die, grün = das), oder nehmen wir Symbole?
+- Welche Grammatik steht in Klasse 5 als Nächstes an? Danach richtet sich die Wortliste für Kleinwurzel.
+
+## Grafikstil und Bildprompts
+
+Ein fester Grundprompt vor jedem Bild hält die Sammlung einheitlich. Film- oder Buchnamen gehören nicht in die Prompts, sonst versucht der Generator, das Original nachzubauen.
+
+### Grundprompt
+
+```
+Hand-painted high fantasy game art, epic but cozy, warm earthy palette with gold accents, thick dark outlines, simple shading, clean readable shapes, storybook illustration style, no text
+```
+
+### Motiv-Zusätze
+
+| Motiv | Zusatz nach dem Grundprompt |
+| --- | --- |
+| Item-Icon | `… dwarven war axe with glowing runes, single item icon, centered, transparent background` |
+| Sprite-Sheet | `… sprite sheet, 4x4 grid of 16 different fantasy weapons, each centered in its cell, evenly spaced, transparent background` |
+| Figur | `… Nordic horse-lord warrior, Anglo-Saxon style, green cloak, gold-trimmed helmet with horsehair plume, round wooden shield, full body, transparent background` |
+| Figur | `… noble knight in black and silver plate armor with winged helmet, silver star emblem, full body, transparent background` |
+| Figur | `… elven archer with pale wooden longbow, dark forest green cloak, full body, transparent background` |
+| Gegner | `… cartoonish orc warrior with crude armor painted with scribbled letters, comedic not scary, full body, transparent background` |
+| Hintergrund | `… rolling green hills with round wooden doors in the hillsides, gardens, warm golden evening light, wide landscape` |
+| Hintergrund | `… white stone city built in seven rings on a mountainside, banners in the wind, wide landscape` |
+
+### Sparsam generieren
+
+- Items als **Sprite-Sheets** zu 16 Stück; Claude Code schneidet sie in Einzelbilder.
+- Nur **Träger-Items** malen lassen, Kräfte (Feuer, Gift, Eis …) als Code-Effekte.
+- Pro Figur ein Porträt und eine Kampfpose.
+- Bis das Spiel Spaß macht: **Platzhalter** (Emojis oder einfache Formen).
+
+## Technik und Bauplan
+
+Gebaut wird eine Web-App ohne Server, in Etappen: Erst muss der Kern Spaß machen, dann kommen Inhalte, Grafik und Codes. Nach jeder Etappe wird auf dem iPad getestet.
+
+### Technik
+
+- **HTML, CSS, JavaScript** (gern mit Vite und TypeScript), Darstellung im Canvas oder mit PixiJS für Effekte.
+- **PWA** mit Manifest und Service Worker: offline spielbar, Symbol auf dem Home-Bildschirm.
+- **Hosting** auf GitHub Pages.
+- **Touch zuerst:** Drag and Drop mit dem Finger, große Felder, Querformat auf dem iPad.
+- **Inhalte als JSON:** `items.json`, `recipes.json`, `encounters.json`, `enemies.json` je Pfad.
+- **Kein Tracking, keine externen Dienste, keine personenbezogenen Daten.**
+
+### Etappen
+
+1. **Kern-Prototyp:** Rucksack-Raster mit Drehen und Verschieben, Laden mit 5 Items, Neu-würfeln, automatischer Kampf gegen einen Ork, Herzen und Siege. Platzhaltergrafik.
+2. **Grammatik-Synergien:** Artikel-Siegel, Adjektiv-Sterne, Kraft + Träger = Kompositum mit Artikelwahl, Feedback-Zeile.
+3. **Pfad 1 vollständig:** etwa 30 Items, 20 Rezepte, Kleinwurzel und Hrossmark, 6 Begegnungen, 2 Startfiguren.
+4. **Fortschritt:** Buch der Wörter mit Silhouetten, Freischaltungen, Ränge, Heldencode.
+5. **Grafik und Effekte:** generierte Bilder, Kraft-Effekte, Animationen, Geräusche.
+6. **Arena:** Rucksack-Codes, Duell, Turniermodus.
+7. **Weitere Pfade:** Pfad 2, 3 und 11 als neue JSON-Pakete.
+
+### Start-Prompt für Claude Code oder Codex
+
+```
+Baue eine Web-App (PWA) für das iPad im Querformat: einen Backpack-Battler namens "Runenrucksack". Etappe 1: Rucksack-Raster 4x3, Items mit Formen (1x1, 1x2, 2x2), per Touch verschieben und drehen; Lager neben dem Rucksack; Laden mit 5 zufälligen Items, Neu-würfeln für 1 Gold; danach automatischer Kampf gegen einen Computer-Gegner mit Abklingzeiten, Schaden und Block; 5 Herzen, 10 Siege gewinnen den Lauf. Alle Items kommen aus einer Datei items.json. Grafik vorerst als Emojis. Kein Server, keine Accounts, keine externen Dienste. Hosting auf GitHub Pages. Das vollständige Spielkonzept liegt in konzept.md.
+```
+
+Tipp: Dieses Dokument als `konzept.md` ins Repository legen, damit Claude Code oder Codex es bei jeder Etappe nachlesen kann.
