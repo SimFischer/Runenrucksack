@@ -72,3 +72,24 @@ test('Runen: drei gleiche irgendwo steigen eine Stufe; Verben fragen das Präter
   const verb = groups.find((g) => g.typ === 'verb');
   assert.equal(mergeQuestion(verb, DEFS).correct, 'schlug');
 });
+
+test('Laden: Items, die man schon besitzt, kommen häufiger; Ketten-Symbol findet Komposita', async () => {
+  const { randomShopItem, seededRng, SAMMEL_GEWICHT, ownedCount } = await import('../js/logic.js');
+  const { compoundPartner } = await import('../js/sterne.js');
+  const pool = ITEMS.filter((d) => d.seltenheit === 'gewoehnlich' && d.art !== 'tasche');
+  const w = { gewoehnlich: 1 };
+  const count = (run) => {
+    const rng = seededRng(5);
+    let n = 0;
+    for (let i = 0; i < 4000; i++) if (randomShopItem(pool, w, rng, run).id === 'dolch') n++;
+    return n;
+  };
+  const ohne = count({ items: [] });
+  const mit = count({ items: [{ uid: 1, id: 'dolch', area: 'store' }] });
+  assert.ok(mit > ohne * (SAMMEL_GEWICHT * 0.75), `mit ${mit}, ohne ${ohne}`);
+  assert.equal(ownedCount({ items: [{ id: 'dolch' }, { id: 'dolch', stern: 2 }, { id: 'dolch' }] }, 'dolch'), 2, '★★ zählt nicht für das nächste ★★');
+  const R = json('recipes.json');
+  assert.equal(compoundPartner(DEFS.feuer, [{ id: 'schwert' }], DEFS, R).id, 'feuer+schwert');
+  assert.equal(compoundPartner(DEFS.axt, [{ id: 'gift' }], DEFS, R).id, 'gift+axt');
+  assert.equal(compoundPartner(DEFS.apfel, [{ id: 'feuer' }], DEFS, R), null);
+});

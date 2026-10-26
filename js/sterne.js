@@ -6,6 +6,20 @@ import { isRune, runeBase, nextLevelId } from './grammar.js';
 
 const lowerFirst = (s) => s.charAt(0).toLowerCase() + s.slice(1);
 
+// Kann ein Item aus dem Laden mit etwas im Rucksack ein Kompositum bilden? → Kompositum-id oder null.
+export function compoundPartner(def, bag, defs, recipes) {
+  const k = recipes.komposita;
+  if (def.art === 'kraft' && k.kraefte[def.id]) {
+    const t = bag.find((p) => k.traeger.includes(p.id));
+    return t ? { id: `${def.id}+${t.id}`, mit: defs[t.id] } : null;
+  }
+  if (k.traeger.includes(def.id)) {
+    const c = bag.find((p) => defs[p.id].art === 'kraft' && k.kraefte[p.id]);
+    return c ? { id: `${c.id}+${def.id}`, mit: defs[c.id] } : null;
+  }
+  return null;
+}
+
 // Kann dieser Gegenstand durch drei gleiche aufsteigen?
 export function canMerge(def, stern = 1) {
   if (def.art === 'siegel' || def.art === 'tasche') return false;

@@ -912,3 +912,17 @@ h2 .hint { font-size: 12px; font-weight: 400; color: var(--ink-soft); }
 .merge-star { position: fixed; left: 0; top: 0; z-index: 500; font-size: 24px; color: #ffd23f; pointer-events: none; text-shadow: 0 0 8px #ffb800; }
 .goal-stars { font-family: var(--font) !important; color: #e0a526; font-size: .32em !important; top: 4px !important; right: 6px !important; text-shadow: 0 0 4px #fff; }
 .modal-card.merge-card .enc-q small { font-size: .6em; color: var(--ink-soft); }
+
+/* Sammeln: 1/3, 2/3 und Ketten-Symbol im Laden */
+.slot .holder .collect {
+  position: absolute; left: -6px; top: -8px; z-index: 3;
+  background: #fff6e2; color: var(--ink);
+  border: 2px solid var(--line); border-radius: 999px;
+  font-size: 13px; font-weight: 900; padding: 1px 7px;
+}
+.slot .holder .collect.almost { background: var(--gold); animation: bump 1.2s ease-in-out infinite; }
+.slot .holder .item.almost { box-shadow: 0 3px 0 var(--line), 0 0 0 3px #ffd65a, 0 0 18px #ffb800; }
+.slot .holder .chain { position: absolute; right: -8px; bottom: -6px; z-index: 3; font-family: var(--emoji); font-size: 18px; filter: drop-shadow(0 0 3px #fff); }
+.slot .holder .item.cant { filter: grayscale(.6) opacity(.6); }
+.star-line { line-height: 1.5; }
+.star-big { color: #e0a526; font-size: 18px; letter-spacing: 1px; text-shadow: 0 0 4px rgba(255,200,40,.6); }

@@ -1,12 +1,12 @@
 // Runenrucksack – Ablauf eines Laufs, Laden, Rucksack (Ziehen und Drehen) und Info-Feld.
 import {
   CFG, income, baseHp, sellValue, newRun, reroll, finishBattle,
-  canPlace, overlapping, findSpot, sizeOf, shuffle, attachTasche,
+  canPlace, overlapping, findSpot, sizeOf, shuffle, attachTasche, ownedCount, MAX_STERN,
 } from './logic.js';
 import {
-  GENUS, SIEGEL_BONUS, findFusions, wrongOrderNeighbor, canRotate, nextRot, isNoun, isRune, runeBase,
+  GENUS, SIEGEL_BONUS, findFusions, wrongOrderNeighbor, canRotate, nextRot, isNoun, isRune, runeBase, starDef,
 } from './grammar.js';
-import { findTriples, mergeQuestion, applyMerge } from './sterne.js';
+import { findTriples, mergeQuestion, applyMerge, canMerge, compoundPartner } from './sterne.js';
 import { G, loadData, save, loadRun, placedOf, itemsIn, gridOf, region, hero, playerCtx, emit } from './state.js';
 import { evaluateBag } from './mods.js';
 import {
@@ -283,7 +283,26 @@ function renderShop() {
     it.dataset.slot = i;
     it.dataset.tut = 'laden-' + def.id;
     if (sameRef(selected, { src: 'shop', slot: i })) it.classList.add('selected');
+    if (run.gold < def.preis) it.classList.add('cant');
     holder.append(it);
+    // Sammeln: wie viele gleiche besitzt du schon? Bei 2/3 leuchtet das Item.
+    const n = canMerge(def) ? ownedCount(run, def.id) : 0;
+    if (n > 0) {
+      const badge = document.createElement('span');
+      badge.className = 'collect' + (n >= 2 ? ' almost' : '');
+      badge.dataset.tut = 'sammeln-' + def.id;
+      badge.textContent = `${Math.min(n, 2)}/3`;
+      holder.append(badge);
+      if (n >= 2) it.classList.add('almost');
+    }
+    // Ketten-Symbol: ergibt mit etwas im Rucksack ein Kompositum
+    if (compoundPartner(def, itemsIn('bag'), G.DEFS, G.RECIPES)) {
+      const chain = document.createElement('span');
+      chain.className = 'chain';
+      chain.textContent = '⛓️';
+      chain.title = 'Ergibt mit etwas in deinem Rucksack ein Kompositum';
+      holder.append(chain);
+    }
 
     const price = document.createElement('div');
     price.className = 'price-tag' + (run.gold < def.preis ? ' cant' : '');
@@ -334,7 +353,7 @@ function renderInfo() {
   const base = defOf(selected);
   const inBag = selected.src === 'bag';
   const ana = inBag ? bagInfo.get(selected.uid) : null;
-  const def = ana ? ana.def : base;
+  const def = ana ? ana.def : starDef(base, selected.uid ? placedOf(selected.uid).stern || 1 : 1);
   const s = sizeOf(base, 0);
   const rar = G.RAR[base.seltenheit] || {};
 
@@ -358,7 +377,7 @@ function renderInfo() {
   for (const [key, label, f] of STAT_ROWS) {
     if (key === 'abklingzeit' && !def.abklingzeit) continue;
     if (!def[key]) continue;
-    const diff = def[key] - (base[key] || 0);
+    const diff = def[key] - ((ana?.base || starDef(base, selected.uid ? placedOf(selected.uid).stern || 1 : 1))[key] || 0);
     const extra = Math.abs(diff) > 1e-9 ? ` <span class="${diff > 0 === (key !== 'abklingzeit') ? 'plus' : 'minus'}">(${diff > 0 ? '+' : '−'}${fmt(Math.round(Math.abs(diff) * 10) / 10)})</span>` : '';
     ul.insertAdjacentHTML('beforeend', `<li><span>${label}</span><b>${f(def[key])}${extra}</b></li>`);
   }
@@ -383,6 +402,7 @@ function renderInfo() {
   if (ana?.tasche && !ana.tasche.ok) {
     box.insertAdjacentHTML('beforeend', `<p class="gram bad">✗ Liegt in der ${ana.tasche.def.name}, gehört aber nicht zum Wortfeld ${G.WORTFELDER[ana.tasche.def.wortfeld]} – kein Bonus.</p>`);
   }
+  for (const n of collectNotes(base, selected)) box.insertAdjacentHTML('beforeend', n);
   const gram = grammarNotes(base, ana, selected);
   if (gram.length) {
     box.insertAdjacentHTML('beforeend', '<h3>Grammatik</h3>');
@@ -410,6 +430,31 @@ function renderInfo() {
     btn(`Verkaufen <span class="price">+${sellValue(G.DEFS[placedOf(uid).id], placedOf(uid).stern || 1)} 🪙</span>`, () => sell(uid), 'danger');
   }
   box.append(actions);
+}
+
+// Sternstufe, Sammelstand und mögliches Kompositum für das Info-Feld.
+function collectNotes(base, ref) {
+  const out = [];
+  const p = ref.uid ? placedOf(ref.uid) : null;
+  const stern = p?.stern || 1;
+  if (canMerge(base, stern) && !isRune(base)) {
+    const next = starDef(base, stern + 1);
+    const keys = ['schaden', 'block', 'heilung', 'gift', 'brand', 'regeneration', 'tempo', 'leben', 'startblock'].filter((k) => base[k]);
+    const vorschau = keys.slice(0, 3).map((k) => `${STAT_ROWS.find((r) => r[0] === k)[1]} ${fmt(next[k])}`).join(' · ');
+    out.push(`<p class="gram star-line"><b class="star-big">${'★'.repeat(stern)}${'☆'.repeat(MAX_STERN - stern)}</b> Stufe ${stern} von ${MAX_STERN}<br>Drei gleiche ergeben ${'★'.repeat(stern + 1)}: ${vorschau}</p>`);
+  } else if (!isRune(base) && stern === MAX_STERN) {
+    out.push(`<p class="gram star-line"><b class="star-big">★★★</b> Höchste Stufe!</p>`);
+  } else if (isRune(base) && base.steigerung) {
+    out.push(`<p class="gram star-line">Drei gleiche Runen werden gesteigert: ${base.steigerung.komparativ} → ${base.steigerung.superlativ}</p>`);
+  }
+  if (ref.src === 'shop' && canMerge(base)) {
+    const n = ownedCount(G.run, base.id);
+    if (n >= 2) out.push('<p class="gram ok"><b>2/3 – Noch einer, dann wird er stärker!</b></p>');
+    else if (n === 1) out.push('<p class="gram">1/3 – Du hast schon einen davon. Drei gleiche werden zu einem stärkeren.</p>');
+    const c = compoundPartner(base, itemsIn('bag'), G.DEFS, G.RECIPES);
+    if (c) out.push(`<p class="gram ok">⛓️ Mit ${dativ(c.mit).replace(/^(dem|der) /, (m) => m === 'dem ' ? 'deinem ' : 'deiner ')} wird daraus: <b>${fullName(G.DEFS[c.id])}</b></p>`);
+  }
+  return out;
 }
 
 function artLabel(d) {

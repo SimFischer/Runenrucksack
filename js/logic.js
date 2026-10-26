@@ -18,6 +18,11 @@ export const baseHp = (day) => Math.round(60 + 14 * (day - 1) + 2.5 * (day - 1) 
 export const STERN_FAKTOR = { 1: 1, 2: 1.8, 3: 3 };
 export const MAX_STERN = 3;
 export const sternOf = (p) => p?.stern || 1;
+// Items, die man schon besitzt, kommen im Laden so viel häufiger, damit Sammeln sich lohnt.
+export const SAMMEL_GEWICHT = 2.5;
+
+// Wie viele gleiche (★, bei Runen gleiche Stufe) liegen schon in Rucksack und Lager?
+export const ownedCount = (run, id) => run.items.filter((p) => p.id === id && sternOf(p) === 1).length;
 export const sellValue = (def, stern = 1) => Math.max(1, Math.floor((def.preis * STERN_FAKTOR[stern]) / 2));
 
 // Gewichte der Seltenheiten im Laden, abhängig vom Tag.
@@ -193,23 +198,26 @@ export function rollShop(run, items, regions, force = false, rng = Math.random) 
   for (let i = 0; i < slots; i++) {
     const old = run.shop[i];
     if (!force && old && old.locked) { next.push(old); continue; }
-    next.push({ id: randomShopItem(pool, weights, rng).id, locked: false });
+    next.push({ id: randomShopItem(pool, weights, rng, run).id, locked: false });
   }
   // Mindestens eine Waffe im Angebot, damit man nie ganz ohne Schaden dasteht.
   const hasWeapon = next.some((s) => s && pool.find((d) => d.id === s.id)?.schaden);
   const free = next.map((s, i) => (s && !s.locked ? i : -1)).filter((i) => i >= 0);
   if (!hasWeapon && free.length) {
     const weapons = pool.filter((d) => d.schaden);
-    next[pickOne(free, rng)] = { id: randomShopItem(weapons, weights, rng).id, locked: false };
+    next[pickOne(free, rng)] = { id: randomShopItem(weapons, weights, rng, run).id, locked: false };
   }
   run.shop = next;
 }
 
-function randomShopItem(items, weights, rng) {
+export function randomShopItem(items, weights, rng = Math.random, run = null) {
   // Nur Seltenheiten, von denen es auch Items gibt.
   const rar = pickWeighted(Object.entries(weights).filter(([r]) => items.some((d) => d.seltenheit === r)), rng);
   const pool = items.filter((d) => d.seltenheit === rar);
-  return pickOne(pool.length ? pool : items, rng);
+  const list = pool.length ? pool : items;
+  if (!run) return pickOne(list, rng);
+  const owned = new Set(run.items.map((p) => p.id));
+  return pickWeighted(list.map((d) => [d, owned.has(d.id) ? SAMMEL_GEWICHT : 1]), rng);
 }
 
 export function reroll(run, items, regions, rng = Math.random) {
