@@ -2,7 +2,7 @@
 import { CFG, makeEnemy, pickEnemy, rectGrid, pickOne, shuffle, ARMOR_BONUS, enemyPool, seededRng } from './logic.js';
 import { Battle, makeFighter, runToEnd } from './battle.js';
 import { analyze } from './grammar.js';
-import { G, itemsIn, gridOf, region, hero, playerCtx, emit } from './state.js';
+import { G, itemsIn, gridOf, region, hero, playerCtx, emit, figurBild, gegnerBild } from './state.js';
 import { evaluateBag } from './mods.js';
 import { $, fmt, buildGrid, drawItems, openModal, closeModal } from './ui.js';
 
@@ -53,8 +53,9 @@ export function startNight(done) {
 
   $('battle-title').textContent = `🌙 ${reg.name} · Nacht ${run.day}${enemy.boss ? ' · Anführer!' : ''}`;
   const h = hero();
-  buildFighter('player', `${h?.emoji || ''}<span class="f-bag">🎒</span>`, h?.name || 'Dein Rucksack', h ? `mit dem Runenrucksack · ${h.volk}` : `Tag ${run.day}`, bag, playerGrid, evaluateBag(bag, G.DEFS, ctx));
-  buildFighter('enemy', enemy.emoji, enemy.name, armorHtml(), enemy.items, enemyGrid, analyze(enemy.items, G.DEFS));
+  const hb = h && figurBild(h.id), gb = gegnerBild(enemy.id);
+  buildFighter('player', hb ? `<img class="f-img" src="${hb}" alt="">` : `${h?.emoji || ''}<span class="f-bag">🎒</span>`, h?.name || 'Dein Rucksack', h ? `mit dem Runenrucksack · ${h.volk}` : `Tag ${run.day}`, bag, playerGrid, evaluateBag(bag, G.DEFS, ctx));
+  buildFighter('enemy', gb ? `<img class="f-img" src="${gb}" alt="">` : enemy.emoji, enemy.name, armorHtml(), enemy.items, enemyGrid, analyze(enemy.items, G.DEFS));
   bindArmor();
   updateBattleUi();
   setSpeed(speed);

@@ -107,7 +107,7 @@ function confirmSkip() {
   box.id = 'tut-confirm';
   box.innerHTML = `
     <div class="tut-confirm-card">
-      <div class="big-emoji">🧙</div>
+      <div class="big-emoji">${fenwickImg ? `<img class="confirm-fenwick" src="${fenwickImg}" alt="">` : '🧙'}</div>
       <h2>Tutorial überspringen?</h2>
       <p>Du kannst es im Menü jederzeit wiederholen.</p>
       <div class="row">
@@ -419,7 +419,7 @@ export function showHelp(onClose = null) {
   box.innerHTML = `
     <div class="help-card">
       <div class="help-head">
-        <span class="help-fenwick">${G.TUTORIAL.begleiter.emoji}</span>
+        <span class="help-fenwick">${fenwickImg ? `<img src="${fenwickImg}" alt="">` : G.TUTORIAL.begleiter.emoji}</span>
         <h2>So geht's</h2>
         <button class="btn icon" data-close aria-label="Schließen">✕</button>
       </div>
@@ -452,7 +452,7 @@ function firstTip(key) {
   document.getElementById('tip-bubble')?.remove();
   const b = document.createElement('div');
   b.id = 'tip-bubble';
-  b.innerHTML = `<span class="tip-fenwick">${G.TUTORIAL.begleiter.emoji}</span><p>${text}</p><button class="btn small" aria-label="Tipp schließen">OK</button>`;
+  b.innerHTML = `<span class="tip-fenwick">${fenwickImg ? `<img src="${fenwickImg}" alt="">` : G.TUTORIAL.begleiter.emoji}</span><p>${text}</p><button class="btn small" aria-label="Tipp schließen">OK</button>`;
   document.body.append(b);
   const close = () => b.remove();
   b.querySelector('button').onclick = close;

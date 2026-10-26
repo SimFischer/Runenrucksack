@@ -7,10 +7,10 @@ import {
   GENUS, SIEGEL_BONUS, findFusions, wrongOrderNeighbor, canRotate, nextRot, isNoun, isRune, isVerb, runeBase, starDef,
 } from './grammar.js';
 import { findTriples, mergeQuestion, applyMerge, canMerge, compoundPartner } from './sterne.js';
-import { G, loadData, save, loadRun, placedOf, itemsIn, gridOf, region, hero, playerCtx, emit } from './state.js';
+import { G, loadData, save, loadRun, placedOf, itemsIn, gridOf, region, hero, playerCtx, emit, figurBild, hintergrundBild } from './state.js';
 import { evaluateBag } from './mods.js';
 import {
-  $, fmt, fullName, genusChip, toast, bump, openModal, closeModal, modal, itemEl, buildGrid, drawItems, mergeAnimation, syncGold,
+  $, fmt, fullName, genusChip, toast, bump, openModal, closeModal, modal, itemEl, buildGrid, drawItems, mergeAnimation, syncGold, iconHtml,
 } from './ui.js';
 import { startNight } from './battle-ui.js';
 import { runEncounter } from './encounters.js';
@@ -86,11 +86,11 @@ function showHeroes() {
     card.className = 'hero-card';
     card.style.setProperty('--hero', h.farbe);
     card.innerHTML = `
-      <div class="hero-emoji">${h.emoji}</div>
+      <div class="hero-emoji">${figurBild(h.id) ? `<img src="${figurBild(h.id)}" alt="">` : h.emoji}</div>
       <div class="hero-name">${h.name}</div>
       <div class="hero-volk">${h.volk}</div>
       <p class="hero-staerke">${h.staerke}</p>
-      <div class="hero-start">Start mit: ${h.start.map((s) => `<span>${G.DEFS[s.id].emoji} ${fullName(G.DEFS[s.id])}</span>`).join('')}</div>`;
+      <div class="hero-start">Start mit: ${h.start.map((s) => `<span>${iconHtml(G.DEFS[s.id])} ${fullName(G.DEFS[s.id])}</span>`).join('')}</div>`;
     card.onclick = () => startNewRun(h);
     box.append(card);
   }
@@ -136,6 +136,8 @@ function applyTheme() {
   root.setProperty('--bg-top', s.oben);
   root.setProperty('--bg-bottom', s.unten);
   root.setProperty('--accent', s.akzent);
+  const bg = hintergrundBild(region().id);
+  root.setProperty('--bg-image', bg ? `url("${bg}")` : 'none');
 }
 
 function showRegion(next) {
@@ -145,7 +147,7 @@ function showRegion(next) {
   applyTheme();
   modal(`
     <div class="region-card">
-      <div class="big-emoji">${reg.emoji}</div>
+      ${hintergrundBild(reg.id) ? `<img class="region-img" src="${hintergrundBild(reg.id)}" alt="">` : `<div class="big-emoji">${reg.emoji}</div>`}
       <p class="region-over">${reg.tage[0] === 1 ? 'Deine Reise beginnt in' : 'Du erreichst'}</p>
       <h2>${reg.name}</h2>
       <p>${reg.text}</p>
@@ -366,7 +368,7 @@ function renderInfo() {
     : `${base.artikel ? `<span class="art">${base.artikel}</span> ` : ''}${base.name}`;
   const icon = base.art === 'siegel'
     ? `<span class="seal-icon" style="--genus:${GENUS[base.genus].farbe}">${base.name}</span>`
-    : `${base.emoji}${base.abzeichen ? `<span class="badge">${base.abzeichen}</span>` : ''}`;
+    : `${iconHtml(base, 'info-img')}${base.abzeichen ? `<span class="badge">${base.abzeichen}</span>` : ''}`;
   box.insertAdjacentHTML('beforeend', `
     <div class="info-head">
       <div class="info-emoji">${icon}</div>
@@ -786,8 +788,8 @@ function askVerb(p) {
     const paid = tries > 0 && !run.tutorial;
     const broke = paid && run.gold < 1;
     const card = openModal(`
-      <div class="fusion-eq"><span class="fi">${d.emoji}<small>${d.name}</small></span><span class="op">➤</span>
-        <span class="fi">${v.subjekt.def.emoji}${v.subjekt.stern > 1 ? `<em class="goal-stars">${'★'.repeat(v.subjekt.stern)}</em>` : ''}<small>${v.subjekt.def.name}</small></span></div>
+      <div class="fusion-eq"><span class="fi">${iconHtml(d)}<small>${d.name}</small></span><span class="op">➤</span>
+        <span class="fi">${iconHtml(v.subjekt.def)}${v.subjekt.stern > 1 ? `<em class="goal-stars">${'★'.repeat(v.subjekt.stern)}</em>` : ''}<small>${v.subjekt.def.name}</small></span></div>
       <p class="enc-progress">Die Rolle zeigt auf ein Subjekt. Wie heißt der Satz?</p>
       <h2 class="enc-q">${v.subjektText} <span class="blank">___</span>. <small>(${d.name})</small></h2>
       <div class="row wrap">${options.map((o, k) => `<button class="btn opt-btn" data-k="${k}" ${wrong.has(k) || broke ? 'disabled' : ''}>${o}</button>`).join('')}</div>
@@ -829,8 +831,8 @@ function showMerge(group) {
     const paid = tries > 0 && !run.tutorial;
     const broke = paid && run.gold < 1;
     const card = openModal(`
-      <div class="fusion-eq">${[0, 1, 2].map(() => `<span class="fi">${d.emoji}<small>${d.name}</small></span>`).join('<span class="op">+</span>')}
-        <span class="op">=</span><span class="fi glowing merge-goal" style="--glow:#ffd65a">${d.emoji}<em class="goal-stars">${ziel}</em></span></div>
+      <div class="fusion-eq">${[0, 1, 2].map(() => `<span class="fi">${iconHtml(d)}<small>${d.name}</small></span>`).join('<span class="op">+</span>')}
+        <span class="op">=</span><span class="fi glowing merge-goal" style="--glow:#ffd65a">${iconHtml(d)}<em class="goal-stars">${ziel}</em></span></div>
       <p class="enc-progress">Drei gleiche werden zu einem stärkeren! ${q.titel}</p>
       <h2 class="enc-q">${q.prompt}</h2>
       <div class="row wrap">${q.options.map((o, k) => `<button class="btn opt-btn" data-k="${k}" ${wrong.has(k) || broke ? 'disabled' : ''}>${o}</button>`).join('')}</div>
@@ -890,9 +892,9 @@ function showFusion(list, i, done) {
     const broke = paid && run.gold < 1;
     const card = openModal(`
       <div class="fusion-eq">
-        <span class="fi">${kd.emoji}<small>${kd.name}</small></span><span class="op">+</span>
-        <span class="fi">${td.emoji}<small>${td.name}</small></span><span class="op">=</span>
-        <span class="fi glowing" style="--glow:${cd.leuchten}">${td.emoji}<em>${kd.emoji}</em><small>?</small></span>
+        <span class="fi">${iconHtml(kd)}<small>${kd.name}</small></span><span class="op">+</span>
+        <span class="fi">${iconHtml(td)}<small>${td.name}</small></span><span class="op">=</span>
+        <span class="fi glowing" style="--glow:${cd.leuchten}">${iconHtml(td)}<em>${kd.emoji}</em><small>?</small></span>
       </div>
       <h2 class="fusion-q"><span class="blank">___</span> ${cd.name}</h2>
       <div class="row">${['der', 'die', 'das'].map((g) => `
@@ -923,7 +925,7 @@ function showFusion(list, i, done) {
       selected = { src: 'bag', uid: t.uid };
       render();
       const card = openModal(`
-        <div class="big-emoji glowing" style="--glow:${cd.leuchten}">${td.emoji}<em>${kd.emoji}</em></div>
+        <div class="big-emoji glowing" style="--glow:${cd.leuchten}">${iconHtml(td, 'ic big')}<em>${kd.emoji}</em></div>
         <h2>${genusChip(cd.artikel)} ${cd.name}</h2>
         <p>Richtig! ${tries > 1 ? '' : 'Gleich beim ersten Versuch. '}Das letzte Wort bestimmt den Artikel: ${fullName(td)} → ${fullName(cd)}.</p>
         <div class="row"><button class="btn primary big" data-next>Weiter</button></div>`);

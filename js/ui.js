@@ -1,7 +1,7 @@
 // Gemeinsame Bausteine der Oberfläche: Fenster, Hinweise, Item-Kacheln und Raster.
 import { sizeOf } from './logic.js';
 import { GENUS, findFusions, isRune, isVerb, runeTargetCell, verbTargetCell } from './grammar.js';
-import { G } from './state.js';
+import { G, bildFuer } from './state.js';
 
 export const $ = (id) => document.getElementById(id);
 export const fmt = (n) => n.toLocaleString('de-DE', { maximumFractionDigits: 1 });
@@ -13,6 +13,11 @@ export function nameAkk(d) {
   if (d.art === 'rune') return `die Rune „${d.name}“`;
   if (d.art === 'tasche') return `die ${d.name}`;
   return d.artikel ? `${d.artikel === 'der' ? 'den' : d.artikel} ${d.name}` : d.name;
+}
+// Kleines Bild für Fenster und Listen; ohne Bild das Emoji.
+export function iconHtml(def, cls = 'ic') {
+  const src = bildFuer(def);
+  return src ? `<img class="${cls}" src="${src}" alt="" draggable="false">` : (def.emoji || '');
 }
 export const genusChip = (g) => `<span class="genus" style="--genus:${GENUS[g].farbe}">${g}</span>`;
 
@@ -138,10 +143,27 @@ export function itemEl(def, rot, size, stern = 1) {
     el.append(st);
   }
 
+  const src = bildFuer(def);
+  // Bild in der Form des Items (bei quer liegenden Items gedreht); ohne Bild bleibt das Emoji
+  const bild = () => {
+    const img = document.createElement('img');
+    img.className = 'item-img';
+    img.src = src;
+    img.alt = '';
+    img.draggable = false;
+    img.style.width = def.w * size - 12 + 'px';
+    img.style.height = def.h * size - 12 + 'px';
+    if ((rot || 0) % 2 && def.w !== def.h) img.style.transform = 'translate(-50%, -50%) rotate(90deg)';
+    img.onerror = () => { el.classList.remove('has-img'); img.remove(); };
+    el.classList.add('has-img');
+    return img;
+  };
+
   if (def.art === 'siegel') {
-    // Artikel-Siegel: Wort auf Genusfarbe
+    // Artikel-Siegel: Wort auf Genusfarbe (über dem Siegel-Bild)
     el.classList.add('siegel');
     el.style.setProperty('--genus', GENUS[def.genus].farbe);
+    if (src) el.append(bild());
     const w = document.createElement('span');
     w.className = 'word';
     w.textContent = def.name;
@@ -157,9 +179,14 @@ export function itemEl(def, rot, size, stern = 1) {
   if (rot && def.w !== def.h) em.style.transform = 'rotate(90deg)';
   el.append(em);
 
+  if (src) el.append(bild());
   if (def.leuchten) {
+    // Kraft-Effekt über dem Bild (Feuer, Gift, Eis …)
     el.classList.add('glow');
     el.style.setProperty('--glow', def.leuchten);
+    const fx = document.createElement('span');
+    fx.className = 'kraft-fx';
+    el.append(fx);
   }
   if (isRune(def)) {
     el.classList.add('rune');

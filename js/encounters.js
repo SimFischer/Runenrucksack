@@ -6,7 +6,7 @@ import {
 } from './logic.js';
 import { GENUS } from './grammar.js';
 import { G, save, region } from './state.js';
-import { openModal, closeModal, toast, bump, fullName, nameAkk } from './ui.js';
+import { openModal, closeModal, toast, bump, fullName, nameAkk, iconHtml } from './ui.js';
 
 let done = null, rerender = null;
 const findEnc = (id) => G.ENCOUNTERS.begegnungen.find((b) => b.id === id);
@@ -237,7 +237,7 @@ function trade(enc) {
     <h2>Welches Angebot möchtest du?</h2>
     <div class="enc-choices">${offers.map((d) => `
       <button class="enc-choice" data-id="${d.id}">
-        <span class="enc-emoji">${d.emoji}</span><b>${fullName(d)}</b>
+        <span class="enc-emoji">${iconHtml(d)}</span><b>${fullName(d)}</b>
         <span class="enc-reward" style="color:${G.RAR[d.seltenheit]?.farbe}">${G.RAR[d.seltenheit]?.name} · ${d.w}×${d.h}</span>
       </button>`).join('')}
     </div>
@@ -254,7 +254,7 @@ function chooseOwn(enc, newDef) {
     <p>Du bekommst ${nameAkk(newDef)} ${newDef.emoji}.</p>
     <div class="own-items">${own.length ? own.map((p) => {
       const d = G.DEFS[p.id];
-      return `<button class="own-item" data-uid="${p.uid}">${d.emoji || '🔷'} ${d.art === 'siegel' ? `Siegel „${d.name}“` : d.name}<small>${p.area === 'bag' ? 'Rucksack' : 'Lager'}</small></button>`;
+      return `<button class="own-item" data-uid="${p.uid}">${iconHtml(d, 'ic small') || '🔷'} ${d.art === 'siegel' ? `Siegel „${d.name}“` : d.name}<small>${p.area === 'bag' ? 'Rucksack' : 'Lager'}</small></button>`;
     }).join('') : '<p class="muted">Du hast noch keine Items zum Tauschen.</p>'}</div>
     <div class="row"><button class="btn small" data-back>Zurück</button></div>`, 'wide');
   card.querySelectorAll('[data-uid]').forEach((b) => { b.onclick = () => swap(enc, +b.dataset.uid, newDef); });
@@ -294,7 +294,7 @@ function kobold(enc) {
   const entry = entries.find((e) => e.item === run.begegnung.kobold) || entries[0];
   const def = G.DEFS[entry.item];
   const task = koboldTask(entry);
-  const vorher = `<div class="kobold-gift"><span class="big-emoji glowing" style="--glow:#a259d9">${def.emoji}${def.abzeichen ? `<em>${def.abzeichen}</em>` : ''}</span></div>`;
+  const vorher = `<div class="kobold-gift"><span class="big-emoji glowing" style="--glow:#a259d9">${iconHtml(def, 'ic big')}${def.abzeichen ? `<em>${def.abzeichen}</em>` : ''}</span></div>`;
   runTasks(enc, [task], (ok) => {
     const p = addItem(run, G.DEFS, def.id, ok ? {} : { fluch: task.falscherName });
     if (!p) { toast('Kein Platz im Rucksack – der Kobold zieht beleidigt ab.'); finish(enc.id); return; }

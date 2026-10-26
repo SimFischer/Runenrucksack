@@ -17,6 +17,7 @@ export const G = {
   ENCOUNTERS: null, // encounters.json
   EXERCISES: null,  // exercises.json
   TUTORIAL: null,   // tutorial.json
+  BILDER: { items: {}, gegner: {}, figuren: {}, bosse: {}, hintergruende: {} }, // assets/zuordnung.json
   run: null,
 };
 
@@ -24,9 +25,10 @@ const SAVE_KEY = 'runenrucksack.lauf.v2';
 
 export async function loadData() {
   const get = (f) => fetch(f).then((r) => r.json());
-  const [itemData, enemyData, recipes, regions, heroes, encounters, exercises, tutorial] = await Promise.all([
+  const [itemData, enemyData, recipes, regions, heroes, encounters, exercises, tutorial, bilder] = await Promise.all([
     get('items.json'), get('enemies.json'), get('recipes.json'), get('regions.json'), get('heroes.json'),
     get('encounters.json'), get('exercises.json'), get('tutorial.json'),
+    get('assets/zuordnung.json').catch(() => null),
   ]);
   G.ITEMS = itemData.items;
   G.RAR = itemData.seltenheiten;
@@ -43,6 +45,7 @@ export async function loadData() {
   G.ENCOUNTERS = encounters;
   G.EXERCISES = exercises;
   G.TUTORIAL = tutorial;
+  if (bilder) Object.assign(G.BILDER, bilder);
 }
 
 // ---------- Speichern (Komfort, nur in diesem Browser) ----------
@@ -80,6 +83,21 @@ export function getPref(key, fallback = null) {
 export function setPref(key, value) {
   try { localStorage.setItem('runenrucksack.' + key, value); } catch { /* privater Modus */ }
 }
+
+// ---------- Bilder (fehlt eines, steht das Emoji) ----------
+
+// Komposita zeigen das Bild ihres Trägers, gesteigerte Runen das der Grundrune.
+export function bildFuer(def) {
+  const it = G.BILDER.items || {};
+  const p = it[def.id] || it[def.teile?.traeger] || it[def.basis];
+  return p ? 'assets/' + p : null;
+}
+export const figurBild = (id) => (G.BILDER.figuren?.[id] ? 'assets/' + G.BILDER.figuren[id] : null);
+export const gegnerBild = (id) => {
+  const p = G.BILDER.bosse?.[id] || G.BILDER.gegner?.[id];
+  return p ? 'assets/' + p : null;
+};
+export const hintergrundBild = (id) => (G.BILDER.hintergruende?.[id] ? 'assets/' + G.BILDER.hintergruende[id] : null);
 
 // ---------- Abkürzungen ----------
 
