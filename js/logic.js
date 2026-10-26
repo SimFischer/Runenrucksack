@@ -268,8 +268,12 @@ export function enemyBudget(day, boss) {
   return Math.floor((cumulativeGold(day) + 8) * (0.92 - 0.035 * (day - 1))) + (boss ? 3 : 0);
 }
 
-// Ab diesen Tagen bringen Orks auch Gegenstände mit Sternstufe mit.
-export const GEGNER_STERNE_AB = { 2: 4, 3: 8 };
+// Ab diesen Tagen bringen Orks auch Gegenstände mit Sternstufe mit (★★ ab Tag 3, ★★★ ab Tag 6);
+// der Boss am letzten Tag hat immer ein legendäres ★★★★-Item dabei.
+export const GEGNER_STERNE_AB = { 2: 3, 3: 6 };
+export const GEGNER_LEGENDAER_TAG = 10;
+// Ein Item der Stufe s kostet den Gegner so viel wie 2^(s-1) einfache – wie beim Verbinden von zwei gleichen.
+export const sternPreis = (preis, stern = 1) => preis * 2 ** (stern - 1);
 
 export function makeEnemy(day, enemy, items, defs, rng = Math.random) {
   let budget = enemyBudget(day, enemy.boss);
@@ -283,14 +287,23 @@ export function makeEnemy(day, enemy, items, defs, rng = Math.random) {
     for (const [k, v] of Object.entries(enemy.vorliebe || {})) if (d[k]) s += v;
     return s * (weights[d.seltenheit] || 0);
   };
-  // Angebot des Gegners: jedes Item als ★, ab Tag 4 auch als ★★, ab Tag 8 auch als ★★★.
+  // Angebot des Gegners: jedes Item als ★, ab Tag 3 auch als ★★, ab Tag 6 auch als ★★★.
   const offers = [];
   for (const d of items) {
     offers.push({ d, stern: 1, preis: d.preis });
-    for (const stern of [2, 3]) if (day >= GEGNER_STERNE_AB[stern]) offers.push({ d, stern, preis: d.preis * 3 ** (stern - 1) });
+    for (const stern of [2, 3]) if (day >= GEGNER_STERNE_AB[stern]) offers.push({ d, stern, preis: sternPreis(d.preis, stern) });
   }
-  const priceOf = (p) => defs[p.id].preis * 3 ** ((p.stern || 1) - 1);
+  const priceOf = (p) => sternPreis(defs[p.id].preis, p.stern || 1);
   const add = (o, spot) => placed.push({ uid: uid++, id: o.d.id, ...spot, ...(o.stern > 1 ? { stern: o.stern } : {}) });
+
+  // Boss am letzten Tag: zuerst ein legendäres ★★★★-Item
+  if (enemy.boss && day >= GEGNER_LEGENDAER_TAG) {
+    const legendaer = items.filter((d) => d.abklingzeit && sternPreis(d.preis, 4) <= budget)
+      .map((d) => ({ d, stern: 4, preis: sternPreis(d.preis, 4) }));
+    const o = pickWeighted(legendaer.map((x) => [x, score(x.d) || 1]), rng);
+    const spot = o && randomSpot(placed, defs, o.d, grid, rng);
+    if (spot) { add(o, spot); budget -= o.preis; }
+  }
 
   for (let tries = 0; tries < 80 && budget > 0; tries++) {
     const cheapest = placed.length ? Math.min(...placed.map(priceOf)) : 0;

@@ -28,3 +28,23 @@ test('200 Zufallsläufe: Siegquote pro Tag, Siege und Spielzeit', (t) => {
   assert.ok(r.kampfSekunden < 60, 'Kämpfe unter einer Minute');
   for (const [d, q] of Object.entries(r.siegquoteProTag)) assert.ok(q >= 35, `Tag ${d} zu schwer: ${q} %`);
 });
+
+test('Gegner-Stufen: ★★ ab Tag 3, ★★★ ab Tag 6, der Boss an Tag 10 immer mit ★★★★', async () => {
+  const { makeEnemy, enemyPool, seededRng } = await import('../js/logic.js');
+  const E = json('enemies.json').gegner;
+  const ork = E.find((e) => e.id === 'spaeher');
+  const boss = E.find((e) => e.id === 'haeuptling');
+  const pool = (day) => enemyPool(data.items, data.compounds, day);
+  const maxStern = (day, foe) => {
+    let m = 1;
+    for (let s = 1; s <= 40; s++) for (const p of makeEnemy(day, foe, pool(day), data.defs, seededRng(s)).items) m = Math.max(m, p.stern || 1);
+    return m;
+  };
+  assert.equal(maxStern(2, ork), 1, 'Tag 2: nur ★');
+  assert.equal(maxStern(3, ork), 2, 'Tag 3: auch ★★');
+  assert.equal(maxStern(6, ork), 3, 'Tag 6: auch ★★★');
+  for (let s = 1; s <= 20; s++) {
+    const items = makeEnemy(10, boss, pool(10), data.defs, seededRng(s)).items;
+    assert.ok(items.some((p) => p.stern === 4), `Boss Tag 10 (Seed ${s}) hat ein ★★★★-Item`);
+  }
+});
