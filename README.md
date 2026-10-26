@@ -1,38 +1,61 @@
 # Runenrucksack
 
-Ein Fantasy-Backpack-Battler fürs iPad (Querformat) als Web-App. Das vollständige Spielkonzept steht in [konzept.md](konzept.md).
+Ein Fantasy-Backpack-Battler fürs iPad (Querformat) als Web-App, in dem Grammatik das Regelwerk der Kombos ist. Das vollständige Spielkonzept steht in [konzept.md](konzept.md).
 
-**Stand: Etappe 2 – Grammatik-Synergien**
+**Stand: Etappe 3 – Pfad 1 vollständig**
 
-## Etappe 2: Grammatik im Rucksack
+Spielen: <https://simfischer.github.io/Runenrucksack/> – auf dem iPad in Safari öffnen, **Teilen → Zum Home-Bildschirm**, dann startet es wie eine App im Vollbild und läuft auch offline.
 
-- **Kraft-Kristalle** (1×1): das Feuer (Brand), das Gift (Gift), das Eis (Kälte), der Blitz (Betäubung), der Stein (Block), der Mond (Heilung über Zeit), das Gold (Glück), der Sturm (Tempo).
-- **Komposita:** Liegt ein Kristall zu Beginn eines Tages direkt **links neben oder über** einem Träger (Schwert, Bogen, Schild, Axt, …), fragt ein Fenster nach dem Artikel: „Feuer + Schwert = ___ Feuerschwert“. Der erste Versuch ist kostenlos, jeder weitere kostet 1 Gold. Richtig: Das Kompositum entsteht und leuchtet in der Farbe der Kraft. Falsch: „Das letzte Wort bestimmt den Artikel: das Schwert → das Feuerschwert“. Liegt der Kristall rechts oder darunter, entsteht nichts – das Info-Feld erklärt, dass das Bestimmungswort vorne steht.
-- **Artikel-Siegel** der (blau), die (rot), das (grün): Neben einem Nomen mit passendem Genus +25 % Wirkung, bei falschem Genus passiert nichts, und das Info-Feld sagt warum.
-- **Adjektiv-Runen** scharf, schwer, schnell, edel mit Pfeil, der sich mitdreht: Wirken nur, wenn der Pfeil auf ein passendes Nomen zeigt. Dann leuchtet eine Linie im Rucksack, und das Info-Feld zeigt z. B. „scharfes Schwert“.
-- **Regel:** Eine grammatisch falsche Kombination ist nie stärker als eine richtige. Ein Kompositum behält die Wirkung des Kristalls und bekommt die Verschmelzungs-Wirkung obendrauf, ist also immer stärker als beide Teile getrennt. Die automatischen Tests in `tests/regeln.test.mjs` prüfen das für alle Kombinationen:
+## So läuft ein Lauf
 
-```bash
-node --test tests/regeln.test.mjs
-```
+1. **Figur wählen:** Borga Eisenfaust (Komposita +20 %, Start mit Axt und Feuer) oder Eadrun die Reiterin (Schriftrollen 20 % schneller, Start mit Speer und „stürmen“).
+2. **Schicksalsrune:** Eine von sechs zufälligen Regeln gilt für den ganzen Lauf, z. B. „Feuer-Komposita doppelt so stark“ oder „Laden hat 6 Plätze“.
+3. **Zehn Tage, zwei Gebiete:** Kleinwurzel (Tag 1–5, Boss: Ork-Plünderer) und Hrossmark (Tag 6–10, Boss: Wolfsreiter-Häuptling). Beim Gebietswechsel gibt es einen Übergangsbildschirm, in Hrossmark wählt man eine **Unterklasse**.
+4. **Jeder Tag:**
+   - **Morgen:** Begegnung am Wegesrand (drei zur Wahl), danach verschmelzen Kristalle mit Trägern und gleiche Runen werden gesteigert.
+   - **Tag:** Laden mit 5 Items, Neu würfeln für 1 Gold, Reservieren, Verkaufen, Verschieben, Drehen.
+   - **Nacht:** Automatischer Kampf. Vorher kann man den Fehler auf der Ork-Rüstung verbessern (ein Versuch, richtig: Ork startet mit 15 % weniger Leben).
+5. **Ende:** nach dem 10. Kampf („Reise geschafft“, mit Sternen nach Siegen) oder wenn alle 5 Herzen weg sind.
 
-## Etappe 1: Kern
+## Grammatik im Spiel
 
-- Rucksack-Raster 4×3, Items in den Formen 1×1, 1×2 und 2×2
-- Verschieben per Finger, Drehen durch zweimal Antippen oder mit einem zweiten Finger beim Ziehen
-- Lager neben dem Rucksack (Items dort wirken nicht); legt man ein Item auf belegte Felder im Rucksack, wandern die überdeckten Items ins Lager
-- Laden mit 5 zufälligen Items, Neu-würfeln für 1 Gold, Reservieren mit 🔓, Verkaufen durch Ziehen in den Laden (halber Preis)
-- Automatischer Kampf gegen einen Ork-Rucksack mit Abklingzeiten, Schaden, Block, Heilung, Gift, Brand und Kälte
-- 5 Herzen, 10 Siege gewinnen den Lauf; jeder 5. Tag ein Anführer
-- Grafik als Emojis, kein Server, keine Accounts, keine externen Dienste
-- Offline spielbar (Service Worker) und als Symbol auf dem Home-Bildschirm installierbar
+| Mechanik | Regel | Lernziel |
+| --- | --- | --- |
+| Komposita | Kraft-Kristall links neben oder über einem Träger → Artikel wählen: „Feuer + Schwert = ___ Feuerschwert“ | Das letzte Wort bestimmt den Artikel |
+| Artikel-Siegel | der/die/das neben einem Nomen mit passendem Genus: +25 % | Genus der Nomen |
+| Adjektiv-Runen | Pfeil zeigt auf ein passendes Nomen: „scharfes Schwert“ | Adjektiv vor dem Nomen, Endungen |
+| Steigerung | Drei gleiche Runen in einer Reihe → Komparativ → Superlativ (+50 % je Stufe) | scharf – schärfer – am schärfsten, gut – besser – am besten |
+| Begegnungen | Plural, Artikel, Rechtschreibung auf der Speisekarte, Personalformen, Fehler im Namen | Wiederholung Klasse 5 |
+| Ork-Rüstung | Falsch geschriebenes Wort verbessern | Rechtschreibung |
+| Wortfeld-Taschen | Gartentasche, Satteltasche: Items aus dem passenden Wortfeld +20 % | Wortfelder |
 
-## Inhalte bearbeiten
+**Regel für alle Aufgaben:** Der erste Versuch ist kostenlos, jeder weitere kostet 1 Gold, bei Fehlern erscheint eine kurze Erklärzeile. **Eine grammatisch falsche Kombination ist nie stärker als eine richtige** – die Tests prüfen das.
 
-- `items.json` – alle Items im Laden mit Wortart (`art`), Artikel, Form, Seltenheit, Preis und Kampfwerten. Neue Items einfach als weitere Zeile ergänzen.
-- `recipes.json` – welche Items Träger sind und was jede Kraft beim Verschmelzen dazugibt. Ein neuer Träger in der Liste ergibt automatisch alle acht Komposita.
-- `enemies.json` – die Computer-Gegner und welche Wirkungen sie beim Packen bevorzugen.
-- Balance-Werte (Startgold, Gold pro Tag, Leben pro Tag) stehen oben in `js/logic.js`.
+## Inhalte ändern (ohne Programmieren)
+
+Alle Inhalte stehen in JSON-Dateien. Jede Datei hat oben ein Feld `_hinweis`, das ihre Felder erklärt. Nach dem Ändern `CACHE` in `sw.js` um eins erhöhen, damit installierte Apps die neue Version laden.
+
+| Datei | Inhalt |
+| --- | --- |
+| `items.json` | Alle Items im Laden: Wortart (`art`), Artikel, Wortfeld, Form, Seltenheit, Preis, Kampfwerte; Runen mit Steigerungsformen; Taschen |
+| `recipes.json` | Welche Items Träger sind und was jede Kraft beim Verschmelzen dazugibt |
+| `exercises.json` | **Die Wörter der Aufgaben:** Plural, Artikel, Speisekarten, Personalformen, Kobold-Namen |
+| `encounters.json` | Die Begegnungen: Figur, Text, Aufgabentyp, Belohnung, Gebiet |
+| `enemies.json` | Die Orks: Vorlieben beim Packen und die falschen Wörter auf ihren Rüstungen |
+| `regions.json` | Die Gebiete: Tage, Farben, Wortfeld, Gegner, Boss |
+| `heroes.json` | Startfiguren mit Bonus, Start-Items und Unterklassen; die sechs Schicksalsrunen |
+
+### Beispiele
+
+- **Neues Plural-Wort:** in `exercises.json` unter `plural` eine Zeile ergänzen:
+  `{ "wort": "das Kind", "richtig": "die Kinder", "falsch": ["die Kinds", "die Kinde"], "regel": "Kind → Kinder: dazu kommt -er." }`
+- **Neues Artikel-Rätsel:** unter `artikel`: `{ "wort": "Schüssel", "artikel": "die" }`
+- **Neue Speisekarte:** unter `speisekarten`; das falsch geschriebene Wort als `falsch|richtig`:
+  `{ "zeilen": ["Tomatensuppe", "Reis mit Gemüse", "Kirschen mit Sahne|Sahne"], "erklaerung": "…" }` – genau ein Wort pro Karte mit `|`.
+- **Neuer Fehler auf einer Ork-Rüstung:** in `enemies.json` beim Gegner unter `fehler`; `optionen` enthält genau eine richtige Schreibung.
+- **Neuer Träger** (z. B. ein Besen): Item in `items.json` mit `"art": "traeger"` anlegen und die id in `recipes.json` unter `traeger` eintragen – alle acht Komposita entstehen automatisch.
+
+Die Tests (siehe unten) melden, wenn eine Aufgabe nicht genau eine richtige Lösung hat.
 
 ## Lokal testen
 
@@ -44,26 +67,45 @@ node tools/serve.mjs
 
 Dann <http://localhost:8080> öffnen. (Einfach `index.html` doppelklicken geht nicht, weil der Browser die JSON-Dateien dann nicht laden darf.)
 
+Alle Tests ausführen (Node.js findet die Dateien in `tests/` selbst):
+
+```bash
+node --test
+```
+
+| Test | prüft |
+| --- | --- |
+| `tests/regeln.test.mjs` | Komposita, Siegel, Runen; falsch nie stärker als richtig |
+| `tests/steigerung.test.mjs` | Steigerungsformen, Deklination, Erkennung von drei Runen, +50 % je Stufe |
+| `tests/begegnungen.test.mjs` | Begegnungen, Aufgaben (genau eine Lösung), Rucksack-Wachstum, Kobold-Fluch |
+| `tests/ablauf.test.mjs` | Gebiete, Bosse, Figuren, Schicksalsrunen, Unterklassen, Taschen, Ork-Rüstungen |
+| `tests/balance.test.mjs` | 200 simulierte Läufe: Siegquote pro Tag, Siege und Spielzeit |
+
+Aktuelle Balance (200 Läufe, einfache Kaufstrategie, Aufgaben zu 75 % richtig): Tag 1 etwa 82 % Siegchance, im Schnitt 6,8 Siege, geschätzt 13–14 Minuten pro Lauf, Kämpfe etwa 12 Sekunden. Die Stellschrauben (Startgold, Gold pro Tag, Leben pro Tag, Gegnerbudget) stehen oben und im Abschnitt „Gegner“ in `js/logic.js`.
+
 ## Auf GitHub Pages veröffentlichen
 
 1. Im Repository auf GitHub: **Settings → Pages**.
 2. Unter „Build and deployment“: **Deploy from a branch**, Branch `main`, Ordner `/ (root)`.
 3. Nach ein bis zwei Minuten läuft das Spiel unter `https://<benutzername>.github.io/Runenrucksack/`.
 
-Auf dem iPad in Safari öffnen, **Teilen → Zum Home-Bildschirm**, dann startet es wie eine App im Vollbild.
-
-Nach Änderungen an Dateien die Versionsnummer `CACHE` in `sw.js` erhöhen, damit installierte Apps die neue Version sicher bekommen.
-
-## Aufbau
+## Aufbau des Codes
 
 | Datei | Inhalt |
 | --- | --- |
 | `index.html`, `style.css` | Bildschirme und Aussehen |
-| `js/main.js` | Oberfläche: Raster, Ziehen und Drehen, Laden, Kampfanzeige |
-| `js/logic.js` | Regeln: Platzieren, Laden, Gold, Lauf, Gegner-Erzeugung |
-| `js/grammar.js` | Grammatik-Regeln: Komposita, Siegel, Runen |
+| `js/main.js` | Ablauf eines Laufs, Laden, Rucksack (Ziehen und Drehen), Info-Feld, Verschmelzen und Steigern |
+| `js/encounters.js` | Begegnungen am Morgen mit ihren Aufgaben |
+| `js/battle-ui.js` | Kampfanzeige und Fehler auf der Ork-Rüstung |
+| `js/ui.js` | Gemeinsame Bausteine: Fenster, Item-Kacheln, Raster |
+| `js/state.js` | Geladene Inhalte und Speichern im Browser |
+| `js/logic.js` | Regeln: Raster, Laden, Gold, Gebiete, Lauf, Gegner, Begegnungen |
+| `js/grammar.js` | Grammatik-Regeln: Komposita, Siegel, Runen, Steigerung |
+| `js/mods.js` | Boni von Figur, Unterklasse, Schicksalsrune, Begegnungen und Taschen |
 | `js/battle.js` | Kampfsimulation |
-| `tests/regeln.test.mjs` | prüft die Grammatik-Regeln |
+| `js/sim.js` | Simulation ganzer Läufe für die Balance |
 | `sw.js`, `manifest.webmanifest`, `icons/` | PWA (offline, Home-Bildschirm) |
 | `tools/serve.mjs` | lokaler Testserver |
 | `tools/make-icons.mjs` | erzeugt die App-Symbole neu |
+
+Kein Server, keine Accounts, keine externen Dienste. Der laufende Lauf wird nur im Browser gemerkt.

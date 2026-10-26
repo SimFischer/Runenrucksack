@@ -196,7 +196,8 @@ function render() {
 function renderTop() {
   const run = G.run, reg = region();
   const c = playerCtx();
-  $('stat-hero').textContent = `${hero()?.emoji || ''} ${hero()?.kurz || ''}${c.unterklasse ? ` · ${c.unterklasse.name}` : ''}${c.fate ? ` ${c.fate.emoji}` : ''}`;
+  $('stat-hero').textContent = `${hero()?.emoji || ''} ${hero()?.kurz || ''}${c.unterklasse ? ` ${c.unterklasse.emoji}` : ''}${c.fate ? ` ${c.fate.emoji}` : ''}`;
+  $('stat-hero').title = [c.unterklasse?.name, c.fate?.name].filter(Boolean).join(' · ');
   $('stat-day').textContent = `${reg.emoji} ${reg.name} · Tag ${run.day} / ${CFG.lastDay}`;
   $('stat-hearts').textContent = '❤️'.repeat(Math.max(0, run.hearts)) + '🤍'.repeat(CFG.hearts - Math.max(0, run.hearts));
   $('stat-wins').textContent = `🏆 ${run.wins}`;
@@ -977,7 +978,7 @@ function battleOver(won, enemyName) {
   modal(won ? `
       <div class="big-emoji">🏆</div>
       <h2>Sieg!</h2>
-      <p>Du hast ${enemyName} besiegt.</p>
+      <p>Du hast gegen ${enemyName} gewonnen.</p>
       <p>Siege: <b>${run.wins}</b> · Herzen: <b>${'❤️'.repeat(heartsLeft)}${'🤍'.repeat(CFG.hearts - heartsLeft)}</b></p>
       <div class="row"><button class="btn primary big" data-act="next">Weiter</button></div>` : `
       <div class="big-emoji">💔</div>
