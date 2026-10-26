@@ -1,0 +1,544 @@
+{
+  "_hinweis": "Welches Bild gehört zu welcher id. Erzeugt von tools/zerschneide.mjs und tools/bilder.mjs.",
+  "items": {
+    "dolch": "items/dolch.webp",
+    "helm": "items/helm.webp",
+    "laterne": "items/laterne.webp",
+    "schild": "items/schild.webp",
+    "hammer": "items/hammer.webp",
+    "apfel": "items/apfel.webp",
+    "brot": "items/brot.webp",
+    "heiltrank": "items/heiltrank.webp",
+    "horn": "items/horn.webp",
+    "runenstein": "items/runenstein.webp",
+    "runenkrone": "items/runenkrone.webp",
+    "drachenschuppe": "items/drachenschuppe.webp",
+    "kettenhemd": "items/kettenhemd.webp",
+    "drachenfeuerschwert": "items/drachenfeuerschwert.webp",
+    "gartentasche": "items/gartentasche.webp",
+    "satteltasche": "items/satteltasche.webp",
+    "schwert": "items/schwert.webp",
+    "axt": "items/axt.webp",
+    "bogen": "items/bogen.webp",
+    "stab": "items/stab.webp",
+    "speer": "items/speer.webp",
+    "stiefel": "items/stiefel.webp",
+    "schlagen": "items/schlagen.webp",
+    "schuetzen": "items/schuetzen.webp",
+    "heilen": "items/heilen.webp",
+    "stuermen": "items/stuermen.webp",
+    "feuer": "items/feuer.webp",
+    "gift": "items/gift.webp",
+    "eis": "items/eis.webp",
+    "blitz": "items/blitz.webp",
+    "stein": "items/stein.webp",
+    "mond": "items/mond.webp",
+    "gold": "items/gold.webp",
+    "sturm": "items/sturm.webp",
+    "siegel-der": "items/siegel-der.webp",
+    "siegel-die": "items/siegel-die.webp",
+    "siegel-das": "items/siegel-das.webp",
+    "rune-scharf": "items/rune-scharf.webp",
+    "rune-schwer": "items/rune-schwer.webp",
+    "rune-schnell": "items/rune-schnell.webp",
+    "rune-edel": "items/rune-edel.webp",
+    "rune-gut": "items/rune-gut.webp",
+    "rune-gross": "items/rune-gross.webp",
+    "rune-stark": "items/rune-stark.webp",
+    "rune-hell": "items/rune-hell.webp"
+  },
+  "gegner": {
+    "spaeher": "gegner/spaeher.webp",
+    "schildork": "gegner/schildork.webp",
+    "schamane": "gegner/schamane.webp",
+    "wolfsreiter": "gegner/wolfsreiter.webp"
+  },
+  "vorgemerkt": {
+    "verb-rufen": {
+      "bild": "items/verb-rufen.webp",
+      "verb": "rufen (Horn)"
+    },
+    "verb-reiten": {
+      "bild": "items/verb-reiten.webp",
+      "verb": "reiten (Hufeisen)"
+    }
+  },
+  "quelle": {
+    "items/dolch.webp": {
+      "sheet": "items-quadratisch.png",
+      "ausschnitt": [
+        37,
+        39,
+        252,
+        302
+      ]
+    },
+    "items/helm.webp": {
+      "sheet": "items-quadratisch.png",
+      "ausschnitt": [
+        358,
+        40,
+        260,
+        294
+      ]
+    },
+    "items/laterne.webp": {
+      "sheet": "items-quadratisch.png",
+      "ausschnitt": [
+        669,
+        21,
+        218,
+        321
+      ]
+    },
+    "items/schild.webp": {
+      "sheet": "items-quadratisch.png",
+      "ausschnitt": [
+        944,
+        46,
+        290,
+        295
+      ]
+    },
+    "items/hammer.webp": {
+      "sheet": "items-quadratisch.png",
+      "ausschnitt": [
+        70,
+        342,
+        247,
+        303
+      ]
+    },
+    "items/apfel.webp": {
+      "sheet": "items-quadratisch.png",
+      "ausschnitt": [
+        349,
+        370,
+        235,
+        270
+      ]
+    },
+    "items/brot.webp": {
+      "sheet": "items-quadratisch.png",
+      "ausschnitt": [
+        630,
+        404,
+        290,
+        232
+      ]
+    },
+    "items/heiltrank.webp": {
+      "sheet": "items-quadratisch.png",
+      "ausschnitt": [
+        966,
+        354,
+        226,
+        295
+      ]
+    },
+    "items/horn.webp": {
+      "sheet": "items-quadratisch.png",
+      "ausschnitt": [
+        27,
+        642,
+        323,
+        283
+      ]
+    },
+    "items/runenstein.webp": {
+      "sheet": "items-quadratisch.png",
+      "ausschnitt": [
+        366,
+        653,
+        273,
+        276
+      ]
+    },
+    "items/runenkrone.webp": {
+      "sheet": "items-quadratisch.png",
+      "ausschnitt": [
+        634,
+        669,
+        313,
+        233
+      ]
+    },
+    "items/drachenschuppe.webp": {
+      "sheet": "items-quadratisch.png",
+      "ausschnitt": [
+        1005,
+        651,
+        205,
+        278
+      ]
+    },
+    "items/kettenhemd.webp": {
+      "sheet": "items-quadratisch.png",
+      "ausschnitt": [
+        19,
+        926,
+        310,
+        293
+      ]
+    },
+    "items/drachenfeuerschwert.webp": {
+      "sheet": "items-quadratisch.png",
+      "ausschnitt": [
+        335,
+        917,
+        301,
+        311
+      ]
+    },
+    "items/gartentasche.webp": {
+      "sheet": "items-quadratisch.png",
+      "ausschnitt": [
+        656,
+        925,
+        266,
+        295
+      ]
+    },
+    "items/satteltasche.webp": {
+      "sheet": "items-quadratisch.png",
+      "ausschnitt": [
+        949,
+        917,
+        285,
+        302
+      ]
+    },
+    "items/schwert.webp": {
+      "sheet": "items-hochkant.png",
+      "ausschnitt": [
+        37,
+        17,
+        203,
+        615
+      ]
+    },
+    "items/axt.webp": {
+      "sheet": "items-hochkant.png",
+      "ausschnitt": [
+        256,
+        70,
+        285,
+        555
+      ]
+    },
+    "items/bogen.webp": {
+      "sheet": "items-hochkant.png",
+      "ausschnitt": [
+        561,
+        11,
+        168,
+        626
+      ]
+    },
+    "items/stab.webp": {
+      "sheet": "items-hochkant.png",
+      "ausschnitt": [
+        806,
+        22,
+        196,
+        616
+      ]
+    },
+    "items/speer.webp": {
+      "sheet": "items-hochkant.png",
+      "ausschnitt": [
+        1048,
+        12,
+        153,
+        627
+      ]
+    },
+    "items/stiefel.webp": {
+      "sheet": "items-hochkant.png",
+      "ausschnitt": [
+        1245,
+        312,
+        259,
+        319
+      ]
+    },
+    "items/schlagen.webp": {
+      "sheet": "items-hochkant.png",
+      "ausschnitt": [
+        32,
+        658,
+        226,
+        342
+      ]
+    },
+    "items/schuetzen.webp": {
+      "sheet": "items-hochkant.png",
+      "ausschnitt": [
+        284,
+        658,
+        226,
+        342
+      ]
+    },
+    "items/heilen.webp": {
+      "sheet": "items-hochkant.png",
+      "ausschnitt": [
+        535,
+        658,
+        223,
+        342
+      ]
+    },
+    "items/stuermen.webp": {
+      "sheet": "items-hochkant.png",
+      "ausschnitt": [
+        786,
+        658,
+        223,
+        344
+      ]
+    },
+    "items/verb-rufen.webp": {
+      "sheet": "items-hochkant.png",
+      "ausschnitt": [
+        1029,
+        658,
+        230,
+        344
+      ]
+    },
+    "items/verb-reiten.webp": {
+      "sheet": "items-hochkant.png",
+      "ausschnitt": [
+        1285,
+        659,
+        234,
+        343
+      ]
+    },
+    "items/feuer.webp": {
+      "sheet": "kristalle-siegel.png",
+      "ausschnitt": [
+        53,
+        67,
+        240,
+        368
+      ]
+    },
+    "items/gift.webp": {
+      "sheet": "kristalle-siegel.png",
+      "ausschnitt": [
+        361,
+        65,
+        228,
+        370
+      ]
+    },
+    "items/eis.webp": {
+      "sheet": "kristalle-siegel.png",
+      "ausschnitt": [
+        661,
+        64,
+        224,
+        372
+      ]
+    },
+    "items/blitz.webp": {
+      "sheet": "kristalle-siegel.png",
+      "ausschnitt": [
+        954,
+        65,
+        267,
+        371
+      ]
+    },
+    "items/stein.webp": {
+      "sheet": "kristalle-siegel.png",
+      "ausschnitt": [
+        51,
+        464,
+        238,
+        367
+      ]
+    },
+    "items/mond.webp": {
+      "sheet": "kristalle-siegel.png",
+      "ausschnitt": [
+        364,
+        464,
+        234,
+        368
+      ]
+    },
+    "items/gold.webp": {
+      "sheet": "kristalle-siegel.png",
+      "ausschnitt": [
+        641,
+        464,
+        282,
+        370
+      ]
+    },
+    "items/sturm.webp": {
+      "sheet": "kristalle-siegel.png",
+      "ausschnitt": [
+        960,
+        467,
+        266,
+        365
+      ]
+    },
+    "items/siegel-der.webp": {
+      "sheet": "kristalle-siegel.png",
+      "ausschnitt": [
+        38,
+        879,
+        286,
+        303
+      ]
+    },
+    "items/siegel-die.webp": {
+      "sheet": "kristalle-siegel.png",
+      "ausschnitt": [
+        325,
+        882,
+        303,
+        296
+      ]
+    },
+    "items/siegel-das.webp": {
+      "sheet": "kristalle-siegel.png",
+      "ausschnitt": [
+        633,
+        884,
+        294,
+        296
+      ]
+    },
+    "items/rune-scharf.webp": {
+      "sheet": "runen.png",
+      "ausschnitt": [
+        11,
+        311,
+        307,
+        379
+      ]
+    },
+    "items/rune-schwer.webp": {
+      "sheet": "runen.png",
+      "ausschnitt": [
+        318,
+        325,
+        316,
+        360
+      ]
+    },
+    "items/rune-schnell.webp": {
+      "sheet": "runen.png",
+      "ausschnitt": [
+        635,
+        321,
+        314,
+        373
+      ]
+    },
+    "items/rune-edel.webp": {
+      "sheet": "runen.png",
+      "ausschnitt": [
+        946,
+        321,
+        305,
+        375
+      ]
+    },
+    "items/rune-gut.webp": {
+      "sheet": "runen.png",
+      "ausschnitt": [
+        5,
+        729,
+        330,
+        355
+      ]
+    },
+    "items/rune-gross.webp": {
+      "sheet": "runen.png",
+      "ausschnitt": [
+        332,
+        721,
+        309,
+        362
+      ]
+    },
+    "items/rune-stark.webp": {
+      "sheet": "runen.png",
+      "ausschnitt": [
+        636,
+        725,
+        315,
+        363
+      ]
+    },
+    "items/rune-hell.webp": {
+      "sheet": "runen.png",
+      "ausschnitt": [
+        945,
+        731,
+        306,
+        347
+      ]
+    },
+    "gegner/spaeher.webp": {
+      "sheet": "gegner-orks.png",
+      "ausschnitt": [
+        64,
+        21,
+        530,
+        559
+      ]
+    },
+    "gegner/schildork.webp": {
+      "sheet": "gegner-orks.png",
+      "ausschnitt": [
+        611,
+        2,
+        635,
+        589
+      ]
+    },
+    "gegner/schamane.webp": {
+      "sheet": "gegner-orks.png",
+      "ausschnitt": [
+        10,
+        584,
+        606,
+        654
+      ]
+    },
+    "gegner/wolfsreiter.webp": {
+      "sheet": "gegner-orks.png",
+      "ausschnitt": [
+        660,
+        584,
+        591,
+        650
+      ]
+    }
+  },
+  "figuren": {
+    "borga": "figur-borga.webp",
+    "eadrun": "figur-eadrun.webp",
+    "faelith": "figur-faelith.webp",
+    "theron": "figur-theron.webp",
+    "ysolde": "figur-ysolde.webp",
+    "fenwick": "figur-fenwick.webp"
+  },
+  "bosse": {
+    "pluenderer": "boss-pluenderer.webp",
+    "haeuptling": "boss-wolfsreiter.webp"
+  },
+  "hintergruende": {
+    "kleinwurzel": "hintergrund-kleinwurzel.webp",
+    "hrossmark": "hintergrund-hrossmark.webp",
+    "titelbild": "titelbild.webp"
+  }
+}
