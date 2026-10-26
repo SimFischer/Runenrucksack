@@ -1,0 +1,45 @@
+{
+  "_hinweis": "Alle Items des Spiels. Felder: w/h = Breite/Höhe in Feldern, abklingzeit in Sekunden (0 = passiv), preis in Gold. Wirkungen: schaden, block, heilung, gift, brand, kaelte (Sekunden), tempo (Prozent, passiv), leben (passiv), startblock (passiv).",
+  "seltenheiten": {
+    "gewoehnlich": { "name": "gewöhnlich", "farbe": "#9a8f7a" },
+    "selten":      { "name": "selten",     "farbe": "#3f8fd2" },
+    "episch":      { "name": "episch",     "farbe": "#a259d9" },
+    "legendaer":   { "name": "legendär",   "farbe": "#e0a526" }
+  },
+  "items": [
+    { "id": "dolch",      "name": "Dolch",      "artikel": "der", "emoji": "🔪", "w": 1, "h": 1, "seltenheit": "gewoehnlich", "preis": 3, "abklingzeit": 1.3, "schaden": 2 },
+    { "id": "schwert",    "name": "Schwert",    "artikel": "das", "emoji": "🗡️", "w": 1, "h": 2, "seltenheit": "gewoehnlich", "preis": 4, "abklingzeit": 2.0, "schaden": 5 },
+    { "id": "axt",        "name": "Axt",        "artikel": "die", "emoji": "🪓", "w": 1, "h": 2, "seltenheit": "gewoehnlich", "preis": 4, "abklingzeit": 2.6, "schaden": 7 },
+    { "id": "bogen",      "name": "Bogen",      "artikel": "der", "emoji": "🏹", "w": 1, "h": 2, "seltenheit": "gewoehnlich", "preis": 4, "abklingzeit": 1.8, "schaden": 4 },
+    { "id": "schild",     "name": "Schild",     "artikel": "der", "emoji": "🛡️", "w": 2, "h": 2, "seltenheit": "gewoehnlich", "preis": 4, "abklingzeit": 3.0, "block": 9 },
+    { "id": "helm",       "name": "Helm",       "artikel": "der", "emoji": "🪖", "w": 1, "h": 1, "seltenheit": "gewoehnlich", "preis": 3, "abklingzeit": 3.5, "block": 4 },
+    { "id": "stein",      "name": "Stein",      "artikel": "der", "emoji": "🪨", "w": 1, "h": 1, "seltenheit": "gewoehnlich", "preis": 2, "abklingzeit": 2.5, "schaden": 2, "block": 1 },
+    { "id": "apfel",      "name": "Apfel",      "artikel": "der", "emoji": "🍎", "w": 1, "h": 1, "seltenheit": "gewoehnlich", "preis": 2, "abklingzeit": 3.0, "heilung": 3 },
+    { "id": "brot",       "name": "Brot",       "artikel": "das", "emoji": "🍞", "w": 1, "h": 1, "seltenheit": "gewoehnlich", "preis": 3, "abklingzeit": 4.0, "heilung": 5 },
+    { "id": "stiefel",    "name": "Stiefel",    "artikel": "die", "emoji": "👢", "w": 1, "h": 2, "seltenheit": "gewoehnlich", "preis": 4, "abklingzeit": 0, "tempo": 12 },
+
+    { "id": "speer",      "name": "Speer",      "artikel": "der", "emoji": "🔱", "w": 1, "h": 2, "seltenheit": "selten", "preis": 6, "abklingzeit": 1.6, "schaden": 5 },
+    { "id": "hammer",     "name": "Hammer",     "artikel": "der", "emoji": "🔨", "w": 2, "h": 2, "seltenheit": "selten", "preis": 6, "abklingzeit": 3.2, "schaden": 14 },
+    { "id": "kettenhemd", "name": "Kettenhemd", "artikel": "das", "emoji": "🥋", "w": 2, "h": 2, "seltenheit": "selten", "preis": 6, "abklingzeit": 0, "startblock": 15, "leben": 10 },
+    { "id": "gift",       "name": "Gift",       "artikel": "das", "emoji": "🧪", "w": 1, "h": 1, "seltenheit": "selten", "preis": 5, "abklingzeit": 2.5, "gift": 2 },
+    { "id": "feuer",      "name": "Feuer",      "artikel": "das", "emoji": "🔥", "w": 1, "h": 1, "seltenheit": "selten", "preis": 5, "abklingzeit": 3.0, "schaden": 2, "brand": 3 },
+    { "id": "eis",        "name": "Eis",        "artikel": "das", "emoji": "🧊", "w": 1, "h": 1, "seltenheit": "selten", "preis": 5, "abklingzeit": 3.5, "schaden": 2, "kaelte": 2 },
+    { "id": "blitz",      "name": "Blitz",      "artikel": "der", "emoji": "⚡", "w": 1, "h": 1, "seltenheit": "selten", "preis": 5, "abklingzeit": 4.0, "schaden": 7 },
+    { "id": "heiltrank",  "name": "Heiltrank",  "artikel": "der", "emoji": "⚗️", "w": 1, "h": 1, "seltenheit": "selten", "preis": 6, "abklingzeit": 5.0, "heilung": 11 },
+    { "id": "laterne",    "name": "Laterne",    "artikel": "die", "emoji": "🏮", "w": 1, "h": 1, "seltenheit": "selten", "preis": 5, "abklingzeit": 3.0, "heilung": 3, "block": 2 },
+    { "id": "schlagen",   "name": "schlagen",   "artikel": "",    "emoji": "📜", "w": 1, "h": 2, "seltenheit": "selten", "preis": 6, "abklingzeit": 3.0, "schaden": 9 },
+    { "id": "schuetzen",  "name": "schützen",   "artikel": "",    "emoji": "📜", "w": 1, "h": 2, "seltenheit": "selten", "preis": 6, "abklingzeit": 3.5, "block": 11 },
+    { "id": "heilen",     "name": "heilen",     "artikel": "",    "emoji": "📜", "w": 1, "h": 2, "seltenheit": "selten", "preis": 6, "abklingzeit": 4.0, "heilung": 9 },
+
+    { "id": "feuerschwert",  "name": "Feuerschwert",  "artikel": "das", "emoji": "🗡️", "abzeichen": "🔥", "w": 1, "h": 2, "seltenheit": "episch", "preis": 9, "abklingzeit": 2.0, "schaden": 6, "brand": 3 },
+    { "id": "giftbogen",     "name": "Giftbogen",     "artikel": "der", "emoji": "🏹", "abzeichen": "🧪", "w": 1, "h": 2, "seltenheit": "episch", "preis": 9, "abklingzeit": 1.8, "schaden": 4, "gift": 2 },
+    { "id": "eisschild",     "name": "Eisschild",     "artikel": "der", "emoji": "🛡️", "abzeichen": "🧊", "w": 2, "h": 2, "seltenheit": "episch", "preis": 9, "abklingzeit": 3.0, "block": 12, "kaelte": 1.5 },
+    { "id": "blitzstab",     "name": "Blitzstab",     "artikel": "der", "emoji": "🪄", "abzeichen": "⚡", "w": 1, "h": 2, "seltenheit": "episch", "preis": 9, "abklingzeit": 2.4, "schaden": 10 },
+    { "id": "mondlaterne",   "name": "Mondlaterne",   "artikel": "die", "emoji": "🏮", "abzeichen": "🌙", "w": 1, "h": 1, "seltenheit": "episch", "preis": 8, "abklingzeit": 2.5, "heilung": 5, "block": 3 },
+    { "id": "sturmstiefel",  "name": "Sturmstiefel",  "artikel": "die", "emoji": "👢", "abzeichen": "🌪️", "w": 1, "h": 2, "seltenheit": "episch", "preis": 8, "abklingzeit": 0, "tempo": 25 },
+
+    { "id": "drachenfeuerschwert", "name": "Drachenfeuerschwert", "artikel": "das", "emoji": "🗡️", "abzeichen": "🐉", "w": 2, "h": 2, "seltenheit": "legendaer", "preis": 14, "abklingzeit": 2.2, "schaden": 13, "brand": 4 },
+    { "id": "runenstein",          "name": "Runenstein",          "artikel": "der", "emoji": "🔮", "w": 1, "h": 1, "seltenheit": "legendaer", "preis": 12, "abklingzeit": 3.5, "schaden": 8, "heilung": 5 },
+    { "id": "runenkrone",          "name": "Runenkrone",          "artikel": "die", "emoji": "👑", "w": 1, "h": 1, "seltenheit": "legendaer", "preis": 12, "abklingzeit": 0, "tempo": 20, "startblock": 12, "leben": 15 }
+  ]
+}

@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>Runenrucksack</title>
+  <meta name="description" content="Ein Fantasy-Backpack-Battler fürs iPad.">
+  <meta name="theme-color" content="#2b1d14">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Runenrucksack">
+  <link rel="manifest" href="manifest.webmanifest">
+  <link rel="icon" href="icons/icon-192.png" type="image/png">
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- Startbildschirm -->
+  <section id="start" class="screen">
+    <div class="start-card">
+      <div class="logo">🎒</div>
+      <h1>Runenrucksack</h1>
+      <p class="tagline">Packe deinen Rucksack, besiege die Wirrwarr-Orks und rette die Wörter der Wanderlande.</p>
+      <div class="start-buttons">
+        <button id="btn-continue" class="btn big primary" hidden>Weiterspielen</button>
+        <button id="btn-new" class="btn big">Neuer Lauf</button>
+      </div>
+      <ul class="rules">
+        <li>🛒 Kaufe Items im Laden und ziehe sie in deinen Rucksack.</li>
+        <li>⟳ Tippe ein Item an, tippe nochmal zum Drehen – oder tippe beim Ziehen mit einem zweiten Finger.</li>
+        <li>📦 Items im Lager wirken nicht im Kampf.</li>
+        <li>⚔️ Nachts kämpft dein Rucksack von selbst. 10 Siege gewinnen, 5 Herzen hast du.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Tag: Laden und Rucksack -->
+  <section id="game" class="screen" hidden>
+    <header class="topbar">
+      <div class="brand">🎒 Runenrucksack</div>
+      <div class="stat" id="stat-day"></div>
+      <div class="stat" id="stat-hearts"></div>
+      <div class="stat" id="stat-wins"></div>
+      <div class="stat gold" id="stat-gold"></div>
+      <div class="spacer"></div>
+      <button id="btn-menu" class="btn icon" aria-label="Menü">☰</button>
+      <button id="btn-fight" class="btn primary fight">⚔️ Zum Kampf</button>
+    </header>
+
+    <main class="board">
+      <section class="panel bag-panel">
+        <h2>Rucksack</h2>
+        <div class="grid" id="grid-bag" data-area="bag"></div>
+      </section>
+      <section class="panel store-panel">
+        <h2>Lager <span class="hint">wirkt nicht im Kampf</span></h2>
+        <div class="grid store" id="grid-store" data-area="store"></div>
+      </section>
+      <aside class="panel info-panel" id="info"></aside>
+      <section class="panel shop-panel" id="shop">
+        <div class="shop-head">
+          <h2>Laden</h2>
+          <button id="btn-reroll" class="btn">🎲 Neu würfeln <span class="price">1 🪙</span></button>
+        </div>
+        <div class="shop-slots" id="shop-slots"></div>
+        <div class="sell-hint">Hierher ziehen zum Verkaufen</div>
+      </section>
+    </main>
+  </section>
+
+  <!-- Nacht: Kampf -->
+  <section id="battle" class="screen" hidden>
+    <header class="topbar">
+      <div class="brand" id="battle-title">Nacht</div>
+      <div class="stat" id="battle-time">0,0 s</div>
+      <div class="spacer"></div>
+      <div class="speed" id="speed">
+        <button class="btn" data-speed="1">1×</button>
+        <button class="btn" data-speed="2">2×</button>
+        <button class="btn" data-speed="4">4×</button>
+      </div>
+      <button id="btn-skip" class="btn">⏭ Überspringen</button>
+    </header>
+    <main class="arena">
+      <div class="fighter" id="fighter-player"></div>
+      <div class="versus">
+        <div class="vs">VS</div>
+        <button id="btn-start-battle" class="btn big primary">Los!</button>
+      </div>
+      <div class="fighter" id="fighter-enemy"></div>
+    </main>
+  </section>
+
+  <div id="modal" class="modal" hidden>
+    <div class="modal-card" id="modal-card"></div>
+  </div>
+  <div id="toast" class="toast" hidden></div>
+  <div id="rotate-hint" class="rotate-hint">
+    <div>📱↻</div>
+    <p>Bitte das iPad quer halten.</p>
+  </div>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>
