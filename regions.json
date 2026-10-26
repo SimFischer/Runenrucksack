@@ -1,0 +1,29 @@
+{
+  "_hinweis": "Die Gebiete eines Laufs. tage: von–bis. stimmung: Hintergrundfarben (oben, unten) und Akzentfarbe. wortfeld: passt zu den Wortfeldern in items.json. gegner und boss: ids aus enemies.json; der Boss kommt am letzten Tag des Gebiets.",
+  "gebiete": [
+    {
+      "id": "kleinwurzel",
+      "name": "Kleinwurzel",
+      "emoji": "🏡",
+      "tage": [1, 5],
+      "stimmung": { "oben": "#55743a", "unten": "#1e2a14", "akzent": "#b4dc78" },
+      "wortfeld": "haus",
+      "wortfeldName": "Haus und Garten",
+      "text": "Grüne Hügel, runde Türen im Hang und Gärten voller Kürbisse. Doch die Wirrwarr-Orks plündern die Vorratskammern – und auf ihren Rüstungen stehen lauter falsche Wörter!",
+      "gegner": ["spaeher", "schildork", "schamane"],
+      "boss": "pluenderer"
+    },
+    {
+      "id": "hrossmark",
+      "name": "Hrossmark",
+      "emoji": "🐎",
+      "tage": [6, 10],
+      "stimmung": { "oben": "#8c7838", "unten": "#2e2410", "akzent": "#f4cf62" },
+      "wortfeld": "pferd",
+      "wortfeldName": "Pferd und Reiten",
+      "text": "Weite Graslande, Wind im Gras und Holzhallen mit goldenen Dächern. Hier jagen die Wolfsreiter der Orks – und ihr Häuptling ist der gefährlichste von allen.",
+      "gegner": ["spaeher", "wolfsreiter", "schildork", "schamane"],
+      "boss": "haeuptling"
+    }
+  ]
+}

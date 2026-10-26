@@ -1,10 +1,11 @@
 {
-  "_hinweis": "Computer-Gegner. vorliebe gewichtet, welche Wirkungen der Gegner beim Packen bevorzugt. ruestung ist das falsch geschriebene Wort auf der Rüstung (für Etappe 2).",
+  "_hinweis": "Computer-Gegner. vorliebe gewichtet, welche Wirkungen der Gegner beim Packen bevorzugt. boss: Anführer am letzten Tag eines Gebiets (siehe regions.json).",
   "gegner": [
-    { "id": "spaeher",    "name": "Späher-Ork",     "emoji": "👺", "ruestung": "Schwerdt",   "vorliebe": { "schaden": 2, "tempo": 3 } },
-    { "id": "schildork",  "name": "Schild-Ork",     "emoji": "👹", "ruestung": "die Schild", "vorliebe": { "block": 3, "startblock": 2, "leben": 2 } },
-    { "id": "schamane",   "name": "Ork-Schamane",   "emoji": "🧌", "ruestung": "Gifft",      "vorliebe": { "gift": 3, "kaelte": 3, "heilung": 2, "regeneration": 2 } },
-    { "id": "wolfsreiter","name": "Wolfsreiter",    "emoji": "🐺", "ruestung": "der Axt",    "vorliebe": { "schaden": 3, "brand": 2, "tempo": 2, "betaeubung": 2 } },
-    { "id": "pluenderer", "name": "Ork-Plünderer",  "emoji": "👿", "ruestung": "Rüstunk",    "vorliebe": { "schaden": 2, "block": 2, "heilung": 1 }, "boss": true }
+    { "id": "spaeher",     "name": "Späher-Ork",            "emoji": "👺", "vorliebe": { "schaden": 2, "tempo": 3 } },
+    { "id": "schildork",   "name": "Schild-Ork",            "emoji": "👹", "vorliebe": { "block": 3, "startblock": 2, "leben": 2 } },
+    { "id": "schamane",    "name": "Ork-Schamane",          "emoji": "🧌", "vorliebe": { "gift": 3, "kaelte": 3, "heilung": 2, "regeneration": 2 } },
+    { "id": "wolfsreiter", "name": "Wolfsreiter",           "emoji": "🐺", "vorliebe": { "schaden": 3, "brand": 2, "tempo": 2, "betaeubung": 2 } },
+    { "id": "pluenderer",  "name": "Ork-Plünderer",         "emoji": "👿", "boss": true, "vorliebe": { "schaden": 2, "block": 2, "heilung": 1 } },
+    { "id": "haeuptling",  "name": "Wolfsreiter-Häuptling", "emoji": "🐺👑", "boss": true, "vorliebe": { "schaden": 3, "brand": 2, "betaeubung": 2, "tempo": 2 } }
   ]
 }

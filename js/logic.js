@@ -1,4 +1,4 @@
-// Spielregeln ohne Darstellung: Raster, Laden, Lauf-Zustand, Gegner.
+// Spielregeln ohne Darstellung: Raster, Laden, Lauf-Zustand, Gebiete, Gegner.
 
 export const CFG = {
   bagCols: 4, bagRows: 3,
@@ -7,7 +7,7 @@ export const CFG = {
   rerollCost: 1,
   shopSlots: 5,
   hearts: 5,
-  winsToWin: 10,
+  lastDay: 10,
 };
 
 export const income = (day) => 8 + day;
@@ -44,22 +44,54 @@ export function pickWeighted(entries, rng = Math.random) {
   return entries[entries.length - 1][0];
 }
 
+export const pickOne = (list, rng = Math.random) => list[Math.floor(rng() * list.length)];
+
+// Wiederholbarer Zufall für Tests und Simulationen.
+export function seededRng(seed = 1) {
+  let s = seed >>> 0;
+  return () => {
+    s = (s + 0x6d2b79f5) >>> 0;
+    let t = s;
+    t = Math.imul(t ^ (t >>> 15), t | 1);
+    t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+    return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+  };
+}
+
 // ---------- Raster ----------
+// Ein Raster ist { cols, rows, mask }. mask (Set "x,y") enthält die benutzbaren Felder;
+// ohne mask ist das ganze Rechteck benutzbar.
 
 export function sizeOf(def, rot) {
   return rot ? { w: def.h, h: def.w } : { w: def.w, h: def.h };
 }
 
-export function areaDims(area) {
-  return area === 'bag'
-    ? { cols: CFG.bagCols, rows: CFG.bagRows }
-    : { cols: CFG.storeCols, rows: CFG.storeRows };
+export const rectGrid = (cols, rows) => ({ cols, rows, mask: null });
+export const STORE_GRID = rectGrid(CFG.storeCols, CFG.storeRows);
+
+export function baseBagCells() {
+  const cells = [];
+  for (let y = 0; y < CFG.bagRows; y++) for (let x = 0; x < CFG.bagCols; x++) cells.push(`${x},${y}`);
+  return cells;
 }
 
+export function bagGrid(run) {
+  const mask = new Set(run.bagCells);
+  let cols = 0, rows = 0;
+  for (const c of mask) {
+    const [x, y] = c.split(',').map(Number);
+    cols = Math.max(cols, x + 1);
+    rows = Math.max(rows, y + 1);
+  }
+  return { cols, rows, mask };
+}
+
+const usable = (grid, x, y) => x >= 0 && y >= 0 && x < grid.cols && y < grid.rows && (!grid.mask || grid.mask.has(`${x},${y}`));
+
 // Prüft, ob ein Item an (x,y) passt. placed: Liste {uid,id,x,y,rot} desselben Bereichs.
-export function canPlace(placed, defs, def, x, y, rot, cols, rows, ignoreUids = []) {
+export function canPlace(placed, defs, def, x, y, rot, grid, ignoreUids = []) {
   const { w, h } = sizeOf(def, rot);
-  if (x < 0 || y < 0 || x + w > cols || y + h > rows) return false;
+  for (let dy = 0; dy < h; dy++) for (let dx = 0; dx < w; dx++) if (!usable(grid, x + dx, y + dy)) return false;
   return overlapping(placed, defs, x, y, w, h, ignoreUids).length === 0;
 }
 
@@ -72,21 +104,31 @@ export function overlapping(placed, defs, x, y, w, h, ignoreUids = []) {
 }
 
 // Erster freier Platz (probiert beide Drehungen).
-export function findSpot(placed, defs, def, cols, rows, ignoreUids = []) {
+export function findSpot(placed, defs, def, grid, ignoreUids = []) {
   for (const rot of [0, 1]) {
     if (rot && def.w === def.h) continue;
-    for (let y = 0; y < rows; y++)
-      for (let x = 0; x < cols; x++)
-        if (canPlace(placed, defs, def, x, y, rot, cols, rows, ignoreUids)) return { x, y, rot };
+    for (let y = 0; y < grid.rows; y++)
+      for (let x = 0; x < grid.cols; x++)
+        if (canPlace(placed, defs, def, x, y, rot, grid, ignoreUids)) return { x, y, rot };
   }
   return null;
 }
 
+// ---------- Gebiete ----------
+
+export function regionOf(day, regions) {
+  return regions.find((r) => day >= r.tage[0] && day <= r.tage[1]) || regions[regions.length - 1];
+}
+
+export const isRegionStart = (day, regions) => regions.some((r) => r.tage[0] === day);
+export const isBossDay = (day, regions) => regionOf(day, regions).tage[1] === day;
+
 // ---------- Lauf ----------
 
-export function newRun(items) {
+export function newRun(items, regions, opts = {}) {
+  const rng = opts.rng || Math.random;
   const run = {
-    version: 1,
+    version: 2,
     day: 1,
     gold: CFG.startGold,
     hearts: CFG.hearts,
@@ -97,71 +139,87 @@ export function newRun(items) {
     shop: [],
     history: [],
     over: null, // null | 'won' | 'lost'
-    pendingFusion: false, // zu Beginn des Tages verschmelzen?
+    bagCells: baseBagCells(),
+    queue: ['gebiet'], // Schritte am Morgen, bevor der Laden öffnet
     lernen: { richtig: 0, falsch: 0 },
   };
-  rollShop(run, items, true);
+  rollShop(run, items, regions, true, rng);
   return run;
 }
 
-export function rollShop(run, items, force = false) {
+// Items, die im Laden des aktuellen Gebiets erscheinen dürfen.
+export function shopPool(run, items, regions) {
+  const region = regionOf(run.day, regions).id;
+  return items.filter((d) => d.laden !== false && (!d.gebiete || d.gebiete.includes(region)));
+}
+
+export function rollShop(run, items, regions, force = false, rng = Math.random) {
+  const pool = shopPool(run, items, regions);
   const weights = rarityWeights(run.day);
+  const slots = run.shopSlots || CFG.shopSlots;
   const next = [];
-  for (let i = 0; i < CFG.shopSlots; i++) {
+  for (let i = 0; i < slots; i++) {
     const old = run.shop[i];
     if (!force && old && old.locked) { next.push(old); continue; }
-    next.push({ id: randomShopItem(items, weights).id, locked: false });
+    next.push({ id: randomShopItem(pool, weights, rng).id, locked: false });
   }
   // Mindestens eine Waffe im Angebot, damit man nie ganz ohne Schaden dasteht.
-  const hasWeapon = next.some((s) => s && items.find((d) => d.id === s.id)?.schaden);
+  const hasWeapon = next.some((s) => s && pool.find((d) => d.id === s.id)?.schaden);
   const free = next.map((s, i) => (s && !s.locked ? i : -1)).filter((i) => i >= 0);
   if (!hasWeapon && free.length) {
-    const weapons = items.filter((d) => d.schaden);
-    const i = free[Math.floor(Math.random() * free.length)];
-    next[i] = { id: randomShopItem(weapons, weights).id, locked: false };
+    const weapons = pool.filter((d) => d.schaden);
+    next[pickOne(free, rng)] = { id: randomShopItem(weapons, weights, rng).id, locked: false };
   }
   run.shop = next;
 }
 
-function randomShopItem(items, weights) {
+function randomShopItem(items, weights, rng) {
   // Nur Seltenheiten, von denen es auch Items gibt.
-  const rar = pickWeighted(Object.entries(weights).filter(([r]) => items.some((d) => d.seltenheit === r)));
+  const rar = pickWeighted(Object.entries(weights).filter(([r]) => items.some((d) => d.seltenheit === r)), rng);
   const pool = items.filter((d) => d.seltenheit === rar);
-  const list = pool.length ? pool : items;
-  return list[Math.floor(Math.random() * list.length)];
+  return pickOne(pool.length ? pool : items, rng);
 }
 
-export function reroll(run, items) {
+export function reroll(run, items, regions, rng = Math.random) {
   if (run.gold < CFG.rerollCost) return false;
   run.gold -= CFG.rerollCost;
-  rollShop(run, items);
+  rollShop(run, items, regions, false, rng);
   return true;
 }
 
 // Nach einem Kampf: Ergebnis buchen, nächsten Tag vorbereiten.
-export function finishBattle(run, items, won, enemyName) {
+export function finishBattle(run, items, regions, won, enemyName, rng = Math.random) {
   run.history.push({ day: run.day, won, enemy: enemyName });
   if (won) run.wins++;
   else { run.hearts--; run.losses++; }
-  if (run.wins >= CFG.winsToWin) { run.over = 'won'; return; }
   if (run.hearts <= 0) { run.over = 'lost'; return; }
+  if (run.day >= CFG.lastDay) { run.over = 'won'; return; }
   run.day++;
   run.gold += income(run.day);
-  run.pendingFusion = true;
-  rollShop(run, items);
+  rollShop(run, items, regions, false, rng);
   for (const s of run.shop) if (s) s.locked = false;
+  run.queue = [];
+  if (isRegionStart(run.day, regions)) run.queue.push('gebiet');
+  run.queue.push('verschmelzen');
 }
 
 // ---------- Gegner ----------
 
-export function makeEnemy(day, enemies, items, defs, rng = Math.random) {
-  const isBoss = day % 5 === 0;
-  const filtered = enemies.filter((e) => !!e.boss === isBoss);
-  const pool = filtered.length ? filtered : enemies;
-  const enemy = pool[Math.floor(rng() * pool.length)];
-  let budget = Math.floor(cumulativeGold(day) * (0.7 + 0.015 * day)) + (isBoss ? 5 : 0);
+export function pickEnemy(day, regions, enemies, rng = Math.random) {
+  const region = regionOf(day, regions);
+  const byId = (id) => enemies.find((e) => e.id === id);
+  if (isBossDay(day, regions)) return byId(region.boss);
+  return byId(pickOne(region.gegner, rng));
+}
+
+export function enemyBudget(day, boss) {
+  return Math.floor(cumulativeGold(day) * (0.7 + 0.015 * day)) + (boss ? 5 : 0);
+}
+
+export function makeEnemy(day, enemy, items, defs, rng = Math.random) {
+  let budget = enemyBudget(day, enemy.boss);
   const weights = rarityWeights(day);
-  const { bagCols: cols, bagRows: rows } = CFG;
+  const grid = rectGrid(CFG.bagCols, CFG.bagRows);
   const placed = [];
   let uid = 1;
 
@@ -178,7 +236,7 @@ export function makeEnemy(day, enemies, items, defs, rng = Math.random) {
     if (!cand) break;
 
     if (cand.preis <= budget) {
-      const spot = randomSpot(placed, defs, cand, cols, rows, rng);
+      const spot = randomSpot(placed, defs, cand, grid, rng);
       if (spot) {
         placed.push({ uid: uid++, id: cand.id, ...spot });
         budget -= cand.preis;
@@ -191,7 +249,7 @@ export function makeEnemy(day, enemies, items, defs, rng = Math.random) {
       const diff = cand.preis - defs[old.id].preis;
       if (diff <= 0 || diff > budget) continue;
       const rest = placed.filter((p) => p !== old);
-      const spot = randomSpot(rest, defs, cand, cols, rows, rng);
+      const spot = randomSpot(rest, defs, cand, grid, rng);
       if (spot) {
         placed.splice(placed.indexOf(old), 1);
         placed.push({ uid: uid++, id: cand.id, ...spot });
@@ -207,11 +265,11 @@ function cheapestPrice(placed, defs) {
   return placed.length ? Math.min(...placed.map((p) => defs[p.id].preis)) : 0;
 }
 
-function randomSpot(placed, defs, def, cols, rows, rng) {
+function randomSpot(placed, defs, def, grid, rng) {
   const spots = [];
   for (const rot of def.w === def.h ? [0] : [0, 1])
-    for (let y = 0; y < rows; y++)
-      for (let x = 0; x < cols; x++)
-        if (canPlace(placed, defs, def, x, y, rot, cols, rows)) spots.push({ x, y, rot });
-  return spots.length ? spots[Math.floor(rng() * spots.length)] : null;
+    for (let y = 0; y < grid.rows; y++)
+      for (let x = 0; x < grid.cols; x++)
+        if (canPlace(placed, defs, def, x, y, rot, grid)) spots.push({ x, y, rot });
+  return spots.length ? pickOne(spots, rng) : null;
 }

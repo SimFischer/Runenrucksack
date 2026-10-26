@@ -155,7 +155,9 @@ export function adjectiveForm(rd, artikel) {
 
 // Wertet einen Rucksack aus: wirksame Werte jedes Items und Erklärungen für das Info-Feld.
 // Ergebnis: Map uid → { def, siegel: [{uid, genus, ok}], runen: [{uid, def, ok}], phrase, ziele }
-export function analyze(placed, defs) {
+export function analyze(placed, defs, opts = {}) {
+  const siegelBonus = opts.siegelBonus ?? SIEGEL_BONUS;
+  const runeMult = opts.runeMult ?? 1;
   const map = cellMap(placed, defs);
   const info = new Map();
   for (const p of placed) info.set(p.uid, { base: defs[p.id], siegel: [], runen: [], ziele: [], ziel: null });
@@ -189,13 +191,13 @@ export function analyze(placed, defs) {
     for (const r of i.runen) {
       if (!r.ok || adjs.some((a) => a.id === r.def.id)) continue;
       adjs.push(r.def);
-      for (const [k, v] of Object.entries(r.def.adjektiv.bonus)) eff[k] = (eff[k] || 0) + v;
+      for (const [k, v] of Object.entries(r.def.adjektiv.bonus)) eff[k] = (eff[k] || 0) + v * runeMult;
     }
     // Siegel: ein passendes Siegel verstärkt alle Wirkungen um 25 %, mehrere zählen einmal.
     if (i.siegel.some((s) => s.ok)) {
       for (const k of EFFECT_KEYS) {
         if (!eff[k]) continue;
-        const v = eff[k] * (1 + SIEGEL_BONUS);
+        const v = eff[k] * (1 + siegelBonus);
         eff[k] = roundUp(k, v);
       }
     }

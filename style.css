@@ -26,7 +26,9 @@ html, body {
   margin: 0;
   height: 100%;
   overflow: hidden;
-  background: radial-gradient(ellipse at top, #4a3322 0%, var(--wood) 60%, #1c120c 100%);
+  background: radial-gradient(ellipse at top, var(--bg-top, #4a3322) 0%, var(--bg-bottom, var(--wood)) 75%, #120b07 100%);
+  background-attachment: fixed;
+  transition: background .6s;
   color: var(--parchment);
   font-family: var(--font);
   -webkit-user-select: none;
@@ -616,3 +618,20 @@ h2 .hint { font-size: 12px; font-weight: 400; color: var(--ink-soft); }
 .floater.betaeubung { color: #ffe14a; }
 .floater.regeneration { color: #c9b8ff; }
 .floater.glueck { color: #ffd65a; font-size: 24px; }
+
+/* ---------- Etappe 3 ---------- */
+:root { --accent: var(--gold); }
+.brand { color: var(--accent); }
+.grid.masked { background: transparent; border-color: transparent; }
+.grid.masked .cell { background-color: var(--wood-2); border-color: rgba(0,0,0,.45); }
+.grid .cell.off { visibility: hidden; }
+.stats .minus { color: var(--red); font-weight: 700; }
+.f-text { min-width: 0; }
+.stars { font-size: 34px; margin: 4px 0 !important; }
+
+/* Übergang in ein neues Gebiet */
+.modal-card.region { max-width: 620px; background: linear-gradient(170deg, #fbf3dc, #ead6a6); }
+.region-card .big-emoji { font-size: 84px; }
+.region-over { margin: 0 !important; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .1em; font-size: 14px !important; }
+.region-card h2 { font-size: 40px !important; margin-top: 2px !important; }
+.region-facts { background: rgba(0,0,0,.06); border-radius: 10px; padding: 10px 14px; }

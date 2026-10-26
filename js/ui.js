@@ -1,0 +1,190 @@
+// Gemeinsame Bausteine der Oberfläche: Fenster, Hinweise, Item-Kacheln und Raster.
+import { sizeOf } from './logic.js';
+import { GENUS, findFusions, isRune, runeTargetCell } from './grammar.js';
+import { G } from './state.js';
+
+export const $ = (id) => document.getElementById(id);
+export const fmt = (n) => n.toLocaleString('de-DE', { maximumFractionDigits: 1 });
+export const fullName = (d) => (d.artikel ? `${d.artikel} ${d.name}` : d.name);
+export const genusChip = (g) => `<span class="genus" style="--genus:${GENUS[g].farbe}">${g}</span>`;
+
+export function toast(text) {
+  const t = $('toast');
+  t.textContent = text;
+  t.hidden = false;
+  clearTimeout(toast.timer);
+  toast.timer = setTimeout(() => { t.hidden = true; }, 2200);
+}
+
+export function bump(id) {
+  const el = $(id);
+  el.classList.remove('bump');
+  void el.offsetWidth;
+  el.classList.add('bump');
+}
+
+// ---------- Fenster ----------
+
+export function openModal(html, cls = '') {
+  const card = $('modal-card');
+  card.className = 'modal-card ' + cls;
+  card.innerHTML = html;
+  $('modal').hidden = false;
+  return card;
+}
+
+export const closeModal = () => { $('modal').hidden = true; };
+
+// Einfaches Fenster: Knöpfe mit data-act schließen es und rufen handlers[act] auf.
+export function modal(html, handlers = {}, cls = '') {
+  const card = openModal(html, cls);
+  card.querySelectorAll('[data-act]').forEach((b) => {
+    b.onclick = () => {
+      closeModal();
+      const fn = handlers[b.dataset.act];
+      if (fn) fn();
+    };
+  });
+  return card;
+}
+
+// ---------- Items ----------
+
+export function itemEl(def, rot, size) {
+  const s = sizeOf(def, rot);
+  const el = document.createElement('div');
+  const passive = !def.abklingzeit && def.art !== 'siegel' && def.art !== 'rune';
+  el.className = `item r-${def.seltenheit}` + (passive ? ' passive' : '');
+  el.style.setProperty('--rar', G.RAR[def.seltenheit]?.farbe || '#9a8f7a');
+  el.style.width = s.w * size - 6 + 'px';
+  el.style.height = s.h * size - 6 + 'px';
+
+  const cd = document.createElement('div');
+  cd.className = 'cd';
+  el.append(cd);
+
+  if (def.art === 'siegel') {
+    // Artikel-Siegel: Wort auf Genusfarbe
+    el.classList.add('siegel');
+    el.style.setProperty('--genus', GENUS[def.genus].farbe);
+    const w = document.createElement('span');
+    w.className = 'word';
+    w.textContent = def.name;
+    w.style.fontSize = Math.round(size * 0.34) + 'px';
+    el.append(w);
+    return el;
+  }
+
+  const em = document.createElement('span');
+  em.className = 'emoji';
+  em.textContent = def.emoji;
+  em.style.fontSize = Math.round(Math.min(s.w, s.h) * size * (s.w * s.h === 1 ? 0.5 : 0.58)) + 'px';
+  if (rot && def.w !== def.h) em.style.transform = 'rotate(90deg)';
+  el.append(em);
+
+  if (def.leuchten) {
+    el.classList.add('glow');
+    el.style.setProperty('--glow', def.leuchten);
+  }
+  if (isRune(def)) {
+    el.classList.add('rune');
+    em.style.fontSize = Math.round(size * 0.34) + 'px';
+    const a = document.createElement('span');
+    a.className = `arrow d${(rot || 0) % 4}`;
+    a.textContent = '➤';
+    a.style.fontSize = Math.round(size * 0.24) + 'px';
+    el.append(a);
+  }
+  if (def.abzeichen) {
+    const b = document.createElement('span');
+    b.className = 'badge';
+    b.textContent = def.abzeichen;
+    b.style.fontSize = Math.round(size * 0.26) + 'px';
+    el.append(b);
+  }
+  if (size >= 70) {
+    const l = document.createElement('span');
+    l.className = 'label';
+    l.textContent = def.name;
+    el.append(l);
+  }
+  return el;
+}
+
+// ---------- Raster ----------
+
+// grid: { cols, rows, mask }. Felder außerhalb der mask bleiben unsichtbar.
+export function buildGrid(el, grid, size) {
+  el.innerHTML = '';
+  el.style.setProperty('--cols', grid.cols);
+  el.style.setProperty('--rows', grid.rows);
+  el.style.setProperty('--cell', size + 'px');
+  el.classList.toggle('masked', !!grid.mask);
+  for (let y = 0; y < grid.rows; y++)
+    for (let x = 0; x < grid.cols; x++) {
+      const c = document.createElement('div');
+      const key = `${x},${y}`;
+      c.className = 'cell';
+      if (grid.mask && !grid.mask.has(key)) c.classList.add('off');
+      el.append(c);
+    }
+}
+
+// Zeichnet Items in ein Raster; info (aus analyze) liefert Markierungen und Leuchtlinien.
+export function drawItems(gridEl, grid, placed, size, info, area) {
+  const els = {};
+  const fusing = new Set();
+  if (area === 'bag') for (const f of findFusions(placed, G.DEFS, G.RECIPES)) fusing.add(f.kraft.uid).add(f.traeger.uid);
+
+  for (const p of placed) {
+    const def = G.DEFS[p.id];
+    const it = itemEl(def, p.rot, size);
+    it.style.left = p.x * size + 'px';
+    it.style.top = p.y * size + 'px';
+    const i = info?.get(p.uid);
+    if (i) {
+      const seal = i.siegel.find((s) => s.ok);
+      if (seal) {
+        const m = document.createElement('span');
+        m.className = 'mark-siegel';
+        m.style.setProperty('--genus', GENUS[seal.genus].farbe);
+        it.append(m);
+      }
+      if (i.adjektive.length) {
+        const m = document.createElement('span');
+        m.className = 'mark-rune';
+        m.textContent = '✦';
+        it.append(m);
+      }
+      const idle = (def.art === 'siegel' && !i.ziele.some((z) => z.ok)) || (isRune(def) && !i.ziel?.ok);
+      if (idle) it.classList.add('idle');
+    }
+    if (fusing.has(p.uid)) it.classList.add('fuses');
+    gridEl.append(it);
+    els[p.uid] = it;
+  }
+
+  if (info) drawRuneLines(gridEl, grid, placed, size, info);
+  return els;
+}
+
+function drawRuneLines(gridEl, grid, placed, size, info) {
+  const lines = [];
+  for (const p of placed) {
+    const i = info.get(p.uid);
+    if (!isRune(G.DEFS[p.id]) || !i?.ziel?.ok) continue;
+    const t = runeTargetCell(p);
+    lines.push([(p.x + 0.5) * size, (p.y + 0.5) * size, (t.x + 0.5) * size, (t.y + 0.5) * size]);
+  }
+  if (!lines.length) return;
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.classList.add('rune-lines');
+  svg.setAttribute('width', grid.cols * size);
+  svg.setAttribute('height', grid.rows * size);
+  for (const [x1, y1, x2, y2] of lines) {
+    const l = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    Object.entries({ x1, y1, x2, y2 }).forEach(([k, v]) => l.setAttribute(k, v));
+    svg.append(l);
+  }
+  gridEl.append(svg);
+}

@@ -9,10 +9,13 @@ const FATIGUE_START = 25;          // ab hier verlieren beide jede Sekunde mehr 
 const MAX_TIME = 60;
 
 // placed: Items im Rucksack; Siegel und Runen werden über analyze() eingerechnet.
-export function makeFighter(name, placed, defs, day, rng = Math.random) {
-  const info = analyze(placed, defs);
+// opts: info (fertige Auswertung, z. B. mit Boni der Figur), leben, tempo (in %), startHp (Anteil 0–1),
+// selbstschaden (zu Kampfbeginn), rng.
+export function makeFighter(name, placed, defs, day, opts = {}) {
+  const rng = opts.rng || Math.random;
+  const info = opts.info || analyze(placed, defs);
   const items = placed.map((p) => ({ uid: p.uid, def: info.get(p.uid).def, t: 0 }));
-  let maxHp = baseHp(day), block = 0, tempo = 0, glueck = 0;
+  let maxHp = baseHp(day) + (opts.leben || 0), block = 0, tempo = opts.tempo || 0, glueck = 0;
   for (const { def } of items) {
     maxHp += def.leben || 0;
     block += def.startblock || 0;
@@ -25,8 +28,9 @@ export function makeFighter(name, placed, defs, day, rng = Math.random) {
     tempo += def.aura?.tempo || 0;
     glueck += def.aura?.glueck || 0;
   }
+  const hp = Math.round(maxHp * (opts.startHp ?? 1)) - (opts.selbstschaden || 0);
   return {
-    name, maxHp, hp: maxHp, block, tempo: tempo / 100, glueck: glueck / 100, rng,
+    name, maxHp, hp, block, tempo: tempo / 100, glueck: glueck / 100, rng,
     gift: 0, brand: 0, kaelte: 0, betaeubt: 0, regeneration: 0,
     items: items.filter((i) => i.def.abklingzeit > 0),
   };

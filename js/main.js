@@ -1,45 +1,31 @@
-// Runenrucksack – Oberfläche: Bildschirme, Raster, Ziehen und Drehen, Laden, Verschmelzen, Kampfanzeige.
+// Runenrucksack – Ablauf eines Laufs, Laden, Rucksack (Ziehen und Drehen) und Info-Feld.
 import {
-  CFG, income, baseHp, sellValue, newRun, reroll, finishBattle, makeEnemy,
-  canPlace, overlapping, findSpot, sizeOf, areaDims,
+  CFG, income, baseHp, sellValue, newRun, reroll, finishBattle,
+  canPlace, overlapping, findSpot, sizeOf,
 } from './logic.js';
 import {
-  GENUS, SIEGEL_BONUS, analyze, buildCompounds, findFusions, wrongOrderNeighbor,
-  canRotate, nextRot, isNoun, isRune, runeTargetCell,
+  GENUS, SIEGEL_BONUS, findFusions, wrongOrderNeighbor, canRotate, nextRot, isNoun, isRune,
 } from './grammar.js';
-import { Battle, makeFighter, runToEnd } from './battle.js';
+import { G, loadData, save, loadRun, placedOf, itemsIn, gridOf, region } from './state.js';
+import { playerContext, evaluateBag } from './mods.js';
+import {
+  $, fmt, fullName, genusChip, toast, bump, openModal, closeModal, modal, itemEl, buildGrid, drawItems,
+} from './ui.js';
+import { startNight } from './battle-ui.js';
 
-const SAVE_KEY = 'runenrucksack.lauf.v1';
-const $ = (id) => document.getElementById(id);
-const fmt = (n) => n.toLocaleString('de-DE', { maximumFractionDigits: 1 });
-
-let ITEMS = [], COMPOUNDS = [], DEFS = {}, RAR = {}, ENEMIES = [], RECIPES = null;
-let run = null;
 let selected = null;   // { src: 'bag'|'store'|'shop', uid?, slot? }
 let drag = null;
-let bagInfo = new Map(); // Auswertung von Siegeln und Runen im Rucksack
-let cell = 96, mini = 56, bcell = 100;
+let bagInfo = new Map(); // wirksame Werte im Rucksack (Siegel, Runen, Boni)
+let cell = 96, mini = 56;
 
 // ---------- Start ----------
 
 async function boot() {
-  const [itemData, enemyData, recipes] = await Promise.all([
-    fetch('items.json').then((r) => r.json()),
-    fetch('enemies.json').then((r) => r.json()),
-    fetch('recipes.json').then((r) => r.json()),
-  ]);
-  ITEMS = itemData.items;
-  RAR = itemData.seltenheiten;
-  RECIPES = recipes;
-  for (const d of ITEMS) DEFS[d.id] = d;
-  COMPOUNDS = buildCompounds(DEFS, RECIPES);
-  for (const d of COMPOUNDS) DEFS[d.id] = d;
-  ENEMIES = enemyData.gegner;
-
-  run = load();
-  $('btn-continue').hidden = !run;
-  $('btn-new').classList.toggle('primary', !run);
-  $('btn-continue').onclick = () => { showScreen('game'); render(); runFusions(); };
+  await loadData();
+  G.run = loadRun();
+  $('btn-continue').hidden = !G.run;
+  $('btn-new').classList.toggle('primary', !G.run);
+  $('btn-continue').onclick = () => { showGame(); continueFlow(); };
   $('btn-new').onclick = startNewRun;
   $('btn-reroll').onclick = onReroll;
   $('btn-fight').onclick = onFight;
@@ -57,213 +43,81 @@ async function boot() {
 }
 
 function startNewRun() {
-  run = newRun(ITEMS);
+  G.run = newRun(G.ITEMS, G.REGIONS);
   selected = null;
-  showScreen('game');
-  render();
+  showGame();
+  continueFlow();
 }
 
 function showScreen(name) {
   for (const id of ['start', 'game', 'battle']) $(id).hidden = id !== name;
 }
 
-// ---------- Speichern (Komfort, nur in diesem Browser) ----------
-
-function save() {
-  try {
-    if (run && !run.over) localStorage.setItem(SAVE_KEY, JSON.stringify(run));
-    else localStorage.removeItem(SAVE_KEY);
-  } catch { /* privater Modus o. ä. */ }
+function showGame() {
+  showScreen('game');
+  layout();
 }
 
-function load() {
-  try {
-    const r = JSON.parse(localStorage.getItem(SAVE_KEY));
-    if (!r || r.version !== 1 || r.over) return null;
-    // Items, die es nicht mehr gibt, fallen weg.
-    r.items = r.items.filter((p) => DEFS[p.id]);
-    r.shop = r.shop.map((s) => (s && DEFS[s.id] ? s : null));
-    r.lernen ||= { richtig: 0, falsch: 0 };
-    return r;
-  } catch { return null; }
+// ---------- Ablauf: Schritte am Morgen, dann Laden ----------
+
+function continueFlow() {
+  save();
+  render();
+  const step = G.run.queue?.[0];
+  if (!step) return;
+  const next = () => { G.run.queue.shift(); continueFlow(); };
+  if (step === 'gebiet') showRegion(next);
+  else if (step === 'verschmelzen') runFusions(next);
+  else next();
+}
+
+function applyTheme() {
+  const s = region().stimmung;
+  const root = document.documentElement.style;
+  root.setProperty('--bg-top', s.oben);
+  root.setProperty('--bg-bottom', s.unten);
+  root.setProperty('--accent', s.akzent);
+}
+
+function showRegion(next) {
+  const reg = region();
+  const boss = G.ENEMIES.find((e) => e.id === reg.boss);
+  applyTheme();
+  modal(`
+    <div class="region-card">
+      <div class="big-emoji">${reg.emoji}</div>
+      <p class="region-over">${reg.tage[0] === 1 ? 'Deine Reise beginnt in' : 'Du erreichst'}</p>
+      <h2>${reg.name}</h2>
+      <p>${reg.text}</p>
+      <p class="region-facts">📖 Wortfeld: <b>${reg.wortfeldName}</b><br>
+      ${boss.emoji} Am ${reg.tage[1]}. Tag wartet: <b>${boss.name}</b></p>
+      <div class="row"><button class="btn primary big" data-act="go">Los geht's</button></div>
+    </div>`, { go: next }, 'region');
 }
 
 // ---------- Größen ----------
 
 function layout() {
   const w = window.innerWidth, h = window.innerHeight;
-  const byW = (w - 380) / 8;
-  const byH = (h - 280) / 4.1;
-  cell = Math.max(56, Math.min(130, Math.floor(Math.min(byW, byH))));
-  mini = Math.round(cell * 0.55);
-  bcell = Math.max(48, Math.min(130, Math.floor(Math.min((w - 260) / 8.4, (h - 300) / 3))));
+  const bag = G.run ? gridOf('bag') : { cols: 4, rows: 3 };
+  const byW = (w - 380) / (bag.cols + CFG.storeCols);
+  const byH = (h - 280) / (Math.max(bag.rows, CFG.storeRows) + 1.1);
+  cell = Math.max(52, Math.min(130, Math.floor(Math.min(byW, byH))));
   document.documentElement.style.setProperty('--cell', cell + 'px');
-  document.documentElement.style.setProperty('--mini', mini + 'px');
   if (!$('game').hidden) render();
 }
 
 // ---------- Hilfsfunktionen ----------
 
-const placedOf = (uid) => run.items.find((p) => p.uid === uid);
-const itemsIn = (area, exceptUid) => run.items.filter((p) => p.area === area && p.uid !== exceptUid);
-const defOf = (ref) => (ref.src === 'shop' ? DEFS[run.shop[ref.slot].id] : DEFS[placedOf(ref.uid).id]);
+const defOf = (ref) => (ref.src === 'shop' ? G.DEFS[G.run.shop[ref.slot].id] : G.DEFS[placedOf(ref.uid).id]);
 const sameRef = (a, b) => a && b && a.src === b.src && a.uid === b.uid && a.slot === b.slot;
-const fullName = (d) => (d.artikel ? `${d.artikel} ${d.name}` : d.name);
-const genusChip = (g) => `<span class="genus" style="--genus:${GENUS[g].farbe}">${g}</span>`;
-
-function toast(text) {
-  const t = $('toast');
-  t.textContent = text;
-  t.hidden = false;
-  clearTimeout(toast.timer);
-  toast.timer = setTimeout(() => { t.hidden = true; }, 2200);
-}
-
-function bump(id) {
-  const el = $(id);
-  el.classList.remove('bump');
-  void el.offsetWidth;
-  el.classList.add('bump');
-}
-
-function itemEl(def, rot, size) {
-  const s = sizeOf(def, rot);
-  const el = document.createElement('div');
-  const passive = !def.abklingzeit && def.art !== 'siegel' && def.art !== 'rune';
-  el.className = `item r-${def.seltenheit}` + (passive ? ' passive' : '');
-  el.style.setProperty('--rar', RAR[def.seltenheit]?.farbe || '#9a8f7a');
-  el.style.width = s.w * size - 6 + 'px';
-  el.style.height = s.h * size - 6 + 'px';
-
-  const cd = document.createElement('div');
-  cd.className = 'cd';
-  el.append(cd);
-
-  if (def.art === 'siegel') {
-    // Artikel-Siegel: Wort auf Genusfarbe
-    el.classList.add('siegel');
-    el.style.setProperty('--genus', GENUS[def.genus].farbe);
-    const w = document.createElement('span');
-    w.className = 'word';
-    w.textContent = def.name;
-    w.style.fontSize = Math.round(size * 0.34) + 'px';
-    el.append(w);
-    return el;
-  }
-
-  const em = document.createElement('span');
-  em.className = 'emoji';
-  em.textContent = def.emoji;
-  em.style.fontSize = Math.round(Math.min(s.w, s.h) * size * (s.w * s.h === 1 ? 0.5 : 0.58)) + 'px';
-  if (rot && def.w !== def.h) em.style.transform = 'rotate(90deg)';
-  el.append(em);
-
-  if (def.leuchten) {
-    el.classList.add('glow');
-    el.style.setProperty('--glow', def.leuchten);
-  }
-  if (isRune(def)) {
-    el.classList.add('rune');
-    em.style.fontSize = Math.round(size * 0.34) + 'px';
-    const a = document.createElement('span');
-    a.className = `arrow d${(rot || 0) % 4}`;
-    a.textContent = '➤';
-    a.style.fontSize = Math.round(size * 0.24) + 'px';
-    el.append(a);
-  }
-  if (def.abzeichen) {
-    const b = document.createElement('span');
-    b.className = 'badge';
-    b.textContent = def.abzeichen;
-    b.style.fontSize = Math.round(size * 0.26) + 'px';
-    el.append(b);
-  }
-  if (size >= 70) {
-    const l = document.createElement('span');
-    l.className = 'label';
-    l.textContent = def.name;
-    el.append(l);
-  }
-  return el;
-}
-
-function buildGrid(el, cols, rows, size) {
-  el.innerHTML = '';
-  el.style.setProperty('--cols', cols);
-  el.style.setProperty('--rows', rows);
-  el.style.setProperty('--cell', size + 'px');
-  for (let i = 0; i < cols * rows; i++) {
-    const c = document.createElement('div');
-    c.className = 'cell';
-    el.append(c);
-  }
-}
-
-// Zeichnet Items in ein Raster; info (aus analyze) liefert Markierungen und Leuchtlinien.
-function drawItems(grid, placed, size, info, area) {
-  const els = {};
-  const fusing = new Set();
-  if (area === 'bag') for (const f of findFusions(placed, DEFS, RECIPES)) fusing.add(f.kraft.uid).add(f.traeger.uid);
-
-  for (const p of placed) {
-    const def = DEFS[p.id];
-    const it = itemEl(def, p.rot, size);
-    it.style.left = p.x * size + 'px';
-    it.style.top = p.y * size + 'px';
-    const i = info?.get(p.uid);
-    if (i) {
-      const seal = i.siegel.find((s) => s.ok);
-      if (seal) {
-        const m = document.createElement('span');
-        m.className = 'mark-siegel';
-        m.style.setProperty('--genus', GENUS[seal.genus].farbe);
-        m.title = `Siegel „${seal.genus}“ passt: +25 %`;
-        it.append(m);
-      }
-      if (i.adjektive.length) {
-        const m = document.createElement('span');
-        m.className = 'mark-rune';
-        m.textContent = '✦';
-        it.append(m);
-      }
-      const idle = (def.art === 'siegel' && !i.ziele.some((z) => z.ok)) || (isRune(def) && !i.ziel?.ok);
-      if (idle) it.classList.add('idle');
-    }
-    if (fusing.has(p.uid)) it.classList.add('fuses');
-    grid.append(it);
-    els[p.uid] = it;
-  }
-
-  if (info) drawRuneLines(grid, placed, size, info);
-  return els;
-}
-
-function drawRuneLines(grid, placed, size, info) {
-  const lines = [];
-  for (const p of placed) {
-    const i = info.get(p.uid);
-    if (!isRune(DEFS[p.id]) || !i?.ziel?.ok) continue;
-    const t = runeTargetCell(p);
-    lines.push([(p.x + 0.5) * size, (p.y + 0.5) * size, (t.x + 0.5) * size, (t.y + 0.5) * size]);
-  }
-  if (!lines.length) return;
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.classList.add('rune-lines');
-  svg.setAttribute('width', CFG.bagCols * size);
-  svg.setAttribute('height', CFG.bagRows * size);
-  for (const [x1, y1, x2, y2] of lines) {
-    const l = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-    Object.entries({ x1, y1, x2, y2 }).forEach(([k, v]) => l.setAttribute(k, v));
-    svg.append(l);
-  }
-  grid.append(svg);
-}
 
 // ---------- Darstellung Tag ----------
 
 function render() {
-  if (!run) return;
-  bagInfo = analyze(itemsIn('bag'), DEFS);
+  if (!G.run) return;
+  applyTheme();
+  bagInfo = evaluateBag(itemsIn('bag'), G.DEFS, playerContext(G.run));
   renderTop();
   renderGrid('bag');
   renderGrid('store');
@@ -273,19 +127,20 @@ function render() {
 }
 
 function renderTop() {
-  $('stat-day').textContent = `☀️ Tag ${run.day}`;
-  $('stat-hearts').textContent = '❤️'.repeat(run.hearts) + '🤍'.repeat(CFG.hearts - run.hearts);
-  $('stat-wins').textContent = `🏆 ${run.wins} / ${CFG.winsToWin}`;
+  const run = G.run, reg = region();
+  $('stat-day').textContent = `${reg.emoji} ${reg.name} · Tag ${run.day} / ${CFG.lastDay}`;
+  $('stat-hearts').textContent = '❤️'.repeat(Math.max(0, run.hearts)) + '🤍'.repeat(CFG.hearts - Math.max(0, run.hearts));
+  $('stat-wins').textContent = `🏆 ${run.wins}`;
   $('stat-gold').textContent = `🪙 ${run.gold}`;
   $('btn-reroll').disabled = run.gold < CFG.rerollCost;
 }
 
 function renderGrid(area) {
   const el = $('grid-' + area);
-  const { cols, rows } = areaDims(area);
-  buildGrid(el, cols, rows, cell);
+  const grid = gridOf(area);
+  buildGrid(el, grid, cell);
   const placed = itemsIn(area);
-  const els = drawItems(el, placed, cell, area === 'bag' ? bagInfo : null, area);
+  const els = drawItems(el, grid, placed, cell, area === 'bag' ? bagInfo : null, area);
   for (const p of placed) {
     const it = els[p.uid];
     it.dataset.src = area;
@@ -295,10 +150,12 @@ function renderGrid(area) {
 }
 
 function renderShop() {
+  const run = G.run;
   const box = $('shop-slots');
   box.innerHTML = '';
   // Item-Größe im Laden an den verfügbaren Platz anpassen.
-  const slotW = (box.clientWidth - (CFG.shopSlots - 1) * 10) / CFG.shopSlots;
+  const n = run.shop.length;
+  const slotW = (box.clientWidth - (n - 1) * 10) / n;
   mini = Math.max(36, Math.floor(Math.min((slotW - 16) / 2, (box.clientHeight - 48) / 2, cell * 0.85)));
   document.documentElement.style.setProperty('--mini', mini + 'px');
   run.shop.forEach((s, i) => {
@@ -310,7 +167,7 @@ function renderShop() {
       box.append(slot);
       return;
     }
-    const def = DEFS[s.id];
+    const def = G.DEFS[s.id];
     const holder = document.createElement('div');
     holder.className = 'holder';
     const it = itemEl(def, 0, mini);
@@ -370,7 +227,7 @@ function renderInfo() {
   const ana = inBag ? bagInfo.get(selected.uid) : null;
   const def = ana ? ana.def : base;
   const s = sizeOf(base, 0);
-  const rar = RAR[base.seltenheit] || {};
+  const rar = G.RAR[base.seltenheit] || {};
 
   const title = ana?.phrase
     ? `<span class="phrase">${ana.phrase}</span>`
@@ -392,8 +249,8 @@ function renderInfo() {
   for (const [key, label, f] of STAT_ROWS) {
     if (key === 'abklingzeit' && !def.abklingzeit) continue;
     if (!def[key]) continue;
-    const diff = key === 'abklingzeit' ? 0 : def[key] - (base[key] || 0);
-    const extra = diff > 0 ? ` <span class="plus">(+${fmt(Math.round(diff * 10) / 10)})</span>` : '';
+    const diff = def[key] - (base[key] || 0);
+    const extra = Math.abs(diff) > 1e-9 ? ` <span class="${diff > 0 === (key !== 'abklingzeit') ? 'plus' : 'minus'}">(${diff > 0 ? '+' : '−'}${fmt(Math.round(Math.abs(diff) * 10) / 10)})</span>` : '';
     ul.insertAdjacentHTML('beforeend', `<li><span>${label}</span><b>${f(def[key])}${extra}</b></li>`);
   }
   if (ul.children.length) box.append(ul);
@@ -405,6 +262,7 @@ function renderInfo() {
   if (base.aura?.glueck) notes.push(`Wirkt außerdem auf den ganzen Rucksack: +${base.aura.glueck} % Glück.`);
   for (const k of Object.keys(EXPLAIN)) if (def[k]) notes.push(EXPLAIN[k]);
   for (const n of notes) box.insertAdjacentHTML('beforeend', `<p class="muted">${n}</p>`);
+  for (const b of ana?.boni || []) box.insertAdjacentHTML('beforeend', `<p class="gram ok">${b}</p>`);
 
   const gram = grammarNotes(base, ana, selected);
   if (gram.length) {
@@ -424,7 +282,7 @@ function renderInfo() {
   };
   if (selected.src === 'shop') {
     const slot = selected.slot;
-    btn(`Kaufen <span class="price">${base.preis} 🪙</span>`, () => buyAuto(slot), 'primary').disabled = run.gold < base.preis;
+    btn(`Kaufen <span class="price">${base.preis} 🪙</span>`, () => buyAuto(slot), 'primary').disabled = G.run.gold < base.preis;
   } else {
     const uid = selected.uid;
     if (canRotate(base)) btn(isRune(base) ? '⟳ Pfeil drehen' : '⟳ Drehen', () => rotateInPlace(uid));
@@ -438,39 +296,43 @@ function renderInfo() {
 function artLabel(d) {
   return {
     traeger: 'Nomen · Träger', nomen: 'Nomen', kraft: 'Nomen · Kraft', kompositum: 'Kompositum',
-    verb: 'Verb', siegel: 'Artikel-Siegel', rune: 'Adjektiv-Rune',
+    verb: 'Verb', siegel: 'Artikel-Siegel', rune: 'Adjektiv-Rune', tasche: 'Tasche',
   }[d.art] || '';
 }
+
+const dativ = (d) => fullName(d).replace(/^der /, 'dem ').replace(/^die /, 'der ').replace(/^das /, 'dem ');
 
 // Erklärungen zu Genus, Siegeln, Runen und Komposita für das Info-Feld.
 function grammarNotes(base, ana, ref) {
   const out = [];
   const where = ref.src === 'bag' ? '' : ' (wirkt nur im Rucksack)';
+  const bag = itemsIn('bag');
 
   if (isNoun(base)) {
     out.push({ html: `${genusChip(base.artikel)} <b>${base.name}</b> – Genus ${GENUS[base.artikel].name}` });
   }
   if (base.art === 'kompositum') {
-    const k = DEFS[base.teile.kraft], t = DEFS[base.teile.traeger];
+    const k = G.DEFS[base.teile.kraft], t = G.DEFS[base.teile.traeger];
     out.push({ html: `${k.name} + ${t.name} = ${base.name}. Das letzte Wort bestimmt den Artikel: ${fullName(t)} → ${fullName(base)}.` });
   }
   if (base.art === 'kraft') {
-    const fus = ref.src === 'bag' && findFusions(itemsIn('bag'), DEFS, RECIPES).find((f) => f.kraft.uid === ref.uid);
-    const wrong = ref.src === 'bag' && !fus && wrongOrderNeighbor(placedOf(ref.uid), itemsIn('bag'), DEFS, RECIPES);
+    const fus = ref.src === 'bag' && findFusions(bag, G.DEFS, G.RECIPES).find((f) => f.kraft.uid === ref.uid);
+    const wrong = ref.src === 'bag' && !fus && wrongOrderNeighbor(placedOf(ref.uid), bag, G.DEFS, G.RECIPES);
     if (fus) {
-      out.push({ cls: 'ok', html: `✓ Verschmilzt zu Beginn des nächsten Tages: ${base.name} + ${DEFS[fus.traeger.id].name} = <b>${DEFS[fus.id].name}</b>` });
+      out.push({ cls: 'ok', html: `✓ Verschmilzt zu Beginn des nächsten Tages: ${base.name} + ${G.DEFS[fus.traeger.id].name} = <b>${G.DEFS[fus.id].name}</b>` });
     } else if (wrong) {
-      const t = DEFS[wrong.id];
-      out.push({ cls: 'bad', html: `✗ Liegt rechts neben oder unter ${fullName(t).replace(/^der /, 'dem ').replace(/^die /, 'der ').replace(/^das /, 'dem ')}. So entstünde „${t.name}${base.name.toLowerCase()}“. Das Bestimmungswort steht vorne: Lege ${fullName(base)} links neben oder über das Item.` });
+      const t = G.DEFS[wrong.id];
+      out.push({ cls: 'bad', html: `✗ Liegt rechts neben oder unter ${dativ(t)}. So entstünde „${t.name}${base.name.toLowerCase()}“. Das Bestimmungswort steht vorne: Lege ${fullName(base)} links neben oder über das Item.` });
     } else {
       out.push({ html: `Lege ${fullName(base)} direkt links neben oder über einen Träger (Schwert, Bogen, Schild …). Zu Beginn des nächsten Tages verschmelzen beide zum Kompositum.` });
     }
   }
   if (base.art === 'siegel') {
-    out.push({ html: `Gibt einem Nomen daneben +${SIEGEL_BONUS * 100} % Wirkung – aber nur, wenn es „${base.genus}“ heißt${where}.` });
+    const bonus = Math.round((playerContext(G.run).siegelBonus ?? SIEGEL_BONUS) * 100);
+    out.push({ html: `Gibt einem Nomen daneben +${bonus} % Wirkung – aber nur, wenn es „${base.genus}“ heißt${where}.` });
     for (const z of ana?.ziele || []) {
       out.push(z.ok
-        ? { cls: 'ok', html: `✓ ${fullName(z.def)}: passt, +25 %` }
+        ? { cls: 'ok', html: `✓ ${fullName(z.def)}: passt, +${bonus} %` }
         : { cls: 'bad', html: `✗ ${z.def.name}: Es heißt „${fullName(z.def)}“ (${GENUS[z.def.artikel].name}). Dazu passt nur das Siegel ${genusChip(z.def.artikel)}.` });
     }
     if (ana && !ana.ziele.length) out.push({ cls: 'bad', html: 'Kein Nomen direkt daneben.' });
@@ -498,7 +360,7 @@ function grammarNotes(base, ana, ref) {
   if (ana && isNoun(base)) {
     for (const sg of ana.siegel) {
       out.push(sg.ok
-        ? { cls: 'ok', html: `✓ Siegel ${genusChip(sg.genus)} daneben: +25 %` }
+        ? { cls: 'ok', html: `✓ Siegel ${genusChip(sg.genus)} daneben: mehr Wirkung` }
         : { cls: 'bad', html: `✗ Siegel ${genusChip(sg.genus)} daneben wirkt nicht: Es heißt „${fullName(base)}“.` });
     }
     for (const r of ana.runen) {
@@ -510,14 +372,16 @@ function grammarNotes(base, ana, ref) {
 }
 
 function refExists(ref) {
-  if (ref.src === 'shop') return !!run.shop[ref.slot];
+  if (ref.src === 'shop') return !!G.run.shop[ref.slot];
   const p = placedOf(ref.uid);
   return !!p && p.area === ref.src;
 }
 
 function renderSummary(box) {
+  const run = G.run;
+  const ctx = playerContext(run);
   const bag = itemsIn('bag').map((p) => bagInfo.get(p.uid).def);
-  let leben = baseHp(run.day), startblock = 0, tempo = 0, glueck = 0;
+  let leben = baseHp(run.day) + (ctx.leben || 0), startblock = 0, tempo = ctx.tempo || 0, glueck = 0;
   const perSec = { schaden: 0, block: 0, heilung: 0, gift: 0, brand: 0 };
   for (const d of bag) {
     leben += d.leben || 0;
@@ -543,33 +407,34 @@ function renderSummary(box) {
   if (perSec.gift) rows.push(['🧪 Gift pro s', fmt(perSec.gift)]);
   if (perSec.brand) rows.push(['🔥 Brand pro s', fmt(perSec.brand)]);
 
-  const fusions = findFusions(itemsIn('bag'), DEFS, RECIPES);
+  const reg = region();
+  const boss = G.ENEMIES.find((e) => e.id === reg.boss);
+  const fusions = findFusions(itemsIn('bag'), G.DEFS, G.RECIPES);
   box.innerHTML = `
     <h2>Dein Rucksack</h2>
     <ul class="stats">${rows.map(([a, b]) => `<li><span>${a}</span><b>${b}</b></li>`).join('')}</ul>
-    ${fusions.length ? `<p class="gram ok">✓ Morgen verschmelzen: ${fusions.map((f) => DEFS[f.id].name).join(', ')}</p>` : ''}
-    ${run.day % 5 === 0 ? '<p class="muted"><b>Heute Nacht wartet ein Anführer der Orks!</b></p>' : ''}
+    ${fusions.length ? `<p class="gram ok">✓ Morgen verschmelzen: ${fusions.map((f) => G.DEFS[f.id].name).join(', ')}</p>` : ''}
+    ${run.day === reg.tage[1] ? `<p class="gram bad"><b>Heute Nacht wartet der Anführer: ${boss.emoji} ${boss.name}!</b></p>` : `<p class="muted">${boss.emoji} ${boss.name} wartet am ${reg.tage[1]}. Tag.</p>`}
     <h3>So geht's</h3>
     <p class="muted">Ziehe Items aus dem Laden in den Rucksack. Tippe ein Item an für Infos, tippe nochmal zum Drehen. Beim Ziehen dreht ein zweiter Finger das Item.</p>
-    <p class="muted">🔥 Kraft links neben oder über einen Träger legen → verschmilzt morgen. ${genusChip('der')} ${genusChip('die')} ${genusChip('das')} Siegel neben ein passendes Nomen: +25 %. ➤ Runen-Pfeil auf ein passendes Nomen richten.</p>
-    <p class="muted">Morgen gibt es ${income(run.day + 1)} 🪙. Mit 🔓 reservierst du ein Item im Laden.</p>`;
+    <p class="muted">🔥 Kraft links neben oder über einen Träger legen → verschmilzt morgen. ${genusChip('der')} ${genusChip('die')} ${genusChip('das')} Siegel neben ein passendes Nomen. ➤ Runen-Pfeil auf ein passendes Nomen richten.</p>
+    <p class="muted">${run.day < CFG.lastDay ? `Morgen gibt es ${income(run.day + 1)} 🪙. ` : 'Heute ist der letzte Tag deiner Reise! '}Mit 🔓 reservierst du ein Item im Laden.</p>`;
 }
 
 // ---------- Aktionen ----------
 
 function onReroll() {
-  if (!reroll(run, ITEMS)) { toast('Zu wenig Gold'); return; }
+  if (!reroll(G.run, G.ITEMS, G.REGIONS)) { toast('Zu wenig Gold'); return; }
   if (selected?.src === 'shop') selected = null;
   bump('stat-gold');
   render();
 }
 
 function buyAuto(slot) {
-  const def = DEFS[run.shop[slot].id];
-  if (run.gold < def.preis) { toast('Zu wenig Gold'); return; }
+  const def = G.DEFS[G.run.shop[slot].id];
+  if (G.run.gold < def.preis) { toast('Zu wenig Gold'); return; }
   for (const area of ['bag', 'store']) {
-    const { cols, rows } = areaDims(area);
-    const spot = findSpot(itemsIn(area), DEFS, def, cols, rows);
+    const spot = findSpot(itemsIn(area), G.DEFS, def, gridOf(area));
     if (spot) {
       buy(slot, area, spot);
       if (area === 'store') toast('Rucksack voll – ins Lager gelegt');
@@ -580,7 +445,8 @@ function buyAuto(slot) {
 }
 
 function buy(slot, area, spot) {
-  const def = DEFS[run.shop[slot].id];
+  const run = G.run;
+  const def = G.DEFS[run.shop[slot].id];
   run.gold -= def.preis;
   run.shop[slot] = null;
   const uid = run.nextUid++;
@@ -592,9 +458,9 @@ function buy(slot, area, spot) {
 
 function sell(uid) {
   const p = placedOf(uid);
-  const def = DEFS[p.id];
-  run.items = run.items.filter((i) => i !== p);
-  run.gold += sellValue(def);
+  const def = G.DEFS[p.id];
+  G.run.items = G.run.items.filter((i) => i !== p);
+  G.run.gold += sellValue(def);
   selected = null;
   toast(`${fullName(def)} verkauft: +${sellValue(def)} 🪙`);
   bump('stat-gold');
@@ -603,33 +469,31 @@ function sell(uid) {
 
 function moveAuto(uid, area) {
   const p = placedOf(uid);
-  const { cols, rows } = areaDims(area);
-  const spot = findSpot(itemsIn(area), DEFS, DEFS[p.id], cols, rows);
+  const spot = findSpot(itemsIn(area), G.DEFS, G.DEFS[p.id], gridOf(area));
   if (!spot) { toast(area === 'bag' ? 'Kein Platz im Rucksack' : 'Kein Platz im Lager'); return; }
   Object.assign(p, { area, ...spot });
-  if (isRune(DEFS[p.id])) p.rot = 0;
+  if (isRune(G.DEFS[p.id])) p.rot = 0;
   selected = { src: area, uid };
   render();
 }
 
 function rotateInPlace(uid) {
   const p = placedOf(uid);
-  const def = DEFS[p.id];
+  const def = G.DEFS[p.id];
   if (!canRotate(def)) return;
   const rot = nextRot(def, p.rot || 0);
   if (isRune(def)) { p.rot = rot; render(); return; }
-  const { cols, rows } = areaDims(p.area);
+  const grid = gridOf(p.area);
   const others = itemsIn(p.area, uid);
   for (const [dx, dy] of [[0, 0], [-1, 0], [0, -1], [-1, -1], [1, 0], [0, 1]]) {
-    if (canPlace(others, DEFS, def, p.x + dx, p.y + dy, rot, cols, rows)) {
+    if (canPlace(others, G.DEFS, def, p.x + dx, p.y + dy, rot, grid)) {
       Object.assign(p, { x: p.x + dx, y: p.y + dy, rot });
       render();
       return;
     }
   }
   toast('Kein Platz zum Drehen');
-  const el = document.querySelector(`.item[data-uid="${uid}"]`);
-  el?.classList.add('shake');
+  document.querySelector(`.item[data-uid="${uid}"]`)?.classList.add('shake');
 }
 
 function onFight() {
@@ -641,16 +505,17 @@ function onFight() {
       <div class="row"><button class="btn primary" data-act="close">Zurück</button></div>`);
     return;
   }
-  startNight();
+  selected = null;
+  startNight(battleOver);
 }
 
 function openMenu() {
-  const l = run.lernen;
+  const run = G.run, l = run.lernen;
   modal(`
     <div class="big-emoji">🎒</div>
     <h2>Menü</h2>
-    <p>Tag ${run.day} · ${run.wins} Siege · ${run.hearts} Herzen</p>
-    ${l.richtig + l.falsch ? `<p>Artikel beim Verschmelzen: ${l.richtig} richtig, ${l.falsch} daneben</p>` : ''}
+    <p>${region().name} · Tag ${run.day} · ${run.wins} Siege · ${run.hearts} Herzen</p>
+    ${l.richtig + l.falsch ? `<p>Grammatik-Aufgaben: ${l.richtig} richtig, ${l.falsch} daneben</p>` : ''}
     <div class="row">
       <button class="btn primary" data-act="close">Weiterspielen</button>
       <button class="btn danger" data-act="new">Neuer Lauf</button>
@@ -667,43 +532,19 @@ function confirmNew() {
     </div>`, { yes: startNewRun });
 }
 
-function openModal(html) {
-  $('modal-card').innerHTML = html;
-  $('modal').hidden = false;
-  return $('modal-card');
-}
-
-const closeModal = () => { $('modal').hidden = true; };
-
-function modal(html, handlers = {}) {
-  const card = openModal(html);
-  card.querySelectorAll('[data-act]').forEach((b) => {
-    b.onclick = () => {
-      closeModal();
-      const fn = handlers[b.dataset.act];
-      if (fn) fn();
-    };
-  });
-}
-
 // ---------- Verschmelzen (zu Beginn des Tages) ----------
 
-function runFusions() {
-  if (!run?.pendingFusion) return;
-  const list = findFusions(itemsIn('bag'), DEFS, RECIPES);
-  showFusion(list, 0);
+function runFusions(done) {
+  showFusion(findFusions(itemsIn('bag'), G.DEFS, G.RECIPES), 0, done);
 }
 
-function showFusion(list, i) {
-  if (i >= list.length) {
-    run.pendingFusion = false;
-    render();
-    return;
-  }
+function showFusion(list, i, done) {
+  const run = G.run;
+  if (i >= list.length) { render(); done(); return; }
   const f = list[i];
   const k = placedOf(f.kraft.uid), t = placedOf(f.traeger.uid);
-  if (!k || !t || k.area !== 'bag' || t.area !== 'bag') { showFusion(list, i + 1); return; }
-  const kd = DEFS[k.id], td = DEFS[t.id], cd = DEFS[f.id];
+  if (!k || !t || k.area !== 'bag' || t.area !== 'bag') { showFusion(list, i + 1, done); return; }
+  const kd = G.DEFS[k.id], td = G.DEFS[t.id], cd = G.DEFS[f.id];
   let tries = 0;
   let feedback = '';
   const wrong = new Set();
@@ -726,7 +567,7 @@ function showFusion(list, i) {
       ${broke ? '<p class="feedback">Kein Gold für einen weiteren Versuch.</p>' : ''}
       <div class="row"><button class="btn small" data-later>Heute nicht verschmelzen</button></div>`);
     card.querySelectorAll('[data-g]').forEach((b) => { b.onclick = () => guess(b.dataset.g); });
-    card.querySelector('[data-later]').onclick = () => { closeModal(); showFusion(list, i + 1); };
+    card.querySelector('[data-later]').onclick = () => { closeModal(); showFusion(list, i + 1, done); };
   };
 
   const guess = (g) => {
@@ -747,7 +588,7 @@ function showFusion(list, i) {
         <h2>${genusChip(cd.artikel)} ${cd.name}</h2>
         <p>Richtig! ${tries > 1 ? '' : 'Gleich beim ersten Versuch. '}Das letzte Wort bestimmt den Artikel: ${fullName(td)} → ${fullName(cd)}.</p>
         <div class="row"><button class="btn primary big" data-next>Weiter</button></div>`);
-      card.querySelector('[data-next]').onclick = () => { closeModal(); showFusion(list, i + 1); };
+      card.querySelector('[data-next]').onclick = () => { closeModal(); showFusion(list, i + 1, done); };
       return;
     }
     run.lernen.falsch++;
@@ -870,9 +711,9 @@ function updateTarget() {
     const ox = r.left + 3, oy = r.top + 3; // innerhalb des Rahmens
     const cx = left - 3 + (s.w * cell) / 2, cy = top - 3 + (s.h * cell) / 2;
     if (cx < r.left - cell / 2 || cx > r.right + cell / 2 || cy < r.top - cell / 2 || cy > r.bottom + cell / 2) continue;
-    const { cols, rows } = areaDims(area);
-    const x = Math.max(0, Math.min(cols - s.w, Math.round((left - 3 - ox) / cell)));
-    const y = Math.max(0, Math.min(rows - s.h, Math.round((top - 3 - oy) / cell)));
+    const grid = gridOf(area);
+    const x = Math.max(0, Math.min(grid.cols - s.w, Math.round((left - 3 - ox) / cell)));
+    const y = Math.max(0, Math.min(grid.rows - s.h, Math.round((top - 3 - oy) / cell)));
     drag.target = { area, x, y, ...evaluate(area, x, y, s) };
 
     const pv = document.createElement('div');
@@ -897,17 +738,19 @@ function updateTarget() {
 // Darf das gezogene Item hier hin? Im Rucksack werden überdeckte Items ins Lager geschoben.
 function evaluate(area, x, y, s) {
   const selfUid = drag.ref.uid;
-  if (drag.ref.src === 'shop' && run.gold < drag.def.preis) return { status: 'bad', reason: 'gold' };
-  const { cols, rows } = areaDims(area);
+  if (drag.ref.src === 'shop' && G.run.gold < drag.def.preis) return { status: 'bad', reason: 'gold' };
+  const grid = gridOf(area);
   const list = itemsIn(area, selfUid);
-  if (canPlace(list, DEFS, drag.def, x, y, drag.rot, cols, rows)) return { status: 'ok' };
+  if (canPlace(list, G.DEFS, drag.def, x, y, drag.rot, grid)) return { status: 'ok' };
   if (area !== 'bag') return { status: 'bad' };
+  // Felder müssen trotzdem zum Rucksack gehören.
+  if (!canPlace([], G.DEFS, drag.def, x, y, drag.rot, grid)) return { status: 'bad' };
 
-  const hit = overlapping(list, DEFS, x, y, s.w, s.h);
+  const hit = overlapping(list, G.DEFS, x, y, s.w, s.h);
   const store = itemsIn('store', selfUid);
   const moves = [];
   for (const o of hit) {
-    const spot = findSpot(store, DEFS, DEFS[o.id], CFG.storeCols, CFG.storeRows);
+    const spot = findSpot(store, G.DEFS, G.DEFS[o.id], gridOf('store'));
     if (!spot) return { status: 'bad' };
     store.push({ ...o, ...spot });
     moves.push({ uid: o.uid, ...spot });
@@ -947,194 +790,54 @@ function tap(ref) {
   else { selected = ref; render(); }
 }
 
-// ---------- Nacht: Kampf ----------
+// ---------- Nach dem Kampf ----------
 
-let battle = null, enemy = null, speed = 1, rafId = 0, lastFrame = 0, itemEls = {};
-
-function enemyPool(day) {
-  const base = ITEMS.filter((d) => d.art !== 'siegel' && d.art !== 'rune');
-  return day >= 3 ? base.concat(COMPOUNDS) : base;
-}
-
-function startNight() {
-  selected = null;
-  enemy = makeEnemy(run.day, ENEMIES, enemyPool(run.day), DEFS);
-  const player = makeFighter('Dein Rucksack', itemsIn('bag'), DEFS, run.day);
-  const foe = makeFighter(enemy.name, enemy.items, DEFS, run.day);
-  battle = new Battle(player, foe);
-  itemEls = { player: {}, enemy: {} };
-
-  $('battle-title').textContent = `🌙 Nacht ${run.day}`;
-  buildFighter('player', '🎒', 'Dein Rucksack', '', itemsIn('bag'));
-  buildFighter('enemy', enemy.emoji, enemy.name, enemy.ruestung, enemy.items);
-  updateBattleUi();
-  setSpeed(speed);
-  $('btn-start-battle').hidden = false;
-  $('btn-start-battle').onclick = beginBattle;
-  $('btn-skip').onclick = skipBattle;
-  $('btn-skip').disabled = false;
-  $('speed').onclick = (e) => { const b = e.target.closest('[data-speed]'); if (b) setSpeed(+b.dataset.speed); };
-  showScreen('battle');
-}
-
-function buildFighter(side, emoji, name, armor, placed) {
-  const box = $('fighter-' + side);
-  box.innerHTML = `
-    <div class="f-head">
-      <div class="f-portrait">${emoji}</div>
-      <div>
-        <div class="f-name">${name}</div>
-        ${armor ? `<div class="f-armor">Auf der Rüstung steht: <b>${armor}</b></div>` : '<div class="f-armor">Tag ' + run.day + '</div>'}
-      </div>
-    </div>
-    <div class="hpbar"><div class="fill"></div><div class="text"></div></div>
-    <div class="f-status"></div>
-    <div class="grid"></div>`;
-  const grid = box.querySelector('.grid');
-  buildGrid(grid, CFG.bagCols, CFG.bagRows, bcell);
-  itemEls[side] = drawItems(grid, placed, bcell, analyze(placed, DEFS), 'battle');
-  for (const el of Object.values(itemEls[side])) el.style.cursor = 'default';
-}
-
-function setSpeed(s) {
-  speed = s;
-  document.querySelectorAll('#speed [data-speed]').forEach((b) => b.classList.toggle('active', +b.dataset.speed === s));
-}
-
-function beginBattle() {
-  $('btn-start-battle').hidden = true;
-  lastFrame = performance.now();
-  rafId = requestAnimationFrame(frame);
-}
-
-function frame(now) {
-  const dt = Math.min(0.1, (now - lastFrame) / 1000) * speed;
-  lastFrame = now;
-  const events = battle.advance(dt);
-  for (const ev of events) showEvent(ev);
-  updateBattleUi();
-  if (battle.result) {
-    $('btn-skip').disabled = true;
-    setTimeout(battleOver, 700);
-    return;
-  }
-  rafId = requestAnimationFrame(frame);
-}
-
-function skipBattle() {
-  cancelAnimationFrame(rafId);
-  $('btn-start-battle').hidden = true;
-  $('btn-skip').disabled = true;
-  runToEnd(battle);
-  updateBattleUi();
-  battleOver();
-}
-
-function updateBattleUi() {
-  $('battle-time').textContent = `⏳ ${fmt(Math.floor(battle.time * 10) / 10)} s`;
-  for (const side of ['player', 'enemy']) {
-    const f = battle.sides[side];
-    const box = $('fighter-' + side);
-    const hp = Math.max(0, Math.ceil(f.hp));
-    box.querySelector('.fill').style.width = (100 * Math.max(0, f.hp)) / f.maxHp + '%';
-    box.querySelector('.hpbar .text').textContent = `${hp} / ${f.maxHp}`;
-    const chips = [];
-    if (f.block > 0) chips.push(`<span class="chip block">🛡️ ${Math.round(f.block)}</span>`);
-    if (f.gift > 0) chips.push(`<span class="chip gift">🧪 ${f.gift}</span>`);
-    if (f.brand > 0) chips.push(`<span class="chip brand">🔥 ${f.brand}</span>`);
-    if (f.kaelte > 0) chips.push(`<span class="chip kaelte">❄️ ${fmt(Math.ceil(f.kaelte * 10) / 10)} s</span>`);
-    if (f.betaeubt > 0) chips.push(`<span class="chip betaeubung">💫 ${fmt(Math.ceil(f.betaeubt * 10) / 10)} s</span>`);
-    if (f.regeneration > 0) chips.push(`<span class="chip regeneration">🌙 ${f.regeneration}</span>`);
-    if (f.tempo > 0) chips.push(`<span class="chip">💨 +${Math.round(f.tempo * 100)} %</span>`);
-    if (f.glueck > 0) chips.push(`<span class="chip">🍀 ${Math.round(f.glueck * 100)} %</span>`);
-    box.querySelector('.f-status').innerHTML = chips.join('');
-    for (const it of f.items) {
-      const el = itemEls[side][it.uid];
-      if (el) el.style.setProperty('--p', Math.min(1, it.t / it.def.abklingzeit));
-    }
-  }
-}
-
-function showEvent(ev) {
-  const box = $('fighter-' + ev.side);
-  let text = '', cls = '';
-  if (ev.type === 'trigger') {
-    const el = itemEls[ev.side][ev.uid];
-    if (el) { el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse'); }
-    if (!ev.crit) return;
-    text = '🍀 Glück! ×2';
-    cls = 'glueck';
-  } else if (ev.type === 'damage') {
-    if (ev.amount > 0) {
-      text = `-${ev.amount}`;
-      cls = ev.kind;
-      const p = box.querySelector('.f-portrait');
-      p.classList.remove('hit'); void p.offsetWidth; p.classList.add('hit');
-    } else if (ev.blocked > 0) { text = '🛡️ geblockt'; cls = 'block'; }
-  } else if (ev.type === 'block') { text = `+${ev.amount} 🛡️`; cls = 'block'; }
-  else if (ev.type === 'heal') { text = `+${ev.amount} ${ev.kind === 'regeneration' ? '🌙' : '💚'}`; cls = 'heal'; }
-  else if (ev.type === 'status') {
-    const icon = { gift: '🧪', brand: '🔥', kaelte: '❄️', betaeubung: '💫', regeneration: '🌙' }[ev.kind];
-    const secs = ev.kind === 'kaelte' || ev.kind === 'betaeubung';
-    text = `${icon} +${secs ? fmt(ev.amount) + ' s' : ev.amount}`;
-    cls = ev.kind;
-  }
-  if (!text) return;
-  // Bei hohem Tempo nicht zu viele Zahlen gleichzeitig.
-  if (box.querySelectorAll('.floater').length > 8) return;
-  const f = document.createElement('div');
-  f.className = 'floater ' + cls;
-  f.textContent = text;
-  f.style.left = 30 + Math.random() * 50 + '%';
-  f.style.top = 150 + Math.random() * 120 + 'px';
-  box.append(f);
-  setTimeout(() => f.remove(), 1000);
-}
-
-function battleOver() {
-  const won = battle.result === 'win';
-  finishBattle(run, ITEMS, won, enemy.name);
+function battleOver(won, enemyName) {
+  const run = G.run;
+  finishBattle(run, G.ITEMS, G.REGIONS, won, enemyName);
   save();
-  const heartsLeft = run.hearts;
+  const heartsLeft = Math.max(0, run.hearts);
   modal(won ? `
       <div class="big-emoji">🏆</div>
       <h2>Sieg!</h2>
-      <p>Du hast ${enemy.name} besiegt.</p>
-      <p>Siege: <b>${run.wins} / ${CFG.winsToWin}</b></p>
+      <p>Du hast ${enemyName} besiegt.</p>
+      <p>Siege: <b>${run.wins}</b> · Herzen: <b>${'❤️'.repeat(heartsLeft)}${'🤍'.repeat(CFG.hearts - heartsLeft)}</b></p>
       <div class="row"><button class="btn primary big" data-act="next">Weiter</button></div>` : `
       <div class="big-emoji">💔</div>
       <h2>Niederlage</h2>
-      <p>${enemy.name} war heute stärker. Du verlierst ein Herz.</p>
+      <p>${enemyName} war heute stärker. Du verlierst ein Herz.</p>
       <p>Herzen: <b>${'❤️'.repeat(heartsLeft)}${'🤍'.repeat(CFG.hearts - heartsLeft)}</b></p>
       <div class="row"><button class="btn primary big" data-act="next">Weiter</button></div>`,
   { next: afterBattle });
 }
 
 function afterBattle() {
-  if (run.over) { showRunEnd(); return; }
-  showScreen('game');
-  render();
-  toast(`Neuer Tag: +${income(run.day)} 🪙`);
-  runFusions();
+  if (G.run.over) { showRunEnd(); return; }
+  showGame();
+  toast(`Neuer Tag: +${income(G.run.day)} 🪙`);
+  continueFlow();
 }
 
 function showRunEnd() {
+  const run = G.run;
   const won = run.over === 'won';
+  const stars = run.wins >= 10 ? '🌟🌟🌟' : run.wins >= 8 ? '⭐⭐⭐' : run.wins >= 6 ? '⭐⭐' : '⭐';
   modal(won ? `
       <div class="big-emoji">👑</div>
-      <h2>Lauf gewonnen!</h2>
-      <p>Zehn Siege in ${run.day} Tagen – mit ${run.hearts} ${run.hearts === 1 ? 'Herz' : 'Herzen'} übrig.</p>
-      <p>Die Wörter der Wanderlande sind ein Stück sicherer.</p>
+      <h2>Reise geschafft!</h2>
+      <p>Du hast Kleinwurzel und Hrossmark durchquert: <b>${run.wins} von ${CFG.lastDay}</b> Kämpfen gewonnen.</p>
+      <p class="stars">${stars}</p>
+      <p>${run.wins >= 10 ? 'Kein einziger Kampf verloren – unglaublich!' : 'Die Wörter der Wanderlande sind ein Stück sicherer.'}</p>
       <div class="row"><button class="btn primary big" data-act="new">Neuer Lauf</button><button class="btn" data-act="home">Zum Start</button></div>` : `
       <div class="big-emoji">🪦</div>
       <h2>Lauf verloren</h2>
-      <p>Alle Herzen sind weg. Du hast <b>${run.wins} von ${CFG.winsToWin}</b> Siegen geschafft.</p>
+      <p>Alle Herzen sind weg – an Tag ${run.day} in ${region().name}. Du hast <b>${run.wins}</b> Kämpfe gewonnen.</p>
       <p>Probier es gleich nochmal – jeder Lauf ist anders.</p>
       <div class="row"><button class="btn primary big" data-act="new">Neuer Lauf</button><button class="btn" data-act="home">Zum Start</button></div>`,
   {
     new: startNewRun,
     home: () => {
-      run = null;
+      G.run = null;
       $('btn-continue').hidden = true;
       $('btn-new').classList.add('primary');
       showScreen('start');
