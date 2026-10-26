@@ -145,12 +145,82 @@ export const runeTargetCell = (r) => {
 export function runeFits(rd, td) {
   if (!isNoun(td)) return false;
   const key = rd.adjektiv.passt;
+  if (key === 'nomen') return true;
   return key === 'abklingzeit' ? td.abklingzeit > 0 : (td[key] || 0) > 0;
 }
 
-export function adjectiveForm(rd, artikel) {
-  const ending = { der: 'er', die: 'e', das: 'es' }[artikel] || 'e';
-  return rd.adjektiv.stamm + ending;
+// Adjektiv vor dem Nomen: ohne Artikel stark (scharfes Schwert), nach „der/die/das“ schwach (das scharfe Schwert).
+export function adjectiveForm(rd, artikel, schwach = false) {
+  const st = rd.stufe || 1;
+  const stamm = st === 3 ? rd.steigerung.sStamm : st === 2 ? rd.steigerung.kStamm : rd.adjektiv.stamm;
+  if (schwach || st === 3) return stamm + 'e';
+  return stamm + ({ der: 'er', die: 'e', das: 'es' }[artikel] || 'e');
+}
+
+export function phraseFor(adjs, def) {
+  if (!adjs.length) return null;
+  const sup = adjs.some((a) => a.stufe === 3);
+  const words = adjs.map((a) => adjectiveForm(a, def.artikel, sup)).join(', ');
+  return sup ? `${def.artikel} ${words} ${def.name}` : `${words} ${def.name}`;
+}
+
+// ---------- Steigerung ----------
+
+export const STEIGERUNG_FAKTOR = 1.5; // jede Stufe +50 % Wirkung
+export const runeBase = (d) => d.basis || d.id;
+
+// Baut aus jeder Rune Komparativ (Stufe 2) und Superlativ (Stufe 3).
+export function buildRuneLevels(defs) {
+  const out = [];
+  const bump = { gewoehnlich: 'selten', selten: 'episch', episch: 'legendaer', legendaer: 'legendaer' };
+  for (const d of Object.values(defs)) {
+    if (!isRune(d) || !d.steigerung || d.stufe) continue;
+    let prev = d;
+    for (const stufe of [2, 3]) {
+      const f = STEIGERUNG_FAKTOR ** (stufe - 1);
+      const adj = { ...d.adjektiv, bonus: {} };
+      for (const [k, v] of Object.entries(d.adjektiv.bonus || {})) adj.bonus[k] = roundUp(k, v * f);
+      if (d.adjektiv.bonusProzent) adj.bonusProzent = Math.round(d.adjektiv.bonusProzent * f);
+      const lvl = {
+        ...d,
+        id: `${d.id}@${stufe}`,
+        basis: d.id,
+        stufe,
+        name: stufe === 2 ? d.steigerung.komparativ : d.steigerung.superlativ,
+        abzeichen: stufe === 2 ? 'Ⅱ' : 'Ⅲ',
+        seltenheit: bump[prev.seltenheit],
+        preis: d.preis * (stufe === 2 ? 3 : 9),
+        adjektiv: adj,
+        laden: false,
+      };
+      out.push(lvl);
+      prev = lvl;
+    }
+  }
+  return out;
+}
+
+export const nextLevelId = (d) => (d.stufe === 3 ? null : `${runeBase(d)}@${(d.stufe || 1) + 1}`);
+
+// Drei gleiche Runen (gleiche Stufe) direkt nebeneinander in einer Reihe oder Spalte.
+export function findSteigerungen(placed, defs) {
+  const map = new Map(placed.map((p) => [`${p.x},${p.y}`, p]));
+  const used = new Set();
+  const out = [];
+  const sorted = [...placed].sort((a, b) => a.y - b.y || a.x - b.x);
+  for (const p of sorted) {
+    const d = defs[p.id];
+    if (!isRune(d) || !d.steigerung || d.stufe === 3 || used.has(p.uid)) continue;
+    for (const [dx, dy] of [[1, 0], [0, 1]]) {
+      const a = map.get(`${p.x + dx},${p.y + dy}`), b = map.get(`${p.x + 2 * dx},${p.y + 2 * dy}`);
+      if (a && b && a.id === p.id && b.id === p.id && !used.has(a.uid) && !used.has(b.uid)) {
+        used.add(p.uid).add(a.uid).add(b.uid);
+        out.push({ runen: [p, a, b], mitte: a, id: nextLevelId(d) });
+        break;
+      }
+    }
+  }
+  return out;
 }
 
 // Wertet einen Rucksack aus: wirksame Werte jedes Items und Erklärungen für das Info-Feld.
@@ -186,12 +256,20 @@ export function analyze(placed, defs, opts = {}) {
   for (const p of placed) {
     const i = info.get(p.uid);
     const eff = { ...i.base };
-    // Runen: jedes Adjektiv zählt einmal (Steigerung kommt später als Rezept).
-    const adjs = [];
+    // Runen: jedes Adjektiv zählt einmal, bei mehreren Stufen die höchste.
+    const best = new Map();
     for (const r of i.runen) {
-      if (!r.ok || adjs.some((a) => a.id === r.def.id)) continue;
-      adjs.push(r.def);
-      for (const [k, v] of Object.entries(r.def.adjektiv.bonus)) eff[k] = (eff[k] || 0) + v * runeMult;
+      if (!r.ok) continue;
+      const key = runeBase(r.def);
+      if (!best.has(key) || (r.def.stufe || 1) > (best.get(key).stufe || 1)) best.set(key, r.def);
+    }
+    const adjs = [...best.values()];
+    for (const a of adjs) {
+      for (const [k, v] of Object.entries(a.adjektiv.bonus || {})) eff[k] = (eff[k] || 0) + v * runeMult;
+    }
+    for (const a of adjs) {
+      if (!a.adjektiv.bonusProzent) continue;
+      for (const k of EFFECT_KEYS) if (eff[k]) eff[k] = roundUp(k, eff[k] * (1 + (a.adjektiv.bonusProzent * runeMult) / 100));
     }
     // Siegel: ein passendes Siegel verstärkt alle Wirkungen um 25 %, mehrere zählen einmal.
     if (i.siegel.some((s) => s.ok)) {
@@ -203,7 +281,7 @@ export function analyze(placed, defs, opts = {}) {
     }
     i.def = eff;
     i.adjektive = adjs;
-    i.phrase = adjs.length ? `${adjs.map((a) => adjectiveForm(a, eff.artikel)).join(', ')} ${eff.name}` : null;
+    i.phrase = phraseFor(adjs, eff);
   }
   return info;
 }

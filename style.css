@@ -726,3 +726,4 @@ h2 .hint { font-size: 12px; font-weight: 400; color: var(--ink-soft); }
 .item.cursed { border-color: #6b2a8a; box-shadow: 0 3px 0 var(--line), 0 0 14px rgba(120,40,160,.8); }
 .item.cursed .label { color: #6b2a8a; }
 .mark-fluch { position: absolute; right: 3px; bottom: 14px; font-family: var(--emoji); font-size: 16px; pointer-events: none; }
+.lvl { font-size: .4em; vertical-align: top; color: var(--gold-dark); font-family: var(--font); font-weight: 900; }

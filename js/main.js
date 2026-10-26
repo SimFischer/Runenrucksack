@@ -1,10 +1,10 @@
 // Runenrucksack – Ablauf eines Laufs, Laden, Rucksack (Ziehen und Drehen) und Info-Feld.
 import {
   CFG, income, baseHp, sellValue, newRun, reroll, finishBattle,
-  canPlace, overlapping, findSpot, sizeOf,
+  canPlace, overlapping, findSpot, sizeOf, shuffle,
 } from './logic.js';
 import {
-  GENUS, SIEGEL_BONUS, findFusions, wrongOrderNeighbor, canRotate, nextRot, isNoun, isRune,
+  GENUS, SIEGEL_BONUS, findFusions, findSteigerungen, wrongOrderNeighbor, canRotate, nextRot, isNoun, isRune, runeBase,
 } from './grammar.js';
 import { G, loadData, save, loadRun, placedOf, itemsIn, gridOf, region, hero, playerCtx } from './state.js';
 import { evaluateBag } from './mods.js';
@@ -370,11 +370,17 @@ function grammarNotes(base, ana, ref) {
     if (ana && !ana.ziele.length) out.push({ cls: 'bad', html: 'Kein Nomen direkt daneben.' });
   }
   if (isRune(base)) {
-    const bonus = Object.entries(base.adjektiv.bonus).map(([k, v]) => {
+    const parts = Object.entries(base.adjektiv.bonus || {}).map(([k, v]) => {
       const label = STAT_ROWS.find((r) => r[0] === k)?.[1].split(' ').slice(1).join(' ') || k;
-      return k === 'tempo' ? `+${v} % ${label}` : `+${v} ${label}`;
-    }).join(', ');
-    out.push({ html: `Der Pfeil muss auf ein passendes Nomen zeigen: ${base.adjektiv.passtText}. Wirkung: ${bonus}${where}.` });
+      return k === 'tempo' ? `+${fmt(v)} % ${label}` : `+${fmt(v)} ${label}`;
+    });
+    if (base.adjektiv.bonusProzent) parts.push(`alle Wirkungen +${base.adjektiv.bonusProzent} %`);
+    out.push({ html: `Der Pfeil muss auf ein passendes Nomen zeigen: ${base.adjektiv.passtText}. Wirkung: ${parts.join(', ')}${where}.` });
+    const b0 = G.DEFS[runeBase(base)];
+    if (b0.steigerung) {
+      const lv = base.stufe || 1;
+      out.push({ html: `Steigerung: ${b0.name} → ${b0.steigerung.komparativ} → ${b0.steigerung.superlativ}. ${lv === 3 ? 'Das ist schon die höchste Stufe (Superlativ).' : `Drei gleiche Runen direkt nebeneinander werden zu Beginn des Tages gesteigert (+50 %).`}` });
+    }
     const z = ana?.ziel;
     if (ana && !z) out.push({ cls: 'bad', html: '✗ Der Pfeil zeigt auf kein Item. Tippe nochmal, um ihn zu drehen.' });
     else if (z?.ok) {
@@ -442,11 +448,13 @@ function renderSummary(box) {
   const reg = region();
   const boss = G.ENEMIES.find((e) => e.id === reg.boss);
   const fusions = findFusions(itemsIn('bag'), G.DEFS, G.RECIPES);
+  const steig = findSteigerungen(itemsIn('bag'), G.DEFS);
   box.innerHTML = `
     <h2>Dein Rucksack</h2>
     ${ctx.hero ? `<p class="gram">${ctx.hero.emoji} <b>${ctx.hero.name}</b>: ${ctx.hero.staerke}</p>` : ''}
     <ul class="stats">${rows.map(([a, b]) => `<li><span>${a}</span><b>${b}</b></li>`).join('')}</ul>
     ${fusions.length ? `<p class="gram ok">✓ Morgen verschmelzen: ${fusions.map((f) => G.DEFS[f.id].name).join(', ')}</p>` : ''}
+    ${steig.length ? `<p class="gram ok">✓ Morgen gesteigert: ${steig.map((s) => G.DEFS[s.id].name).join(', ')}</p>` : ''}
     ${run.day === reg.tage[1] ? `<p class="gram bad"><b>Heute Nacht wartet der Anführer: ${boss.emoji} ${boss.name}!</b></p>` : `<p class="muted">${boss.emoji} ${boss.name} wartet am ${reg.tage[1]}. Tag.</p>`}
     <h3>So geht's</h3>
     <p class="muted">Ziehe Items aus dem Laden in den Rucksack. Tippe ein Item an für Infos, tippe nochmal zum Drehen. Beim Ziehen dreht ein zweiter Finger das Item.</p>
@@ -568,7 +576,77 @@ function confirmNew() {
 // ---------- Verschmelzen (zu Beginn des Tages) ----------
 
 function runFusions(done) {
-  showFusion(findFusions(itemsIn('bag'), G.DEFS, G.RECIPES), 0, done);
+  showFusion(findFusions(itemsIn('bag'), G.DEFS, G.RECIPES), 0, () => runSteigerungen(done));
+}
+
+// Drei gleiche Runen nebeneinander: Grundform → Komparativ → Superlativ.
+function runSteigerungen(done) {
+  showSteigerung(findSteigerungen(itemsIn('bag'), G.DEFS), 0, done);
+}
+
+function showSteigerung(list, i, done) {
+  const run = G.run;
+  if (i >= list.length) { render(); done(); return; }
+  const s = list[i];
+  if (s.runen.some((r) => placedOf(r.uid)?.area !== 'bag')) { showSteigerung(list, i + 1, done); return; }
+  const from = G.DEFS[s.runen[0].id], to = G.DEFS[s.id];
+  const base = G.DEFS[runeBase(from)];
+  const st = base.steigerung;
+  const toSup = to.stufe === 3;
+  const options = shuffle([to.name, ...(toSup ? st.falschS : st.falschK)]);
+  const stufeName = toSup ? 'Superlativ (höchste Stufe)' : 'Komparativ (Vergleichsstufe)';
+  const regel = `${base.name} → ${st.komparativ} → ${st.superlativ}${st.unregelmaessig ? ' – eine unregelmäßige Steigerung!' : ''}`;
+  let tries = 0, feedback = '';
+  const wrong = new Set();
+
+  const draw = () => {
+    const paid = tries > 0;
+    const broke = paid && run.gold < 1;
+    const card = openModal(`
+      <div class="fusion-eq">${[0, 1, 2].map(() => `<span class="fi">${from.emoji}<small>${from.name}</small></span>`).join('<span class="op">+</span>')}</div>
+      <p class="enc-progress">Drei gleiche Runen werden zur nächsten Stufe: ${stufeName}</p>
+      <h2 class="enc-q">${from.name} → <span class="blank">___</span></h2>
+      <div class="row wrap">${options.map((o, k) => `<button class="btn opt-btn" data-k="${k}" ${wrong.has(k) || broke ? 'disabled' : ''}>${o}</button>`).join('')}</div>
+      <p class="cost">${paid ? `Jeder weitere Versuch kostet 1 🪙 · du hast ${run.gold} 🪙` : 'Erster Versuch kostenlos'}</p>
+      ${feedback ? `<p class="feedback">${feedback}</p>` : ''}
+      ${broke ? '<p class="feedback">Kein Gold für einen weiteren Versuch.</p>' : ''}
+      <div class="row"><button class="btn small" data-later>Heute nicht steigern</button></div>`);
+    card.querySelectorAll('[data-k]').forEach((b) => { b.onclick = () => guess(options[+b.dataset.k], +b.dataset.k); });
+    card.querySelector('[data-later]').onclick = () => { closeModal(); showSteigerung(list, i + 1, done); };
+  };
+
+  const guess = (o, k) => {
+    if (tries > 0) {
+      if (run.gold < 1) return;
+      run.gold -= 1;
+      bump('stat-gold');
+    }
+    tries++;
+    if (o === to.name) {
+      run.lernen.richtig++;
+      const keep = placedOf(s.mitte.uid);
+      const others = new Set(s.runen.filter((r) => r.uid !== keep.uid).map((r) => r.uid));
+      run.items = run.items.filter((p) => !others.has(p.uid));
+      keep.id = to.id;
+      selected = { src: 'bag', uid: keep.uid };
+      render();
+      const card = openModal(`
+        <div class="big-emoji">${to.emoji}<sup class="lvl">${to.abzeichen}</sup></div>
+        <h2>${to.name}</h2>
+        <p>Richtig! ${regel}</p>
+        <p class="muted">Die Rune wirkt jetzt 50 % stärker.</p>
+        <div class="row"><button class="btn primary big" data-next>Weiter</button></div>`);
+      card.querySelector('[data-next]').onclick = () => { closeModal(); showSteigerung(list, i + 1, done); };
+      return;
+    }
+    run.lernen.falsch++;
+    wrong.add(k);
+    feedback = `✗ ${regel}`;
+    save();
+    draw();
+  };
+
+  draw();
 }
 
 function showFusion(list, i, done) {

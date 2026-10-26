@@ -1,6 +1,6 @@
 // Gemeinsame Bausteine der Oberfläche: Fenster, Hinweise, Item-Kacheln und Raster.
 import { sizeOf } from './logic.js';
-import { GENUS, findFusions, isRune, runeTargetCell } from './grammar.js';
+import { GENUS, findFusions, findSteigerungen, isRune, runeTargetCell } from './grammar.js';
 import { G } from './state.js';
 
 export const $ = (id) => document.getElementById(id);
@@ -142,7 +142,10 @@ export function buildGrid(el, grid, size) {
 export function drawItems(gridEl, grid, placed, size, info, area) {
   const els = {};
   const fusing = new Set();
-  if (area === 'bag') for (const f of findFusions(placed, G.DEFS, G.RECIPES)) fusing.add(f.kraft.uid).add(f.traeger.uid);
+  if (area === 'bag') {
+    for (const f of findFusions(placed, G.DEFS, G.RECIPES)) fusing.add(f.kraft.uid).add(f.traeger.uid);
+    for (const s of findSteigerungen(placed, G.DEFS)) for (const r of s.runen) fusing.add(r.uid);
+  }
 
   for (const p of placed) {
     const def = G.DEFS[p.id];

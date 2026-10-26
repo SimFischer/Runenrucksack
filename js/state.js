@@ -1,6 +1,6 @@
 // Gemeinsamer Zustand: geladene Inhalte (JSON-Dateien) und der laufende Lauf.
 import { bagGrid, STORE_GRID, regionOf } from './logic.js';
-import { buildCompounds } from './grammar.js';
+import { buildCompounds, buildRuneLevels } from './grammar.js';
 import { playerContext } from './mods.js';
 
 export const G = {
@@ -31,6 +31,7 @@ export async function loadData() {
   for (const d of G.ITEMS) G.DEFS[d.id] = d;
   G.COMPOUNDS = buildCompounds(G.DEFS, G.RECIPES);
   for (const d of G.COMPOUNDS) G.DEFS[d.id] = d;
+  for (const d of buildRuneLevels(G.DEFS)) G.DEFS[d.id] = d;
   G.ENEMIES = enemyData.gegner;
   G.REGIONS = regions.gebiete;
   G.HEROES = heroes.helden;
