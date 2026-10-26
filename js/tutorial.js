@@ -381,3 +381,58 @@ function finale() {
   box.querySelector('[data-go]').onclick = () => { box.remove(); stop(); api.showHeroes(); };
   box.querySelector('[data-back]')?.addEventListener('click', () => { box.remove(); stop(); api.continueSaved(); });
 }
+
+// ---------- „So geht's“: kurze Übersicht zum Nachschlagen ----------
+
+// Karten aus tutorial.json (Feld „hilfe“), nur für Funktionen, die es gibt.
+export function helpCards() {
+  return activeSteps(G.TUTORIAL).filter((s) => s.hilfe).map((s) => s.hilfe);
+}
+
+export function showHelp(onClose = null) {
+  const box = document.createElement('div');
+  box.id = 'help-layer';
+  box.innerHTML = `
+    <div class="help-card">
+      <div class="help-head">
+        <span class="help-fenwick">${G.TUTORIAL.begleiter.emoji}</span>
+        <h2>So geht's</h2>
+        <button class="btn icon" data-close aria-label="Schließen">✕</button>
+      </div>
+      <div class="help-grid">${helpCards().map((h) => `
+        <div class="help-item">
+          <span class="help-emoji anim-${h.animation || 'pulsieren'}">${h.emoji}</span>
+          <div><b>${h.titel}</b><p>${h.text}</p></div>
+        </div>`).join('')}
+      </div>
+    </div>`;
+  document.body.append(box);
+  const close = () => { box.remove(); if (onClose) onClose(); };
+  box.querySelector('[data-close]').onclick = close;
+  box.addEventListener('click', (e) => { if (e.target === box) close(); });
+}
+
+// ---------- Erste-Mal-Tipps im normalen Spiel ----------
+
+export const tipsOn = () => getPref('tipps') !== 'aus';
+export const setTips = (on) => setPref('tipps', on ? 'an' : 'aus');
+
+// Einmal pro Lauf eine kleine Fenwick-Sprechblase, wenn etwas Neues passiert.
+function firstTip(key) {
+  const run = G.run;
+  const text = G.TUTORIAL.tipps?.[key];
+  if (!run || run.tutorial || !text || !tipsOn()) return;
+  run.tippsGezeigt ||= [];
+  if (run.tippsGezeigt.includes(key)) return;
+  run.tippsGezeigt.push(key);
+  document.getElementById('tip-bubble')?.remove();
+  const b = document.createElement('div');
+  b.id = 'tip-bubble';
+  b.innerHTML = `<span class="tip-fenwick">${G.TUTORIAL.begleiter.emoji}</span><p>${text}</p><button class="btn small" aria-label="Tipp schließen">OK</button>`;
+  document.body.append(b);
+  const close = () => b.remove();
+  b.querySelector('button').onclick = close;
+  setTimeout(close, 9000);
+}
+
+onEvent((ev) => { if (ev.typ === 'tipp') firstTip(ev.key); });

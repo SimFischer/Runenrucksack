@@ -13,7 +13,7 @@ import {
 } from './ui.js';
 import { startNight } from './battle-ui.js';
 import { runEncounter } from './encounters.js';
-import { initTutorial, startTutorial, tutorialDone } from './tutorial.js';
+import { initTutorial, startTutorial, tutorialDone, showHelp, tipsOn, setTips } from './tutorial.js';
 
 let selected = null;   // { src: 'bag'|'store'|'shop', uid?, slot? }
 let drag = null;
@@ -30,6 +30,7 @@ async function boot() {
   $('btn-tutorial').onclick = startTutorial;
   $('btn-first').onclick = startTutorial;
   $('btn-known').onclick = showStart;
+  $('btn-help').onclick = () => showHelp();
   initTutorial({ render, showGame, showStart, showHeroes, runFusions, continueSaved, hasSavedRun: () => !!loadRun() });
   showAsk();
   $('btn-reroll').onclick = onReroll;
@@ -137,6 +138,7 @@ function applyTheme() {
 
 function showRegion(next) {
   const reg = region();
+  if (reg.tage[0] > 1) emit('tipp', { key: 'gebiet' });
   const boss = G.ENEMIES.find((e) => e.id === reg.boss);
   applyTheme();
   modal(`
@@ -167,6 +169,7 @@ function showFate(next) {
 function chooseSubclass(next) {
   const h = hero();
   if (!h?.unterklassen?.length || G.run.unterklasse) { next(); return; }
+  emit('tipp', { key: 'unterklasse' });
   const card = openModal(`
     <div class="enc-top">${h.emoji} ${h.name}</div>
     <h2>Wähle deinen Weg</h2>
@@ -663,8 +666,15 @@ function openMenu() {
       <button class="btn danger" data-act="new">Neuer Lauf</button>
     </div>
     <div class="row">
+      <button class="btn small" data-act="help">📖 So geht's</button>
       <button class="btn small" data-act="tutorial">🧙 Tutorial wiederholen</button>
-    </div>`, { new: () => confirmNew(), tutorial: startTutorial });
+      <button class="btn small" data-act="tips">💡 Erste-Mal-Tipps: ${tipsOn() ? 'an' : 'aus'}</button>
+    </div>`, {
+    new: () => confirmNew(),
+    tutorial: startTutorial,
+    help: () => showHelp(openMenu),
+    tips: () => { setTips(!tipsOn()); toast(`Erste-Mal-Tipps sind jetzt ${tipsOn() ? 'an' : 'aus'}.`); openMenu(); },
+  });
 }
 
 function confirmNew() {
@@ -685,7 +695,9 @@ function runFusions(done) {
 
 // Drei gleiche Runen nebeneinander: Grundform → Komparativ → Superlativ.
 function runSteigerungen(done) {
-  showSteigerung(findSteigerungen(itemsIn('bag'), G.DEFS), 0, done);
+  const list = findSteigerungen(itemsIn('bag'), G.DEFS);
+  if (list.length) emit('tipp', { key: 'steigerung' });
+  showSteigerung(list, 0, done);
 }
 
 function showSteigerung(list, i, done) {

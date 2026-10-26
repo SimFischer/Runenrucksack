@@ -173,3 +173,13 @@ test('Nach dem Tutorial startet ein normaler Lauf ohne Tutorial-Reste', () => {
   assert.equal(run.shop.filter(Boolean).length, 5);
   assert.ok(run.queue.includes('gebiet'));
 });
+
+test('So geht\'s und Erste-Mal-Tipps: Inhalte aus tutorial.json', () => {
+  const karten = activeSteps(TUT).filter((s) => s.hilfe).map((s) => s.hilfe.titel);
+  for (const t of ['Kaufen', 'Drehen', 'Lager', 'Verschmelzen', 'Artikel-Siegel', 'Adjektiv-Runen', 'Kampf', 'Herzen und Siege', 'Begegnungen']) {
+    assert.ok(karten.includes(t), `Hilfe-Karte ${t}`);
+  }
+  assert.ok(!karten.includes('Buch der Wörter') && !karten.includes('Heldencode'), 'keine Karten für fehlende Funktionen');
+  for (const s of TUT.schritte.filter((x) => x.hilfe)) assert.ok(s.hilfe.emoji && s.hilfe.text, s.id);
+  for (const k of ['boss', 'gebiet', 'steigerung', 'unterklasse']) assert.ok(TUT.tipps[k], `Tipp ${k}`);
+});

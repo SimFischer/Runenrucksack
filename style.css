@@ -842,3 +842,41 @@ h2 .hint { font-size: 12px; font-weight: 400; color: var(--ink-soft); }
 .confetti { position: fixed; inset: 0; overflow: hidden; pointer-events: none; }
 .confetti span { position: absolute; top: -40px; font-family: var(--emoji); font-size: 30px; animation: fall linear infinite; }
 @keyframes fall { to { transform: translateY(110vh) rotate(540deg); } }
+
+/* „So geht's“ */
+#help-layer { position: fixed; inset: 0; z-index: 350; background: rgba(10,6,3,.7); display: flex; align-items: center; justify-content: center; padding: 16px; }
+.help-card { background: var(--parchment); color: var(--ink); border: 3px solid var(--line); border-radius: 18px; padding: 16px 20px 20px; width: min(900px, 100%); max-height: calc(100vh - 32px); overflow-y: auto; box-shadow: 0 16px 50px rgba(0,0,0,.6); animation: pop .25s; }
+.help-head { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+.help-head h2 { flex: 1; font-size: 28px; }
+.help-fenwick { font-family: var(--emoji); font-size: 40px; }
+.help-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 12px; }
+.help-item { display: flex; gap: 12px; align-items: flex-start; background: #fff6e2; border: 2px solid rgba(0,0,0,.15); border-radius: 14px; padding: 12px; }
+.help-item b { font-size: 18px; }
+.help-item p { margin: 4px 0 0; font-size: 15px; line-height: 1.4; }
+.help-emoji { font-family: var(--emoji); font-size: 38px; line-height: 1; flex: none; display: inline-block; }
+.anim-ziehen { animation: helpDrag 2.2s ease-in-out infinite; }
+.anim-tippen { animation: helpTap 1.4s ease-in-out infinite; }
+.anim-drehen { animation: helpTurn 2.4s ease-in-out infinite; }
+.anim-wackeln { animation: helpWobble 2s ease-in-out infinite; }
+.anim-pulsieren { animation: helpPulse 1.8s ease-in-out infinite; }
+@keyframes helpDrag { 0%, 15% { transform: translate(0, 8px); } 60%, 85% { transform: translate(10px, -10px); } 100% { transform: translate(0, 8px); } }
+@keyframes helpTap { 0%, 100% { transform: scale(1); } 40% { transform: scale(.82); } }
+@keyframes helpTurn { 0%, 30% { transform: rotate(0); } 50%, 80% { transform: rotate(90deg); } 100% { transform: rotate(0); } }
+@keyframes helpWobble { 0%, 100% { transform: rotate(0); } 25% { transform: rotate(-8deg); } 75% { transform: rotate(8deg); } }
+@keyframes helpPulse { 0%, 100% { transform: scale(1); filter: none; } 50% { transform: scale(1.12); filter: drop-shadow(0 0 8px var(--gold)); } }
+
+/* Erste-Mal-Tipps */
+#tip-bubble {
+  position: fixed;
+  left: 16px; bottom: 16px;
+  z-index: 300;
+  display: flex; align-items: center; gap: 10px;
+  max-width: min(460px, calc(100vw - 32px));
+  background: #fffaf0; color: var(--ink);
+  border: 3px solid var(--line); border-radius: 16px;
+  padding: 10px 12px;
+  box-shadow: 0 8px 24px rgba(0,0,0,.5);
+  animation: pop .25s;
+}
+#tip-bubble p { margin: 0; font-size: 16px; line-height: 1.4; font-weight: 700; flex: 1; }
+.tip-fenwick { font-family: var(--emoji); font-size: 36px; }

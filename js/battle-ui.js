@@ -2,7 +2,7 @@
 import { CFG, makeEnemy, pickEnemy, rectGrid, pickOne, shuffle, ARMOR_BONUS, enemyPool, seededRng } from './logic.js';
 import { Battle, makeFighter, runToEnd } from './battle.js';
 import { analyze } from './grammar.js';
-import { G, itemsIn, gridOf, region, hero, playerCtx } from './state.js';
+import { G, itemsIn, gridOf, region, hero, playerCtx, emit } from './state.js';
 import { evaluateBag } from './mods.js';
 import { $, fmt, buildGrid, drawItems, openModal, closeModal } from './ui.js';
 
@@ -63,7 +63,8 @@ export function startNight(done) {
   $('btn-skip').onclick = skipBattle;
   $('btn-skip').disabled = false;
   $('speed').onclick = (e) => { const b = e.target.closest('[data-speed]'); if (b) setSpeed(+b.dataset.speed); };
-  for (const id of ['start', 'game', 'battle']) $(id).hidden = id !== 'battle';
+  for (const id of ['start', 'heroes', 'game', 'battle']) $(id).hidden = id !== 'battle';
+  if (enemy.boss) emit('tipp', { key: 'boss' });
 }
 
 function buildFighter(side, emoji, name, sub, placed, grid, info) {
