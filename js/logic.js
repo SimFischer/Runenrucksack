@@ -11,7 +11,8 @@ export const CFG = {
 };
 
 export const income = (day) => 8 + day;
-export const baseHp = (day) => Math.round(40 + 8 * (day - 1) + 1.5 * (day - 1) ** 2);
+export const ARMOR_BONUS = 0.15; // Rüstungsfehler richtig verbessert: Gegner startet mit 15 % weniger Leben
+export const baseHp = (day) => Math.round(60 + 14 * (day - 1) + 2.5 * (day - 1) ** 2);
 export const sellValue = (def) => Math.max(1, Math.floor(def.preis / 2));
 
 // Gewichte der Seltenheiten im Laden, abhängig vom Tag.
@@ -233,6 +234,13 @@ export function finishBattle(run, items, regions, won, enemyName, rng = Math.ran
 
 // ---------- Gegner ----------
 
+export const COMPOUNDS_FROM_DAY = 4; // ab diesem Tag bringen Orks auch Komposita mit
+
+export function enemyPool(items, compounds, day) {
+  const base = items.filter((d) => d.art !== 'siegel' && d.art !== 'rune' && d.art !== 'tasche');
+  return day >= COMPOUNDS_FROM_DAY ? base.concat(compounds) : base;
+}
+
 export function pickEnemy(day, regions, enemies, rng = Math.random) {
   const region = regionOf(day, regions);
   const byId = (id) => enemies.find((e) => e.id === id);
@@ -241,7 +249,9 @@ export function pickEnemy(day, regions, enemies, rng = Math.random) {
 }
 
 export function enemyBudget(day, boss) {
-  return Math.floor(cumulativeGold(day) * (0.7 + 0.015 * day)) + (boss ? 5 : 0);
+  // Gegner bekommen anfangs fast so viel Gold wie du (plus Start-Items), später anteilig weniger:
+  // Du verbesserst deinen Rucksack mit Grammatik (Komposita, Siegel, Runen), die Orks nicht.
+  return Math.floor((cumulativeGold(day) + 8) * (0.92 - 0.06 * (day - 1))) + (boss ? 3 : 0);
 }
 
 export function makeEnemy(day, enemy, items, defs, rng = Math.random) {

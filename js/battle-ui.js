@@ -1,5 +1,5 @@
 // Nacht: Kampfanzeige mit Lebensbalken, Abklingzeiten und Schadenszahlen.
-import { CFG, makeEnemy, pickEnemy, rectGrid, pickOne, shuffle } from './logic.js';
+import { CFG, makeEnemy, pickEnemy, rectGrid, pickOne, shuffle, ARMOR_BONUS, enemyPool } from './logic.js';
 import { Battle, makeFighter, runToEnd } from './battle.js';
 import { analyze } from './grammar.js';
 import { G, itemsIn, gridOf, region, hero, playerCtx } from './state.js';
@@ -8,12 +8,6 @@ import { $, fmt, buildGrid, drawItems, openModal, closeModal } from './ui.js';
 
 let battle = null, enemy = null, speed = 1, rafId = 0, lastFrame = 0, itemEls = {}, onDone = null;
 let bcell = 100, selfHit = 0, armor = null;
-export const ARMOR_BONUS = 0.15; // richtig verbessert: Gegner startet mit 15 % weniger Leben
-
-function enemyPool(day) {
-  const base = G.ITEMS.filter((d) => d.art !== 'siegel' && d.art !== 'rune' && d.art !== 'tasche');
-  return day >= 3 ? base.concat(G.COMPOUNDS) : base;
-}
 
 function cellSize(cols, rows) {
   const w = window.innerWidth, h = window.innerHeight;
@@ -27,7 +21,7 @@ export function startNight(done) {
   const run = G.run;
   const reg = region();
   const foeDef = pickEnemy(run.day, G.REGIONS, G.ENEMIES);
-  enemy = makeEnemy(run.day, foeDef, enemyPool(run.day), G.DEFS);
+  enemy = makeEnemy(run.day, foeDef, enemyPool(G.ITEMS, G.COMPOUNDS, run.day), G.DEFS);
   armor = foeDef.fehler?.length ? { ...pickOne(foeDef.fehler), status: 'offen' } : null;
 
   const ctx = playerCtx();
