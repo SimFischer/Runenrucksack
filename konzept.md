@@ -71,15 +71,16 @@ Man trifft eine Figur am Wegesrand und wählt aus zwei bis drei Boni. Jede Begeg
 
 ### Tag: Laden und Rucksack
 
-- Zu Beginn des Tages verschmelzen benachbarte Items nach Rezept.
-- Gold pro Tag, steigend mit den Tagen.
-- Laden mit 5 Items; neu würfeln kostet 1 Gold, Items lassen sich reservieren, gelegentlich ist eines im Angebot.
-- Items kaufen, verkaufen, verschieben, drehen.
+- Zu Beginn des Tages verschmelzen Kraft-Kristalle mit dem Träger rechts daneben oder darunter zum Kompositum.
+- Gold pro Tag, steigend mit den Tagen; die Goldanzeige ist groß und zählt beim Ausgeben und Bekommen mit.
+- Laden mit 5 Items; neu würfeln kostet 1 Gold, Items lassen sich reservieren. Ein Abzeichen „1/3“ oder „2/3“ zeigt, wie viele gleiche man schon besitzt; solche Items erscheinen häufiger. Ein Ketten-Symbol zeigt Items, die mit etwas im Rucksack ein Kompositum ergeben.
+- Items kaufen, verkaufen, verschieben, drehen. Drei gleiche Items verschmelzen sofort zur nächsten Sternstufe (siehe „Sternstufen“).
 
 ### Nacht: Kampf
 
 - Der Rucksack kämpft automatisch gegen einen Ork-Rucksack; zuschauen, Kombos feiern.
-- Vorher optional: einen Fehler auf der Gegnerrüstung korrigieren, um ihn zu schwächen.
+- Vorher optional: einen Fehler auf der Gegnerrüstung korrigieren (ein Versuch), dann startet der Ork mit 15 % weniger Leben.
+- Ab Tag 4 bringen Orks auch Items mit ★★ mit, ab Tag 8 auch mit ★★★.
 - Sieg = Trophäe, Niederlage = 1 Herz weniger.
 
 ### Ende eines Laufs
@@ -104,9 +105,23 @@ Jede Wortart ist eine Item-Sorte mit eigener Form und Rolle, und die Stern-Felde
 | Nomen (Kraft) | Feuer, Gift, Eis, Blitz, Stein, Mond, Gold, Sturm | 1×1 Kristall | wird mit einem Träger zum Kompositum |
 | Adjektiv | Edelsteine und Runen: scharf, schwer, schnell, golden, edel | 1×1 | Stern zeigt auf ein Nomen und verändert es wörtlich |
 | Artikel | Siegel in Genusfarben: der, die, das | 1×1 | aktiviert ein benachbartes Nomen mit passendem Genus |
-| Verb | Schriftrollen: heilen, schlagen, schützen, rufen, reiten | 1×2 | das Verb bestimmt, was passiert |
+| Verb | Schriftrollen: schlagen, schützen, heilen, stürmen, stechen, schießen, brennen, leuchten | 1×2 | Pfeil zeigt auf das Subjekt; das Verb bestimmt, was passiert |
 
 Bedeutung und Wirkung fallen zusammen: Ein scharfes Schwert macht mehr Schaden, schnelle Stiefel lassen alles schneller wirken, ein schwerer Schild blockt mehr.
+
+### Verben brauchen ein Subjekt
+
+- Jede Verb-Rolle hat einen Pfeil, der sich mitdreht. Zeigt er auf ein Nomen, ist das das Subjekt.
+- Beim ersten Verbinden fragt das Spiel nach der Personalform: „Das Feuerschwert ___ (schlagen)“ → schlägt. Bei Items mit ★★ oder ★★★ steht das Subjekt in der Mehrzahl: „Die Speere ___“ → schlagen.
+- Mit richtigem Subjekt wirkt die Rolle voll, und das Subjekt löst zusätzlich seine eigene Wirkung aus. Ohne Subjekt oder mit falscher Form wirkt die Rolle nur halb.
+- Passende Subjekte geben Extras: stechen mit Speer oder Dolch, schießen mit dem Bogen, leuchten mit der Laterne, brennen mit Feuer-Komposita (+Brand).
+
+### Sternstufen: drei gleiche ergeben einen besseren
+
+- Jedes Item hat eine Sternstufe: ★, ★★ (1,8-fache Wirkung), ★★★ (3-fache Wirkung). Auch der Verkaufspreis steigt.
+- Besitzt man drei Items mit gleicher id und Stufe (Rucksack und Lager zählen zusammen), verschmelzen sie sofort – beim Kauf, Ablegen oder einer Belohnung. Das neue Item liegt dort, wo das zuletzt hinzugekommene lag.
+- Vorher eine Grammatik-Frage: Nomen, Träger, Komposita und Kristalle → **Mehrzahl** („der Speer + der Speer + der Speer = die ___“), Verben → **Präteritum** („Gestern ___ der Ritter“), Adjektiv-Runen → **Steigerung**. Siegel und Taschen verschmelzen nicht.
+- Erster Versuch kostenlos, jeder weitere 1 Gold, bei Fehlern eine Zeile Erklärung („Viele Nomen bekommen in der Mehrzahl einen Umlaut: die Axt → die Äxte“).
 
 ### Zeitformen als Wirkung (ab Pfad 2)
 
@@ -126,7 +141,7 @@ Abklingzeit, Schaden, Block, Heilung sowie Zustände, die zu den Kräften passen
 
 ## Kombinieren
 
-Das Kombinieren ist die größte Stärke des Spiels: Benachbarte Items verschmelzen zu Beginn des nächsten Tages, und es entsteht immer etwas Neues. Die Regeln dahinter sind echte deutsche Grammatik.
+Das Kombinieren ist die größte Stärke des Spiels: Kristalle verschmelzen zu Beginn des nächsten Tages mit Trägern, drei gleiche Items sofort zur nächsten Sternstufe, und es entsteht immer etwas Neues. Die Regeln dahinter sind echte deutsche Grammatik.
 
 ### Komposita: Kraft + Träger
 
@@ -140,6 +155,7 @@ Das Kombinieren ist die größte Stärke des Spiels: Benachbarte Items verschmel
 
 ### Steigerung: dreimal dasselbe Adjektiv
 
+- Drei gleiche Adjektiv-Runen irgendwo in Rucksack oder Lager werden gesteigert – nach derselben Regel wie die Sternstufen.
 - scharf → schärfer → am schärfsten
 - Unregelmäßige Formen (gut → besser → am besten, viel → mehr → am meisten) sind seltene, besonders starke Rezepte.
 

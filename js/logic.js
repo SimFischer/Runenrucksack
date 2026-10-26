@@ -264,8 +264,11 @@ export function pickEnemy(day, regions, enemies, rng = Math.random) {
 export function enemyBudget(day, boss) {
   // Gegner bekommen anfangs fast so viel Gold wie du (plus Start-Items), später anteilig weniger:
   // Du verbesserst deinen Rucksack mit Grammatik (Komposita, Siegel, Runen), die Orks nicht.
-  return Math.floor((cumulativeGold(day) + 8) * (0.92 - 0.06 * (day - 1))) + (boss ? 3 : 0);
+  return Math.floor((cumulativeGold(day) + 8) * (0.92 - 0.035 * (day - 1))) + (boss ? 3 : 0);
 }
+
+// Ab diesen Tagen bringen Orks auch Gegenstände mit Sternstufe mit.
+export const GEGNER_STERNE_AB = { 2: 4, 3: 8 };
 
 export function makeEnemy(day, enemy, items, defs, rng = Math.random) {
   let budget = enemyBudget(day, enemy.boss);
@@ -279,41 +282,46 @@ export function makeEnemy(day, enemy, items, defs, rng = Math.random) {
     for (const [k, v] of Object.entries(enemy.vorliebe || {})) if (d[k]) s += v;
     return s * (weights[d.seltenheit] || 0);
   };
+  // Angebot des Gegners: jedes Item als ★, ab Tag 4 auch als ★★, ab Tag 8 auch als ★★★.
+  const offers = [];
+  for (const d of items) {
+    offers.push({ d, stern: 1, preis: d.preis });
+    for (const stern of [2, 3]) if (day >= GEGNER_STERNE_AB[stern]) offers.push({ d, stern, preis: d.preis * 3 ** (stern - 1) });
+  }
+  const priceOf = (p) => defs[p.id].preis * 3 ** ((p.stern || 1) - 1);
+  const add = (o, spot) => placed.push({ uid: uid++, id: o.d.id, ...spot, ...(o.stern > 1 ? { stern: o.stern } : {}) });
 
   for (let tries = 0; tries < 80 && budget > 0; tries++) {
-    const affordable = items.filter((d) => d.preis <= budget + cheapestPrice(placed, defs));
+    const cheapest = placed.length ? Math.min(...placed.map(priceOf)) : 0;
+    const affordable = offers.filter((o) => o.preis <= budget + cheapest);
     if (!affordable.length) break;
-    const cand = pickWeighted(affordable.map((d) => [d, score(d)]), rng);
+    const cand = pickWeighted(affordable.map((o) => [o, score(o.d) / o.stern]), rng);
     if (!cand) break;
 
     if (cand.preis <= budget) {
-      const spot = randomSpot(placed, defs, cand, grid, rng);
+      const spot = randomSpot(placed, defs, cand.d, grid, rng);
       if (spot) {
-        placed.push({ uid: uid++, id: cand.id, ...spot });
+        add(cand, spot);
         budget -= cand.preis;
         continue;
       }
     }
     // Kein Platz: ein billigeres Item gegen ein besseres tauschen.
-    const sorted = [...placed].sort((a, b) => defs[a.id].preis - defs[b.id].preis);
+    const sorted = [...placed].sort((a, b) => priceOf(a) - priceOf(b));
     for (const old of sorted) {
-      const diff = cand.preis - defs[old.id].preis;
+      const diff = cand.preis - priceOf(old);
       if (diff <= 0 || diff > budget) continue;
       const rest = placed.filter((p) => p !== old);
-      const spot = randomSpot(rest, defs, cand, grid, rng);
+      const spot = randomSpot(rest, defs, cand.d, grid, rng);
       if (spot) {
         placed.splice(placed.indexOf(old), 1);
-        placed.push({ uid: uid++, id: cand.id, ...spot });
+        add(cand, spot);
         budget -= diff;
         break;
       }
     }
   }
   return { ...enemy, items: placed };
-}
-
-function cheapestPrice(placed, defs) {
-  return placed.length ? Math.min(...placed.map((p) => defs[p.id].preis)) : 0;
 }
 
 function randomSpot(placed, defs, def, grid, rng) {

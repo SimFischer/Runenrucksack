@@ -2,7 +2,7 @@
 
 Ein Fantasy-Backpack-Battler fürs iPad (Querformat) als Web-App, in dem Grammatik das Regelwerk der Kombos ist. Das vollständige Spielkonzept steht in [konzept.md](konzept.md).
 
-**Stand: Etappe 3 – Pfad 1 vollständig, mit Tutorial „Der erste Tag“**
+**Stand: Etappe 3 – Pfad 1 vollständig, mit Tutorial, Sternstufen und Verben mit Subjekt**
 
 Spielen: <https://simfischer.github.io/Runenrucksack/> – auf dem iPad in Safari öffnen, **Teilen → Zum Home-Bildschirm**, dann startet es wie eine App im Vollbild und läuft auch offline.
 
@@ -52,8 +52,8 @@ Nach Änderungen: `node --test` prüft, dass jeder Schritt erreichbar ist und h�
 2. **Schicksalsrune:** Eine von sechs zufälligen Regeln gilt für den ganzen Lauf, z. B. „Feuer-Komposita doppelt so stark“ oder „Laden hat 6 Plätze“.
 3. **Zehn Tage, zwei Gebiete:** Kleinwurzel (Tag 1–5, Boss: Ork-Plünderer) und Hrossmark (Tag 6–10, Boss: Wolfsreiter-Häuptling). Beim Gebietswechsel gibt es einen Übergangsbildschirm, in Hrossmark wählt man eine **Unterklasse**.
 4. **Jeder Tag:**
-   - **Morgen:** Begegnung am Wegesrand (drei zur Wahl), danach verschmelzen Kristalle mit Trägern und gleiche Runen werden gesteigert.
-   - **Tag:** Laden mit 5 Items, Neu würfeln für 1 Gold, Reservieren, Verkaufen, Verschieben, Drehen.
+   - **Morgen:** Begegnung am Wegesrand (drei zur Wahl), danach verschmelzen Kristalle mit Trägern.
+   - **Tag:** Laden mit 5 Items, Neu würfeln für 1 Gold, Reservieren, Verkaufen, Verschieben, Drehen. Abzeichen „1/3“ und „2/3“ zeigen, wie viele gleiche man besitzt; drei gleiche verschmelzen sofort zur nächsten Sternstufe.
    - **Nacht:** Automatischer Kampf. Vorher kann man den Fehler auf der Ork-Rüstung verbessern (ein Versuch, richtig: Ork startet mit 15 % weniger Leben).
 5. **Ende:** nach dem 10. Kampf („Reise geschafft“, mit Sternen nach Siegen) oder wenn alle 5 Herzen weg sind.
 
@@ -68,6 +68,8 @@ Nach Änderungen: `node --test` prüft, dass jeder Schritt erreichbar ist und h�
 | Begegnungen | Plural, Artikel, Rechtschreibung auf der Speisekarte, Personalformen, Fehler im Namen | Wiederholung Klasse 5 |
 | Ork-Rüstung | Falsch geschriebenes Wort verbessern | Rechtschreibung |
 | Wortfeld-Taschen | Gartentasche, Satteltasche: Items aus dem passenden Wortfeld +20 % | Wortfelder |
+| Sternstufen | Drei gleiche Items (Rucksack + Lager) werden zu ★★ (1,8-fach) und ★★★ (3-fach); vorher Mehrzahl-, Präteritum- oder Steigerungsfrage | die Axt → die Äxte, gestern schlug er |
+| Verben mit Subjekt | Pfeil der Schriftrolle zeigt auf ein Nomen, Frage nach der Personalform; richtig: Rolle voll und das Subjekt schlägt mit, sonst nur halbe Wirkung | Das Feuerschwert schlägt. Die Speere schlagen. |
 
 **Regel für alle Aufgaben:** Der erste Versuch ist kostenlos, jeder weitere kostet 1 Gold, bei Fehlern erscheint eine kurze Erklärzeile. **Eine grammatisch falsche Kombination ist nie stärker als eine richtige** – die Tests prüfen das.
 
@@ -77,7 +79,7 @@ Alle Inhalte stehen in JSON-Dateien. Jede Datei hat oben ein Feld `_hinweis`, da
 
 | Datei | Inhalt |
 | --- | --- |
-| `items.json` | Alle Items im Laden: Wortart (`art`), Artikel, Wortfeld, Form, Seltenheit, Preis, Kampfwerte; Runen mit Steigerungsformen; Taschen |
+| `items.json` | Alle Items im Laden: Wortart (`art`), Artikel, Wortfeld, Form, Seltenheit, Preis, Kampfwerte; Mehrzahl mit zwei falschen Formen (`plural`), Verbformen (`formen`: er, sie, Präteritum), Extras für passende Subjekte (`subjektBonus`); Runen mit Steigerungsformen; Taschen |
 | `recipes.json` | Welche Items Träger sind und was jede Kraft beim Verschmelzen dazugibt |
 | `exercises.json` | **Die Wörter der Aufgaben:** Plural, Artikel, Speisekarten, Personalformen, Kobold-Namen |
 | `encounters.json` | Die Begegnungen: Figur, Text, Aufgabentyp, Belohnung, Gebiet |
@@ -121,6 +123,8 @@ node --test
 | `tests/begegnungen.test.mjs` | Begegnungen, Aufgaben (genau eine Lösung), Rucksack-Wachstum, Kobold-Fluch |
 | `tests/ablauf.test.mjs` | Gebiete, Bosse, Figuren, Schicksalsrunen, Unterklassen, Taschen, Ork-Rüstungen |
 | `tests/balance.test.mjs` | 200 simulierte Läufe: Siegquote pro Tag, Siege und Spielzeit |
+| `tests/sterne.test.mjs` | Mehrzahl- und Verbformen aller Items, Verschmelzen über Rucksack und Lager, Laden-Gewichtung |
+| `tests/verben.test.mjs` | Pfeil, Personalform, Verb mit und ohne Subjekt (falsch nie stärker) |
 | `tests/tutorial.test.mjs` | Tutorial komplett durchspielen, Zurücksetzen, Überspringen fehlender Funktionen, danach normaler Lauf |
 
 Das Tutorial in einem echten Browser per Touch durchspielen (braucht Chrome oder Edge; Server vorher mit `node tools/serve.mjs` starten):
@@ -131,7 +135,7 @@ node tools/tutorial-browsertest.mjs http://localhost:8080/ 1180 820
 
 Breite und Höhe lassen sich ändern, z. B. `1024 768` für kleinere iPads.
 
-Aktuelle Balance (200 Läufe, einfache Kaufstrategie, Aufgaben zu 75 % richtig): Tag 1 etwa 82 % Siegchance, im Schnitt 6,8 Siege, geschätzt 13–14 Minuten pro Lauf, Kämpfe etwa 12 Sekunden. Die Stellschrauben (Startgold, Gold pro Tag, Leben pro Tag, Gegnerbudget) stehen oben und im Abschnitt „Gegner“ in `js/logic.js`.
+Aktuelle Balance (200 Läufe, einfache Kaufstrategie, Aufgaben zu 75 % richtig): Tag 1 etwa 83 % Siegchance, im Schnitt 7,4 Siege, geschätzt 14 Minuten pro Lauf, Kämpfe etwa 12 Sekunden. Die Stellschrauben stehen oben in `js/logic.js` (Startgold, Gold pro Tag, Leben pro Tag, `STERN_FAKTOR`, `SAMMEL_GEWICHT`) und im Abschnitt „Gegner“ (Gegnerbudget, `GEGNER_STERNE_AB`).
 
 ## Auf GitHub Pages veröffentlichen
 
@@ -152,7 +156,8 @@ Aktuelle Balance (200 Läufe, einfache Kaufstrategie, Aufgaben zu 75 % richtig):
 | `js/ui.js` | Gemeinsame Bausteine: Fenster, Item-Kacheln, Raster |
 | `js/state.js` | Geladene Inhalte und Speichern im Browser |
 | `js/logic.js` | Regeln: Raster, Laden, Gold, Gebiete, Lauf, Gegner, Begegnungen |
-| `js/grammar.js` | Grammatik-Regeln: Komposita, Siegel, Runen, Steigerung |
+| `js/grammar.js` | Grammatik-Regeln: Komposita, Siegel, Runen, Steigerung, Verben mit Subjekt, Mehrzahl |
+| `js/sterne.js` | Sammeln und Aufwerten: drei gleiche finden, Frage bauen, verschmelzen |
 | `js/mods.js` | Boni von Figur, Unterklasse, Schicksalsrune, Begegnungen und Taschen |
 | `js/battle.js` | Kampfsimulation |
 | `js/sim.js` | Simulation ganzer Läufe für die Balance |
