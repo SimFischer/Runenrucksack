@@ -85,18 +85,31 @@ export function merkhilfe(ph, n) {
 
 const ohneDoppelte = (liste, richtig) => [...new Set(liste)].filter((x) => x && x !== richtig);
 
-// Falsche Pluralformen: ohne Umlaut, falsche Endung, -s statt Endung usw.
-export function falschePlurale(n) {
-  const sg = n.wort, pl = n.plural, u = umlaut(sg);
-  const kandidaten = [
-    sg + 's', sg + 'e', sg + 'en', sg + 'er', sg + 'n',
-    u && u + 'e', u && u + 'er', u,
-    pl.endsWith('e') && pl.slice(0, -1) + 'en',
-    pl.endsWith('er') && pl.slice(0, -2) + 'e',
-    pl.endsWith('n') && pl + 's',
-    pl.replace(/[äöü]/, (c) => ({ ä: 'a', ö: 'o', ü: 'u' }[c])),
-  ];
-  return ohneDoppelte(kandidaten.filter((x) => typeof x === 'string' && x.length > 1), pl);
+// Falsche Pluralformen, die typischsten zuerst: ohne Umlaut (Hande), falsche Endung (Handen), -s (Hands).
+// Unaussprechbares (Buchn, Feeen) fällt weg.
+// formen (optional): alle echten Wörter – Fehlerformen, die zufällig ein anderes Wort sind (Dachs, Ritter), fallen weg.
+export function falschePlurale(n, formen = null) {
+  const sg = n.wort, pl = n.plural;
+  const kons = /[^aeiouäöüy]$/.test(sg); // endet auf Mitlaut
+  const u = kons ? umlaut(sg) : null; // Umlaut nur bei Wörtern wie Axt, Haus, Vogel
+  const uu = u && u !== sg ? u : null;
+  const ue = /e$/.test(sg) && umlaut(sg) !== sg ? umlaut(sg) : null; // Blume → Blüme(n)
+  const k = {
+    '-e': [uu && uu + 'e', sg + 'en', sg + 's', sg + 'er'],
+    'Umlaut+e': [sg + 'e', uu && uu + 'en', sg + 's', uu && uu + 'er'],
+    '-er': [sg + 'e', sg + 's', sg + 'en', uu && uu + 'er'],
+    'Umlaut+er': [sg + 'er', uu && uu + 'e', sg + 's', sg + 'e'],
+    'Umlaut+en': [sg + 'en', sg + 's', uu && uu + 'e'],
+    '-n': [sg + 's', ue && ue + 'n', sg],
+    '-en': [sg + 's', sg + 'e', uu && uu + 'e', sg],
+    '-s': [sg, sg + 'n', sg + 'en', sg + 'e'],
+    '-nen': [sg + 's', sg + 'en', sg + 'ne', sg + 'e'],
+    '-se': [sg + 'e', sg + 's', sg + 'sen', sg + 'en'],
+    'unverändert': [sg + 's', sg + 'e', sg + 'en'],
+    'Umlaut': [sg, sg + 's', uu && uu + 'e', sg + 'e'],
+  }[n.pluralmuster] || [sg + 's', sg + 'e', sg + 'en'];
+  return ohneDoppelte(k.filter((x) => typeof x === 'string' && x.length > 1 && !/eee|eie$/.test(x)
+    && (!formen || x === sg || !formen.has(x))), pl);
 }
 
 // Falsches Präteritum: schwache Form für starke Verben (schlagte), Präsensform, Partizip ohne Hilfsverb.

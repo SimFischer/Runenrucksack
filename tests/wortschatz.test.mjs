@@ -64,8 +64,9 @@ test('Komposita: Das Grundwort bestimmt Artikel und Mehrzahl', () => {
 
 test('Falsche Antworten aus Fehlermustern sind nie zufällig richtig', () => {
   for (const n of WS.nomen.filter((x) => !x.mehrdeutig)) {
-    const f = falschePlurale(n);
-    assert.ok(f.length >= 3, `${n.wort}: genug falsche Mehrzahlformen (${f})`);
+    const f = falschePlurale(n, FORMEN);
+    assert.ok(f.length >= 2, `${n.wort}: genug falsche Mehrzahlformen (${f})`);
+    for (const x of f) assert.ok(x === n.wort || !FORMEN.has(x), `${n.wort}: ${x} ist ein anderes echtes Wort`);
     assert.ok(!f.includes(n.plural), n.wort);
   }
   for (const v of WS.verben) {
