@@ -35,6 +35,7 @@ export function zeigeLaufende(run, abschluss, aktionen) {
       </div>` : '';
   const frei = a?.frei ? [
     ...a.frei.figuren.map((id) => { const h = G.HEROES.find((x) => x.id === id); return `<div class="frei-neu">${figurBild(id) ? `<img src="${figurBild(id)}" alt="">` : h.emoji}<span><small>Neue Figur frei!</small><b>${h.name}</b></span></div>`; }),
+    ...(a.erfolge || []).map((id) => { const e = G.ACH.erfolge.find((x) => x.id === id); return `<div class="frei-neu"><span class="frei-emoji">${e.emoji}</span><span><small>Neuer Erfolg!</small><b>${e.name}</b></span></div>`; }),
     ...a.frei.designs.map((id) => { const d = G.ACH.designs.find((x) => x.id === id); return `<div class="frei-neu"><span class="frei-emoji">${d.emoji}</span><span><small>Neues Rucksack-Design!</small><b>${d.name}</b></span></div>`; }),
   ].join('') : '';
   modal(`${kopf}${xp}${frei ? `<div class="frei-liste">${frei}</div>` : ''}

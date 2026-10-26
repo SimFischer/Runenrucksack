@@ -53,6 +53,13 @@ function karte(e, da) {
     ${e.hinweis ? `<small class="buch-hinweis">${e.hinweis}</small>` : ''}</div>`;
 }
 
+// Neuer Erfolg während des Laufs: dieselbe Einblendung, nur golden beschriftet.
+export function meldeErfolg(e) {
+  if (!e) return;
+  warteschlange.push({ erfolg: e });
+  if (!zeigt) naechste();
+}
+
 // Kurze Einblendung „Neu im Buch der Wörter!“ mit Glanz – hält das Spiel nicht an.
 const warteschlange = [];
 let zeigt = false;
@@ -70,7 +77,8 @@ function naechste() {
   zeigt = true;
   const n = document.createElement('div');
   n.className = 'buch-neu';
-  n.innerHTML = `<span class="buch-neu-pic">${iconHtml(e.def, 'buch-img')}</span>
+  if (e.erfolg) n.innerHTML = `<span class="buch-neu-pic">${e.erfolg.emoji}</span><span><small>🏆 Neuer Erfolg!</small><b>${e.erfolg.name}</b></span>`;
+  else n.innerHTML = `<span class="buch-neu-pic">${iconHtml(e.def, 'buch-img')}</span>
     <span><small>📚 Neu im Buch der Wörter!</small><b>${e.seite === 'stufen' ? '★'.repeat(e.stern) + ' ' : ''}${e.artikel ? e.artikel + ' ' : ''}${e.name}</b></span>`;
   document.body.append(n);
   setTimeout(() => n.remove(), 2400);

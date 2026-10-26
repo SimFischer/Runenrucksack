@@ -152,3 +152,28 @@ export const designFrei = (profil, d) => !d.freischaltung || profil.designs.incl
 
 // Items mit Freischaltung, die im Laden schon erscheinen dürfen.
 export const freieItems = (profil, items, ctx) => items.filter((d) => d.freischaltung && erfuellt(d.freischaltung, profil, ctx)).map((d) => d.id);
+
+// ---------- Erfolge (achievements.json) ----------
+
+export function erfolgErfuellt(b, profil, ctx) {
+  if (b.stat) return (profil.stats[b.stat] || 0) >= b.min;
+  if (b.muster) {
+    const passend = ctx.buch.eintraege.filter((e) => e.id.includes(b.muster)).map((e) => e.id);
+    const da = new Set(profil.buch);
+    const n = passend.filter((id) => da.has(id)).length;
+    return b.alle ? n === passend.length && n > 0 : n >= b.min;
+  }
+  if (b.figurSiege) return (ctx.heroes || []).every((h) => profil.figurSiege.includes(h.id));
+  return erfuellt(b, profil, ctx); // rang, buch, seite, gewonnen
+}
+
+// Neu erreichte Erfolge ins Profil schreiben. Gibt die neuen ids zurück.
+export function pruefeErfolge(profil, ctx) {
+  const neu = [];
+  for (const e of ctx.achievements.erfolge || []) {
+    if (profil.erfolge.includes(e.id) || !erfolgErfuellt(e.bedingung, profil, ctx)) continue;
+    profil.erfolge.push(e.id);
+    neu.push(e.id);
+  }
+  return neu;
+}

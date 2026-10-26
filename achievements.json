@@ -1,5 +1,5 @@
 {
-  "_hinweis": "Fortschritt zwischen den Läufen. erfahrung: Erfahrungspunkte am Ende eines Laufs (pro Sieg, pro neuer Entdeckung im Buch der Wörter, pro Grammatik-Frage beim ersten Versuch richtig). raenge: ab = nötige Erfahrung insgesamt. designs: Rucksack-Designs (nur Optik); freischaltung wie bei Figuren (rang, gewonnen, buch, seite: volle Seite im Buch, erfolg).",
+  "_hinweis": "Fortschritt zwischen den Läufen. erfahrung: Erfahrungspunkte am Ende eines Laufs (pro Sieg, pro neuer Entdeckung im Buch der Wörter, pro Grammatik-Frage beim ersten Versuch richtig). raenge: ab = nötige Erfahrung insgesamt. designs: Rucksack-Designs (nur Optik); freischaltung wie bei Figuren (rang, gewonnen, buch, seite: volle Seite im Buch, erfolg). erfolge: bedingung ist eine von: stat (Zähler im Profil: laeufe, siege, gewonnen, ohneFehler, orkFehler, saetze, komposita, sterne4, richtig) mit min; buch (Anzahl Einträge); muster (Buch-Einträge, deren id den Text enthält) mit min oder alle; seite (volle Buchseite); figurSiege: \"alle\" (mit jeder Figur einen Lauf gewonnen); rang.",
   "erfahrung": {
     "sieg": 10,
     "entdeckung": 5,
@@ -78,6 +78,182 @@
       "text": "Silberne Stickerei der Reiherritter.",
       "freischaltung": {
         "erfolg": "alle-figuren"
+      }
+    }
+  ],
+  "erfolge": [
+    {
+      "id": "erstes-kompositum",
+      "emoji": "🔥",
+      "name": "Erstes Kompositum",
+      "text": "Verbinde einen Kraft-Kristall mit einem Träger.",
+      "bedingung": {
+        "stat": "komposita",
+        "min": 1
+      }
+    },
+    {
+      "id": "erste-vier-sterne",
+      "emoji": "🌟",
+      "name": "Erste ★★★★",
+      "text": "Bringe ein Item auf die legendäre Stufe ★★★★.",
+      "bedingung": {
+        "stat": "sterne4",
+        "min": 1
+      }
+    },
+    {
+      "id": "fehlerjaeger",
+      "emoji": "🔍",
+      "name": "Fehlerjäger",
+      "text": "Verbessere 10 Fehler auf Ork-Rüstungen.",
+      "bedingung": {
+        "stat": "orkFehler",
+        "min": 10
+      }
+    },
+    {
+      "id": "satzbauer",
+      "emoji": "📜",
+      "name": "Satzbauer",
+      "text": "Bilde 10 richtige Sätze mit Verb und Subjekt.",
+      "bedingung": {
+        "stat": "saetze",
+        "min": 10
+      }
+    },
+    {
+      "id": "ohne-fehler",
+      "emoji": "💎",
+      "name": "Ohne Fehlversuch",
+      "text": "Gewinne einen Lauf, ohne eine einzige Frage falsch zu beantworten.",
+      "bedingung": {
+        "stat": "ohneFehler",
+        "min": 1
+      }
+    },
+    {
+      "id": "reise-geschafft",
+      "emoji": "👑",
+      "name": "Reise geschafft",
+      "text": "Gewinne deinen ersten Lauf – alle zehn Tage überstanden.",
+      "bedingung": {
+        "stat": "gewonnen",
+        "min": 1
+      }
+    },
+    {
+      "id": "alle-figuren",
+      "emoji": "🏅",
+      "name": "Alle Helden",
+      "text": "Gewinne mit jeder Figur einen Lauf.",
+      "bedingung": {
+        "figurSiege": "alle"
+      }
+    },
+    {
+      "id": "feuer-komposita",
+      "emoji": "🌋",
+      "name": "Feuermeister",
+      "text": "Entdecke alle Feuer-Komposita.",
+      "bedingung": {
+        "muster": "komp:feuer+",
+        "alle": true
+      }
+    },
+    {
+      "id": "erste-krone",
+      "emoji": "👑",
+      "name": "Gekrönte Rune",
+      "text": "Steigere eine Rune bis zum Superlativ mit Krone.",
+      "bedingung": {
+        "muster": "@4",
+        "min": 1
+      }
+    },
+    {
+      "id": "kampferprobt",
+      "emoji": "⚔️",
+      "name": "Kampferprobt",
+      "text": "Gewinne insgesamt 25 Kämpfe.",
+      "bedingung": {
+        "stat": "siege",
+        "min": 25
+      }
+    },
+    {
+      "id": "wortsammler",
+      "emoji": "📚",
+      "name": "Wortsammler",
+      "text": "Entdecke 10 Einträge im Buch der Wörter.",
+      "bedingung": {
+        "buch": 10
+      }
+    },
+    {
+      "id": "wortforscher",
+      "emoji": "🔎",
+      "name": "Wortforscherin",
+      "text": "Entdecke 50 Einträge im Buch der Wörter.",
+      "bedingung": {
+        "buch": 50
+      }
+    },
+    {
+      "id": "buecherwurm",
+      "emoji": "🐛",
+      "name": "Bücherwurm",
+      "text": "Entdecke 100 Einträge im Buch der Wörter.",
+      "bedingung": {
+        "buch": 100
+      }
+    },
+    {
+      "id": "schatzhueter",
+      "emoji": "💰",
+      "name": "Schatzhüter",
+      "text": "Fülle die Seite „Schätze“ im Buch der Wörter.",
+      "bedingung": {
+        "seite": "besondere"
+      }
+    },
+    {
+      "id": "grammatik-profi",
+      "emoji": "✅",
+      "name": "Grammatik-Profi",
+      "text": "Beantworte 100 Fragen gleich beim ersten Versuch richtig.",
+      "bedingung": {
+        "stat": "richtig",
+        "min": 100
+      }
+    },
+    {
+      "id": "weitgereist",
+      "emoji": "🥾",
+      "name": "Weitgereist",
+      "text": "Spiele 10 Läufe.",
+      "bedingung": {
+        "stat": "laeufe",
+        "min": 10
+      }
+    },
+    {
+      "id": "schlagfertig",
+      "emoji": "🥊",
+      "name": "Schlagfertig",
+      "text": "Finde alle Sätze mit „schlagen“.",
+      "bedingung": {
+        "muster": "satz:schlagen:",
+        "alle": true
+      }
+    },
+    {
+      "id": "hueter",
+      "emoji": "🏰",
+      "name": "Hüter der Sprache",
+      "text": "Erreiche den höchsten Rang.",
+      "bedingung": {
+        "rang": 5
       }
     }
   ]

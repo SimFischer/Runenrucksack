@@ -22,10 +22,10 @@ import { runEncounter } from './encounters.js';
 import { initTutorial, startTutorial, tutorialDone, showHelp, tipsOn, setTips } from './tutorial.js';
 import { entdeckungenIn } from './buch.js';
 import {
-  entdecke, merkeAntwort, laufStand, laufAbschluss, rangVon, pruefeFreischaltungen, figurFrei, freieItems, bedingungText,
+  entdecke, merkeAntwort, laufStand, laufAbschluss, rangVon, pruefeFreischaltungen, figurFrei, freieItems, bedingungText, pruefeErfolge,
 } from './fortschritt.js';
 import { zeigeSammlung, wendeDesignAn, fortschrittCtx } from './sammlung-ui.js';
-import { zeigeBuch, meldeNeu } from './buch-ui.js';
+import { zeigeBuch, meldeNeu, meldeErfolg } from './buch-ui.js';
 import { zeigeLaufende } from './ende-ui.js';
 
 let selected = null;   // { src: 'bag'|'store'|'shop', uid?, slot? }
@@ -46,6 +46,7 @@ async function boot() {
   $('btn-help').onclick = () => showHelp();
   $('btn-buch').onclick = () => zeigeBuch();
   $('btn-sammlung').onclick = () => zeigeSammlung();
+  pruefeErfolge(G.PROFIL, fortschrittCtx());
   pruefeFreischaltungen(G.PROFIL, fortschrittCtx());
   wendeDesignAn();
   $('btn-buch-spiel').onclick = () => zeigeBuch();
@@ -297,10 +298,12 @@ function render() {
 function pruefeBuch() {
   const neu = entdecke(G.PROFIL, entdeckungenIn(G.run, G.DEFS, G.BUCH));
   if (!neu.length) return;
-  saveProfil();
   G.run.prog ||= {};
   (G.run.prog.neu ||= []).push(...neu);
   meldeNeu(neu);
+  // Erfolge rund ums Buch („Wortsammler“) gleich melden
+  for (const id of pruefeErfolge(G.PROFIL, fortschrittCtx())) meldeErfolg(G.ACH.erfolge.find((e) => e.id === id));
+  saveProfil();
   emit('entdeckt', { ids: neu });
 }
 
@@ -1235,6 +1238,7 @@ function battleOver(won, enemyName) {
   if (run.over && !run.tutorial && !run.abgeschlossen) {
     run.abgeschlossen = true;
     G.abschluss = laufAbschluss(G.PROFIL, run, { achievements: G.ACH });
+    G.abschluss.erfolge = pruefeErfolge(G.PROFIL, fortschrittCtx());
     G.abschluss.frei = pruefeFreischaltungen(G.PROFIL, fortschrittCtx());
     saveProfil();
   }

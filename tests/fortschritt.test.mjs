@@ -105,3 +105,33 @@ test('Fähigkeiten: Ysoldes Runen wirken auf zwei Nomen, Theron gibt Startblock 
   assert.equal(theron.get(3).def.startblock, 3, 'das Schwert neben dem das-Siegel');
   assert.ok(!borga.get(3).def.startblock);
 });
+
+test('Erfolge: mindestens 15, jeder erreichbar geprüft, Silberbanner nach „Alle Helden“', async () => {
+  const { pruefeErfolge, pruefeFreischaltungen } = await import('../js/fortschritt.js');
+  const { baueBuch } = await import('../js/buch.js');
+  const { buildCompounds, buildRuneLevels } = await import('../js/grammar.js');
+  const H = json('heroes.json').helden;
+  const items = json('items.json').items;
+  const R = json('recipes.json');
+  const defs = Object.fromEntries(items.map((d) => [d.id, d]));
+  for (const d of buildCompounds(defs, R)) defs[d.id] = d;
+  for (const d of buildRuneLevels(defs)) defs[d.id] = d;
+  const buch = baueBuch(defs, items, R);
+  const ctx = { achievements: ACH, buch, heroes: H };
+  assert.ok(ACH.erfolge.length >= 15);
+  assert.equal(new Set(ACH.erfolge.map((e) => e.id)).size, ACH.erfolge.length);
+  for (const n of ['Erstes Kompositum', 'Erste ★★★★', 'Fehlerjäger', 'Satzbauer', 'Ohne Fehlversuch', 'Alle Helden', 'Feuermeister']) {
+    assert.ok(ACH.erfolge.some((e) => e.name === n), n);
+  }
+  for (const e of ACH.erfolge) if (e.bedingung.muster) assert.ok(buch.eintraege.some((x) => x.id.includes(e.bedingung.muster)), e.id);
+
+  const p = neuesProfil();
+  assert.deepEqual(pruefeErfolge(p, ctx), []);
+  p.stats = { komposita: 1, orkFehler: 10 };
+  p.buch = buch.eintraege.filter((x) => x.id.startsWith('komp:feuer+')).map((x) => x.id);
+  assert.deepEqual(pruefeErfolge(p, ctx).sort(), ['erstes-kompositum', 'fehlerjaeger', 'feuer-komposita', 'wortsammler']);
+  assert.deepEqual(pruefeErfolge(p, ctx), [], 'jeder nur einmal');
+  p.figurSiege = H.map((h) => h.id);
+  assert.deepEqual(pruefeErfolge(p, ctx), ['alle-figuren']);
+  assert.ok(pruefeFreischaltungen(p, ctx).designs.includes('silberbanner'));
+});
