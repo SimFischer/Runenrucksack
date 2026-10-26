@@ -27,6 +27,7 @@ import {
 import { zeigeSammlung, wendeDesignAn, fortschrittCtx } from './sammlung-ui.js';
 import { zeigeBuch, meldeNeu, meldeErfolg } from './buch-ui.js';
 import { zeigeLaufende } from './ende-ui.js';
+import { zeigeCode, zeigeEingabe, uebernehmen, neuBeginnen } from './code-ui.js';
 
 let selected = null;   // { src: 'bag'|'store'|'shop', uid?, slot? }
 let drag = null;
@@ -46,6 +47,8 @@ async function boot() {
   $('btn-help').onclick = () => showHelp();
   $('btn-buch').onclick = () => zeigeBuch();
   $('btn-sammlung').onclick = () => zeigeSammlung();
+  $('btn-code-ein').onclick = () => zeigeEingabe({ geladen: codeGeladen, zurueck: showStart });
+  $('btn-neu-beginnen').onclick = () => neuBeginnen(() => { wendeDesignAn(); showAsk(); });
   pruefeErfolge(G.PROFIL, fortschrittCtx());
   pruefeFreischaltungen(G.PROFIL, fortschrittCtx());
   wendeDesignAn();
@@ -123,6 +126,23 @@ function zeigeRang() {
   box.innerHTML = `<span class="rang-emoji">${r.emoji}</span><span><b>${r.name}</b>
     <span class="rang-bar"><i style="width:${pct}%"></i></span>
     <small>${r.naechster ? `${G.PROFIL.xp} Erfahrung · noch ${r.bisNaechster} bis ${r.naechster.name}` : `${G.PROFIL.xp} Erfahrung · höchster Rang!`}</small></span>`;
+}
+
+// Ein eingelesener Helden- oder Reisecode: Fortschritt übernehmen, beim Reisecode gleich weiterspielen.
+function codeGeladen(r) {
+  const run = uebernehmen(r);
+  pruefeErfolge(G.PROFIL, fortschrittCtx());
+  pruefeFreischaltungen(G.PROFIL, fortschrittCtx());
+  wendeDesignAn();
+  if (run) {
+    toast('Willkommen zurück! Deine Reise geht weiter.');
+    selected = null;
+    showGame();
+    continueFlow();
+  } else {
+    toast('Willkommen zurück! Dein Fortschritt ist geladen.');
+    showStart();
+  }
 }
 
 function continueSaved() {
@@ -820,16 +840,20 @@ function openMenu() {
     <div class="row">
       <button class="btn small" data-act="buch">📚 Buch der Wörter</button>
       <button class="btn small" data-act="sammlung">🏆 Sammlung</button>
+      <button class="btn small" data-act="code">🔑 Heldencode</button>
       <button class="btn small" data-act="help">📖 So geht's</button>
       <button class="btn small" data-act="tutorial">🧙 Tutorial wiederholen</button>
       <button class="btn small" data-act="tips">💡 Erste-Mal-Tipps: ${tipsOn() ? 'an' : 'aus'}</button>
       <button class="btn small" data-act="klang">${klangAn() ? '🔊' : '🔇'} Klang: ${klangAn() ? 'an' : 'aus'}</button>
+      <button class="btn small" data-act="neustart">🗑️ Neu beginnen</button>
     </div>`, {
     new: () => confirmNew(),
     tutorial: startTutorial,
     help: () => showHelp(openMenu),
     buch: () => zeigeBuch(openMenu),
     sammlung: () => zeigeSammlung(openMenu),
+    code: () => zeigeCode({ zurueck: openMenu }),
+    neustart: () => neuBeginnen(() => { wendeDesignAn(); showAsk(); }),
     tips: () => { setTips(!tipsOn()); toast(`Erste-Mal-Tipps sind jetzt ${tipsOn() ? 'an' : 'aus'}.`); openMenu(); },
     klang: () => { setPref('klang', klangAn() ? 'aus' : 'an'); toast(`Klang beim Verbinden ist jetzt ${klangAn() ? 'an' : 'aus'}.`); openMenu(); },
   });

@@ -196,7 +196,7 @@ test('Dreimal gleich richtig beantwortet: Die Frage kommt in diesem Lauf nicht m
   assert.equal(istGekonnt(run, q), true);
   assert.equal(q.kurz, 'die Äxte ✓');
   // Anderes Wort oder andere Art bleibt eine Frage
-  const speer = { ...q, wort: 'Speer' };
+  const speer = { ...q, wort: 'Speer', ref: 'speer' };
   assert.equal(istGekonnt(run, speer), false);
   assert.equal(istGekonnt(run, { ...q, art: 'artikel' }), false);
   assert.equal(istGekonnt(leererLauf([]), q), false, 'neuer Lauf: wieder fragen');

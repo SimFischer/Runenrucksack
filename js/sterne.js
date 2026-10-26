@@ -130,7 +130,7 @@ export function frageFuer(a, defs, rng = Math.random) {
   if (a.typ === 'kompositum') {
     const kd = defs[a.kraft.id], td = defs[a.traeger.id], cd = defs[a.id];
     return {
-      art: 'artikel', wort: cd.name, genus: true,
+      art: 'artikel', wort: cd.name, ref: cd.id, genus: true,
       titel: `${kd.name} + ${td.name}`,
       prompt: `${blank} ${cd.name}`,
       options: ['der', 'die', 'das'],
@@ -145,7 +145,7 @@ export function frageFuer(a, defs, rng = Math.random) {
     if (to.stufe > 3) return null;
     const sup = to.stufe === 3;
     return {
-      art: 'steigerung', wort: to.name,
+      art: 'steigerung', wort: to.name, ref: to.id,
       titel: sup ? 'Superlativ (höchste Stufe)' : 'Komparativ (Vergleichsstufe)',
       prompt: `${d.name} → ${blank}`,
       options: shuffle([to.name, ...(sup ? st.falschS : st.falschK)], rng),
@@ -157,7 +157,7 @@ export function frageFuer(a, defs, rng = Math.random) {
   if (d.art === 'verb') {
     const f = d.formen;
     return {
-      art: 'praeteritum', wort: d.name,
+      art: 'praeteritum', wort: d.name, ref: d.id,
       titel: 'Präteritum (so erzählt man, was gestern war)',
       prompt: `Gestern ${blank} der Ritter. <small>(${d.name})</small>`,
       options: shuffle([f.praeteritum, ...f.falschPraeteritum], rng),
@@ -174,7 +174,7 @@ export function frageFuer(a, defs, rng = Math.random) {
   else explain = `Die Mehrzahl von „${art} ${einzahl}“ heißt „die ${pl.richtig}“.`;
   if (pl.grund) explain += ' Bei zusammengesetzten Wörtern ändert sich nur das letzte Wort.';
   return {
-    art: 'mehrzahl', wort: einzahl,
+    art: 'mehrzahl', wort: einzahl, ref: d.id,
     titel: 'Mehrzahl',
     prompt: `${art} ${einzahl} + ${art} ${einzahl} = zwei ${blank}`,
     options: shuffle([pl.richtig, ...pl.falsch], rng),
@@ -187,7 +187,7 @@ export function frageFuer(a, defs, rng = Math.random) {
 // Gekonnte Fragen: Wer dieselbe Frage (gleiches Wort, gleiche Art) in einem Lauf dreimal gleich beim
 // ersten Versuch richtig beantwortet hat, bekommt sie in diesem Lauf nicht mehr gestellt.
 export const GEKONNT_AB = 3;
-export const frageKey = (q) => `${q.art}|${q.wort}`;
+export const frageKey = (q) => `${q.art}|${q.ref}`; // ref = Item-id (für den Reisecode)
 export const istGekonnt = (run, q) => !!q && (run.gekonnt?.[frageKey(q)] || 0) >= GEKONNT_AB;
 export function merkeRichtig(run, q) {
   run.gekonnt = { ...(run.gekonnt || {}) };

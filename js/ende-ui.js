@@ -4,6 +4,7 @@ import { G, region } from './state.js';
 import { laufStand, lernbericht } from './fortschritt.js';
 import { modal, klang, iconHtml } from './ui.js';
 import { figurBild } from './state.js';
+import { codeKasten, kopierenAn, aktuellerHeldencode } from './code-ui.js';
 
 const rangBalken = (r) => {
   const pct = r.naechster ? Math.round(((G.PROFIL.xp - r.ab) / (r.naechster.ab - r.ab)) * 100) : 100;
@@ -38,13 +39,16 @@ export function zeigeLaufende(run, abschluss, aktionen) {
     ...(a.erfolge || []).map((id) => { const e = G.ACH.erfolge.find((x) => x.id === id); return `<div class="frei-neu"><span class="frei-emoji">${e.emoji}</span><span><small>Neuer Erfolg!</small><b>${e.name}</b></span></div>`; }),
     ...a.frei.designs.map((id) => { const d = G.ACH.designs.find((x) => x.id === id); return `<div class="frei-neu"><span class="frei-emoji">${d.emoji}</span><span><small>Neues Rucksack-Design!</small><b>${d.name}</b></span></div>`; }),
   ].join('') : '';
-  modal(`${kopf}
+  const code = a ? aktuellerHeldencode() : null;
+  const card = modal(`${kopf}
       <div class="ende-spalten">
         <div>${berichtHtml(run, a)}</div>
-        <div>${xp}${frei ? `<div class="frei-liste">${frei}</div>` : ''}</div>
+        <div>${xp}${frei ? `<div class="frei-liste">${frei}</div>` : ''}
+          ${code ? `<div class="ende-code"><b>🔑 Dein Heldencode</b><small>Schreib ihn ab oder fotografiere ihn – damit holst du deinen Fortschritt zurück.</small>${codeKasten(code, true)}</div>` : ''}</div>
       </div>
       <div class="row"><button class="btn primary big" data-act="neu">Neuer Lauf</button><button class="btn" data-act="home">Zum Start</button></div>`,
   { neu: aktionen.neu, home: aktionen.home }, 'wide ende');
+  if (code) kopierenAn(card, code);
   if (a?.aufgestiegen) setTimeout(() => rangFeier(a.nachher), 700);
 }
 

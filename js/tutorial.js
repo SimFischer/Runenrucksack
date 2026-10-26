@@ -1,6 +1,6 @@
 // Tutorial „Der erste Tag“: Meister Fenwick führt mit Spotlight, Sprechblase und Hand durch einen
 // festgelegten, echten Lauf. Die Schritte stehen in tutorial.json, die Prüf-Logik in tutorial-logic.js.
-import { G, onEvent, getPref, setPref, loadRun, emit } from './state.js';
+import { G, onEvent, getPref, setPref, loadRun, emit, saveProfil } from './state.js';
 import {
   activeSteps, makeTutorialRun, applyShop, prepareStep, checkStep, resetWrong, targetCell, spotFor,
 } from './tutorial-logic.js';
@@ -15,7 +15,7 @@ let idleTimer = 0, layoutTimer = 0, extraTip = '', warnText = '';
 let fenwickImg = null, voice = null;
 const el = {};
 
-export const tutorialDone = () => getPref('tutorial') === 'fertig';
+export const tutorialDone = () => getPref('tutorial') === 'fertig' || !!G.PROFIL?.tutorial;
 export const tutorialActive = () => active;
 
 // ---------- Aufbau ----------
@@ -377,6 +377,8 @@ function blocker(e) {
 
 function finale() {
   setPref('tutorial', 'fertig');
+  G.PROFIL.tutorial = true; // gehört auch in den Heldencode
+  saveProfil();
   shown = false;
   clearHand();
   layout();
