@@ -2,65 +2,366 @@
   "_hinweis": "Computer-Gegner. uebung: nur im Tutorial, mit festen Gegenständen (ausruestung). vorliebe gewichtet, welche Wirkungen der Gegner beim Packen bevorzugt. boss: Anführer am letzten Tag eines Gebiets (siehe regions.json). fehler: falsch geschriebene Wörter auf der Rüstung – vor jedem Kampf wird eines zufällig gewählt. optionen enthält genau eine richtige Schreibung (richtig).",
   "gegner": [
     {
-      "id": "spaeher", "name": "Späher-Ork", "emoji": "👺", "vorliebe": { "schaden": 2, "tempo": 3 },
+      "id": "spaeher",
+      "name": "Späher-Ork",
+      "emoji": "👺",
+      "vorliebe": {
+        "schaden": 2,
+        "tempo": 3
+      },
       "fehler": [
-        { "falsch": "Schwerdt", "richtig": "Schwert", "optionen": ["Schwert", "Schwerdt", "Schwärt"], "erklaerung": "Schwert schreibt man mit t am Ende." },
-        { "falsch": "Bogn", "richtig": "Bogen", "optionen": ["Bogen", "Bogn", "Boogen"], "erklaerung": "Bogen hat zwei Silben: Bo-gen." },
-        { "falsch": "Pfeiel", "richtig": "Pfeil", "optionen": ["Pfeil", "Pfeiel", "Pfail"], "erklaerung": "Pfeil schreibt man mit ei – ohne e danach." },
-        { "falsch": "Hellm", "richtig": "Helm", "optionen": ["Helm", "Hellm", "Hälm"], "erklaerung": "Helm schreibt man mit einem l." }
+        {
+          "falsch": "Schwerdt",
+          "richtig": "Schwert",
+          "optionen": [
+            "Schwert",
+            "Schwerdt",
+            "Schwärt"
+          ],
+          "erklaerung": "Schwert schreibt man mit t am Ende."
+        },
+        {
+          "falsch": "Bogn",
+          "richtig": "Bogen",
+          "optionen": [
+            "Bogen",
+            "Bogn",
+            "Boogen"
+          ],
+          "erklaerung": "Bogen hat zwei Silben: Bo-gen."
+        },
+        {
+          "falsch": "Pfeiel",
+          "richtig": "Pfeil",
+          "optionen": [
+            "Pfeil",
+            "Pfeiel",
+            "Pfail"
+          ],
+          "erklaerung": "Pfeil schreibt man mit ei – ohne e danach."
+        },
+        {
+          "falsch": "Hellm",
+          "richtig": "Helm",
+          "optionen": [
+            "Helm",
+            "Hellm",
+            "Hälm"
+          ],
+          "erklaerung": "Helm schreibt man mit einem l."
+        }
       ]
     },
     {
-      "id": "schildork", "name": "Schild-Ork", "emoji": "👹", "vorliebe": { "block": 3, "startblock": 2, "leben": 2 },
+      "id": "schildork",
+      "name": "Schild-Ork",
+      "emoji": "👹",
+      "vorliebe": {
+        "block": 3,
+        "startblock": 2,
+        "leben": 2
+      },
       "fehler": [
-        { "falsch": "die Schild", "richtig": "der Schild", "optionen": ["der Schild", "die Schild", "dos Schild"], "erklaerung": "Zum Schützen heißt es der Schild." },
-        { "falsch": "Panzr", "richtig": "Panzer", "optionen": ["Panzer", "Panzr", "Pantser"], "erklaerung": "Panzer hat zwei Silben: Pan-zer." },
-        { "falsch": "Rüstunk", "richtig": "Rüstung", "optionen": ["Rüstung", "Rüstunk", "Rüstong"], "erklaerung": "Wörter auf -ung schreibt man mit g am Ende: die Rüstungen." },
-        { "falsch": "Schildt", "richtig": "Schild", "optionen": ["Schild", "Schildt", "Schilt"], "erklaerung": "Schild schreibt man mit d – das hörst du in die Schilde." }
+        {
+          "falsch": "die Schild",
+          "richtig": "der Schild",
+          "optionen": [
+            "der Schild",
+            "die Schild",
+            "dos Schild"
+          ],
+          "erklaerung": "Zum Schützen heißt es der Schild."
+        },
+        {
+          "falsch": "Panzr",
+          "richtig": "Panzer",
+          "optionen": [
+            "Panzer",
+            "Panzr",
+            "Pantser"
+          ],
+          "erklaerung": "Panzer hat zwei Silben: Pan-zer."
+        },
+        {
+          "falsch": "Rüstunk",
+          "richtig": "Rüstung",
+          "optionen": [
+            "Rüstung",
+            "Rüstunk",
+            "Rüstong"
+          ],
+          "erklaerung": "Wörter auf -ung schreibt man mit g am Ende: die Rüstungen."
+        },
+        {
+          "falsch": "Schildt",
+          "richtig": "Schild",
+          "optionen": [
+            "Schild",
+            "Schildt",
+            "Schilt"
+          ],
+          "erklaerung": "Schild schreibt man mit d – das hörst du in die Schilde."
+        }
       ]
     },
     {
-      "id": "schamane", "name": "Ork-Schamane", "emoji": "🧌", "vorliebe": { "gift": 3, "kaelte": 3, "heilung": 2, "regeneration": 2 },
+      "id": "schamane",
+      "name": "Ork-Schamane",
+      "emoji": "🧌",
+      "vorliebe": {
+        "gift": 3,
+        "kaelte": 3,
+        "heilung": 2,
+        "regeneration": 2
+      },
       "fehler": [
-        { "falsch": "Gifft", "richtig": "Gift", "optionen": ["Gift", "Gifft", "Gieft"], "erklaerung": "Gift schreibt man mit einem f." },
-        { "falsch": "Zauberstap", "richtig": "Zauberstab", "optionen": ["Zauberstab", "Zauberstap", "Zauperstab"], "erklaerung": "Stab schreibt man mit b – das hörst du in die Stäbe." },
-        { "falsch": "Hexerey", "richtig": "Hexerei", "optionen": ["Hexerei", "Hexerey", "Hexarei"], "erklaerung": "Wörter auf -ei schreibt man mit ei." },
-        { "falsch": "Kreuter", "richtig": "Kräuter", "optionen": ["Kräuter", "Kreuter", "Kräutter"], "erklaerung": "Kräuter kommt von Kraut – darum äu." }
+        {
+          "falsch": "Gifft",
+          "richtig": "Gift",
+          "optionen": [
+            "Gift",
+            "Gifft",
+            "Gieft"
+          ],
+          "erklaerung": "Gift schreibt man mit einem f."
+        },
+        {
+          "falsch": "Zauberstap",
+          "richtig": "Zauberstab",
+          "optionen": [
+            "Zauberstab",
+            "Zauberstap",
+            "Zauperstab"
+          ],
+          "erklaerung": "Stab schreibt man mit b – das hörst du in die Stäbe."
+        },
+        {
+          "falsch": "Hexerey",
+          "richtig": "Hexerei",
+          "optionen": [
+            "Hexerei",
+            "Hexerey",
+            "Hexarei"
+          ],
+          "erklaerung": "Wörter auf -ei schreibt man mit ei."
+        },
+        {
+          "falsch": "Kreuter",
+          "richtig": "Kräuter",
+          "optionen": [
+            "Kräuter",
+            "Kreuter",
+            "Kräutter"
+          ],
+          "erklaerung": "Kräuter kommt von Kraut – darum äu."
+        }
       ]
     },
     {
-      "id": "wolfsreiter", "name": "Wolfsreiter", "emoji": "🐺", "vorliebe": { "schaden": 3, "brand": 2, "tempo": 2, "betaeubung": 2 },
+      "id": "wolfsreiter",
+      "name": "Wolfsreiter",
+      "emoji": "🐺",
+      "vorliebe": {
+        "schaden": 3,
+        "brand": 2,
+        "tempo": 2,
+        "betaeubung": 2
+      },
       "fehler": [
-        { "falsch": "der Axt", "richtig": "die Axt", "optionen": ["die Axt", "der Axt", "das Axt"], "erklaerung": "Es heißt die Axt." },
-        { "falsch": "Wolff", "richtig": "Wolf", "optionen": ["Wolf", "Wolff", "Wollf"], "erklaerung": "Wolf schreibt man mit einem f." },
-        { "falsch": "Satel", "richtig": "Sattel", "optionen": ["Sattel", "Satel", "Sattl"], "erklaerung": "Nach kurzem a kommt ein doppeltes t: Sattel." },
-        { "falsch": "Speehr", "richtig": "Speer", "optionen": ["Speer", "Speehr", "Spehr"], "erklaerung": "Speer schreibt man mit ee – ohne h." }
+        {
+          "falsch": "der Axt",
+          "richtig": "die Axt",
+          "optionen": [
+            "die Axt",
+            "der Axt",
+            "das Axt"
+          ],
+          "erklaerung": "Es heißt die Axt."
+        },
+        {
+          "falsch": "Wolff",
+          "richtig": "Wolf",
+          "optionen": [
+            "Wolf",
+            "Wolff",
+            "Wollf"
+          ],
+          "erklaerung": "Wolf schreibt man mit einem f."
+        },
+        {
+          "falsch": "Satel",
+          "richtig": "Sattel",
+          "optionen": [
+            "Sattel",
+            "Satel",
+            "Sattl"
+          ],
+          "erklaerung": "Nach kurzem a kommt ein doppeltes t: Sattel."
+        },
+        {
+          "falsch": "Speehr",
+          "richtig": "Speer",
+          "optionen": [
+            "Speer",
+            "Speehr",
+            "Spehr"
+          ],
+          "erklaerung": "Speer schreibt man mit ee – ohne h."
+        }
       ]
     },
     {
-      "id": "pluenderer", "name": "Ork-Plünderer", "emoji": "👿", "boss": true, "vorliebe": { "schaden": 2, "block": 2, "heilung": 1 },
+      "id": "pluenderer",
+      "name": "Ork-Plünderer",
+      "emoji": "👿",
+      "boss": true,
+      "vorliebe": {
+        "schaden": 2,
+        "block": 2,
+        "heilung": 1
+      },
       "fehler": [
-        { "falsch": "Rüstunk", "richtig": "Rüstung", "optionen": ["Rüstung", "Rüstunk", "Rüstong"], "erklaerung": "Wörter auf -ung schreibt man mit g am Ende." },
-        { "falsch": "Beüte", "richtig": "Beute", "optionen": ["Beute", "Beüte", "Boite"], "erklaerung": "Beute schreibt man mit eu." },
-        { "falsch": "Schatskiste", "richtig": "Schatzkiste", "optionen": ["Schatzkiste", "Schatskiste", "Schazkiste"], "erklaerung": "Schatz schreibt man mit tz." },
-        { "falsch": "Plünderrer", "richtig": "Plünderer", "optionen": ["Plünderer", "Plünderrer", "Plündera"], "erklaerung": "Plünderer: plündern + -er, mit einem r in der Mitte." },
-        { "falsch": "Vorratskamer", "richtig": "Vorratskammer", "optionen": ["Vorratskammer", "Vorratskamer", "Forratskammer"], "erklaerung": "Kammer schreibt man mit mm." }
+        {
+          "falsch": "Rüstunk",
+          "richtig": "Rüstung",
+          "optionen": [
+            "Rüstung",
+            "Rüstunk",
+            "Rüstong"
+          ],
+          "erklaerung": "Wörter auf -ung schreibt man mit g am Ende."
+        },
+        {
+          "falsch": "Beüte",
+          "richtig": "Beute",
+          "optionen": [
+            "Beute",
+            "Beüte",
+            "Boite"
+          ],
+          "erklaerung": "Beute schreibt man mit eu."
+        },
+        {
+          "falsch": "Schatskiste",
+          "richtig": "Schatzkiste",
+          "optionen": [
+            "Schatzkiste",
+            "Schatskiste",
+            "Schazkiste"
+          ],
+          "erklaerung": "Schatz schreibt man mit tz."
+        },
+        {
+          "falsch": "Plünderrer",
+          "richtig": "Plünderer",
+          "optionen": [
+            "Plünderer",
+            "Plünderrer",
+            "Plündera"
+          ],
+          "erklaerung": "Plünderer: plündern + -er, mit einem r in der Mitte."
+        },
+        {
+          "falsch": "Vorratskamer",
+          "richtig": "Vorratskammer",
+          "optionen": [
+            "Vorratskammer",
+            "Vorratskamer",
+            "Forratskammer"
+          ],
+          "erklaerung": "Kammer schreibt man mit mm."
+        }
       ]
     },
     {
-      "id": "haeuptling", "name": "Wolfsreiter-Häuptling", "emoji": "🐺👑", "boss": true, "vorliebe": { "schaden": 3, "brand": 2, "betaeubung": 2, "tempo": 2 },
+      "id": "haeuptling",
+      "name": "Wolfsreiter-Häuptling",
+      "emoji": "🐺👑",
+      "boss": true,
+      "vorliebe": {
+        "schaden": 3,
+        "brand": 2,
+        "betaeubung": 2,
+        "tempo": 2
+      },
       "fehler": [
-        { "falsch": "Heuptling", "richtig": "Häuptling", "optionen": ["Häuptling", "Heuptling", "Häuptlink"], "erklaerung": "Häuptling kommt von Haupt – darum äu." },
-        { "falsch": "Krohne", "richtig": "Krone", "optionen": ["Krone", "Krohne", "Kroone"], "erklaerung": "Krone schreibt man ohne h." },
-        { "falsch": "Wolfsreitter", "richtig": "Wolfsreiter", "optionen": ["Wolfsreiter", "Wolfsreitter", "Wolfsraiter"], "erklaerung": "Nach ei kommt nur ein t: reiten, Reiter." },
-        { "falsch": "das Mähne", "richtig": "die Mähne", "optionen": ["die Mähne", "das Mähne", "den Mähne"], "erklaerung": "Es heißt die Mähne." },
-        { "falsch": "Stiefl", "richtig": "Stiefel", "optionen": ["Stiefel", "Stiefl", "Stifel"], "erklaerung": "Stiefel hat zwei Silben: Stie-fel." }
+        {
+          "falsch": "Heuptling",
+          "richtig": "Häuptling",
+          "optionen": [
+            "Häuptling",
+            "Heuptling",
+            "Häuptlink"
+          ],
+          "erklaerung": "Häuptling kommt von Haupt – darum äu."
+        },
+        {
+          "falsch": "Krohne",
+          "richtig": "Krone",
+          "optionen": [
+            "Krone",
+            "Krohne",
+            "Kroone"
+          ],
+          "erklaerung": "Krone schreibt man ohne h."
+        },
+        {
+          "falsch": "Wolfsreitter",
+          "richtig": "Wolfsreiter",
+          "optionen": [
+            "Wolfsreiter",
+            "Wolfsreitter",
+            "Wolfsraiter"
+          ],
+          "erklaerung": "Nach ei kommt nur ein t: reiten, Reiter."
+        },
+        {
+          "falsch": "das Mähne",
+          "richtig": "die Mähne",
+          "optionen": [
+            "die Mähne",
+            "das Mähne",
+            "den Mähne"
+          ],
+          "erklaerung": "Es heißt die Mähne."
+        },
+        {
+          "falsch": "Stiefl",
+          "richtig": "Stiefel",
+          "optionen": [
+            "Stiefel",
+            "Stiefl",
+            "Stifel"
+          ],
+          "erklaerung": "Stiefel hat zwei Silben: Stie-fel."
+        }
       ]
     },
     {
-      "id": "strohpuppe", "name": "Strohpuppen-Ork", "emoji": "🌾", "uebung": true, "vorliebe": {},
-      "ausruestung": [{ "id": "apfel", "x": 1, "y": 1 }],
-      "fehler": []
+      "id": "strohpuppe",
+      "name": "Strohpuppen-Ork",
+      "emoji": "🌾",
+      "uebung": true,
+      "vorliebe": {},
+      "ausruestung": [
+        {
+          "id": "apfel",
+          "x": 1,
+          "y": 1
+        }
+      ],
+      "fehler": [
+        {
+          "falsch": "Schwerdt",
+          "richtig": "Schwert",
+          "optionen": [
+            "Schwert",
+            "Schwerdt",
+            "Schwärt"
+          ],
+          "erklaerung": "Schwert schreibt man mit t am Ende."
+        }
+      ]
     }
   ]
 }

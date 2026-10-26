@@ -11,6 +11,7 @@ import {
 import { newRun, seededRng } from '../js/logic.js';
 import { buildCompounds, buildRuneLevels, analyze, DIRS } from '../js/grammar.js';
 import { makeFighter, Battle, runToEnd } from '../js/battle.js';
+import { findTriples, applyMerge } from '../js/sterne.js';
 
 const json = (f) => JSON.parse(readFileSync(new URL('../' + f, import.meta.url)));
 const TUT = json('tutorial.json');
@@ -72,13 +73,31 @@ function act(step, run) {
       assert.ok(pointRune(run, r, a.ziel), 'Rune lässt sich auf das Feuerschwert drehen');
       return null;
     }
-    case 'ereignis': return { typ: a.name };
+    case 'anzahl': buyTo(run, a.item, 'bag', spotFor(run, DEFS, a.item)); return null;
+    case 'zeigt': {
+      const r = run.items.find((p) => p.id === a.verb);
+      for (let rot = 0; rot < 4; rot++) {
+        r.rot = rot;
+        if (analyze(bag(run), DEFS).get(r.uid).verb?.subjekt?.id === a.ziel) return null;
+      }
+      assert.fail('Rolle lässt sich auf das Ziel drehen');
+      return null;
+    }
+    case 'ereignis':
+      if (a.name === 'verschmolzen') { applyMerge(run, findTriples(run.items, DEFS)[0], DEFS); return { typ: a.name }; }
+      if (a.name === 'satz') {
+        const r = run.items.find((p) => p.id === 'schlagen');
+        const v = analyze(bag(run), DEFS).get(r.uid).verb;
+        r.satz = { uid: v.subjekt.uid, id: v.subjekt.id, stern: v.subjekt.stern, ok: true };
+        return { typ: 'satz', ok: true };
+      }
+      return { typ: a.name };
     default: return null;
   }
 }
 
 test('tutorial.json: jeder Schritt hat id, kurzen Text und eine bekannte Aktion', () => {
-  const typen = ['weiter', 'kaufen', 'antippen', 'drehen', 'neben', 'verschmelzen', 'siegel', 'runen', 'rune', 'ereignis', 'abschluss'];
+  const typen = ['weiter', 'kaufen', 'antippen', 'drehen', 'neben', 'verschmelzen', 'siegel', 'runen', 'rune', 'ereignis', 'abschluss', 'anzahl', 'zeigt'];
   const ids = new Set();
   for (const s of TUT.schritte) {
     assert.ok(s.id && !ids.has(s.id), `doppelte oder fehlende id ${s.id}`);
@@ -108,7 +127,7 @@ test('Tutorial komplett durchspielen: jeder Schritt ist erreichbar', () => {
     assert.equal(checkStep(step, run, DEFS, RECIPES, ev)?.ok, true, `${step.id} wird geschafft`);
     geschafft.push(step.id);
 
-    if (step.id === 'kampf-starten') {
+    if (step.id === 'kampf-starten' || step.id === 'kampf2-starten') {
       // Übungskampf gegen den Strohpuppen-Ork: sicherer Sieg
       const ork = ENEMIES.find((e) => e.id === TUT.uebungsgegner);
       const items = ork.ausruestung.map((a, i) => ({ uid: i + 1, rot: 0, ...a }));
@@ -120,6 +139,10 @@ test('Tutorial komplett durchspielen: jeder Schritt ist erreichbar', () => {
     }
   }
   assert.deepEqual(geschafft, steps.map((s) => s.id));
+  // Zweiter Tag: ★★-Dolch, Satz mit Subjekt
+  assert.ok(run.items.some((p) => p.id === 'dolch' && p.stern === 2), '★★-Dolch entstanden');
+  const rolle = run.items.find((p) => p.id === 'schlagen');
+  assert.equal(analyze(bag(run), DEFS).get(rolle.uid).verb.satz, 'Das Feuerschwert schlägt.');
   // Am Ende: scharfes Feuerschwert mit Siegel
   const fs = findItem(run, 'feuer+schwert');
   const i = analyze(bag(run), DEFS).get(fs.uid);

@@ -1,7 +1,7 @@
 // Tutorial „Der erste Tag“ ohne Darstellung: welche Schritte gelten, ob ein Schritt geschafft ist,
 // freundliches Zurücksetzen bei falschen Aktionen. Wird von js/tutorial.js und den Tests benutzt.
-import { newRun, findSpot, canPlace, bagGrid, sizeOf } from './logic.js';
-import { analyze, findFusions } from './grammar.js';
+import { newRun, findSpot, canPlace, bagGrid, sizeOf, STORE_GRID } from './logic.js';
+import { analyze, findFusions, verbTargetCell } from './grammar.js';
 
 // Funktionen, die es im Spiel gibt. Schritte mit einer fehlenden voraussetzung werden übersprungen.
 // Etappe 4 ergänzt hier z. B. 'buch' und 'heldencode'.
@@ -34,7 +34,16 @@ const find = (run, id, area) => run.items.find((p) => p.id === id && (!area || p
 
 // Vorbereitung eines Schritts, z. B. Platz links neben dem Schwert schaffen.
 export function prepareStep(run, step, defs) {
-  const id = step.vorbereitung?.platzLinksVon;
+  const v = step.vorbereitung || {};
+  // Geschenke von Fenwick in einen bestimmten Bereich legen
+  for (const g of v.geschenk || []) {
+    const area = g.bereich || 'bag';
+    const grid = area === 'bag' ? bagGrid(run) : STORE_GRID;
+    const spot = findSpot(run.items.filter((p) => p.area === area), defs, defs[g.id], grid);
+    if (spot) run.items.push({ uid: run.nextUid++, id: g.id, area, ...spot });
+  }
+  if (v.rolleFuer) placeRole(run, v.rolleFuer, defs);
+  const id = v.platzLinksVon;
   if (!id) return false;
   const t = run.items.find((p) => baseId(p.id, defs) === id && p.area === 'bag');
   if (!t) return false;
@@ -54,6 +63,25 @@ export function prepareStep(run, step, defs) {
         return true;
       }
   return false;
+}
+
+// Verb-Rolle so neben ein Nomen legen, dass ihr Pfeil durch Drehen auf das Nomen zeigen kann –
+// zu Beginn zeigt er genau in die Gegenrichtung.
+function placeRole(run, { verb, ziel }, defs) {
+  if (run.items.some((p) => p.id === verb)) return;
+  const t = run.items.find((p) => p.id === ziel && p.area === 'bag');
+  if (!t) return;
+  const grid = bagGrid(run);
+  const bag = run.items.filter((p) => p.area === 'bag');
+  const ts = sizeOf(defs[t.id], t.rot);
+  const hits = (c) => c.x >= t.x && c.x < t.x + ts.w && c.y >= t.y && c.y < t.y + ts.h;
+  for (const rot of [0, 2, 1, 3])
+    for (let y = 0; y < grid.rows; y++)
+      for (let x = 0; x < grid.cols; x++) {
+        if (!canPlace(bag, defs, defs[verb], x, y, rot, grid) || !hits(verbTargetCell({ x, y, rot }, defs[verb]))) continue;
+        run.items.push({ uid: run.nextUid++, id: verb, area: 'bag', x, y, rot: (rot + 2) % 4 });
+        return;
+      }
 }
 
 // Prüft einen Schritt. ev: letztes Ereignis { typ, id } (z. B. auswahl, drehen, kampfStart).
@@ -88,8 +116,16 @@ export function checkStep(step, run, defs, recipes, ev = null) {
       break;
     }
     case 'ereignis':
-      ok = ev?.typ === a.name;
+      ok = ev?.typ === a.name && (a.ok === undefined || ev.ok === a.ok);
       break;
+    case 'anzahl':
+      ok = run.items.filter((p) => p.id === a.item && !p.stern).length >= a.min;
+      break;
+    case 'zeigt': {
+      const r = run.items.find((p) => p.id === a.verb && p.area === 'bag');
+      ok = !!r && analyze(bagItems(run), defs).get(r.uid).verb?.subjekt?.id === a.ziel;
+      break;
+    }
     default:
       ok = false;
   }

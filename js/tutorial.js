@@ -159,6 +159,7 @@ function complete() {
   const s = step();
   if (!s) return;
   if (s.kampfPause) battleControl.resume();
+  if (s.kampfStarten) battleControl.start();
   el['tut-bubble'].classList.add('done');
   setTimeout(() => {
     el['tut-bubble'].classList.remove('done');
@@ -202,7 +203,7 @@ function draw() {
   el['tut-next'].hidden = s.aktion.typ !== 'weiter';
   el['tut-speak'].hidden = !voice;
   const nr = steps.indexOf(s);
-  el['tut-dots'].innerHTML = steps.map((_, i) => `<i class="${i < nr ? 'past' : i === nr ? 'now' : ''}"></i>`).join('');
+  el['tut-dots'].innerHTML = `<span class="tut-bar"><i style="width:${Math.round(((nr + 1) / steps.length) * 100)}%"></i></span><small>${nr + 1}/${steps.length}</small>`;
   layout();
   playHand();
   resetIdle();

@@ -956,3 +956,7 @@ h2 .hint { font-size: 12px; font-weight: 400; color: var(--ink-soft); }
 
 .slot .holder .collect { left: calc(50% - var(--iw) / 2 - 10px); top: calc(50% - var(--ih) / 2 - 12px); }
 .slot .holder .chain { right: calc(50% - var(--iw) / 2 - 12px); bottom: calc(50% - var(--ih) / 2 - 8px); }
+.tut-dots { align-items: center; gap: 8px; flex-wrap: nowrap; }
+.tut-bar { flex: 1; height: 10px; border-radius: 999px; background: #e3d5b4; overflow: hidden; border: 1px solid rgba(0,0,0,.15); }
+.tut-bar i { display: block; height: 100%; background: linear-gradient(90deg, var(--green), var(--gold)); border-radius: 999px; transition: width .4s; }
+.tut-dots small { font-size: 13px; font-weight: 700; color: var(--ink-soft); white-space: nowrap; }

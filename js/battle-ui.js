@@ -65,6 +65,7 @@ export function startNight(done) {
   $('speed').onclick = (e) => { const b = e.target.closest('[data-speed]'); if (b) setSpeed(+b.dataset.speed); };
   for (const id of ['start', 'heroes', 'game', 'battle']) $(id).hidden = id !== 'battle';
   if (enemy.boss) emit('tipp', { key: 'boss' });
+  else if (armor) emit('tipp', { key: 'ruestung' });
 }
 
 function buildFighter(side, emoji, name, sub, placed, grid, info) {
@@ -196,7 +197,7 @@ function armorHtml() {
   if (!armor) return who;
   if (armor.status === 'richtig') return `Rüstung: <s>${armor.falsch}</s> → <b class="ok">${armor.richtig}</b> · geschwächt!`;
   if (armor.status === 'falsch' || armor.status === 'vorbei') return `Auf der Rüstung steht: <b>${armor.falsch}</b>`;
-  return `Auf der Rüstung steht: <button class="armor-word" id="armor-word">${armor.falsch} 🔍</button>`;
+  return `Auf der Rüstung steht: <button class="armor-word" id="armor-word" data-tut="ruestung">${armor.falsch} 🔍</button>`;
 }
 
 function refreshArmor() {
@@ -242,7 +243,7 @@ function openArmor() {
         <p class="feedback">Richtig wäre: <b>${armor.richtig}</b>. ${armor.erklaerung}</p>
         <p class="muted">Der Ork bleibt so stark wie vorher.</p>
         <div class="row"><button class="btn primary" data-ok>Weiter</button></div>`);
-      res.querySelector('[data-ok]').onclick = () => { closeModal(); refreshArmor(); };
+      res.querySelector('[data-ok]').onclick = () => { closeModal(); refreshArmor(); emit('ruestungFertig', { ok }); };
     };
   });
   card.querySelector('[data-no]').onclick = closeModal;

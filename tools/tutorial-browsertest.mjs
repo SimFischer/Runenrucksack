@@ -107,6 +107,35 @@ try {
   await expect('Trophäe');
   await tap('#modal [data-act="next"]'); await expect('Am Morgen');
   await tap('#modal [data-go]'); await tap('#modal [data-i="2"]'); await tap('#modal [data-next]'); await tap('#modal [data-ok]');
+
+  // Der zweite Tag
+  await expect('zweiten Tag');
+  await tap('#tut-next'); await expect('Dolch');
+  const bg2 = await rect('#grid-bag'), c2 = await cell();
+  const frei = await ev(`(() => { const g = document.getElementById('grid-bag').getBoundingClientRect(); const c = ${c2};
+    for (let y = 0; y < 3; y++) for (let x = 0; x < 4; x++) { const px = g.left + 3 + (x + .5) * c, py = g.top + 3 + (y + .5) * c;
+      if (!document.elementsFromPoint(px, py).some((e) => e.classList?.contains('item'))) return [px, py]; } return null; })()`);
+  await drag('[data-tut="laden-dolch"]', frei[0], frei[1]); await expect('Mehrzahl');
+  const optsD = await ev(`[...document.querySelectorAll('#modal [data-k]')].map((x) => x.textContent)`);
+  await tap(`#modal [data-k="${optsD.indexOf('Dolche')}"]`); await sleep(1200);
+  check(await ev(`!!document.querySelector('#grid-bag .item.s2, #grid-store .item.s2')`), 'drei Dolche werden zu einem ★★-Dolch');
+  await expect('2/3');
+  check(await ev(`document.querySelector('[data-tut="sammeln-apfel"]')?.textContent === '2/3'`), 'Abzeichen 2/3 im Laden');
+  await tap('#tut-next'); await expect('Verben');
+  for (let i = 0; i < 6 && (await ev('document.getElementById("modal").hidden')); i++) await tap('#grid-bag [data-tut="item-schlagen"]');
+  await expect('welche Form');
+  const optsV = await ev(`[...document.querySelectorAll('#modal [data-k]')].map((x) => x.textContent)`);
+  await tap(`#modal [data-k="${optsV.indexOf('schlägt')}"]`); await expect('schlägt dein Feuerschwert');
+  check(await ev(`!!document.querySelector('#grid-bag .rune-lines line.verb')`), 'Leuchtlinie von der Rolle zum Feuerschwert');
+  await tap('#tut-next'); await expect('zweiten Kampf');
+  await tap('#btn-fight'); await expect('Rüstung des Orks');
+  await tap('#armor-word');
+  const optsR = await ev(`[...document.querySelectorAll('#modal [data-k]')].map((x) => x.textContent)`);
+  await tap(`#modal [data-k="${optsR.indexOf('Schwert')}"]`); await tap('#modal [data-ok]'); await expect('geschwächt');
+  await tap('#tut-next');
+  for (let i = 0; i < 60 && (await ev('document.getElementById("modal").hidden')); i++) await sleep(500);
+  await expect('zweiten Tag geschafft');
+  await tap('#modal [data-act="next"]');
   await sleep(600);
   check(!!(await rect('#tut-finale [data-go]')), 'Abschluss mit „Meinen ersten Lauf starten“');
   check(await ev('localStorage.getItem("runenrucksack.tutorial") === "fertig"'), 'Tutorial auf diesem Gerät als fertig gemerkt');
