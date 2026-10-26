@@ -1,0 +1,76 @@
+// Buch der Wörter: Bildschirm mit Seiten, Fortschrittsbalken und Karten; Einblendung bei neuen Entdeckungen.
+import { G, emit } from './state.js';
+import { seitenStand } from './buch.js';
+import { iconHtml, genusChip } from './ui.js';
+
+let seiteAktiv = 'komposita';
+
+export function zeigeBuch(zurueck = null) {
+  document.getElementById('buch-layer')?.remove();
+  const box = document.createElement('div');
+  box.id = 'buch-layer';
+  document.body.append(box);
+  const zeichne = () => {
+    const entdeckt = new Set(G.PROFIL.buch);
+    const gesamt = G.BUCH.eintraege.length;
+    const seite = G.BUCH.seiten.find((s) => s.id === seiteAktiv);
+    const stand = seitenStand(seite, entdeckt);
+    box.innerHTML = `
+      <div class="buch-card" data-tut="buch-fenster">
+        <header class="buch-head">
+          <h2>📚 Buch der Wörter</h2>
+          <span class="buch-total">${G.PROFIL.buch.length} von ${gesamt} entdeckt</span>
+          <button class="btn primary" data-close>Schließen</button>
+        </header>
+        <nav class="buch-tabs">${G.BUCH.seiten.map((s) => {
+          const st = seitenStand(s, entdeckt);
+          return `<button class="buch-tab${s.id === seiteAktiv ? ' on' : ''}${st.voll ? ' voll' : ''}" data-seite="${s.id}">
+            <span>${s.emoji} ${s.titel}</span>
+            <span class="buch-bar"><i style="width:${Math.round((st.gefunden / st.gesamt) * 100)}%"></i></span>
+            <small>${st.gefunden}/${st.gesamt}</small></button>`;
+        }).join('')}</nav>
+        <p class="buch-intro">${seite.text}${seite.belohnung ? ` <b class="buch-lohn${stand.voll ? ' da' : ''}">${stand.voll ? '✓' : '🎁'} Volle Seite: ${seite.belohnung}</b>` : ''}</p>
+        <div class="buch-grid">${seite.eintraege.map((e) => karte(e, entdeckt.has(e.id))).join('')}</div>
+      </div>`;
+    box.querySelector('[data-close]').onclick = () => { box.remove(); emit('buchZu'); zurueck?.(); };
+    box.querySelectorAll('[data-seite]').forEach((b) => { b.onclick = () => { seiteAktiv = b.dataset.seite; zeichne(); }; });
+  };
+  zeichne();
+  emit('buchAuf');
+}
+
+function karte(e, da) {
+  const sterne = e.stern && e.seite === 'stufen' ? `<em class="buch-sterne">${'★'.repeat(e.stern)}</em>` : '';
+  const bild = e.seite === 'saetze'
+    ? `<span class="buch-pair">${iconHtml(e.subjekt, 'buch-img')}<b>+</b>${iconHtml(e.def, 'buch-img')}</span>`
+    : `<span class="buch-pic${e.stern === 4 ? ' legendaer' : ''}"${e.def.leuchten ? ` style="--glow:${e.def.leuchten}"` : ''}>${iconHtml(e.def, 'buch-img')}${sterne}${e.def.abzeichen && e.seite === 'komposita' ? `<em class="buch-kraft">${e.def.abzeichen}</em>` : ''}</span>`;
+  if (!da) return `<div class="buch-eintrag dunkel">${bild}<b>???</b></div>`;
+  return `<div class="buch-eintrag">${bild}
+    <b>${e.artikel ? genusChip(e.artikel) + ' ' : ''}${e.name}</b>
+    ${e.wirkung ? `<small class="buch-wirkung">${e.wirkung}</small>` : ''}
+    ${e.hinweis ? `<small class="buch-hinweis">${e.hinweis}</small>` : ''}</div>`;
+}
+
+// Kurze Einblendung „Neu im Buch der Wörter!“ mit Glanz – hält das Spiel nicht an.
+const warteschlange = [];
+let zeigt = false;
+export function meldeNeu(ids) {
+  for (const id of ids) {
+    const e = G.BUCH.byId.get(id);
+    if (e) warteschlange.push(e);
+  }
+  if (!zeigt) naechste();
+}
+
+function naechste() {
+  const e = warteschlange.shift();
+  if (!e) { zeigt = false; return; }
+  zeigt = true;
+  const n = document.createElement('div');
+  n.className = 'buch-neu';
+  n.innerHTML = `<span class="buch-neu-pic">${iconHtml(e.def, 'buch-img')}</span>
+    <span><small>📚 Neu im Buch der Wörter!</small><b>${e.seite === 'stufen' ? '★'.repeat(e.stern) + ' ' : ''}${e.artikel ? e.artikel + ' ' : ''}${e.name}</b></span>`;
+  document.body.append(n);
+  setTimeout(() => n.remove(), 2400);
+  setTimeout(naechste, warteschlange.length ? 900 : 2400);
+}

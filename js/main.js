@@ -10,7 +10,7 @@ import {
   canMerge, compoundPartner, placeNew, findeVerbindung, fuehreAus, frageFuer, sameKind, istGekonnt, merkeRichtig, nichtVerbinden,
 } from './sterne.js';
 import {
-  G, loadData, save, loadRun, placedOf, itemsIn, gridOf, region, hero, playerCtx, emit, onEvent, figurBild, hintergrundBild, setPref,
+  G, loadData, save, loadRun, placedOf, itemsIn, gridOf, region, hero, playerCtx, emit, onEvent, figurBild, hintergrundBild, setPref, saveProfil,
 } from './state.js';
 import { evaluateBag } from './mods.js';
 import {
@@ -20,6 +20,9 @@ import {
 import { startNight } from './battle-ui.js';
 import { runEncounter } from './encounters.js';
 import { initTutorial, startTutorial, tutorialDone, showHelp, tipsOn, setTips } from './tutorial.js';
+import { entdeckungenIn } from './buch.js';
+import { entdecke } from './fortschritt.js';
+import { zeigeBuch, meldeNeu } from './buch-ui.js';
 
 let selected = null;   // { src: 'bag'|'store'|'shop', uid?, slot? }
 let drag = null;
@@ -37,6 +40,8 @@ async function boot() {
   $('btn-first').onclick = startTutorial;
   $('btn-known').onclick = showStart;
   $('btn-help').onclick = () => showHelp();
+  $('btn-buch').onclick = () => zeigeBuch();
+  $('btn-buch-spiel').onclick = () => zeigeBuch();
   initTutorial({ render, showGame, showStart, showHeroes, continueSaved, hasSavedRun: () => !!loadRun() });
   showAsk();
   $('btn-reroll').onclick = onReroll;
@@ -262,8 +267,20 @@ function render() {
   renderShop();
   renderInfo();
   save();
+  pruefeBuch();
   emit('render');
   setTimeout(checkMerges, 0);
+}
+
+// Neue Kombinationen im Rucksack oder Lager? → ins Buch der Wörter (mit kurzer Einblendung).
+function pruefeBuch() {
+  const neu = entdecke(G.PROFIL, entdeckungenIn(G.run, G.DEFS, G.BUCH));
+  if (!neu.length) return;
+  saveProfil();
+  G.run.prog ||= {};
+  (G.run.prog.neu ||= []).push(...neu);
+  meldeNeu(neu);
+  emit('entdeckt', { ids: neu });
 }
 
 function renderTop() {
@@ -768,6 +785,7 @@ function openMenu() {
       <button class="btn danger" data-act="new">Neuer Lauf</button>
     </div>
     <div class="row">
+      <button class="btn small" data-act="buch">📚 Buch der Wörter</button>
       <button class="btn small" data-act="help">📖 So geht's</button>
       <button class="btn small" data-act="tutorial">🧙 Tutorial wiederholen</button>
       <button class="btn small" data-act="tips">💡 Erste-Mal-Tipps: ${tipsOn() ? 'an' : 'aus'}</button>
@@ -776,6 +794,7 @@ function openMenu() {
     new: () => confirmNew(),
     tutorial: startTutorial,
     help: () => showHelp(openMenu),
+    buch: () => zeigeBuch(openMenu),
     tips: () => { setTips(!tipsOn()); toast(`Erste-Mal-Tipps sind jetzt ${tipsOn() ? 'an' : 'aus'}.`); openMenu(); },
     klang: () => { setPref('klang', klangAn() ? 'aus' : 'an'); toast(`Klang beim Verbinden ist jetzt ${klangAn() ? 'an' : 'aus'}.`); openMenu(); },
   });

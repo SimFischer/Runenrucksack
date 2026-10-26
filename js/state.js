@@ -3,6 +3,8 @@ import { bagGrid, STORE_GRID, regionOf } from './logic.js';
 import { buildCompounds, buildRuneLevels } from './grammar.js';
 import { playerContext } from './mods.js';
 import { placeWaiting } from './sterne.js';
+import { baueBuch } from './buch.js';
+import { neuesProfil } from './fortschritt.js';
 
 export const G = {
   ITEMS: [],      // Items im Laden (items.json)
@@ -19,6 +21,8 @@ export const G = {
   EXERCISES: null,  // exercises.json
   TUTORIAL: null,   // tutorial.json
   BILDER: { items: {}, gegner: {}, figuren: {}, bosse: {}, hintergruende: {} }, // assets/zuordnung.json
+  BUCH: null,       // Buch der Wörter (aus items.json und recipes.json erzeugt)
+  PROFIL: null,     // dauerhafter Fortschritt (js/fortschritt.js)
   run: null,
 };
 
@@ -47,6 +51,22 @@ export async function loadData() {
   G.EXERCISES = exercises;
   G.TUTORIAL = tutorial;
   if (bilder) Object.assign(G.BILDER, bilder);
+  G.BUCH = baueBuch(G.DEFS, G.ITEMS, G.RECIPES);
+  G.PROFIL = loadProfil();
+}
+
+// ---------- Profil (dauerhafter Fortschritt; maßgeblich ist der Heldencode) ----------
+
+const PROFIL_KEY = 'runenrucksack.profil.v1';
+export function loadProfil() {
+  try {
+    const p = JSON.parse(localStorage.getItem(PROFIL_KEY));
+    if (p && p.v === 1) return { ...neuesProfil(), ...p };
+  } catch { /* privater Modus o. ä. */ }
+  return neuesProfil();
+}
+export function saveProfil() {
+  try { localStorage.setItem(PROFIL_KEY, JSON.stringify(G.PROFIL)); } catch { /* privater Modus */ }
 }
 
 // ---------- Speichern (Komfort, nur in diesem Browser) ----------

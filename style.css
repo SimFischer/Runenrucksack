@@ -1148,3 +1148,64 @@ body {
 @keyframes feierGlanz { 0% { background-position: 120% 0; opacity: 1; } 100% { background-position: -120% 0; opacity: 0; } }
 /* Laden: „= sofort ★★“ unter Items, die man schon hat */
 .slot .price-tag.merge-hint small { display: block; font-size: 12px; font-weight: 900; color: #a86b00; line-height: 1.1; text-align: center; }
+
+/* ---------- Buch der Wörter ---------- */
+#buch-layer { position: fixed; inset: 0; z-index: 330; background: rgba(10,6,3,.72); display: flex; align-items: center; justify-content: center; padding: 14px; }
+.buch-card {
+  width: min(1120px, 100%); height: min(780px, 100%); display: flex; flex-direction: column;
+  background: linear-gradient(180deg, #f6ead0, #ead7ab); color: var(--ink);
+  border: 3px solid var(--line); border-radius: 18px; box-shadow: 0 16px 50px rgba(0,0,0,.6); padding: 14px 18px; animation: pop .2s ease-out;
+}
+.buch-head { display: flex; align-items: center; gap: 14px; }
+.buch-head h2 { margin: 0; font-size: 26px; }
+.buch-total { flex: 1; color: var(--ink-soft); font-weight: 800; }
+.buch-tabs { display: flex; gap: 8px; margin: 10px 0 6px; flex-wrap: wrap; }
+.buch-tab {
+  flex: 1; min-width: 150px; display: grid; gap: 3px; text-align: left; padding: 8px 10px; border-radius: 12px;
+  border: 2px solid var(--line); background: #fff6e2; font: inherit; font-weight: 800; color: var(--ink); min-height: 64px;
+}
+.buch-tab.on { background: var(--gold); box-shadow: 0 3px 0 var(--line); }
+.buch-tab.voll { outline: 3px solid #4fb04a; }
+.buch-tab small { color: var(--ink-soft); font-size: 12px; }
+.buch-bar { display: block; height: 8px; border-radius: 99px; background: rgba(0,0,0,.15); overflow: hidden; }
+.buch-bar i { display: block; height: 100%; background: linear-gradient(90deg, #4fb04a, #9be03c); }
+.buch-intro { margin: 4px 0 8px; font-size: 15px; }
+.buch-lohn { margin-left: 8px; color: #a86b00; }
+.buch-lohn.da { color: #2f7d32; }
+.buch-grid { flex: 1; overflow-y: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; padding: 2px 4px 10px; align-content: start; -webkit-overflow-scrolling: touch; touch-action: pan-y; }
+.buch-eintrag {
+  background: #fff8e8; border: 2px solid var(--line); border-radius: 12px; padding: 8px; display: flex; flex-direction: column;
+  align-items: center; gap: 3px; text-align: center; min-height: 150px;
+}
+.buch-eintrag b { font-size: 15px; line-height: 1.2; }
+.buch-eintrag .genus { font-size: 12px; padding: 0 5px; }
+.buch-wirkung { font-size: 12px; color: var(--ink-soft); }
+.buch-hinweis { font-size: 12px; color: #2f6a8a; line-height: 1.25; }
+.buch-pic, .buch-pair { position: relative; display: flex; align-items: center; justify-content: center; height: 72px; font-size: 44px; font-family: var(--emoji); }
+.buch-pair b { font-family: var(--font); font-size: 18px; margin: 0 2px; }
+.buch-img { max-width: 64px; max-height: 72px; object-fit: contain; }
+.buch-pair .buch-img { max-width: 44px; }
+.buch-pic[style*="--glow"] .buch-img { filter: drop-shadow(0 0 8px var(--glow)); }
+.buch-pic.legendaer .buch-img { filter: drop-shadow(0 0 10px #ffb800); }
+.buch-sterne { position: absolute; top: -4px; left: 50%; transform: translateX(-50%); font-style: normal; font-size: 16px; color: #ffd23f; text-shadow: 0 0 2px #7a4a00, 0 1px 0 #7a4a00; white-space: nowrap; }
+.buch-kraft { position: absolute; right: -6px; bottom: 0; font-style: normal; font-size: 22px; }
+.buch-eintrag.dunkel { background: #3a2a1d; border-color: #2a1e14; color: #c9b48a; justify-content: center; }
+.buch-eintrag.dunkel .buch-img { filter: brightness(0) opacity(.55); }
+.buch-eintrag.dunkel .buch-pic, .buch-eintrag.dunkel .buch-pair { filter: brightness(0) opacity(.55); }
+.buch-eintrag.dunkel .buch-sterne, .buch-eintrag.dunkel .buch-kraft { display: none; }
+.buch-eintrag.dunkel b { font-size: 22px; letter-spacing: 2px; }
+.buch-neu {
+  position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 470; pointer-events: none;
+  display: flex; align-items: center; gap: 10px; padding: 8px 16px 8px 10px; border-radius: 16px;
+  background: linear-gradient(120deg, #fff6d6, #ffd977 40%, #fff6d6 60%, #ffd977); background-size: 300% 100%;
+  border: 3px solid #b8860b; box-shadow: 0 8px 24px rgba(0,0,0,.45), 0 0 24px rgba(255,190,0,.8);
+  animation: buchNeu 2.4s ease-out forwards, buchGlanz 1.2s linear infinite;
+}
+.buch-neu small { display: block; font-weight: 900; color: #7a4a00; font-size: 13px; }
+.buch-neu b { font-size: 18px; color: var(--ink); }
+.buch-neu-pic .buch-img { max-width: 46px; max-height: 46px; }
+.buch-neu-pic { font-size: 34px; font-family: var(--emoji); }
+@keyframes buchNeu { 0% { opacity: 0; transform: translate(-50%, -20px) scale(.9); } 10% { opacity: 1; transform: translate(-50%, 0) scale(1.05); } 18% { transform: translate(-50%, 0) scale(1); } 85% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -10px); } }
+@keyframes buchGlanz { 0% { background-position: 100% 0; } 100% { background-position: 0 0; } }
+.buch-eintrag > * { flex-shrink: 0; }
+.buch-grid { grid-auto-rows: max-content; }
