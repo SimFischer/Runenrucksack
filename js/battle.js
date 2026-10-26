@@ -1,22 +1,33 @@
 // Automatischer Kampf: beide Rucksäcke laden ihre Items auf und lösen sie aus.
 import { baseHp } from './logic.js';
+import { analyze } from './grammar.js';
 
 export const STEP = 0.05;          // Sekunden pro Simulationsschritt
 const COLD_SLOW = 0.6;             // Kälte: Items laden nur mit 60 % Tempo
+const STUN_MAX = 2;                // Betäubung höchstens 2 s am Stück
 const FATIGUE_START = 25;          // ab hier verlieren beide jede Sekunde mehr Leben
 const MAX_TIME = 60;
 
-export function makeFighter(name, placed, defs, day) {
-  const items = placed.map((p) => ({ uid: p.uid, def: defs[p.id], t: 0 }));
-  let maxHp = baseHp(day), block = 0, tempo = 0;
+// placed: Items im Rucksack; Siegel und Runen werden über analyze() eingerechnet.
+export function makeFighter(name, placed, defs, day, rng = Math.random) {
+  const info = analyze(placed, defs);
+  const items = placed.map((p) => ({ uid: p.uid, def: info.get(p.uid).def, t: 0 }));
+  let maxHp = baseHp(day), block = 0, tempo = 0, glueck = 0;
   for (const { def } of items) {
     maxHp += def.leben || 0;
     block += def.startblock || 0;
-    tempo += def.tempo || 0;
+    // Passive Items wirken auf den ganzen Rucksack, aktive nur auf sich selbst.
+    if (!def.abklingzeit) {
+      tempo += def.tempo || 0;
+      glueck += def.glueck || 0;
+    }
+    // Komposita mit passiver Kraft (Sturm, Gold) wirken zusätzlich auf den ganzen Rucksack.
+    tempo += def.aura?.tempo || 0;
+    glueck += def.aura?.glueck || 0;
   }
   return {
-    name, maxHp, hp: maxHp, block, tempo: tempo / 100,
-    gift: 0, brand: 0, kaelte: 0,
+    name, maxHp, hp: maxHp, block, tempo: tempo / 100, glueck: glueck / 100, rng,
+    gift: 0, brand: 0, kaelte: 0, betaeubt: 0, regeneration: 0,
     items: items.filter((i) => i.def.abklingzeit > 0),
   };
 }
@@ -47,10 +58,12 @@ export class Battle {
       const me = this.sides[key];
       const foe = this.sides[key === 'player' ? 'enemy' : 'player'];
       const foeKey = key === 'player' ? 'enemy' : 'player';
-      const speed = (1 + me.tempo) * (me.kaelte > 0 ? COLD_SLOW : 1);
+      const stunned = me.betaeubt > 0;
+      const speed = stunned ? 0 : (1 + me.tempo) * (me.kaelte > 0 ? COLD_SLOW : 1);
       me.kaelte = Math.max(0, me.kaelte - h);
+      me.betaeubt = Math.max(0, me.betaeubt - h);
       for (const it of me.items) {
-        it.t += h * speed;
+        it.t += h * speed * (1 + (it.def.tempo || 0) / 100);
         if (it.t >= it.def.abklingzeit) {
           it.t -= it.def.abklingzeit;
           this.trigger(key, me, foeKey, foe, it, ev);
@@ -66,6 +79,11 @@ export class Battle {
         const me = this.sides[key];
         if (me.gift > 0) this.hurt(key, me, me.gift, 'gift', ev, true);
         if (me.brand > 0) { this.hurt(key, me, me.brand, 'brand', ev, true); me.brand--; }
+        if (me.regeneration > 0) {
+          me.hp = Math.min(me.maxHp, me.hp + me.regeneration);
+          ev.push({ type: 'heal', side: key, amount: me.regeneration, kind: 'regeneration' });
+          me.regeneration--;
+        }
         if (this.time > FATIGUE_START) {
           this.hurt(key, me, Math.floor(this.time - FATIGUE_START), 'muede', ev, true);
         }
@@ -80,17 +98,27 @@ export class Battle {
 
   trigger(key, me, foeKey, foe, it, ev) {
     const d = it.def;
-    ev.push({ type: 'trigger', side: key, uid: it.uid });
-    if (d.block) { me.block += d.block; ev.push({ type: 'block', side: key, amount: d.block }); }
+    // Glück: Chance, dass das Item doppelt wirkt.
+    const luck = me.glueck + (d.glueck || 0) / 100;
+    const m = luck > 0 && me.rng() < luck ? 2 : 1;
+    ev.push({ type: 'trigger', side: key, uid: it.uid, crit: m > 1 });
+    if (d.block) { me.block += d.block * m; ev.push({ type: 'block', side: key, amount: d.block * m }); }
     if (d.heilung) {
-      const amount = Math.min(d.heilung, me.maxHp - me.hp);
-      me.hp += amount;
-      ev.push({ type: 'heal', side: key, amount: d.heilung });
+      me.hp = Math.min(me.maxHp, me.hp + d.heilung * m);
+      ev.push({ type: 'heal', side: key, amount: d.heilung * m });
     }
-    if (d.schaden) this.hurt(foeKey, foe, d.schaden, 'schaden', ev, false);
-    if (d.gift) { foe.gift += d.gift; ev.push({ type: 'status', side: foeKey, kind: 'gift', amount: d.gift }); }
-    if (d.brand) { foe.brand += d.brand; ev.push({ type: 'status', side: foeKey, kind: 'brand', amount: d.brand }); }
-    if (d.kaelte) { foe.kaelte += d.kaelte; ev.push({ type: 'status', side: foeKey, kind: 'kaelte', amount: d.kaelte }); }
+    if (d.regeneration) {
+      me.regeneration += d.regeneration * m;
+      ev.push({ type: 'status', side: key, kind: 'regeneration', amount: d.regeneration * m });
+    }
+    if (d.schaden) this.hurt(foeKey, foe, d.schaden * m, 'schaden', ev, false);
+    if (d.gift) { foe.gift += d.gift * m; ev.push({ type: 'status', side: foeKey, kind: 'gift', amount: d.gift * m }); }
+    if (d.brand) { foe.brand += d.brand * m; ev.push({ type: 'status', side: foeKey, kind: 'brand', amount: d.brand * m }); }
+    if (d.kaelte) { foe.kaelte += d.kaelte * m; ev.push({ type: 'status', side: foeKey, kind: 'kaelte', amount: d.kaelte * m }); }
+    if (d.betaeubung) {
+      foe.betaeubt = Math.min(STUN_MAX, foe.betaeubt + d.betaeubung * m);
+      ev.push({ type: 'status', side: foeKey, kind: 'betaeubung', amount: d.betaeubung * m });
+    }
   }
 
   hurt(key, target, amount, kind, ev, ignoreBlock) {

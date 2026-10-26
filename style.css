@@ -458,3 +458,161 @@ h2 .hint { font-size: 12px; font-weight: 400; color: var(--ink-soft); }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .01ms !important; transition: none !important; }
 }
+
+/* ---------- Etappe 2: Grammatik ---------- */
+.genus {
+  display: inline-block;
+  min-width: 34px;
+  text-align: center;
+  padding: 1px 7px;
+  border-radius: 999px;
+  background: var(--genus);
+  color: #fff;
+  font-weight: 700;
+  font-size: .9em;
+  text-shadow: 0 1px 0 rgba(0,0,0,.35);
+}
+
+/* Artikel-Siegel */
+.item.siegel {
+  background: radial-gradient(circle at 35% 30%, color-mix(in srgb, var(--genus) 60%, #fff), var(--genus) 70%);
+  border-color: color-mix(in srgb, var(--genus) 60%, #000);
+  border-radius: 50%;
+}
+.item.siegel .word {
+  color: #fff;
+  font-weight: 900;
+  letter-spacing: .02em;
+  text-shadow: 0 2px 0 rgba(0,0,0,.4);
+  pointer-events: none;
+}
+.seal-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: var(--genus);
+  color: #fff;
+  font-family: var(--font);
+  font-size: 20px;
+  font-weight: 900;
+  border: 3px solid var(--line);
+}
+
+/* Adjektiv-Runen mit Pfeil */
+.item.rune { background: linear-gradient(160deg, #e9e3f5, #c8bedf); }
+.item.rune .emoji { margin-bottom: 8%; }
+.item .arrow {
+  position: absolute;
+  color: var(--gold-dark);
+  line-height: 1;
+  pointer-events: none;
+  text-shadow: 0 0 4px #fff;
+}
+.item .arrow.d0 { right: 2px; top: 50%; transform: translateY(-50%); }
+.item .arrow.d1 { bottom: 1px; left: 50%; transform: translateX(-50%) rotate(90deg); }
+.item .arrow.d2 { left: 2px; top: 50%; transform: translateY(-50%) rotate(180deg); }
+.item .arrow.d3 { top: 1px; left: 50%; transform: translateX(-50%) rotate(270deg); }
+.item.rune .label { bottom: 1px; }
+.rune-lines {
+  position: absolute;
+  left: 0; top: 0;
+  pointer-events: none;
+  z-index: 3;
+  overflow: visible;
+}
+.rune-lines line {
+  stroke: #ffd65a;
+  stroke-width: 5;
+  stroke-linecap: round;
+  filter: drop-shadow(0 0 5px #ffb800);
+  stroke-dasharray: 2 9;
+  animation: runeflow 1s linear infinite;
+}
+@keyframes runeflow { to { stroke-dashoffset: -22; } }
+
+/* Markierungen: Siegel passt, Rune wirkt, Verschmelzung morgen, wirkungslos */
+.mark-siegel {
+  position: absolute;
+  left: 5px; top: 24px;
+  width: 14px; height: 14px;
+  border-radius: 50%;
+  background: var(--genus);
+  border: 2px solid #fff;
+  box-shadow: 0 0 6px var(--genus);
+  pointer-events: none;
+}
+.mark-rune {
+  position: absolute;
+  left: 4px; top: 2px;
+  color: var(--gold);
+  font-size: 18px;
+  text-shadow: 0 0 6px #ffb800;
+  pointer-events: none;
+}
+.item.idle { filter: grayscale(.85) opacity(.7); }
+.item.fuses { animation: fuse 1.6s ease-in-out infinite; }
+@keyframes fuse { 50% { box-shadow: 0 3px 0 var(--line), 0 0 0 3px #fff, 0 0 20px #ffd65a; } }
+
+/* Komposita leuchten in der Farbe ihrer Kraft */
+.item.glow { box-shadow: 0 3px 0 var(--line), 0 0 16px var(--glow), inset 0 0 18px color-mix(in srgb, var(--glow) 45%, transparent); }
+.item.glow .emoji { filter: drop-shadow(0 0 6px var(--glow)); }
+
+/* Info-Feld */
+.info-name .phrase { color: var(--wood-3); }
+.stats .plus { color: var(--green); font-weight: 700; }
+.gram { margin: 0; font-size: 14px; line-height: 1.45; padding: 6px 8px; border-radius: 8px; background: rgba(0,0,0,.05); }
+.gram.ok { background: rgba(79,154,74,.15); border-left: 4px solid var(--green); }
+.gram.bad { background: rgba(200,66,58,.12); border-left: 4px solid var(--red); }
+
+/* Verschmelzen-Fenster */
+.fusion-eq { display: flex; align-items: center; justify-content: center; gap: 12px; margin-bottom: 8px; }
+.fusion-eq .fi {
+  position: relative;
+  display: flex; flex-direction: column; align-items: center;
+  font-family: var(--emoji);
+  font-size: 54px; line-height: 1.1;
+  background: #fff6e2;
+  border: 3px solid var(--line);
+  border-radius: 14px;
+  padding: 8px 12px 4px;
+  min-width: 92px;
+}
+.fusion-eq .fi small { font-family: var(--font); font-size: 15px; font-weight: 700; color: var(--ink); }
+.fusion-eq .op { font-size: 34px; font-weight: 900; color: var(--ink-soft); }
+.glowing { position: relative; box-shadow: 0 0 22px var(--glow); }
+.glowing em { position: absolute; top: 2px; right: 4px; font-size: .45em; font-style: normal; }
+.big-emoji.glowing { display: inline-block; border-radius: 20px; padding: 6px 18px; background: #fff6e2; }
+.fusion-q { font-size: 34px !important; margin: 14px 0 6px !important; }
+.fusion-q .blank {
+  display: inline-block;
+  min-width: 90px;
+  border-bottom: 4px dashed var(--ink-soft);
+  color: transparent;
+}
+.genus-btn {
+  min-width: 110px;
+  font-size: 26px;
+  background: var(--genus);
+  color: #fff;
+  text-shadow: 0 2px 0 rgba(0,0,0,.35);
+}
+.genus-btn:disabled { opacity: .3; }
+.modal-card .cost { color: var(--ink-soft); font-size: 15px; }
+.modal-card .feedback {
+  background: rgba(200,66,58,.12);
+  border-left: 4px solid var(--red);
+  border-radius: 8px;
+  padding: 8px 12px;
+  font-weight: 700;
+  text-align: left;
+}
+.btn.small { font-size: 14px; min-height: 38px; padding: 6px 12px; }
+
+/* Kampf: neue Zustände */
+.chip.betaeubung { border-color: #f2c94c; }
+.chip.regeneration { border-color: #b39cff; }
+.floater.betaeubung { color: #ffe14a; }
+.floater.regeneration { color: #c9b8ff; }
+.floater.glueck { color: #ffd65a; font-size: 24px; }

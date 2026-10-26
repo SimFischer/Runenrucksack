@@ -97,6 +97,8 @@ export function newRun(items) {
     shop: [],
     history: [],
     over: null, // null | 'won' | 'lost'
+    pendingFusion: false, // zu Beginn des Tages verschmelzen?
+    lernen: { richtig: 0, falsch: 0 },
   };
   rollShop(run, items, true);
   return run;
@@ -122,7 +124,8 @@ export function rollShop(run, items, force = false) {
 }
 
 function randomShopItem(items, weights) {
-  const rar = pickWeighted(Object.entries(weights));
+  // Nur Seltenheiten, von denen es auch Items gibt.
+  const rar = pickWeighted(Object.entries(weights).filter(([r]) => items.some((d) => d.seltenheit === r)));
   const pool = items.filter((d) => d.seltenheit === rar);
   const list = pool.length ? pool : items;
   return list[Math.floor(Math.random() * list.length)];
@@ -144,6 +147,7 @@ export function finishBattle(run, items, won, enemyName) {
   if (run.hearts <= 0) { run.over = 'lost'; return; }
   run.day++;
   run.gold += income(run.day);
+  run.pendingFusion = true;
   rollShop(run, items);
   for (const s of run.shop) if (s) s.locked = false;
 }

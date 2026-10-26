@@ -1,0 +1,18 @@
+{
+  "_hinweis": "Kombinationsregeln. Ein Kraft-Kristall direkt links neben oder über einem Träger verschmilzt zu Beginn des Tages zum Kompositum: Bestimmungswort (Kraft) vorne, Grundwort (Träger) hinten, der Artikel kommt vom Grundwort. Das Kompositum hat die Werte des Trägers, behält die Wirkung des Kristalls (umgerechnet auf die Abklingzeit des Trägers) und bekommt die Verschmelzungs-Wirkung unten obendrauf. So ist richtig Verschmolzenes immer stärker als beide Teile getrennt.",
+  "regel": "Das letzte Wort bestimmt den Artikel.",
+  "komposita": {
+    "traeger": ["dolch", "schwert", "axt", "bogen", "stab", "schild", "helm", "laterne", "speer", "hammer"],
+    "kraefte": {
+      "feuer": { "farbe": "#ff6a2a", "wirkung": { "brand": 2 } },
+      "gift":  { "farbe": "#9be03c", "wirkung": { "gift": 1 } },
+      "eis":   { "farbe": "#6fd3ff", "wirkung": { "kaelte": 1 } },
+      "blitz": { "farbe": "#ffe14a", "wirkung": { "betaeubung": 0.3 } },
+      "stein": { "farbe": "#a8a29a", "wirkung": { "block": 2 } },
+      "mond":  { "farbe": "#c9b8ff", "wirkung": { "regeneration": 1 } },
+      "gold":  { "farbe": "#ffc93c", "wirkung": { "glueck": 25 } },
+      "sturm": { "farbe": "#9fe8d8", "wirkung": { "tempo": 20 } }
+    },
+    "preisAufschlag": 2
+  }
+}
