@@ -1,7 +1,7 @@
 // Runenrucksack – Ablauf eines Laufs, Laden, Rucksack (Ziehen und Drehen) und Info-Feld.
 import {
   CFG, income, baseHp, sellValue, newRun, reroll, finishBattle,
-  canPlace, overlapping, findSpot, sizeOf, shuffle,
+  canPlace, overlapping, findSpot, sizeOf, shuffle, attachTasche,
 } from './logic.js';
 import {
   GENUS, SIEGEL_BONUS, findFusions, findSteigerungen, wrongOrderNeighbor, canRotate, nextRot, isNoun, isRune, runeBase,
@@ -325,7 +325,7 @@ function renderInfo() {
   if (ul.children.length) box.append(ul);
 
   const notes = [];
-  if (base.art !== 'siegel' && base.art !== 'rune' && !base.abklingzeit) notes.push('Passiv: wirkt den ganzen Kampf, solange es im Rucksack liegt.');
+  if (!['siegel', 'rune', 'tasche'].includes(base.art) && !base.abklingzeit) notes.push('Passiv: wirkt den ganzen Kampf, solange es im Rucksack liegt.');
   if (base.abklingzeit && base.tempo) notes.push('Tempo: Dieses Item lädt schneller auf.');
   if (base.aura?.tempo) notes.push(`Wirkt außerdem auf den ganzen Rucksack: +${base.aura.tempo} % Tempo.`);
   if (base.aura?.glueck) notes.push(`Wirkt außerdem auf den ganzen Rucksack: +${base.aura.glueck} % Glück.`);
@@ -335,6 +335,14 @@ function renderInfo() {
   const cursed = selected.uid && placedOf(selected.uid)?.fluch;
   if (cursed) box.insertAdjacentHTML('beforeend', `<p class="gram bad">😈 Verflucht: Der Kobold hat den Namen falsch geschrieben („${cursed}“). Solange es im Rucksack liegt, kostet es dich zu Kampfbeginn 2 Leben.</p>`);
 
+  if (base.art === 'tasche') {
+    box.insertAdjacentHTML('beforeend', `<p class="gram">Wird außen an den Rucksack genäht: +${base.tasche.felder.length} Felder. Items aus dem Wortfeld <b>${G.WORTFELDER[base.wortfeld]}</b> darin wirken ${base.tasche.bonus} % stärker.</p>`);
+  } else if (base.wortfeld) {
+    box.insertAdjacentHTML('beforeend', `<p class="muted">📖 Wortfeld: ${G.WORTFELDER[base.wortfeld] || base.wortfeld}</p>`);
+  }
+  if (ana?.tasche && !ana.tasche.ok) {
+    box.insertAdjacentHTML('beforeend', `<p class="gram bad">✗ Liegt in der ${ana.tasche.def.name}, gehört aber nicht zum Wortfeld ${G.WORTFELDER[ana.tasche.def.wortfeld]} – kein Bonus.</p>`);
+  }
   const gram = grammarNotes(base, ana, selected);
   if (gram.length) {
     box.insertAdjacentHTML('beforeend', '<h3>Grammatik</h3>');
@@ -515,6 +523,7 @@ function onReroll() {
 function buyAuto(slot) {
   const def = G.DEFS[G.run.shop[slot].id];
   if (G.run.gold < def.preis) { toast('Zu wenig Gold'); return; }
+  if (def.art === 'tasche') { buyTasche(slot); return; }
   for (const area of ['bag', 'store']) {
     const spot = findSpot(itemsIn(area), G.DEFS, def, gridOf(area));
     if (spot) {
@@ -535,6 +544,20 @@ function buy(slot, area, spot) {
   run.items.push({ uid, id: def.id, area, ...spot });
   selected = { src: area, uid };
   bump('stat-gold');
+  render();
+}
+
+// Taschen liegen nicht im Raster: Sie werden außen an den Rucksack genäht.
+function buyTasche(slot) {
+  const run = G.run;
+  const def = G.DEFS[run.shop[slot].id];
+  if (run.gold < def.preis) { toast('Zu wenig Gold'); render(); return; }
+  run.gold -= def.preis;
+  run.shop[slot] = null;
+  attachTasche(run, def);
+  selected = null;
+  bump('stat-gold');
+  toast(`${def.name} angenäht: +${def.tasche.felder.length} Felder!`);
   render();
 }
 
@@ -891,6 +914,7 @@ function updateTarget() {
 function evaluate(area, x, y, s) {
   const selfUid = drag.ref.uid;
   if (drag.ref.src === 'shop' && G.run.gold < drag.def.preis) return { status: 'bad', reason: 'gold' };
+  if (drag.def.art === 'tasche') return area === 'bag' ? { status: 'ok' } : { status: 'bad' };
   const grid = gridOf(area);
   const list = itemsIn(area, selfUid);
   if (canPlace(list, G.DEFS, drag.def, x, y, drag.rot, grid)) return { status: 'ok' };
@@ -923,6 +947,7 @@ function drop(d) {
   const t = d.target;
   if (!t) { render(); return; }
   if (t.sell) { sell(d.ref.uid); return; }
+  if (d.def.art === 'tasche') { buyTasche(d.ref.slot); return; }
   if (t.status === 'bad') {
     if (t.reason === 'gold') toast('Zu wenig Gold');
     render();

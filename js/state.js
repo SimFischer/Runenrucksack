@@ -8,6 +8,7 @@ export const G = {
   COMPOUNDS: [],  // Komposita aus recipes.json
   DEFS: {},       // alle Item-Definitionen nach id
   RAR: {},
+  WORTFELDER: {},
   ENEMIES: [],
   RECIPES: null,
   REGIONS: [],
@@ -28,6 +29,7 @@ export async function loadData() {
   ]);
   G.ITEMS = itemData.items;
   G.RAR = itemData.seltenheiten;
+  G.WORTFELDER = itemData.wortfelder || {};
   G.RECIPES = recipes;
   for (const d of G.ITEMS) G.DEFS[d.id] = d;
   G.COMPOUNDS = buildCompounds(G.DEFS, G.RECIPES);

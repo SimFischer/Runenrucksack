@@ -744,3 +744,21 @@ h2 .hint { font-size: 12px; font-weight: 400; color: var(--ink-soft); }
 .bad-word { font-family: "Courier New", monospace; color: var(--red); font-size: 1.2em; }
 .fate-rune { font-size: 90px !important; filter: drop-shadow(0 0 18px var(--accent)); }
 .fate-text { font-size: 22px !important; font-weight: 700; }
+
+/* Wortfeld-Taschen */
+.grid .cell.tasche {
+  position: relative;
+  background:
+    repeating-linear-gradient(45deg, rgba(255,255,255,.06) 0 6px, transparent 6px 12px),
+    #6a4a2a !important;
+  border: 2px dashed #e6c58a !important;
+  border-radius: 6px;
+}
+.grid .cell.tasche[data-symbol]::after {
+  content: attr(data-symbol);
+  position: absolute;
+  right: 3px; top: 2px;
+  font-family: var(--emoji);
+  font-size: 18px;
+  opacity: .85;
+}

@@ -77,13 +77,14 @@ export function baseBagCells() {
 
 export function bagGrid(run) {
   const mask = new Set(run.bagCells);
+  const taschen = run.taschenFelder || {}; // "x,y" → id der Tasche
   let cols = 0, rows = 0;
   for (const c of mask) {
     const [x, y] = c.split(',').map(Number);
     cols = Math.max(cols, x + 1);
     rows = Math.max(rows, y + 1);
   }
-  return { cols, rows, mask };
+  return { cols, rows, mask, taschen };
 }
 
 const usable = (grid, x, y) => x >= 0 && y >= 0 && x < grid.cols && y < grid.rows && (!grid.mask || grid.mask.has(`${x},${y}`));
@@ -163,7 +164,19 @@ export function newRun(items, regions, opts = {}) {
 // Items, die im Laden des aktuellen Gebiets erscheinen dürfen.
 export function shopPool(run, items, regions) {
   const region = regionOf(run.day, regions).id;
-  return items.filter((d) => d.laden !== false && (!d.gebiete || d.gebiete.includes(region)));
+  return items.filter((d) => d.laden !== false && (!d.gebiete || d.gebiete.includes(region))
+    && !(d.art === 'tasche' && run.taschen?.[d.id]));
+}
+
+// Tasche kaufen: Der Rucksack bekommt ihre Felder dazu.
+export function attachTasche(run, def) {
+  run.taschen = { ...(run.taschen || {}), [def.id]: true };
+  run.taschenFelder = { ...(run.taschenFelder || {}) };
+  for (const [x, y] of def.tasche.felder) {
+    const key = `${x},${y}`;
+    if (!run.bagCells.includes(key)) run.bagCells.push(key);
+    run.taschenFelder[key] = def.id;
+  }
 }
 
 export function rollShop(run, items, regions, force = false, rng = Math.random) {

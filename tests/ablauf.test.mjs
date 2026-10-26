@@ -111,3 +111,34 @@ test('Schicksalsrunen und Unterklassen wirken', async () => {
   assert.equal(run.day, 6);
   assert.deepEqual(run.queue, ['gebiet', 'unterklasse', 'begegnung', 'verschmelzen']);
 });
+
+test('Wortfeld-Taschen: +2 Felder, passende Items darin +20 %', async () => {
+  const { attachTasche, shopPool, bagGrid } = await import('../js/logic.js');
+  const { evaluateBag, playerContext } = await import('../js/mods.js');
+  const DEFS = Object.fromEntries(ITEMS.map((d) => [d.id, d]));
+  const WF = json('items.json').wortfelder;
+  for (const d of ITEMS) assert.ok(WF[d.wortfeld], `${d.id} braucht ein Wortfeld`);
+  const garten = DEFS.gartentasche, sattel = DEFS.satteltasche;
+  assert.equal(garten.wortfeld, 'haus');
+  assert.equal(sattel.wortfeld, 'pferd');
+
+  const run = newRun(ITEMS, REGIONS);
+  assert.ok(shopPool(run, ITEMS, REGIONS).some((d) => d.id === 'gartentasche'));
+  assert.ok(!shopPool(run, ITEMS, REGIONS).some((d) => d.id === 'satteltasche'), 'Satteltasche nur in Hrossmark');
+  attachTasche(run, garten);
+  assert.equal(run.bagCells.length, 14);
+  assert.ok(!shopPool(run, ITEMS, REGIONS).some((d) => d.id === 'gartentasche'), 'nur einmal kaufbar');
+  assert.equal(bagGrid(run).taschen['5,0'], 'gartentasche');
+
+  const items = [
+    { uid: 1, id: 'brot', area: 'bag', x: 5, y: 0, rot: 0 },   // Haus und Garten in der Gartentasche
+    { uid: 2, id: 'dolch', area: 'bag', x: 5, y: 1, rot: 0 },  // Schmiede: kein Bonus
+    { uid: 3, id: 'apfel', area: 'bag', x: 0, y: 0, rot: 0 },  // außerhalb
+  ];
+  run.items = items;
+  const info = evaluateBag(items, DEFS, playerContext(run));
+  assert.equal(info.get(1).def.heilung, Math.ceil(DEFS.brot.heilung * 1.2));
+  assert.equal(info.get(2).def.schaden, DEFS.dolch.schaden);
+  assert.equal(info.get(2).tasche.ok, false);
+  assert.equal(info.get(3).def.heilung, DEFS.apfel.heilung);
+});

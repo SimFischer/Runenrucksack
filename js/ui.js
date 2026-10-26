@@ -134,6 +134,14 @@ export function buildGrid(el, grid, size) {
       const key = `${x},${y}`;
       c.className = 'cell';
       if (grid.mask && !grid.mask.has(key)) c.classList.add('off');
+      const t = grid.taschen?.[key];
+      if (t) {
+        c.classList.add('tasche');
+        // Taschen-Symbol im ersten Feld der Tasche
+        if (G.DEFS[t] && Object.entries(grid.taschen).find(([, v]) => v === t)[0] === key) {
+          c.dataset.symbol = G.DEFS[t].emoji;
+        }
+      }
       el.append(c);
     }
 }
