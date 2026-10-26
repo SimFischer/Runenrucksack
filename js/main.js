@@ -13,6 +13,7 @@ import {
 } from './ui.js';
 import { startNight } from './battle-ui.js';
 import { runEncounter } from './encounters.js';
+import { initTutorial, startTutorial, tutorialDone } from './tutorial.js';
 
 let selected = null;   // { src: 'bag'|'store'|'shop', uid?, slot? }
 let drag = null;
@@ -24,10 +25,13 @@ let cell = 96, mini = 56;
 async function boot() {
   await loadData();
   G.run = loadRun();
-  $('btn-continue').hidden = !G.run;
-  $('btn-new').classList.toggle('primary', !G.run);
-  $('btn-continue').onclick = () => { showGame(); continueFlow(); };
+  $('btn-continue').onclick = continueSaved;
   $('btn-new').onclick = showHeroes;
+  $('btn-tutorial').onclick = startTutorial;
+  $('btn-first').onclick = startTutorial;
+  $('btn-known').onclick = showStart;
+  initTutorial({ render, showGame, showStart, showHeroes, runFusions, continueSaved, hasSavedRun: () => !!loadRun() });
+  showAsk();
   $('btn-reroll').onclick = onReroll;
   $('btn-fight').onclick = onFight;
   $('btn-menu').onclick = openMenu;
@@ -41,6 +45,33 @@ async function boot() {
   layout();
   window.addEventListener('resize', layout);
   registerServiceWorker();
+}
+
+// Startbildschirm: zuerst die Frage, ob man zum ersten Mal hier ist.
+function showAsk() {
+  showScreen('start');
+  $('start-ask').hidden = false;
+  $('start-menu').hidden = true;
+  // Auf diesem Gerät schon gelernt? Dann ist „Ich kenne das schon“ hervorgehoben.
+  $('btn-known').classList.toggle('primary', tutorialDone());
+  $('btn-first').classList.toggle('primary', !tutorialDone());
+}
+
+// Normales Startmenü (Weiterspielen, Neuer Lauf).
+function showStart() {
+  G.run = G.run?.tutorial ? loadRun() : G.run || loadRun();
+  showScreen('start');
+  $('start-ask').hidden = true;
+  $('start-menu').hidden = false;
+  $('btn-continue').hidden = !G.run;
+  $('btn-new').classList.toggle('primary', !G.run);
+}
+
+function continueSaved() {
+  G.run = loadRun();
+  if (!G.run) { showStart(); return; }
+  showGame();
+  continueFlow();
 }
 
 // Vor jedem Lauf: Figur wählen.
@@ -199,6 +230,7 @@ function renderTop() {
   const c = playerCtx();
   $('stat-hero').textContent = `${hero()?.emoji || ''} ${hero()?.kurz || ''}${c.unterklasse ? ` ${c.unterklasse.emoji}` : ''}${c.fate ? ` ${c.fate.emoji}` : ''}`;
   $('stat-hero').title = [c.unterklasse?.name, c.fate?.name].filter(Boolean).join(' · ');
+  $('stat-hero').hidden = !hero();
   $('stat-day').textContent = `${reg.emoji} ${reg.name} · Tag ${run.day} / ${CFG.lastDay}`;
   $('stat-hearts').textContent = '❤️'.repeat(Math.max(0, run.hearts)) + '🤍'.repeat(CFG.hearts - Math.max(0, run.hearts));
   $('stat-wins').textContent = `🏆 ${run.wins}`;
@@ -545,7 +577,7 @@ function buy(slot, area, spot) {
   run.shop[slot] = null;
   const uid = run.nextUid++;
   run.items.push({ uid, id: def.id, area, ...spot });
-  selected = { src: area, uid };
+  selected = run.tutorial ? null : { src: area, uid }; // im Tutorial soll das erste Antippen die Infos zeigen
   bump('stat-gold');
   render();
 }
@@ -629,7 +661,10 @@ function openMenu() {
     <div class="row">
       <button class="btn primary" data-act="close">Weiterspielen</button>
       <button class="btn danger" data-act="new">Neuer Lauf</button>
-    </div>`, { new: () => confirmNew() });
+    </div>
+    <div class="row">
+      <button class="btn small" data-act="tutorial">🧙 Tutorial wiederholen</button>
+    </div>`, { new: () => confirmNew(), tutorial: startTutorial });
 }
 
 function confirmNew() {
@@ -1027,9 +1062,7 @@ function showRunEnd() {
     new: showHeroes,
     home: () => {
       G.run = null;
-      $('btn-continue').hidden = true;
-      $('btn-new').classList.add('primary');
-      showScreen('start');
+      showStart();
     },
   });
 }

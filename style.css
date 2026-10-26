@@ -766,3 +766,79 @@ h2 .hint { font-size: 12px; font-weight: 400; color: var(--ink-soft); }
 @media (max-width: 1300px) { .brand-text { display: none; } }
 @media (max-width: 1100px) { .topbar .stat { padding: 6px 10px; font-size: 15px; } .topbar { gap: 6px; } }
 .f-portrait { white-space: nowrap; }
+
+/* ---------- Tutorial ---------- */
+.start-ask { display: flex; flex-direction: column; gap: 14px; margin-bottom: 22px; }
+.ask-btn { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 18px 24px; font-size: 24px; min-height: 84px; }
+.ask-btn small { font-size: 15px; font-weight: 400; opacity: .85; }
+
+#tut-layer { position: fixed; inset: 0; z-index: 400; pointer-events: none; }
+#tut-layer > * { pointer-events: auto; }
+#tut-layer #tut-shade, #tut-layer #tut-hand { pointer-events: none; }
+#tut-shade { position: absolute; inset: 0; width: 100%; height: 100%; transition: opacity .3s; }
+#tut-layer.waiting #tut-shade { opacity: 0; }
+.tut-ring { fill: none; stroke: #ffd65a; stroke-width: 4; filter: drop-shadow(0 0 8px #ffb800); animation: tutRing 1.4s ease-in-out infinite; }
+@keyframes tutRing { 50% { stroke-opacity: .35; } }
+
+#tut-bubble {
+  position: fixed;
+  width: min(360px, calc(100vw - 24px));
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  background: #fffaf0;
+  color: var(--ink);
+  border: 3px solid var(--line);
+  border-radius: 18px;
+  padding: 14px 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,.5);
+  transition: left .25s, top .25s;
+}
+#tut-bubble.done { animation: pop .3s; }
+#tut-bubble.nudge { animation: shake .35s; }
+.tut-fenwick { font-family: var(--emoji); font-size: 48px; line-height: 1; flex: none; }
+.tut-fenwick img { width: 64px; height: 64px; object-fit: contain; }
+.tut-body { flex: 1; min-width: 0; }
+.tut-name { font-size: 13px; font-weight: 700; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .06em; }
+.tut-text { font-size: 19px; line-height: 1.4; margin: 4px 0 6px; font-weight: 700; }
+.tut-tip { font-size: 16px; line-height: 1.4; margin: 0 0 8px; background: rgba(79,154,74,.14); border-left: 4px solid var(--green); border-radius: 8px; padding: 6px 10px; }
+.tut-tip.warn { background: rgba(224,165,38,.2); border-left-color: var(--gold-dark); }
+.tut-foot { display: flex; align-items: center; gap: 8px; }
+.tut-dots { flex: 1; display: flex; gap: 5px; flex-wrap: wrap; }
+.tut-dots i { width: 9px; height: 9px; border-radius: 50%; background: #d8c8a4; }
+.tut-dots i.past { background: var(--green); }
+.tut-dots i.now { background: var(--gold); box-shadow: 0 0 0 2px var(--gold-dark); }
+.tut-speak { font-family: var(--emoji); font-size: 22px; width: 48px; height: 48px; border-radius: 50%; border: 2px solid var(--line); background: #fff6e2; cursor: pointer; }
+#tut-next { min-width: 110px; min-height: 48px; }
+#tut-skip { position: fixed; right: 14px; top: 74px; opacity: .92; }
+#tut-hand {
+  position: fixed;
+  left: 0; top: 0;
+  font-family: var(--emoji);
+  font-size: 46px;
+  opacity: 0;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,.5));
+  z-index: 2;
+}
+#tut-confirm, #tut-finale { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: rgba(8,5,2,.55); }
+.tut-confirm-card, .tut-finale-card {
+  background: var(--parchment);
+  color: var(--ink);
+  border: 3px solid var(--line);
+  border-radius: 18px;
+  padding: 24px 32px;
+  text-align: center;
+  max-width: 520px;
+  box-shadow: 0 16px 50px rgba(0,0,0,.6);
+  animation: pop .3s;
+  position: relative;
+  z-index: 2;
+}
+.tut-confirm-card h2, .tut-finale-card h2 { justify-content: center; font-size: 30px; margin: 6px 0; }
+.tut-finale-card p { font-size: 19px; }
+.tut-finale-fenwick { font-family: var(--emoji); font-size: 90px; animation: bump 1s ease-in-out infinite; }
+.tut-finale-fenwick img { width: 120px; }
+#tut-layer.finale #tut-shade { opacity: 0; }
+.confetti { position: fixed; inset: 0; overflow: hidden; pointer-events: none; }
+.confetti span { position: absolute; top: -40px; font-family: var(--emoji); font-size: 30px; animation: fall linear infinite; }
+@keyframes fall { to { transform: translateY(110vh) rotate(540deg); } }

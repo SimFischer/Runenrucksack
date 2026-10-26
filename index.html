@@ -22,9 +22,15 @@
       <div class="logo">🎒</div>
       <h1>Runenrucksack</h1>
       <p class="tagline">Packe deinen Rucksack, besiege die Wirrwarr-Orks und rette die Wörter der Wanderlande.</p>
-      <div class="start-buttons">
+      <!-- Erst fragen: Mehrere Kinder teilen sich oft ein iPad. -->
+      <div class="start-ask" id="start-ask">
+        <button id="btn-first" class="btn big ask-btn">🧙 Ich bin zum ersten Mal hier<small>Meister Fenwick zeigt dir alles (3–4 Minuten)</small></button>
+        <button id="btn-known" class="btn big ask-btn">🎒 Ich kenne das schon<small>Direkt zum Spiel</small></button>
+      </div>
+      <div class="start-buttons" id="start-menu" hidden>
         <button id="btn-continue" class="btn big primary" hidden>Weiterspielen</button>
         <button id="btn-new" class="btn big">Neuer Lauf</button>
+        <button id="btn-tutorial" class="btn">🧙 Tutorial</button>
       </div>
       <ul class="rules">
         <li>🧔‍♀️ Wähle eine Figur und reise 10 Tage lang durch Kleinwurzel und Hrossmark.</li>
