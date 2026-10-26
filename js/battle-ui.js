@@ -2,8 +2,8 @@
 import { CFG, makeEnemy, pickEnemy, rectGrid } from './logic.js';
 import { Battle, makeFighter, runToEnd } from './battle.js';
 import { analyze } from './grammar.js';
-import { G, itemsIn, gridOf, region } from './state.js';
-import { playerContext, evaluateBag } from './mods.js';
+import { G, itemsIn, gridOf, region, hero, playerCtx } from './state.js';
+import { evaluateBag } from './mods.js';
 import { $, fmt, buildGrid, drawItems } from './ui.js';
 
 let battle = null, enemy = null, speed = 1, rafId = 0, lastFrame = 0, itemEls = {}, onDone = null;
@@ -28,9 +28,9 @@ export function startNight(done) {
   const foeDef = pickEnemy(run.day, G.REGIONS, G.ENEMIES);
   enemy = makeEnemy(run.day, foeDef, enemyPool(run.day), G.DEFS);
 
-  const ctx = playerContext(run);
+  const ctx = playerCtx();
   const bag = itemsIn('bag');
-  const player = makeFighter('Dein Rucksack', bag, G.DEFS, run.day, {
+  const player = makeFighter(hero()?.name || 'Dein Rucksack', bag, G.DEFS, run.day, {
     info: evaluateBag(bag, G.DEFS, ctx), leben: ctx.leben, tempo: ctx.tempo,
   });
   const foe = makeFighter(enemy.name, enemy.items, G.DEFS, run.day);
@@ -42,7 +42,8 @@ export function startNight(done) {
   bcell = cellSize(Math.max(playerGrid.cols, 4), Math.max(playerGrid.rows, 3));
 
   $('battle-title').textContent = `🌙 ${reg.name} · Nacht ${run.day}${enemy.boss ? ' · Anführer!' : ''}`;
-  buildFighter('player', '🎒', 'Dein Rucksack', `Tag ${run.day}`, bag, playerGrid, evaluateBag(bag, G.DEFS, ctx));
+  const h = hero();
+  buildFighter('player', `${h?.emoji || ''}<span class="f-bag">🎒</span>`, h?.name || 'Dein Rucksack', h ? `mit dem Runenrucksack · ${h.volk}` : `Tag ${run.day}`, bag, playerGrid, evaluateBag(bag, G.DEFS, ctx));
   buildFighter('enemy', enemy.emoji, enemy.name, enemy.boss ? 'Anführer der Orks' : 'Wirrwarr-Ork', enemy.items, enemyGrid, analyze(enemy.items, G.DEFS));
   updateBattleUi();
   setSpeed(speed);

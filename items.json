@@ -38,6 +38,7 @@
     { "id": "schlagen",  "art": "verb", "name": "schlagen", "emoji": "📜", "w": 1, "h": 2, "seltenheit": "selten", "preis": 6, "abklingzeit": 3.0, "schaden": 9 },
     { "id": "schuetzen", "art": "verb", "name": "schützen", "emoji": "📜", "w": 1, "h": 2, "seltenheit": "selten", "preis": 6, "abklingzeit": 3.5, "block": 11 },
     { "id": "heilen",    "art": "verb", "name": "heilen",   "emoji": "📜", "w": 1, "h": 2, "seltenheit": "selten", "preis": 6, "abklingzeit": 4.0, "heilung": 9 },
+    { "id": "stuermen",  "art": "verb", "name": "stürmen",  "emoji": "📜", "abzeichen": "🐎", "w": 1, "h": 2, "seltenheit": "selten", "preis": 6, "abklingzeit": 3.2, "schaden": 6, "betaeubung": 0.2 },
 
     { "id": "siegel-der", "art": "siegel", "name": "der", "genus": "der", "emoji": "", "w": 1, "h": 1, "seltenheit": "gewoehnlich", "preis": 2, "abklingzeit": 0 },
     { "id": "siegel-die", "art": "siegel", "name": "die", "genus": "die", "emoji": "", "w": 1, "h": 1, "seltenheit": "gewoehnlich", "preis": 2, "abklingzeit": 0 },

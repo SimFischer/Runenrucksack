@@ -43,3 +43,26 @@ test('Ein Lauf endet nach Tag 10 oder ohne Herzen; Übergang an Tag 6', () => {
   for (let i = 0; i < CFG.hearts; i++) finishBattle(lost, ITEMS, REGIONS, false, 'Ork');
   assert.equal(lost.over, 'lost');
 });
+
+test('Startfiguren: Start-Items und Boni', async () => {
+  const { playerContext, evaluateBag } = await import('../js/mods.js');
+  const { buildCompounds } = await import('../js/grammar.js');
+  const HEROES = json('heroes.json').helden;
+  const DEFS = Object.fromEntries(ITEMS.map((d) => [d.id, d]));
+  for (const c of buildCompounds(DEFS, json('recipes.json'))) DEFS[c.id] = c;
+  const borga = HEROES.find((h) => h.id === 'borga'), eadrun = HEROES.find((h) => h.id === 'eadrun');
+
+  const run = newRun(ITEMS, REGIONS, { hero: borga });
+  assert.deepEqual(run.items.map((p) => p.id).sort(), ['axt', 'feuer']);
+  assert.equal(newRun(ITEMS, REGIONS, { hero: eadrun }).items.map((p) => p.id).sort().join(), 'speer,stuermen');
+
+  const fs = [{ uid: 1, id: 'feuer+schwert', x: 0, y: 0, rot: 0 }, { uid: 2, id: 'schwert', x: 1, y: 0, rot: 0 }];
+  const b = evaluateBag(fs, DEFS, playerContext({ hero: 'borga' }, { heroes: HEROES }));
+  assert.equal(b.get(1).def.schaden, Math.ceil(DEFS['feuer+schwert'].schaden * 1.2));
+  assert.equal(b.get(2).def.schaden, DEFS.schwert.schaden, 'Borga stärkt nur Komposita');
+
+  const vs = [{ uid: 1, id: 'stuermen', x: 0, y: 0, rot: 0 }, { uid: 2, id: 'speer', x: 1, y: 0, rot: 0 }];
+  const e = evaluateBag(vs, DEFS, playerContext({ hero: 'eadrun' }, { heroes: HEROES }));
+  assert.ok(Math.abs(e.get(1).def.abklingzeit - DEFS.stuermen.abklingzeit * 0.8) < 0.06);
+  assert.equal(e.get(2).def.abklingzeit, DEFS.speer.abklingzeit, 'Eadrun beschleunigt nur Verben');
+});

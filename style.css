@@ -635,3 +635,32 @@ h2 .hint { font-size: 12px; font-weight: 400; color: var(--ink-soft); }
 .region-over { margin: 0 !important; color: var(--ink-soft); text-transform: uppercase; letter-spacing: .1em; font-size: 14px !important; }
 .region-card h2 { font-size: 40px !important; margin-top: 2px !important; }
 .region-facts { background: rgba(0,0,0,.06); border-radius: 10px; padding: 10px 14px; }
+
+/* Figurenwahl */
+#heroes { align-items: center; justify-content: center; }
+.heroes-wrap { text-align: center; max-width: 900px; }
+.heroes-wrap h1 { font-size: 40px; color: var(--accent); }
+.heroes-wrap .tagline { color: var(--parchment-2); }
+.hero-cards { display: flex; gap: 24px; justify-content: center; }
+.hero-card {
+  font: inherit;
+  flex: 1;
+  max-width: 380px;
+  text-align: center;
+  background: var(--parchment);
+  color: var(--ink);
+  border: 3px solid var(--line);
+  border-top: 10px solid var(--hero);
+  border-radius: 18px;
+  padding: 20px 22px;
+  box-shadow: 0 6px 0 var(--line), 0 10px 30px rgba(0,0,0,.4);
+  cursor: pointer;
+}
+.hero-card:active { transform: translateY(3px); box-shadow: 0 3px 0 var(--line); }
+.hero-emoji { font-family: var(--emoji); font-size: 84px; line-height: 1.1; }
+.hero-name { font-size: 26px; font-weight: 800; margin-top: 6px; }
+.hero-volk { color: var(--ink-soft); font-size: 15px; }
+.hero-staerke { font-size: 17px; line-height: 1.45; margin: 12px 0; }
+.hero-start { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; font-size: 15px; color: var(--ink-soft); align-items: center; }
+.hero-start span { background: rgba(0,0,0,.07); border-radius: 999px; padding: 4px 10px; color: var(--ink); font-weight: 700; }
+.f-bag { font-size: .45em; position: absolute; right: -10px; bottom: -4px; }

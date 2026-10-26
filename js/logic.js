@@ -142,7 +142,10 @@ export function newRun(items, regions, opts = {}) {
     bagCells: baseBagCells(),
     queue: ['gebiet'], // Schritte am Morgen, bevor der Laden öffnet
     lernen: { richtig: 0, falsch: 0 },
+    hero: opts.hero?.id || null,
   };
+  // Start-Items der Figur
+  for (const s of opts.hero?.start || []) run.items.push({ uid: run.nextUid++, id: s.id, area: 'bag', x: s.x, y: s.y, rot: s.rot || 0 });
   rollShop(run, items, regions, true, rng);
   return run;
 }

@@ -1,0 +1,33 @@
+{
+  "_hinweis": "Startfiguren. bonus gilt den ganzen Lauf: filter wählt Items aus (art, id, kraft, traeger, wortfeld), prozent verstärkt ihre Wirkung, abklingzeit verändert die Abklingzeit in Prozent (negativ = schneller). start: Items mit Position im Rucksack.",
+  "helden": [
+    {
+      "id": "borga",
+      "name": "Borga Eisenfaust",
+      "kurz": "Borga",
+      "volk": "Zwergin vom Eisenberg Duramar",
+      "emoji": "🧔‍♀️",
+      "farbe": "#c0612b",
+      "staerke": "Meisterin der Komposita: Alle Komposita wirken 20 % stärker.",
+      "bonus": { "filter": { "art": "kompositum" }, "prozent": 20, "text": "Borga Eisenfaust: Komposita +20 %" },
+      "start": [
+        { "id": "feuer", "x": 0, "y": 0 },
+        { "id": "axt", "x": 1, "y": 0 }
+      ]
+    },
+    {
+      "id": "eadrun",
+      "name": "Eadrun die Reiterin",
+      "kurz": "Eadrun",
+      "volk": "Pferdesippe aus Hrossmark",
+      "emoji": "🏇",
+      "farbe": "#3f8a4a",
+      "staerke": "Schnelle Reiterin: Verb-Schriftrollen laden 20 % schneller.",
+      "bonus": { "filter": { "art": "verb" }, "abklingzeit": -20, "text": "Eadrun die Reiterin: Schriftrollen laden 20 % schneller" },
+      "start": [
+        { "id": "stuermen", "x": 0, "y": 0 },
+        { "id": "speer", "x": 1, "y": 0 }
+      ]
+    }
+  ]
+}

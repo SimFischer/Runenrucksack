@@ -6,8 +6,8 @@ import {
 import {
   GENUS, SIEGEL_BONUS, findFusions, wrongOrderNeighbor, canRotate, nextRot, isNoun, isRune,
 } from './grammar.js';
-import { G, loadData, save, loadRun, placedOf, itemsIn, gridOf, region } from './state.js';
-import { playerContext, evaluateBag } from './mods.js';
+import { G, loadData, save, loadRun, placedOf, itemsIn, gridOf, region, hero, playerCtx } from './state.js';
+import { evaluateBag } from './mods.js';
 import {
   $, fmt, fullName, genusChip, toast, bump, openModal, closeModal, modal, itemEl, buildGrid, drawItems,
 } from './ui.js';
@@ -26,7 +26,7 @@ async function boot() {
   $('btn-continue').hidden = !G.run;
   $('btn-new').classList.toggle('primary', !G.run);
   $('btn-continue').onclick = () => { showGame(); continueFlow(); };
-  $('btn-new').onclick = startNewRun;
+  $('btn-new').onclick = showHeroes;
   $('btn-reroll').onclick = onReroll;
   $('btn-fight').onclick = onFight;
   $('btn-menu').onclick = openMenu;
@@ -42,15 +42,36 @@ async function boot() {
   registerServiceWorker();
 }
 
-function startNewRun() {
-  G.run = newRun(G.ITEMS, G.REGIONS);
+// Vor jedem Lauf: Figur wählen.
+function showHeroes() {
+  const box = $('hero-cards');
+  box.innerHTML = '';
+  for (const h of G.HEROES) {
+    const card = document.createElement('button');
+    card.className = 'hero-card';
+    card.style.setProperty('--hero', h.farbe);
+    card.innerHTML = `
+      <div class="hero-emoji">${h.emoji}</div>
+      <div class="hero-name">${h.name}</div>
+      <div class="hero-volk">${h.volk}</div>
+      <p class="hero-staerke">${h.staerke}</p>
+      <div class="hero-start">Start mit: ${h.start.map((s) => `<span>${G.DEFS[s.id].emoji} ${fullName(G.DEFS[s.id])}</span>`).join('')}</div>`;
+    card.onclick = () => startNewRun(h);
+    box.append(card);
+  }
+  showScreen('heroes');
+}
+
+function startNewRun(h) {
+  if (!h?.id) { showHeroes(); return; }
+  G.run = newRun(G.ITEMS, G.REGIONS, { hero: h });
   selected = null;
   showGame();
   continueFlow();
 }
 
 function showScreen(name) {
-  for (const id of ['start', 'game', 'battle']) $(id).hidden = id !== name;
+  for (const id of ['start', 'heroes', 'game', 'battle']) $(id).hidden = id !== name;
 }
 
 function showGame() {
@@ -117,7 +138,7 @@ const sameRef = (a, b) => a && b && a.src === b.src && a.uid === b.uid && a.slot
 function render() {
   if (!G.run) return;
   applyTheme();
-  bagInfo = evaluateBag(itemsIn('bag'), G.DEFS, playerContext(G.run));
+  bagInfo = evaluateBag(itemsIn('bag'), G.DEFS, playerCtx());
   renderTop();
   renderGrid('bag');
   renderGrid('store');
@@ -128,6 +149,7 @@ function render() {
 
 function renderTop() {
   const run = G.run, reg = region();
+  $('stat-hero').textContent = `${hero()?.emoji || ''} ${hero()?.kurz || ''}`;
   $('stat-day').textContent = `${reg.emoji} ${reg.name} · Tag ${run.day} / ${CFG.lastDay}`;
   $('stat-hearts').textContent = '❤️'.repeat(Math.max(0, run.hearts)) + '🤍'.repeat(CFG.hearts - Math.max(0, run.hearts));
   $('stat-wins').textContent = `🏆 ${run.wins}`;
@@ -328,7 +350,7 @@ function grammarNotes(base, ana, ref) {
     }
   }
   if (base.art === 'siegel') {
-    const bonus = Math.round((playerContext(G.run).siegelBonus ?? SIEGEL_BONUS) * 100);
+    const bonus = Math.round((playerCtx().siegelBonus ?? SIEGEL_BONUS) * 100);
     out.push({ html: `Gibt einem Nomen daneben +${bonus} % Wirkung – aber nur, wenn es „${base.genus}“ heißt${where}.` });
     for (const z of ana?.ziele || []) {
       out.push(z.ok
@@ -379,7 +401,7 @@ function refExists(ref) {
 
 function renderSummary(box) {
   const run = G.run;
-  const ctx = playerContext(run);
+  const ctx = playerCtx();
   const bag = itemsIn('bag').map((p) => bagInfo.get(p.uid).def);
   let leben = baseHp(run.day) + (ctx.leben || 0), startblock = 0, tempo = ctx.tempo || 0, glueck = 0;
   const perSec = { schaden: 0, block: 0, heilung: 0, gift: 0, brand: 0 };
@@ -412,6 +434,7 @@ function renderSummary(box) {
   const fusions = findFusions(itemsIn('bag'), G.DEFS, G.RECIPES);
   box.innerHTML = `
     <h2>Dein Rucksack</h2>
+    ${ctx.hero ? `<p class="gram">${ctx.hero.emoji} <b>${ctx.hero.name}</b>: ${ctx.hero.staerke}</p>` : ''}
     <ul class="stats">${rows.map(([a, b]) => `<li><span>${a}</span><b>${b}</b></li>`).join('')}</ul>
     ${fusions.length ? `<p class="gram ok">✓ Morgen verschmelzen: ${fusions.map((f) => G.DEFS[f.id].name).join(', ')}</p>` : ''}
     ${run.day === reg.tage[1] ? `<p class="gram bad"><b>Heute Nacht wartet der Anführer: ${boss.emoji} ${boss.name}!</b></p>` : `<p class="muted">${boss.emoji} ${boss.name} wartet am ${reg.tage[1]}. Tag.</p>`}
@@ -529,7 +552,7 @@ function confirmNew() {
     <div class="row">
       <button class="btn" data-act="close">Abbrechen</button>
       <button class="btn danger" data-act="yes">Neuer Lauf</button>
-    </div>`, { yes: startNewRun });
+    </div>`, { yes: showHeroes });
 }
 
 // ---------- Verschmelzen (zu Beginn des Tages) ----------
@@ -835,7 +858,7 @@ function showRunEnd() {
       <p>Probier es gleich nochmal – jeder Lauf ist anders.</p>
       <div class="row"><button class="btn primary big" data-act="new">Neuer Lauf</button><button class="btn" data-act="home">Zum Start</button></div>`,
   {
-    new: startNewRun,
+    new: showHeroes,
     home: () => {
       G.run = null;
       $('btn-continue').hidden = true;
