@@ -13,7 +13,12 @@ export const CFG = {
 export const income = (day) => 8 + day;
 export const ARMOR_BONUS = 0.15; // Rüstungsfehler richtig verbessert: Gegner startet mit 15 % weniger Leben
 export const baseHp = (day) => Math.round(60 + 14 * (day - 1) + 2.5 * (day - 1) ** 2);
-export const sellValue = (def) => Math.max(1, Math.floor(def.preis / 2));
+// Sternstufen: drei gleiche Gegenstände werden zu einem der nächsten Stufe.
+// ★★ wirkt 1,8-fach, ★★★ 3-fach – auch der Verkaufspreis steigt so.
+export const STERN_FAKTOR = { 1: 1, 2: 1.8, 3: 3 };
+export const MAX_STERN = 3;
+export const sternOf = (p) => p?.stern || 1;
+export const sellValue = (def, stern = 1) => Math.max(1, Math.floor((def.preis * STERN_FAKTOR[stern]) / 2));
 
 // Gewichte der Seltenheiten im Laden, abhängig vom Tag.
 export function rarityWeights(day) {
@@ -64,7 +69,7 @@ export function seededRng(seed = 1) {
 // ohne mask ist das ganze Rechteck benutzbar.
 
 export function sizeOf(def, rot) {
-  return rot ? { w: def.h, h: def.w } : { w: def.w, h: def.h };
+  return rot % 2 ? { w: def.h, h: def.w } : { w: def.w, h: def.h };
 }
 
 export const rectGrid = (cols, rows) => ({ cols, rows, mask: null });

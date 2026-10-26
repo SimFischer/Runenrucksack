@@ -1,7 +1,7 @@
 // Grammatik als Spielregel: Komposita, Artikel-Siegel, Adjektiv-Runen.
 // Grundsatz: Eine grammatisch falsche Kombination ist nie stärker als eine richtige –
 // falsch gelegte Siegel und Runen wirken gar nicht, falsche Artikel verschmelzen nicht.
-import { sizeOf } from './logic.js';
+import { sizeOf, STERN_FAKTOR } from './logic.js';
 
 export const GENUS = {
   der: { name: 'maskulin', farbe: '#3f7fd9' },
@@ -35,6 +35,16 @@ export function compoundId(kraftId, traegerId) {
 }
 
 const roundUp = (key, v) => (DECIMAL_KEYS.has(key) ? Math.ceil(v * 10 - 1e-9) / 10 : Math.ceil(v - 1e-9));
+
+// Werte eines Gegenstands mit Sternstufe (★★ 1,8-fach, ★★★ 3-fach).
+export function starDef(def, stern = 1) {
+  if (!stern || stern === 1) return def;
+  const f = STERN_FAKTOR[stern];
+  const out = { ...def, stern, preis: Math.round(def.preis * f) };
+  for (const k of EFFECT_KEYS) if (out[k]) out[k] = roundUp(k, out[k] * f);
+  if (def.aura) out.aura = Object.fromEntries(Object.entries(def.aura).map(([k, v]) => [k, Math.round(v * f)]));
+  return out;
+}
 
 // Baut aus recipes.json alle Komposita (Kraft + Träger) als eigene Item-Definitionen.
 // Ein Kompositum vereint beide Teile: Es behält die Wirkung des Kristalls (umgerechnet auf die
@@ -230,7 +240,7 @@ export function analyze(placed, defs, opts = {}) {
   const runeMult = opts.runeMult ?? 1;
   const map = cellMap(placed, defs);
   const info = new Map();
-  for (const p of placed) info.set(p.uid, { base: defs[p.id], siegel: [], runen: [], ziele: [], ziel: null });
+  for (const p of placed) info.set(p.uid, { base: starDef(defs[p.id], p.stern), siegel: [], runen: [], ziele: [], ziel: null });
 
   for (const p of placed) {
     const d = defs[p.id];
