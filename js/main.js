@@ -61,19 +61,23 @@ async function boot() {
 // Schnelles Tippen: Knöpfe reagieren schon, wenn der Finger losgelassen wird. Manche Browser verschlucken
 // sonst den Klick, solange gerade Münzen fliegen. Der danach eventuell noch kommende echte Klick wird
 // ignoriert – auch auf einem Knopf, der inzwischen an derselben Stelle steht (keine doppelte Antwort).
+// Erkannt wird er an der Finger-Nummer (pointerId); ohne sie nur in einem kurzen Zeitfenster.
 function fastTap() {
-  let down = null, done = 0;
+  let down = null, done = { id: null, t: -1e9 };
   document.addEventListener('pointerdown', (e) => { down = e.pointerType === 'touch' ? e.target.closest('button') : null; }, true);
   document.addEventListener('pointerup', (e) => {
     const b = e.target.closest?.('button');
     const ok = down && b === down && !b.disabled;
     down = null;
     if (!ok) return;
-    done = performance.now();
+    done = { id: e.pointerId, t: performance.now() };
     b.click();
   }, true);
   document.addEventListener('click', (e) => {
-    if (e.isTrusted && performance.now() - done < 600) { e.stopPropagation(); e.preventDefault(); }
+    if (!e.isTrusted) return;
+    const recent = performance.now() - done.t < 400;
+    const same = e.pointerId > 0 ? e.pointerId === done.id && recent : recent;
+    if (same) { e.stopPropagation(); e.preventDefault(); done = { id: null, t: -1e9 }; }
   }, true);
 }
 
