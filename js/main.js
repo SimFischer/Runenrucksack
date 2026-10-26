@@ -6,12 +6,14 @@ import {
 import {
   GENUS, SIEGEL_BONUS, findFusions, wrongOrderNeighbor, canRotate, nextRot, isNoun, isRune, isVerb, runeBase, starDef,
 } from './grammar.js';
-import { canMerge, compoundPartner, placeNew, placeWaiting, findeVerbindung, fuehreAus, frageFuer, sameKind } from './sterne.js';
+import {
+  canMerge, compoundPartner, placeNew, findeVerbindung, fuehreAus, frageFuer, sameKind, istGekonnt, merkeRichtig, nichtVerbinden,
+} from './sterne.js';
 import { G, loadData, save, loadRun, placedOf, itemsIn, gridOf, region, hero, playerCtx, emit, onEvent, figurBild, hintergrundBild } from './state.js';
 import { evaluateBag } from './mods.js';
 import {
   $, fmt, fullName, genusChip, toast, bump, openModal, closeModal, modal, itemEl, buildGrid, drawItems, mergeAnimation, syncGold, iconHtml,
-  openQuick, closeQuick, sternVon,
+  openQuick, closeQuick, sternVon, hinweisAm,
 } from './ui.js';
 import { startNight } from './battle-ui.js';
 import { runEncounter } from './encounters.js';
@@ -820,33 +822,51 @@ function quiz(opts) {
 }
 
 // Zwei gleiche oder Kristall + Träger gefunden: Frage stellen, bei richtiger Antwort sofort verbinden.
-function askMerge(a) {
+// Gekonnte Fragen (dreimal gleich richtig) werden übersprungen – dann nur ein kleiner Hinweis („die Äxte ✓“).
+function askMerge(a, c) {
+  const run = G.run;
   const q = frageFuer(a, G.DEFS);
+  if (a.typ === 'paar') emit('tipp', { key: isRune(G.DEFS[a.alt.id]) ? 'steigerung' : 'sterne' });
+  if (!q) { doMerge(a); return; } // Superlativ → Krone: ohne neue Frage
+  if (istGekonnt(run, q)) { doMerge(a, q.kurz); return; }
+  let kopf;
   if (a.typ === 'kompositum') {
     const kd = G.DEFS[a.kraft.id], td = G.DEFS[a.traeger.id], cd = G.DEFS[a.id];
-    quiz({
-      q,
-      anchor: itemNode(a.traeger.uid),
-      kopf: `<span class="quick-eq">${iconHtml(kd, 'ic small')}<b>+</b>${iconHtml(td, 'ic small')}<b>=</b><span class="glowing quick-goal" style="--glow:${cd.leuchten}">${iconHtml(td, 'ic small')}</span></span>`,
-      richtig: () => doMerge(a),
-      trotzdem: () => doMerge(a),
-    });
-    return;
+    kopf = `<span class="quick-eq">${iconHtml(kd, 'ic small')}<b>+</b>${iconHtml(td, 'ic small')}<b>=</b><span class="glowing quick-goal" style="--glow:${cd.leuchten}">${iconHtml(td, 'ic small')}</span></span>`;
+  } else {
+    const d = G.DEFS[a.alt.id];
+    kopf = `<span class="quick-eq">${iconHtml(d, 'ic small')}<b>+</b>${iconHtml(d, 'ic small')}<b>=</b><em class="goal-stars">${'★'.repeat(sternVon(a.alt) + 1)}</em></span>`;
   }
-  const d = G.DEFS[a.alt.id];
-  emit('tipp', { key: isRune(d) ? 'steigerung' : 'sterne' });
-  if (!q) { doMerge(a); return; } // Superlativ → Krone: ohne neue Frage
-  const ziel = '★'.repeat(sternVon(a.alt) + 1);
   quiz({
     q,
-    anchor: itemNode(a.alt.uid),
-    kopf: `<span class="quick-eq">${iconHtml(d, 'ic small')}<b>+</b>${iconHtml(d, 'ic small')}<b>=</b><em class="goal-stars">${ziel}</em></span>`,
-    richtig: () => doMerge(a),
+    anchor: itemNode(a.typ === 'kompositum' ? a.traeger.uid : a.alt.uid),
+    kopf,
+    richtig: (ersterVersuch) => { if (ersterVersuch) merkeRichtig(run, q); doMerge(a); },
     trotzdem: () => doMerge(a),
+    nein: run.tutorial ? null : () => dontMerge(a, c),
   });
 }
 
-function doMerge(a) {
+// „Nicht verbinden“: Das Item wird ohne Verbinden abgelegt (beim Kaufen ins Lager, falls kein Platz).
+function dontMerge(a, c) {
+  const run = G.run;
+  closeQuick();
+  if (!nichtVerbinden(run, G.DEFS, a)) {
+    if (c?.kauf) {
+      // Nirgends Platz: Kauf zurücknehmen
+      run.gold += c.kauf.preis;
+      if (!run.shop[c.kauf.slot]) run.shop[c.kauf.slot] = { id: c.kauf.id, locked: false };
+      toast('Kein Platz – der Kauf wurde zurückgenommen.');
+    } else toast('Kein Platz – das Item bleibt beim Händler.');
+  } else if (a.typ === 'paar') {
+    if (a.neu.area === 'store' && c?.kauf) toast('Ins Lager gelegt');
+    pending.unshift({ uid: a.neu.uid }); // liegt es vielleicht richtig neben einem Träger?
+  }
+  merging = false;
+  render();
+}
+
+function doMerge(a, kurz = null) {
   const run = G.run;
   const teile = a.typ === 'kompositum' ? [a.kraft, a.traeger] : [a.neu, a.alt];
   const from = teile.map((p) => itemNode(p.uid)?.getBoundingClientRect()).filter(Boolean);
@@ -856,7 +876,8 @@ function doMerge(a) {
   render();
   const nd = G.DEFS[p.id];
   mergeAnimation(from, itemNode(p.uid), nd.emoji);
-  if (a.typ === 'kompositum') toast(`${fullName(nd)} ist entstanden!`);
+  if (kurz) hinweisAm(itemNode(p.uid), kurz);
+  else if (a.typ === 'kompositum') toast(`${fullName(nd)} ist entstanden!`);
   else toast(isRune(nd) ? `Rune gesteigert: ${nd.name}${nd.krone ? ' 👑' : ''}!` : `${'★'.repeat(p.stern)} ${nd.name}: jetzt viel stärker!`);
   emit('verschmolzen', { id: p.id, stern: sternVon(p), typ: a.typ });
   // Kette: Gibt es zum neuen Item wieder ein gleiches? Erst nach der Animation weiter.

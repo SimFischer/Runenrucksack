@@ -163,3 +163,41 @@ test('Laden: Items, die man schon besitzt, kommen häufiger; Ketten-Symbol finde
   assert.equal(compoundPartner(DEFS.axt, [{ id: 'gift' }], DEFS, RECIPES).id, 'gift+axt');
   assert.equal(compoundPartner(DEFS.apfel, [{ id: 'feuer' }], DEFS, RECIPES), null);
 });
+
+test('„Nicht verbinden“: Das Item wird ohne Verbinden abgelegt (ins Lager, falls kein Platz; sonst Kauf zurück)', async () => {
+  const { nichtVerbinden } = await import('../js/sterne.js');
+  // Normal gekauft: bleibt, wo es liegt – zwei einzelne Speere
+  const run = leererLauf([{ uid: 1, id: 'speer', area: 'store', x: 0, y: 0, rot: 0 }]);
+  const p = placeNew(run, DEFS, 'speer');
+  verbindeAlles(run, DEFS, RECIPES, [{ uid: p.uid, paar: true }], () => 'nein');
+  assert.deepEqual(run.items.map((i) => [i.id, i.area, i.stern]), [['speer', 'store', undefined], ['speer', 'bag', undefined]]);
+  // Auf ein gleiches gezogen (wartet im Bereich „neu“): Rucksack voll → ins Lager
+  const voll = leererLauf([{ uid: 1, id: 'dolch', area: 'bag', x: 0, y: 0, rot: 0 }]);
+  voll.bagCells = ['0,0'];
+  const w = placeNew(voll, DEFS, 'dolch', { area: 'neu', x: 0, y: 0 });
+  const a = findeVerbindung(voll, DEFS, RECIPES, { uid: w.uid, mit: 1 });
+  assert.equal(nichtVerbinden(voll, DEFS, a), true);
+  assert.equal(w.area, 'store');
+  // Nirgends Platz: Item kommt weg (das Spiel gibt das Gold zurück)
+  w.area = 'neu';
+  for (let x = 0; x < 4; x++) for (let y = 0; y < 3; y++) voll.items.push({ uid: 50 + x * 3 + y, id: 'apfel', area: 'store', x, y, rot: 0 });
+  assert.equal(nichtVerbinden(voll, DEFS, findeVerbindung(voll, DEFS, RECIPES, { uid: w.uid, mit: 1 })), false);
+  assert.ok(!voll.items.includes(w));
+});
+
+test('Dreimal gleich richtig beantwortet: Die Frage kommt in diesem Lauf nicht mehr', async () => {
+  const { istGekonnt, merkeRichtig, GEKONNT_AB } = await import('../js/sterne.js');
+  const run = leererLauf([{ uid: 1, id: 'axt', area: 'bag', x: 0, y: 0, rot: 0 }, { uid: 2, id: 'axt', area: 'store', x: 0, y: 0, rot: 0 }]);
+  const q = frageFuer(findeVerbindung(run, DEFS, RECIPES, { uid: 2, paar: true }), DEFS);
+  assert.equal(GEKONNT_AB, 3);
+  for (let i = 0; i < 2; i++) merkeRichtig(run, q);
+  assert.equal(istGekonnt(run, q), false, 'nach zwei Mal noch nicht');
+  merkeRichtig(run, q);
+  assert.equal(istGekonnt(run, q), true);
+  assert.equal(q.kurz, 'die Äxte ✓');
+  // Anderes Wort oder andere Art bleibt eine Frage
+  const speer = { ...q, wort: 'Speer' };
+  assert.equal(istGekonnt(run, speer), false);
+  assert.equal(istGekonnt(run, { ...q, art: 'artikel' }), false);
+  assert.equal(istGekonnt(leererLauf([]), q), false, 'neuer Lauf: wieder fragen');
+});

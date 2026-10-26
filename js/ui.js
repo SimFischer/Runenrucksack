@@ -138,6 +138,19 @@ export function openQuick(html, anchor) {
 
 export const closeQuick = () => $('quick')?.remove();
 
+// Kleiner Hinweis direkt über einem Item, z. B. „die Äxte ✓“ bei einer gekonnten Frage.
+export function hinweisAm(el, text) {
+  const r = el?.getBoundingClientRect();
+  if (!r) { toast(text); return; }
+  const h = document.createElement('div');
+  h.className = 'item-hint';
+  h.textContent = text;
+  h.style.left = r.left + r.width / 2 + 'px';
+  h.style.top = r.top + 'px';
+  document.body.append(h);
+  setTimeout(() => h.remove(), 1800);
+}
+
 // Über dem Item, sonst darunter; immer ganz im Bild.
 function placeQuick(card, r) {
   const m = 8, cw = card.offsetWidth, ch = card.offsetHeight;

@@ -184,6 +184,26 @@ export function frageFuer(a, defs, rng = Math.random) {
   };
 }
 
+// Gekonnte Fragen: Wer dieselbe Frage (gleiches Wort, gleiche Art) in einem Lauf dreimal gleich beim
+// ersten Versuch richtig beantwortet hat, bekommt sie in diesem Lauf nicht mehr gestellt.
+export const GEKONNT_AB = 3;
+export const frageKey = (q) => `${q.art}|${q.wort}`;
+export const istGekonnt = (run, q) => !!q && (run.gekonnt?.[frageKey(q)] || 0) >= GEKONNT_AB;
+export function merkeRichtig(run, q) {
+  run.gekonnt = { ...(run.gekonnt || {}) };
+  run.gekonnt[frageKey(q)] = (run.gekonnt[frageKey(q)] || 0) + 1;
+}
+
+// „Nicht verbinden“: Das neue Item bleibt, wo es liegt. Wartete es (kein Platz, auf ein gleiches gezogen),
+// kommt es in Rucksack oder Lager. Gibt false zurück, wenn es nirgends hinpasst – dann muss es weg
+// (beim Kauf: Gold zurück).
+export function nichtVerbinden(run, defs, a) {
+  if (a.typ !== 'paar' || a.neu.area !== 'neu') return true;
+  if (placeWaiting(run, defs, a.neu)) return true;
+  run.items = run.items.filter((p) => p !== a.neu);
+  return false;
+}
+
 // Löst alle Verbindungen auf, die von den Prüfungen ausgehen (ohne Darstellung: Simulation und Tests).
 // antwort(aktion, frage) → 'richtig' (verbinden) oder 'nein' (nicht verbinden). Gibt die Ergebnisse zurück.
 export function verbindeAlles(run, defs, recipes, checks, antwort = () => 'richtig') {
@@ -194,10 +214,8 @@ export function verbindeAlles(run, defs, recipes, checks, antwort = () => 'richt
     const a = findeVerbindung(run, defs, recipes, c);
     if (!a) continue;
     if (antwort(a, frageFuer(a, defs)) !== 'richtig') {
-      if (a.typ === 'paar') {
-        if (a.neu.area === 'neu' && !placeWaiting(run, defs, a.neu)) run.items = run.items.filter((p) => p !== a.neu);
-        else queue.unshift({ uid: a.neu.uid }); // nicht verbunden – vielleicht liegt es neben einem Träger
-      }
+      // nicht verbunden – liegt das Item vielleicht neben einem Träger?
+      if (nichtVerbinden(run, defs, a) && a.typ === 'paar') queue.unshift({ uid: a.neu.uid });
       continue;
     }
     const p = fuehreAus(run, a, defs);
