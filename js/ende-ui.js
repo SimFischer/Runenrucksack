@@ -39,6 +39,7 @@ export function zeigeLaufende(run, abschluss, aktionen) {
     ...(a.erfolge || []).map((id) => { const e = G.ACH.erfolge.find((x) => x.id === id); return `<div class="frei-neu"><span class="frei-emoji">${e.emoji}</span><span><small>Neuer Erfolg!</small><b>${e.name}</b></span></div>`; }),
     ...a.frei.designs.map((id) => { const d = G.ACH.designs.find((x) => x.id === id); return `<div class="frei-neu"><span class="frei-emoji">${d.emoji}</span><span><small>Neues Rucksack-Design!</small><b>${d.name}</b></span></div>`; }),
   ].join('') : '';
+  document.getElementById('tip-bubble')?.remove(); // offene Erste-Mal-Tipps gehören zum Lauf
   const code = a ? aktuellerHeldencode() : null;
   const card = modal(`${kopf}
       <div class="ende-spalten">

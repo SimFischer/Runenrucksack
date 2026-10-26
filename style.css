@@ -1315,3 +1315,23 @@ body[data-design="silberbanner"] #grid-bag { border-color: #c9d4ea; }
 .code-meldung { background: rgba(200,66,58,.12); border-left: 4px solid var(--red); border-radius: 8px; padding: 8px 12px; text-align: left; font-weight: 700; }
 .code-kamera video { width: 100%; max-height: 300px; border-radius: 12px; background: #000; margin-top: 8px; }
 .code-info { font-size: 17px; }
+/* Ende: Kopf und Knöpfe bleiben sichtbar, nur die Mitte scrollt bei Bedarf */
+.modal-card.ende { display: flex; flex-direction: column; overflow: hidden; padding: 12px 20px 14px; }
+.modal-card.ende > * { flex-shrink: 0; }
+.modal-card.ende .big-emoji { font-size: 40px; line-height: 1; }
+.modal-card.ende h2 { font-size: 26px; margin: 0 0 4px; }
+.modal-card.ende > p { margin: 2px 0 !important; font-size: 15px !important; }
+.modal-card.ende .ende-spalten { flex: 1 1 auto; min-height: 0; overflow-y: auto; touch-action: pan-y; padding: 2px; }
+.modal-card.ende .row { margin-top: 10px; }
+.ende-spalten .xp-zeile { font-size: 14px; }
+.ende-spalten .xp-summe { font-size: 16px; }
+.ende-spalten .frei-liste { gap: 6px; margin-top: 8px; }
+.ende-spalten .frei-neu { padding: 4px 10px; gap: 6px; }
+.ende-spalten .frei-neu img { height: 38px; }
+.ende-spalten .frei-emoji { font-size: 24px; }
+.ende-spalten .frei-neu b { font-size: 14px; }
+.ende-spalten .frei-neu small { font-size: 11px; }
+.ende-code { margin-top: 8px; padding: 6px 8px; }
+.ende-code .code-kasten.klein { margin-top: 4px; grid-template-columns: 1fr 84px; }
+.ende-code .code-kasten.klein .code-qr { width: 84px; }
+.ende-code .code-kasten.klein .code-text { font-size: 14px; }

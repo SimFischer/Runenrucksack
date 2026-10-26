@@ -188,10 +188,10 @@ test('Schritte für fehlende Funktionen werden übersprungen', () => {
   assert.ok(!ohne.some((s) => s.voraussetzung), 'ohne Funktionen nur Schritte ohne Voraussetzung');
   const jetzt = activeSteps(TUT).map((s) => s.id);
   assert.ok(jetzt.includes('begegnung'), 'Begegnungen gibt es schon');
-  assert.ok(!jetzt.includes('buch') && !jetzt.includes('heldencode'), 'Buch und Heldencode gibt es noch nicht');
-  const spaeter = activeSteps(TUT, new Set([...FEATURES, 'buch', 'heldencode'])).map((s) => s.id);
-  assert.ok(spaeter.includes('buch') && spaeter.includes('heldencode'));
-  assert.equal(spaeter.length, TUT.schritte.length);
+  assert.ok(jetzt.includes('buch') && jetzt.includes('heldencode'), 'Buch der Wörter und Heldencode sind jetzt dabei');
+  assert.equal(jetzt.length, TUT.schritte.length, 'alle vorbereiteten Schritte sind aktiv');
+  const ohneBuch = activeSteps(TUT, new Set([...FEATURES].filter((f) => f !== 'buch'))).map((s) => s.id);
+  assert.ok(!ohneBuch.includes('buch') && !ohneBuch.includes('buch-seite'));
 });
 
 test('Nach dem Tutorial startet ein normaler Lauf ohne Tutorial-Reste', () => {
@@ -204,10 +204,9 @@ test('Nach dem Tutorial startet ein normaler Lauf ohne Tutorial-Reste', () => {
 
 test('So geht\'s und Erste-Mal-Tipps: Inhalte aus tutorial.json', () => {
   const karten = activeSteps(TUT).filter((s) => s.hilfe).map((s) => s.hilfe.titel);
-  for (const t of ['Kaufen', 'Drehen', 'Lager', 'Verschmelzen', 'Artikel-Siegel', 'Adjektiv-Runen', 'Kampf', 'Herzen und Siege', 'Begegnungen']) {
+  for (const t of ['Kaufen', 'Drehen', 'Lager', 'Verschmelzen', 'Artikel-Siegel', 'Adjektiv-Runen', 'Kampf', 'Herzen und Siege', 'Begegnungen', 'Buch der Wörter', 'Heldencode']) {
     assert.ok(karten.includes(t), `Hilfe-Karte ${t}`);
   }
-  assert.ok(!karten.includes('Buch der Wörter') && !karten.includes('Heldencode'), 'keine Karten für fehlende Funktionen');
   for (const s of TUT.schritte.filter((x) => x.hilfe)) assert.ok(s.hilfe.emoji && s.hilfe.text, s.id);
   for (const k of ['boss', 'gebiet', 'steigerung', 'unterklasse']) assert.ok(TUT.tipps[k], `Tipp ${k}`);
 });

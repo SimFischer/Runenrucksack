@@ -138,6 +138,15 @@ try {
   for (let i = 0; i < 60 && (await ev('document.getElementById("modal").hidden')); i++) await sleep(500);
   await expect('zweiten Tag geschafft');
   await tap('#modal [data-act="next"]');
+  // Buch der Wörter und Heldencode
+  await expect('Buch der Wörter');
+  await tap('#btn-buch-spiel'); await expect('Feuerschwert steht schon drin');
+  check(await ev(`[...document.querySelectorAll('#buch-layer .buch-eintrag:not(.dunkel) b')].some((b) => b.textContent.includes('Feuerschwert'))`), 'Feuerschwert ist im Buch entdeckt');
+  check(await ev(`document.querySelectorAll('#buch-layer .buch-eintrag.dunkel').length > 10`), 'unentdeckte Einträge als dunkle Silhouetten');
+  await tap('#buch-layer [data-close]'); await expect('Heldencode');
+  await tap('#btn-menu'); await tap('#modal [data-act="code"]'); await expect('Schreib den Code');
+  check(await ev(`!!document.querySelector('#code-layer .code-qr svg') && /^[2-9A-Z]{5}/.test(document.querySelector('#code-layer [data-code]').innerText)`), 'Heldencode mit QR-Code');
+  await tap('#code-layer [data-ok]');
   await sleep(600);
   check(!!(await rect('#tut-finale [data-go]')), 'Abschluss mit „Meinen ersten Lauf starten“');
   check(await ev('localStorage.getItem("runenrucksack.tutorial") === "fertig"'), 'Tutorial auf diesem Gerät als fertig gemerkt');

@@ -212,12 +212,14 @@ Der stärkste Antrieb ist die Entdeckung: Unbekannte Kombinationen stehen als �
 
 ### Zwischen den Läufen
 
-- **Buch der Wörter:** Sammelalbum und persönliches Wörterbuch zugleich; Seiten pro Gebiet, Belohnung für volle Seiten.
-- **Neue Figuren** und neue Items, die künftig im Laden auftauchen.
-- **Neue Gebiete** auf der Karte.
-- **Rucksack-Designs** als kosmetische Belohnung.
-- **Ränge:** Lehrling → Wanderer → Runenkundige → Wortmeister → Hüter der Sprache.
-- **Erfolge** wie „Erstes Dreifach-Kompositum“ oder „Gewonnen ohne Fehlversuch“.
+- **Buch der Wörter:** Sammelalbum und persönliches Wörterbuch zugleich. Seiten: Komposita (Kraft + Träger), Sternstufen (★★ bis ★★★★), Steigerungen, Sätze (Verb + Subjekt, z. B. „Die Äxte schlagen.“) und Schätze. Jede mögliche Kombination steht von Anfang an im Buch – unentdeckt als dunkle Silhouette mit „???“, entdeckt mit Bild, Name, Artikel, Wirkung und Lernhinweis („Das Grundwort Axt bestimmt den Artikel → die Feueraxt“). Die Einträge entstehen automatisch aus den Inhalten. Neue Entdeckungen erscheinen kurz mit Glanz, ohne das Spiel anzuhalten; volle Seiten schalten Rucksack-Designs frei.
+- **Erfahrung und Ränge:** Erfahrung am Ende jedes Laufs: pro Sieg, pro neuer Entdeckung und pro Grammatik-Frage beim ersten Versuch richtig. Ränge: Lehrling → Wanderer → Runenkundige → Wortmeister → Hüter der Sprache – Rang 2 nach etwa zwei Läufen, Rang 5 nach etwa 25–30 Läufen; der Aufstieg wird gefeiert.
+- **Neue Figuren:** Faelith die Bogenschützin (ab Rang Wanderer), Hauptmann Theron (nach 3 gewonnenen Läufen), Ritterin Ysolde (ab 25 Einträgen im Buch).
+- **Neue Items** im Laden erst nach Freischaltung, z. B. das Drachenfeuerschwert ab Rang Runenkundige.
+- **Rucksack-Designs** als kosmetische Belohnung: Leder, Zwergenstahl, Elbenseide, Reiterleder, Silberbanner – für volle Buchseiten und Erfolge. Die **Sammlung** zeigt alle Figuren, Designs und Erfolge, gesperrte mit einem Hinweis, wie man sie bekommt.
+- **Erfolge** (18), z. B. „Erstes Kompositum“, „Erste ★★★★“, „Fehlerjäger: 10 Ork-Fehler verbessert“, „Satzbauer“, „Ohne Fehlversuch gewonnen“, „Lauf mit jeder Figur gewonnen“, „Alle Feuer-Komposita entdeckt“.
+- **Lernbericht** am Ende jedes Laufs, nur für das Kind: Siege, neue Entdeckungen, Rangfortschritt und „Das sitzt schon / Das üben wir noch“ mit einer kurzen Merkhilfe zu jeder Regel, bei der es Fehler gab – freundlich, ohne Noten und ohne Prozentzahlen.
+- **Neue Gebiete** auf der Karte (später).
 
 ### Bewusst weggelassen
 
@@ -238,20 +240,22 @@ Auf jedem Pfad gibt es zusätzlich die Stufen **leicht / normal / schwer**. Sie 
 
 ## Speichern per Code und Klassenarena
 
-Das Spiel speichert nichts dauerhaft auf dem iPad, sondern erzeugt Codes, die die Kinder ins Heft schreiben oder fotografieren. So funktioniert es auch auf geteilten Geräten, ganz ohne Accounts.
+Das Spiel erzeugt Codes, die die Kinder ins Heft schreiben oder fotografieren. So funktioniert es auch auf geteilten Geräten, ganz ohne Accounts. Maßgeblich ist der Code; der Browser merkt sich den letzten Stand nur als Komfort.
 
 ### Drei Codes
 
 | Code | Inhalt | Form | Beispiel |
 | --- | --- | --- | --- |
-| Heldencode | dauerhafter Fortschritt: Figuren, Rang, Gebiete, Buch der Wörter, Erfolge, gewählter Pfad | 4–5 Fantasy-Wörter + Zahl | Drache-Laterne-Moos-Eiche-47 |
-| Reisecode | ein laufender Lauf: Tag, Herzen, Siege, Gold, Rucksack mit Positionen | länger, nur zum Weiterspielen | Code aus Buchstaben und Zahlen |
+| Heldencode | dauerhafter Fortschritt: Rang, Erfahrung, Figuren, Designs, Erfolge, Buch der Wörter, Statistik für Erfolge, Tutorial abgeschlossen | Fünfergruppen aus Großbuchstaben und Ziffern, wächst mit (Anfänger 35, voller Fortschritt etwa 150 Zeichen) | RWV6D-8AWXP-UXKUP-EQHE4-FGCHA-NM6U8-GK5PA |
+| Reisecode | Heldencode plus laufender Lauf: Figur, Unterklasse, Schicksalsrune, Tag, Herzen, Siege, Gold, Rucksack und Lager mit Positionen, Drehung und Stufen, Verb-Subjekt-Verbindungen, reservierte Ladenplätze, gekonnte Fragen | gleiches Format, länger, mit QR-Code | – |
 | Rucksack-Code | ein fertiger Rucksack für die Arena | mittellang | Code aus Buchstaben und Zahlen |
 
-- Eine **Prüfziffer** erkennt Tippfehler und meldet sie freundlich.
-- Der Code ist **komprimiert** (Bitfelder): jedes freigeschaltete Element ist ein Bit, so bleibt der Heldencode kurz.
-- **Wortliste** für den Heldencode: etwa 256 Fantasy-Wörter, jedes steht für 8 Bit.
-- Zusätzlich darf das Spiel den letzten Stand im Browser merken, als Komfort – maßgeblich ist aber der Code.
+- **Zeichen:** Großbuchstaben und Ziffern ohne verwechselbare Zeichen (kein 0/O, 1/I/L), in Fünfergruppen mit Bindestrichen. Beim Eingeben sind Bindestriche optional, Kleinbuchstaben werden automatisch groß.
+- Ein **Prüfzeichen** am Ende erkennt jedes falsch abgeschriebene Zeichen und jeden Dreher und meldet es freundlich („Da hat sich ein Tippfehler eingeschlichen“, „Im Code gibt es kein O und keine Null“).
+- **Kompakt:** Versionsnummer, kleine Zahlen als Varint, Listen sortiert und als Abstände kodiert – oder als Bitfeld, wenn das kürzer ist. So ist der Code am Anfang kurz und wächst mit.
+- **Feste Nummern** für alle Inhalte in `registry.json`; neue Inhalte werden nur hinten angehängt, nie umnummeriert. So bleiben alte Codes gültig.
+- Am Ende jedes Laufs und im Menü erscheint der Code groß, darunter ein **QR-Code** (lokal erzeugt, keine externen Dienste) und ein Knopf „Kopieren“. Einlesen geht per Tastatur oder mit der iPad-Kamera; das Spiel erkennt selbst, ob es ein Helden- oder Reisecode ist.
+- „Neu beginnen“ im Menü löscht den Stand auf dem iPad (mit Sicherheitsabfrage).
 - Fälschen ist möglich, aber unwichtig: Es gibt nichts zu gewinnen außer Spaß.
 
 ### Klassenarena

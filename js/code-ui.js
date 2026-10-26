@@ -50,7 +50,7 @@ function ebene(id, html) {
   const box = document.createElement('div');
   box.id = id;
   box.className = 'code-ebene';
-  box.innerHTML = `<div class="code-card">${html}</div>`;
+  box.innerHTML = `<div class="code-card" data-tut="code-fenster">${html}</div>`;
   document.body.append(box);
   return box;
 }
@@ -66,8 +66,8 @@ export function zeigeCode({ reise = false, zurueck = null } = {}) {
     ${codeKasten(code)}
     <div class="row"><button class="btn primary big" data-ok>${reise ? 'Lauf beenden und zum Start' : 'Fertig'}</button>${reise ? '<button class="btn" data-weiter>Doch weiterspielen</button>' : ''}</div>`);
   kopierenAn(box, code);
-  box.querySelector('[data-ok]').onclick = () => { box.remove(); zurueck?.(true); };
-  box.querySelector('[data-weiter]')?.addEventListener('click', () => { box.remove(); zurueck?.(false); });
+  box.querySelector('[data-ok]').onclick = () => { box.remove(); emit('codeZu'); zurueck?.(true); };
+  box.querySelector('[data-weiter]')?.addEventListener('click', () => { box.remove(); emit('codeZu'); zurueck?.(false); });
   emit('codeZeigen');
 }
 

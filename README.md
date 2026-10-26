@@ -2,7 +2,7 @@
 
 Ein Fantasy-Backpack-Battler fürs iPad (Querformat) als Web-App, in dem Grammatik das Regelwerk der Kombos ist. Das vollständige Spielkonzept steht in [konzept.md](konzept.md).
 
-**Stand: Etappe 3 – Pfad 1 vollständig, mit Tutorial, Sternstufen, Verben mit Subjekt und Bildern**
+**Stand: Etappe 4 – Fortschritt: Buch der Wörter, Ränge, Freischaltungen, Erfolge, Lernbericht, Helden- und Reisecode**
 
 Spielen: <https://simfischer.github.io/Runenrucksack/> – auf dem iPad in Safari öffnen, **Teilen → Zum Home-Bildschirm**, dann startet es wie eine App im Vollbild und läuft auch offline.
 
@@ -39,7 +39,7 @@ Alles steht in `tutorial.json`:
 | `laden` | fester Laden-Inhalt ab diesem Schritt (Item-ids) |
 | `hand` | `{ "typ": "tippen", "auf": "<ziel>" }` oder `{ "typ": "ziehen", "von": "<ziel>", "nach": "rucksack" | "links-von:<id>" | "neben:<id>" }` |
 | `falsch` | Liste von `{ "wenn": { "item", "bereich" }, "text", "zuruecksetzen" }` – freundlicher Hinweis, bei `zuruecksetzen` wandert das Item zurück in den Laden |
-| `voraussetzung` | Schritt nur, wenn es die Funktion gibt. Die vorhandenen Funktionen stehen in `FEATURES` in `js/tutorial-logic.js`; `buch` und `heldencode` fehlen noch, darum werden diese Schritte übersprungen. Etappe 4 trägt sie dort ein. |
+| `voraussetzung` | Schritt nur, wenn es die Funktion gibt. Die vorhandenen Funktionen stehen in `FEATURES` in `js/tutorial-logic.js` (seit Etappe 4 auch `buch` und `heldencode`). |
 | `kampfPause`, `zeigenBei` | Kampf kurz anhalten und erklären; Sprechblase erst bei einem Ereignis zeigen (z. B. `kampfEnde`) |
 
 Der Übungsgegner (`uebungsgegner`) steht in `enemies.json` mit `"uebung": true` und festen Gegenständen (`ausruestung`). Ein Bild für Fenwick wird automatisch benutzt, sobald es unter `assets/figur-fenwick.webp` liegt.
@@ -48,14 +48,47 @@ Nach Änderungen: `node --test` prüft, dass jeder Schritt erreichbar ist und h�
 
 ## So läuft ein Lauf
 
-1. **Figur wählen:** Borga Eisenfaust (Komposita +20 %, Start mit Axt und Feuer) oder Eadrun die Reiterin (Schriftrollen 20 % schneller, Start mit Speer und „stürmen“).
+1. **Figur wählen:** Borga Eisenfaust (Komposita +20 %, Start mit Axt und Feuer) oder Eadrun die Reiterin (Schriftrollen 20 % schneller, Start mit Speer und „stürmen“). Später kommen Faelith, Theron und Ysolde dazu (siehe „Fortschritt zwischen den Läufen“).
 2. **Schicksalsrune:** Eine von sechs zufälligen Regeln gilt für den ganzen Lauf, z. B. „Feuer-Komposita doppelt so stark“ oder „Laden hat 6 Plätze“.
 3. **Zehn Tage, zwei Gebiete:** Kleinwurzel (Tag 1–5, Boss: Ork-Plünderer) und Hrossmark (Tag 6–10, Boss: Wolfsreiter-Häuptling). Beim Gebietswechsel gibt es einen Übergangsbildschirm, in Hrossmark wählt man eine **Unterklasse**.
 4. **Jeder Tag:**
    - **Morgen:** Begegnung am Wegesrand (drei zur Wahl).
    - **Tag:** Laden mit 5 Items, Neu würfeln für 1 Gold, Reservieren, Verkaufen, Verschieben, Drehen. Alles Verbinden passiert sofort: zwei gleiche werden zur nächsten Sternstufe, ein Kristall neben einem Träger zum Kompositum. Das Abzeichen „1/2“ mit „= sofort ★★“ zeigt Items, von denen man schon eins hat.
    - **Nacht:** Automatischer Kampf. Vorher kann man den Fehler auf der Ork-Rüstung verbessern (ein Versuch, richtig: Ork startet mit 15 % weniger Leben).
-5. **Ende:** nach dem 10. Kampf („Reise geschafft“, mit Sternen nach Siegen) oder wenn alle 5 Herzen weg sind.
+5. **Ende:** nach dem 10. Kampf („Reise geschafft“, mit Sternen nach Siegen) oder wenn alle 5 Herzen weg sind. Danach: Lernbericht, Erfahrung und Rang, neue Freischaltungen und Erfolge, der Heldencode mit QR-Code.
+
+Im Spielmenü kann man den **Lauf unterbrechen**: Das Spiel zeigt einen Reisecode, mit dem es später (auch auf einem anderen iPad) genau dort weitergeht.
+
+## Fortschritt zwischen den Läufen
+
+| Was | So funktioniert es |
+| --- | --- |
+| **Buch der Wörter** (📚 im Spiel, Startmenü, Menü) | Seiten Komposita, Sternstufen, Steigerungen, Sätze, Schätze – 317 Einträge, automatisch aus `items.json` und `recipes.json`. Unentdeckt: dunkle Silhouette mit „???“; entdeckt: Bild, Name, Artikel, Wirkung, Lernhinweis. Fortschrittsbalken pro Seite, volle Seiten schalten Rucksack-Designs frei. Neue Entdeckungen werden kurz eingeblendet. |
+| **Erfahrung und Ränge** | Am Ende jedes Laufs: 10 pro Sieg, 5 pro neuer Entdeckung, 2 pro Frage beim ersten Versuch richtig. Lehrling (0) → Wanderer (350) → Runenkundige (1200) → Wortmeister (2600) → Hüter der Sprache (4000). Laut Simulation Rang 2 nach 2 Läufen, Rang 5 nach etwa 26. |
+| **Freischaltungen** | Faelith die Bogenschützin (Rang Wanderer; Bogen-Komposita +30 %, sieht mögliche Komposita im Laden von Weitem), Hauptmann Theron (3 gewonnene Läufe; +3 Startblock für Nomen mit passendem Siegel), Ritterin Ysolde (25 Einträge; Runen wirken auf zwei Nomen). Drachenfeuerschwert, Runenstein und Runenkrone erst nach Freischaltung im Laden. |
+| **Rucksack-Designs** | Leder, Zwergenstahl (Seite Komposita), Elbenseide (Seite Steigerungen), Reiterleder (Seite Sätze), Silberbanner (Erfolg „Alle Helden“) – nur Optik, Auswahl in der **Sammlung** (Startmenü). |
+| **Erfolge** | 18 Erfolge, z. B. „Erstes Kompositum“, „Erste ★★★★“, „Fehlerjäger“, „Satzbauer“, „Ohne Fehlversuch“, „Alle Helden“, „Feuermeister“. |
+| **Lernbericht** | Nur für das Kind: Siege, neue Entdeckungen, Rangfortschritt, „Das sitzt schon“ und „Das üben wir noch“ mit Merkhilfe – ohne Noten und Prozentzahlen. |
+
+Alle Werte stehen in `achievements.json` (Erfahrung, Ränge, Designs, Erfolge), `heroes.json` (Figuren mit `freischaltung`) und `items.json` (Items mit `freischaltung`).
+
+## Heldencode und Reisecode
+
+- **Heldencode:** gesamter Fortschritt (Rang, Erfahrung, Figuren, Designs, Erfolge, Buch der Wörter, Statistik, Tutorial). Erscheint am Ende jedes Laufs und im Menü – groß, mit QR-Code und Knopf „Kopieren“.
+- **Reisecode:** Heldencode plus laufender Lauf (Menü → „Lauf unterbrechen“).
+- **Eingeben:** Startmenü → „Heldencode eingeben“. Bindestriche sind optional, Kleinbuchstaben werden groß. Das Spiel erkennt selbst, ob es ein Helden- oder Reisecode ist, und meldet Tippfehler freundlich. Mit „📷 QR-Code scannen“ geht es auch über die iPad-Kamera.
+- **Format:** Großbuchstaben und Ziffern ohne 0/O und 1/I/L, Fünfergruppen, Prüfzeichen am Ende. Länge: Anfänger 35, Mittelstand etwa 125, voller Fortschritt etwa 150 Zeichen; ein Reisecode ist länger (120–370 Zeichen).
+- Der Browser merkt sich den letzten Stand zusätzlich (Komfort). „Neu beginnen“ im Menü löscht ihn nach einer Sicherheitsabfrage.
+
+### Wichtige Regel: registry.json nur hinten ergänzen
+
+Jeder Inhalt (Item, Figur, Erfolg, Buch-Eintrag …) hat in `registry.json` eine feste Nummer. Nach neuen Inhalten:
+
+```bash
+node tools/registry.mjs
+```
+
+Das Werkzeug hängt neue Einträge **nur hinten an**. Nie Einträge umsortieren, umbenennen oder löschen – sonst passen alte Helden- und Reisecodes nicht mehr. Die Tests melden, wenn etwas in `registry.json` fehlt, und prüfen einen gespeicherten Code aus Version 1.
 
 ## Grammatik im Spiel
 
@@ -89,6 +122,8 @@ Alle Inhalte stehen in JSON-Dateien. Jede Datei hat oben ein Feld `_hinweis`, da
 | `regions.json` | Die Gebiete: Tage, Farben, Wortfeld, Gegner, Boss |
 | `heroes.json` | Startfiguren mit Bonus, Start-Items und Unterklassen; die sechs Schicksalsrunen |
 | `tutorial.json` | Tutorial „Der erste Tag“: Schritte, Texte, Hilfe-Karten für „So geht's“, Erste-Mal-Tipps |
+| `achievements.json` | Erfahrung, Ränge, Rucksack-Designs, Erfolge |
+| `registry.json` | Feste Nummern für Helden- und Reisecodes (nur mit `node tools/registry.mjs` ergänzen) |
 
 ### Beispiele
 
@@ -156,11 +191,14 @@ node --test
 | `tests/steigerung.test.mjs` | Steigerungsformen, Deklination, Erkennung von drei Runen, +50 % je Stufe |
 | `tests/begegnungen.test.mjs` | Begegnungen, Aufgaben (genau eine Lösung), Rucksack-Wachstum, Kobold-Fluch |
 | `tests/ablauf.test.mjs` | Gebiete, Bosse, Figuren, Schicksalsrunen, Unterklassen, Taschen, Ork-Rüstungen |
-| `tests/balance.test.mjs` | 200 simulierte Läufe: Siegquote pro Tag, Siege und Spielzeit; Sternstufen der Gegner |
+| `tests/balance.test.mjs` | 200 simulierte Läufe: Siegquote pro Tag, Siege und Spielzeit; Sternstufen der Gegner; Rang-Aufstieg über viele Läufe |
 | `tests/sterne.test.mjs` | Mehrzahl- und Verbformen aller Items, Verbinden beim Kaufen, beim Ziehen auf ein gleiches Item, bei Belohnungen und als Kette, „Nicht verbinden“, gekonnte Fragen, Laden-Gewichtung |
 | `tests/komposita.test.mjs` | Komposita entstehen sofort beim Ablegen und Drehen, Stufe vom Träger, Feueraxt ★ + ★ → ★★, falsch nie stärker |
 | `tests/verben.test.mjs` | Pfeil, Personalform, Verb mit und ohne Subjekt (falsch nie stärker) |
 | `tests/tutorial.test.mjs` | Tutorial komplett durchspielen, Zurücksetzen, Überspringen fehlender Funktionen, danach normaler Lauf |
+| `tests/buch.test.mjs` | Buch der Wörter: alle Einträge aus den Daten, Entdeckungen aus dem Lauf, Seitenstand |
+| `tests/fortschritt.test.mjs` | Erfahrung, Ränge, Freischaltungen, Fähigkeiten der neuen Figuren, Erfolge, Lernbericht |
+| `tests/code.test.mjs` | Helden- und Reisecode: exakt derselbe Stand (auch voll), Tippfehler und Dreher, angehängte Inhalte, gespeicherter Code aus Version 1; nennt die Codelängen |
 
 Das Tutorial in einem echten Browser per Touch durchspielen (braucht Chrome oder Edge; Server vorher mit `node tools/serve.mjs` starten):
 
@@ -195,12 +233,20 @@ Aktuelle Balance (200 Läufe, einfache Kaufstrategie, Aufgaben zu 75 % richtig):
 | `js/sterne.js` | Sofortiges Verbinden: zwei gleiche und Kristall + Träger finden, Frage bauen, verbinden (auch als Kette), gekonnte Fragen |
 | `js/mods.js` | Boni von Figur, Unterklasse, Schicksalsrune, Begegnungen und Taschen |
 | `js/battle.js` | Kampfsimulation |
-| `js/sim.js` | Simulation ganzer Läufe für die Balance |
+| `js/sim.js` | Simulation ganzer Läufe (und vieler Läufe hintereinander) für die Balance |
+| `js/buch.js`, `js/buch-ui.js` | Buch der Wörter: Einträge erzeugen, Entdeckungen finden; Bildschirm und Einblendung |
+| `js/fortschritt.js` | Fortschritt ohne Darstellung: Antworten merken, Erfahrung, Rang, Freischaltungen, Erfolge, Lernbericht |
+| `js/ende-ui.js` | Ende eines Laufs: Lernbericht, Erfahrung, Rang-Feier, Freischaltungen, Heldencode |
+| `js/sammlung-ui.js` | Sammlung: Figuren, Rucksack-Designs, Erfolge |
+| `js/code.js`, `js/code-ui.js` | Helden- und Reisecode: kodieren, prüfen, lesen; anzeigen mit QR-Code, eingeben, Kamera |
+| `js/vendor/qrcode.js` | QR-Code-Erzeugung (qrcode-generator von Kazuhiko Arase, MIT-Lizenz) |
+| `js/vendor/jsQR.js` | QR-Code lesen mit der Kamera (jsQR, Apache-2.0, siehe `js/vendor/jsQR-LICENSE.txt`) |
 | `sw.js`, `manifest.webmanifest`, `icons/` | PWA (offline, Home-Bildschirm) |
 | `tools/serve.mjs` | lokaler Testserver |
 | `tools/zerschneide.mjs` | zerlegt Sprite-Sheets in Einzelbilder (WebP), schreibt Zuordnung und Vorschau |
 | `tools/bilder.mjs` | verkleinert Figuren, Bosse, Hintergründe, Titelbild; erzeugt die App-Symbole |
 | `tools/chrome.mjs`, `tools/vorschau.mjs` | Hilfen für die Bild-Werkzeuge |
 | `tools/tutorial-browsertest.mjs` | spielt das Tutorial im Browser per Touch durch |
+| `tools/registry.mjs` | hängt neue Inhalte hinten an `registry.json` an |
 
-Kein Server, keine Accounts, keine externen Dienste. Der laufende Lauf wird nur im Browser gemerkt.
+Kein Server, keine Accounts, keine externen Dienste. Fortschritt und laufender Lauf werden nur im Browser gemerkt; maßgeblich sind Helden- und Reisecode.

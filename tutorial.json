@@ -567,35 +567,73 @@
     {
       "id": "buch",
       "voraussetzung": "buch",
-      "text": "Jede neue Kombination landet im Buch der Wörter. Kannst du alle finden?",
+      "text": "Alles, was du entdeckst, landet im Buch der Wörter. Tipp oben auf 📚!",
+      "tipp": "Das Buch-Symbol ist oben rechts, neben dem Menü.",
       "ziel": [
         "buch"
       ],
       "aktion": {
-        "typ": "weiter"
+        "typ": "ereignis",
+        "name": "buchAuf"
+      },
+      "hand": {
+        "typ": "tippen",
+        "auf": "buch"
       },
       "hilfe": {
         "titel": "Buch der Wörter",
-        "emoji": "📖",
+        "emoji": "📚",
         "animation": "pulsieren",
-        "text": "Neue Kombinationen landen im Buch der Wörter."
+        "text": "Jede neue Kombination landet im Buch der Wörter. Dunkle Felder mit ??? kannst du noch entdecken – volle Seiten bringen Belohnungen."
+      }
+    },
+    {
+      "id": "buch-seite",
+      "voraussetzung": "buch",
+      "text": "Dein Feuerschwert steht schon drin! Dunkle Felder mit Fragezeichen kannst du noch entdecken.",
+      "tipp": "Tipp auf „Schließen“, wenn du fertig geschaut hast.",
+      "ziel": [
+        "buch-fenster"
+      ],
+      "aktion": {
+        "typ": "ereignis",
+        "name": "buchZu"
       }
     },
     {
       "id": "heldencode",
       "voraussetzung": "heldencode",
-      "text": "Am Ende bekommst du einen Code. Schreib ihn ab oder fotografiere ihn, dann kannst du nächstes Mal weiterspielen.",
+      "text": "Mit deinem Heldencode nimmst du deinen Fortschritt mit. Tipp auf ☰ und dann auf „Heldencode“.",
+      "tipp": "Das Menü ☰ ist oben rechts.",
       "ziel": [
-        "heldencode"
+        "menue",
+        "fenster"
       ],
       "aktion": {
-        "typ": "weiter"
+        "typ": "ereignis",
+        "name": "codeZeigen"
+      },
+      "hand": {
+        "typ": "tippen",
+        "auf": "menue"
       },
       "hilfe": {
         "titel": "Heldencode",
         "emoji": "🔑",
         "animation": "pulsieren",
-        "text": "Mit deinem Heldencode spielst du nächstes Mal weiter."
+        "text": "Am Ende jedes Laufs bekommst du einen Heldencode. Schreib ihn ab oder fotografiere ihn – mit „Heldencode eingeben“ holst du deinen Fortschritt zurück, auch auf einem anderen iPad."
+      }
+    },
+    {
+      "id": "heldencode-erklaerung",
+      "voraussetzung": "heldencode",
+      "text": "Schreib den Code ins Heft oder fotografiere ihn. Damit spielst du nächstes Mal genau hier weiter!",
+      "ziel": [
+        "code-fenster"
+      ],
+      "aktion": {
+        "typ": "ereignis",
+        "name": "codeZu"
       }
     },
     {

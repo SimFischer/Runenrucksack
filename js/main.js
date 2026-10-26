@@ -853,7 +853,7 @@ function openMenu() {
     help: () => showHelp(openMenu),
     buch: () => zeigeBuch(openMenu),
     sammlung: () => zeigeSammlung(openMenu),
-    code: () => zeigeCode({ zurueck: openMenu }),
+    code: () => zeigeCode({ zurueck: G.run?.tutorial ? null : openMenu }), // im Tutorial führt Fenwick weiter
     // Reisecode: Helden-Fortschritt + laufender Lauf; danach zum Start (der Lauf bleibt auch im Browser gemerkt)
     pause: () => zeigeCode({ reise: true, zurueck: (beenden) => { if (beenden) { save(); showStart(); } } }),
     neustart: () => neuBeginnen(() => { wendeDesignAn(); showAsk(); }),
