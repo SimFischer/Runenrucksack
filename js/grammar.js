@@ -23,8 +23,10 @@ export const DIRS = [[1, 0], [0, 1], [-1, 0], [0, -1]];
 
 export const isNoun = (d) => !!d.artikel && d.art !== 'siegel' && d.art !== 'rune';
 export const isRune = (d) => d.art === 'rune';
-export const canRotate = (d) => isRune(d) || d.w !== d.h;
-export const nextRot = (d, rot) => (isRune(d) ? (rot + 1) % 4 : d.w !== d.h ? (rot ? 0 : 1) : rot);
+export const isVerb = (d) => d.art === 'verb';
+// Runen und Verben drehen ihren Pfeil in vier Richtungen, andere längliche Items legen sich quer.
+export const canRotate = (d) => isRune(d) || isVerb(d) || d.w !== d.h;
+export const nextRot = (d, rot) => (isRune(d) || isVerb(d) ? (rot + 1) % 4 : d.w !== d.h ? (rot ? 0 : 1) : rot);
 
 const lowerFirst = (s) => s.charAt(0).toLowerCase() + s.slice(1);
 
@@ -147,6 +149,56 @@ function neighbors(p, defs, map) {
   return [...found];
 }
 
+// Pfeil einer Verb-Rolle zeigt entlang ihrer langen Seite: 0 ↑, 1 →, 2 ↓, 3 ←.
+export function verbTargetCell(p, def) {
+  const s = sizeOf(def, p.rot || 0);
+  return [{ x: p.x, y: p.y - 1 }, { x: p.x + s.w, y: p.y }, { x: p.x, y: p.y + s.h }, { x: p.x - 1, y: p.y }][(p.rot || 0) % 4];
+}
+
+export const ROLLE_OHNE_SUBJEKT = 0.5; // ohne Subjekt oder mit falscher Form wirkt die Rolle nur halb
+
+const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
+
+// Mehrzahl eines Items; Komposita bilden sie über ihr Grundwort (Feuer + Äxte = Feueräxte).
+export function pluralOf(def, defs) {
+  if (def.art === 'kompositum') {
+    const k = defs[def.teile.kraft], t = pluralOf(defs[def.teile.traeger], defs);
+    return {
+      einzahl: def.name,
+      richtig: k.name + lowerFirst(t.richtig),
+      falsch: t.falsch.map((f) => k.name + lowerFirst(f)),
+      grund: t,
+    };
+  }
+  if (!def.plural) return null;
+  return { einzahl: def.plural.einzahl || def.name, richtig: def.plural.richtig, falsch: def.plural.falsch };
+}
+
+// Der Satz aus Subjekt und Verb: „Das Feuerschwert schlägt.“ / „Die Speere schlagen.“ (★★ und ★★★ = Mehrzahl)
+export function satzFor(verbDef, subjDef, stern, defs) {
+  const mehrzahl = stern > 1;
+  const f = verbDef.formen;
+  const subjekt = mehrzahl ? `Die ${pluralOf(subjDef, defs).richtig}` : `${cap(subjDef.artikel)} ${subjDef.name}`;
+  return {
+    mehrzahl,
+    subjektText: subjekt,
+    richtig: mehrzahl ? f.sie : f.er,
+    falsch: mehrzahl ? f.falschSie : f.falschEr,
+    satz: `${subjekt} ${mehrzahl ? f.sie : f.er}.`,
+    regel: mehrzahl
+      ? `Sind es mehrere (sie), bleibt die Grundform: die ${pluralOf(subjDef, defs).richtig} ${f.sie}.`
+      : `Bei einem (er, sie, es) endet das Verb meist auf -t: ${subjDef.artikel} ${subjDef.name} ${f.er}.`,
+  };
+}
+
+function subjektPasst(bonus, sd) {
+  const f = bonus?.filter || {};
+  const base = sd.teile?.traeger || sd.id;
+  if (f.traeger && !f.traeger.includes(base)) return false;
+  if (f.kraft && !f.kraft.includes(sd.teile?.kraft)) return false;
+  return !!bonus;
+}
+
 export const runeTargetCell = (r) => {
   const [dx, dy] = DIRS[(r.rot || 0) % 4];
   return { x: r.x + dx, y: r.y + dy };
@@ -239,6 +291,20 @@ export function analyze(placed, defs, opts = {}) {
       const ok = runeFits(d, td);
       info.get(p.uid).ziel = { uid: t.uid, def: td, ok };
       info.get(t.uid).runen.push({ uid: p.uid, def: d, ok });
+    } else if (isVerb(d) && d.formen) {
+      const c = verbTargetCell(p, d);
+      const t = map.get(`${c.x},${c.y}`);
+      const vi = info.get(p.uid);
+      vi.verb = { status: 'kein' };
+      if (!t || !isNoun(defs[t.id])) continue;
+      const stern = t.stern || 1;
+      const s = p.satz;
+      const passt = s && s.uid === t.uid && s.id === t.id && (s.stern || 1) === stern;
+      vi.verb = {
+        status: passt ? (s.ok ? 'ok' : 'falsch') : 'offen',
+        subjekt: { uid: t.uid, id: t.id, stern, def: defs[t.id] },
+        ...satzFor(d, defs[t.id], stern, defs),
+      };
     }
   }
 
@@ -271,6 +337,30 @@ export function analyze(placed, defs, opts = {}) {
     i.def = eff;
     i.adjektive = adjs;
     i.phrase = phraseFor(adjs, eff);
+  }
+
+  // Verb-Rollen: mit richtigem Subjekt volle Wirkung und das Subjekt schlägt mit,
+  // sonst nur halbe Wirkung – grammatisch falsch ist nie stärker als richtig.
+  for (const p of placed) {
+    const i = info.get(p.uid);
+    if (!i.verb) continue;
+    const v = i.verb;
+    if (v.status === 'ok') {
+      i.def.subjektUid = v.subjekt.uid;
+      const bonus = i.base.subjektBonus;
+      if (subjektPasst(bonus, v.subjekt.def)) {
+        v.bonus = bonus.text;
+        if (bonus.prozent) for (const k of EFFECT_KEYS) if (i.def[k]) i.def[k] = roundUp(k, i.def[k] * (1 + bonus.prozent / 100));
+        const sub = info.get(v.subjekt.uid);
+        for (const [k, val] of Object.entries(bonus.plus || {})) sub.def[k] = (sub.def[k] || 0) + val;
+      }
+    } else {
+      for (const k of EFFECT_KEYS) {
+        if (!i.def[k]) continue;
+        const half = i.def[k] * ROLLE_OHNE_SUBJEKT;
+        i.def[k] = DECIMAL_KEYS.has(k) ? Math.floor(half * 10) / 10 : Math.floor(half);
+      }
+    }
   }
   return info;
 }

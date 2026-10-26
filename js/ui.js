@@ -1,6 +1,6 @@
 // Gemeinsame Bausteine der Oberfläche: Fenster, Hinweise, Item-Kacheln und Raster.
 import { sizeOf } from './logic.js';
-import { GENUS, findFusions, isRune, runeTargetCell } from './grammar.js';
+import { GENUS, findFusions, isRune, isVerb, runeTargetCell, verbTargetCell } from './grammar.js';
 import { G } from './state.js';
 
 export const $ = (id) => document.getElementById(id);
@@ -113,6 +113,16 @@ export function itemEl(def, rot, size, stern = 1) {
     a.style.fontSize = Math.round(size * 0.24) + 'px';
     el.append(a);
   }
+  if (isVerb(def) && def.formen) {
+    // Verb-Rolle: Pfeil zeigt auf das Subjekt (0 ↑, 1 →, 2 ↓, 3 ←)
+    el.classList.add('verb');
+    const a = document.createElement('span');
+    a.className = `arrow v${(rot || 0) % 4}`;
+    a.textContent = '➤';
+    a.style.fontSize = Math.round(size * 0.26) + 'px';
+    el.append(a);
+    if ((rot || 0) % 2) em.style.transform = 'rotate(90deg)';
+  }
   if (def.abzeichen) {
     const b = document.createElement('span');
     b.className = 'badge';
@@ -185,7 +195,7 @@ export function drawItems(gridEl, grid, placed, size, info, area) {
         m.textContent = '✦';
         it.append(m);
       }
-      const idle = (def.art === 'siegel' && !i.ziele.some((z) => z.ok)) || (isRune(def) && !i.ziel?.ok);
+      const idle = (def.art === 'siegel' && !i.ziele.some((z) => z.ok)) || (isRune(def) && !i.ziel?.ok) || (i.verb && i.verb.status !== 'ok');
       if (idle) it.classList.add('idle');
     }
     if (fusing.has(p.uid)) it.classList.add('fuses');
@@ -210,17 +220,27 @@ function drawRuneLines(gridEl, grid, placed, size, info) {
   const lines = [];
   for (const p of placed) {
     const i = info.get(p.uid);
-    if (!isRune(G.DEFS[p.id]) || !i?.ziel?.ok) continue;
-    const t = runeTargetCell(p);
-    lines.push([(p.x + 0.5) * size, (p.y + 0.5) * size, (t.x + 0.5) * size, (t.y + 0.5) * size]);
+    const d = G.DEFS[p.id];
+    if (isRune(d) && i?.ziel?.ok) {
+      const t = runeTargetCell(p);
+      lines.push([(p.x + 0.5) * size, (p.y + 0.5) * size, (t.x + 0.5) * size, (t.y + 0.5) * size]);
+    } else if (isVerb(d) && i?.verb?.status === 'ok') {
+      // Linie von der Spitze der Rolle zum Subjekt
+      const t = verbTargetCell(p, d);
+      const dir = (p.rot || 0) % 4;
+      const s = dir % 2 ? { w: d.h, h: d.w } : { w: d.w, h: d.h };
+      const from = [{ x: p.x + 0.5, y: p.y + 0.5 }, { x: p.x + s.w - 0.5, y: p.y + 0.5 }, { x: p.x + 0.5, y: p.y + s.h - 0.5 }, { x: p.x + 0.5, y: p.y + 0.5 }][dir];
+      lines.push([from.x * size, from.y * size, (t.x + 0.5) * size, (t.y + 0.5) * size, 'verb']);
+    }
   }
   if (!lines.length) return;
   const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
   svg.classList.add('rune-lines');
   svg.setAttribute('width', grid.cols * size);
   svg.setAttribute('height', grid.rows * size);
-  for (const [x1, y1, x2, y2] of lines) {
+  for (const [x1, y1, x2, y2, cls] of lines) {
     const l = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    if (cls) l.classList.add(cls);
     Object.entries({ x1, y1, x2, y2 }).forEach(([k, v]) => l.setAttribute(k, v));
     svg.append(l);
   }

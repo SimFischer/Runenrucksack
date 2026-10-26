@@ -2,9 +2,9 @@
 // einem der nächsten Stufe – Rucksack und Lager zählen zusammen. Vorher eine Grammatik-Frage:
 // Nomen → Mehrzahl, Verben → Präteritum, Adjektiv-Runen → Steigerung.
 import { MAX_STERN, sternOf, bagGrid, STORE_GRID, canPlace, findSpot, shuffle } from './logic.js';
-import { isRune, runeBase, nextLevelId } from './grammar.js';
+import { isRune, runeBase, nextLevelId, pluralOf } from './grammar.js';
 
-const lowerFirst = (s) => s.charAt(0).toLowerCase() + s.slice(1);
+export { pluralOf };
 
 // Kann ein Item aus dem Laden mit etwas im Rucksack ein Kompositum bilden? → Kompositum-id oder null.
 export function compoundPartner(def, bag, defs, recipes) {
@@ -25,21 +25,6 @@ export function canMerge(def, stern = 1) {
   if (def.art === 'siegel' || def.art === 'tasche') return false;
   if (isRune(def)) return !!def.steigerung && (def.stufe || 1) < 3;
   return stern < MAX_STERN;
-}
-
-// Mehrzahl eines Items; Komposita bilden sie über ihr Grundwort (Feuer + Äxte = Feueräxte).
-export function pluralOf(def, defs) {
-  if (def.art === 'kompositum') {
-    const k = defs[def.teile.kraft], t = pluralOf(defs[def.teile.traeger], defs);
-    return {
-      einzahl: def.name,
-      richtig: k.name + lowerFirst(t.richtig),
-      falsch: t.falsch.map((f) => k.name + lowerFirst(f)),
-      grund: t,
-    };
-  }
-  if (!def.plural) return null;
-  return { einzahl: def.plural.einzahl || def.name, richtig: def.plural.richtig, falsch: def.plural.falsch };
 }
 
 // Alle Dreiergruppen im Besitz (Rucksack + Lager). Der neue Gegenstand kommt an die Stelle des zuletzt hinzugekommenen.

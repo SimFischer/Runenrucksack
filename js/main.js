@@ -1,10 +1,10 @@
 // Runenrucksack – Ablauf eines Laufs, Laden, Rucksack (Ziehen und Drehen) und Info-Feld.
 import {
   CFG, income, baseHp, sellValue, newRun, reroll, finishBattle,
-  canPlace, overlapping, findSpot, sizeOf, shuffle, attachTasche, ownedCount, MAX_STERN,
+  canPlace, overlapping, findSpot, sizeOf, shuffle, attachTasche, ownedCount, MAX_STERN, STERN_FAKTOR,
 } from './logic.js';
 import {
-  GENUS, SIEGEL_BONUS, findFusions, wrongOrderNeighbor, canRotate, nextRot, isNoun, isRune, runeBase, starDef,
+  GENUS, SIEGEL_BONUS, findFusions, wrongOrderNeighbor, canRotate, nextRot, isNoun, isRune, isVerb, runeBase, starDef,
 } from './grammar.js';
 import { findTriples, mergeQuestion, applyMerge, canMerge, compoundPartner } from './sterne.js';
 import { G, loadData, save, loadRun, placedOf, itemsIn, gridOf, region, hero, playerCtx, emit } from './state.js';
@@ -424,7 +424,7 @@ function renderInfo() {
     btn(`Kaufen <span class="price">${base.preis} 🪙</span>`, () => buyAuto(slot), 'primary').disabled = G.run.gold < base.preis;
   } else {
     const uid = selected.uid;
-    if (canRotate(base)) btn(isRune(base) ? '⟳ Pfeil drehen' : '⟳ Drehen', () => rotateInPlace(uid));
+    if (canRotate(base)) btn(isRune(base) || isVerb(base) ? '⟳ Pfeil drehen' : '⟳ Drehen', () => rotateInPlace(uid));
     if (selected.src === 'bag') btn('📦 Ins Lager', () => moveAuto(uid, 'store'));
     else btn('🎒 In den Rucksack', () => moveAuto(uid, 'bag'));
     btn(`Verkaufen <span class="price">+${sellValue(G.DEFS[placedOf(uid).id], placedOf(uid).stern || 1)} 🪙</span>`, () => sell(uid), 'danger');
@@ -441,7 +441,7 @@ function collectNotes(base, ref) {
     const next = starDef(base, stern + 1);
     const keys = ['schaden', 'block', 'heilung', 'gift', 'brand', 'regeneration', 'tempo', 'leben', 'startblock'].filter((k) => base[k]);
     const vorschau = keys.slice(0, 3).map((k) => `${STAT_ROWS.find((r) => r[0] === k)[1]} ${fmt(next[k])}`).join(' · ');
-    out.push(`<p class="gram star-line"><b class="star-big">${'★'.repeat(stern)}${'☆'.repeat(MAX_STERN - stern)}</b> Stufe ${stern} von ${MAX_STERN}<br>Drei gleiche ergeben ${'★'.repeat(stern + 1)}: ${vorschau}</p>`);
+    out.push(`<p class="gram star-line"><b class="star-big">${'★'.repeat(stern)}${'☆'.repeat(MAX_STERN - stern)}</b> Stufe ${stern} von ${MAX_STERN}<br>Drei gleiche ergeben ${'★'.repeat(stern + 1)} – ${fmt(STERN_FAKTOR[stern + 1])}-fache Wirkung${vorschau && !isVerb(base) ? `: ${vorschau}` : ''}</p>`);
   } else if (!isRune(base) && stern === MAX_STERN) {
     out.push(`<p class="gram star-line"><b class="star-big">★★★</b> Höchste Stufe!</p>`);
   } else if (isRune(base) && base.steigerung) {
@@ -474,6 +474,14 @@ function grammarNotes(base, ana, ref) {
 
   if (isNoun(base)) {
     out.push({ html: `${genusChip(base.artikel)} <b>${base.name}</b> – Genus ${GENUS[base.artikel].name}` });
+  }
+  if (isVerb(base) && base.formen) {
+    const v = ana?.verb;
+    out.push({ html: `Verben sagen, was passiert. Dreh den Pfeil der Rolle auf ein Nomen – das ist das Subjekt. Formen: er ${base.formen.er}, sie ${base.formen.sie}, gestern ${base.formen.praeteritum}.` });
+    if (v?.status === 'ok') out.push({ cls: 'ok', html: `✓ <b>„${v.satz}“</b> Wenn die Rolle wirkt, ${v.mehrzahl ? 'schlagen' : 'schlägt'} ${v.subjektText.charAt(0).toLowerCase() + v.subjektText.slice(1)} mit.${v.bonus ? ` ${v.bonus}!` : ''}` });
+    else if (v?.status === 'falsch') out.push({ cls: 'bad', html: `✗ Die Form passte nicht – richtig wäre „${v.satz}“. Die Rolle wirkt nur halb. Leg sie neu an, um es nochmal zu versuchen.` });
+    else if (v?.status === 'offen') out.push({ cls: 'bad', html: 'Gleich fragt das Spiel nach der richtigen Form.' });
+    else if (ana) out.push({ cls: 'bad', html: '✗ Der Pfeil zeigt auf kein Nomen. Ohne Subjekt wirkt die Rolle nur halb. Tippe zweimal, um sie zu drehen.' });
   }
   if (base.art === 'kompositum') {
     const k = G.DEFS[base.teile.kraft], t = G.DEFS[base.teile.traeger];
@@ -747,9 +755,59 @@ let merging = false;
 function checkMerges() {
   if (merging || !G.run || G.run.over || !$('modal').hidden || drag || $('game').hidden) return;
   const groups = findTriples(G.run.items, G.DEFS);
-  if (!groups.length) return;
-  merging = true;
-  showMerge(groups[0]);
+  if (groups.length) { merging = true; showMerge(groups[0]); return; }
+  // Danach: Zeigt eine Verb-Rolle auf ein neues Subjekt? Dann nach der Personalform fragen.
+  const offen = itemsIn('bag').find((p) => bagInfo.get(p.uid)?.verb?.status === 'offen');
+  if (offen) { merging = true; askVerb(offen); }
+}
+
+// „Das Feuerschwert ___ (schlagen)“ – die Antwort gilt, solange Rolle und Subjekt so liegen.
+function askVerb(p) {
+  const run = G.run;
+  const d = G.DEFS[p.id];
+  const v = bagInfo.get(p.uid).verb;
+  const options = shuffle([v.richtig, ...v.falsch]);
+  emit('tipp', { key: 'verben' });
+  let tries = 0, feedback = '';
+  const wrong = new Set();
+  const store = (ok) => {
+    p.satz = { uid: v.subjekt.uid, id: v.subjekt.id, stern: v.subjekt.stern, ok };
+    closeModal();
+    merging = false;
+    render();
+    emit('satz', { ok, verb: p.id, subjekt: v.subjekt.id });
+    if (ok) toast(`„${v.satz}“ – jetzt wirkt die Rolle voll!`);
+  };
+  const draw = () => {
+    const paid = tries > 0 && !run.tutorial;
+    const broke = paid && run.gold < 1;
+    const card = openModal(`
+      <div class="fusion-eq"><span class="fi">${d.emoji}<small>${d.name}</small></span><span class="op">➤</span>
+        <span class="fi">${v.subjekt.def.emoji}${v.subjekt.stern > 1 ? `<em class="goal-stars">${'★'.repeat(v.subjekt.stern)}</em>` : ''}<small>${v.subjekt.def.name}</small></span></div>
+      <p class="enc-progress">Die Rolle zeigt auf ein Subjekt. Wie heißt der Satz?</p>
+      <h2 class="enc-q">${v.subjektText} <span class="blank">___</span>. <small>(${d.name})</small></h2>
+      <div class="row wrap">${options.map((o, k) => `<button class="btn opt-btn" data-k="${k}" ${wrong.has(k) || broke ? 'disabled' : ''}>${o}</button>`).join('')}</div>
+      <p class="cost">${run.tutorial ? (tries ? 'Probier es noch einmal!' : '') : paid ? `Jeder weitere Versuch kostet 1 🪙 · du hast ${run.gold} 🪙` : 'Erster Versuch kostenlos'}</p>
+      ${feedback ? `<p class="feedback">${feedback}</p>` : ''}
+      ${run.tutorial ? '' : '<div class="row"><button class="btn small" data-leave>So lassen (Rolle wirkt nur halb)</button></div>'}`, 'merge-card');
+    card.querySelectorAll('[data-k]').forEach((b) => { b.onclick = () => guess(+b.dataset.k); });
+    card.querySelector('[data-leave]')?.addEventListener('click', () => store(false));
+  };
+  const guess = (k) => {
+    if (tries > 0 && !run.tutorial) {
+      if (run.gold < 1) return;
+      run.gold -= 1;
+      bump('stat-gold');
+    }
+    tries++;
+    if (options[k] === v.richtig) { run.lernen.richtig++; store(true); return; }
+    run.lernen.falsch++;
+    wrong.add(k);
+    feedback = `✗ ${v.regel}`;
+    save();
+    draw();
+  };
+  draw();
 }
 
 function showMerge(group) {

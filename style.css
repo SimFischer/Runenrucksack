@@ -926,3 +926,11 @@ h2 .hint { font-size: 12px; font-weight: 400; color: var(--ink-soft); }
 .slot .holder .item.cant { filter: grayscale(.6) opacity(.6); }
 .star-line { line-height: 1.5; }
 .star-big { color: #e0a526; font-size: 18px; letter-spacing: 1px; text-shadow: 0 0 4px rgba(255,200,40,.6); }
+
+/* Verb-Rollen mit Pfeil */
+.item .arrow.v0 { top: 1px; left: 50%; transform: translateX(-50%) rotate(270deg); }
+.item .arrow.v1 { right: 2px; top: 50%; transform: translateY(-50%); }
+.item .arrow.v2 { bottom: 14px; left: 50%; transform: translateX(-50%) rotate(90deg); }
+.item .arrow.v3 { left: 2px; top: 50%; transform: translateY(-50%) rotate(180deg); }
+.item.verb .arrow { color: #b0472a; }
+.rune-lines line.verb { stroke: #ff9a5a; filter: drop-shadow(0 0 5px #ff6a2a); }

@@ -100,7 +100,7 @@ export class Battle {
     }
   }
 
-  trigger(key, me, foeKey, foe, it, ev) {
+  trigger(key, me, foeKey, foe, it, ev, alsSubjekt = false) {
     const d = it.def;
     // Glück: Chance, dass das Item doppelt wirkt.
     const luck = me.glueck + (d.glueck || 0) / 100;
@@ -119,6 +119,11 @@ export class Battle {
     if (d.gift) { foe.gift += d.gift * m; ev.push({ type: 'status', side: foeKey, kind: 'gift', amount: d.gift * m }); }
     if (d.brand) { foe.brand += d.brand * m; ev.push({ type: 'status', side: foeKey, kind: 'brand', amount: d.brand * m }); }
     if (d.kaelte) { foe.kaelte += d.kaelte * m; ev.push({ type: 'status', side: foeKey, kind: 'kaelte', amount: d.kaelte * m }); }
+    // Verb-Rolle mit Subjekt: Das Subjekt löst zusätzlich einmal seine eigene Wirkung aus.
+    if (d.subjektUid && !alsSubjekt) {
+      const s = me.items.find((x) => x.uid === d.subjektUid);
+      if (s) this.trigger(key, me, foeKey, foe, s, ev, true);
+    }
     if (d.betaeubung) {
       foe.betaeubt = Math.min(STUN_MAX, foe.betaeubt + d.betaeubung * m);
       ev.push({ type: 'status', side: foeKey, kind: 'betaeubung', amount: d.betaeubung * m });
