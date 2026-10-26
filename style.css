@@ -934,3 +934,25 @@ h2 .hint { font-size: 12px; font-weight: 400; color: var(--ink-soft); }
 .item .arrow.v3 { left: 2px; top: 50%; transform: translateY(-50%) rotate(180deg); }
 .item.verb .arrow { color: #b0472a; }
 .rune-lines line.verb { stroke: #ff9a5a; filter: drop-shadow(0 0 5px #ff6a2a); }
+
+/* ---------- Große Goldanzeige ---------- */
+.stat.gold {
+  display: flex; align-items: center; gap: 6px;
+  padding: 2px 16px 2px 8px;
+  background: linear-gradient(#5a3a10, #2b1a06);
+  border: 2px solid var(--gold);
+  box-shadow: 0 0 12px rgba(224,165,38,.5), inset 0 0 8px rgba(255,210,90,.25);
+}
+.stat.gold .coin { font-family: var(--emoji); font-size: 32px; line-height: 1; filter: drop-shadow(0 0 4px rgba(255,200,60,.8)); }
+.stat.gold .gold-num { font-size: 36px; font-weight: 900; color: #ffd65a; line-height: 1; text-shadow: 0 2px 0 #000; min-width: 1.4em; font-variant-numeric: tabular-nums; }
+.stat.gold.gain { animation: goldGain .6s; }
+.stat.gold.spend { animation: goldSpend .6s; }
+@keyframes goldGain { 40% { transform: scale(1.15); box-shadow: 0 0 24px #7fe06a; } }
+@keyframes goldSpend { 40% { transform: scale(.92); box-shadow: 0 0 20px #ff6a5a; } }
+.shop-gold { margin-left: auto; margin-right: 10px; font-size: 18px; font-weight: 700; color: var(--ink); background: rgba(224,165,38,.18); border: 2px solid var(--gold-dark); border-radius: 999px; padding: 4px 12px; white-space: nowrap; }
+.shop-gold b { font-size: 22px; }
+.coin-fly { position: fixed; left: 0; top: 0; z-index: 450; font-family: var(--emoji); font-size: 26px; pointer-events: none; }
+.slot .price-tag.cant { color: var(--red); }
+
+.slot .holder .collect { left: calc(50% - var(--iw) / 2 - 10px); top: calc(50% - var(--ih) / 2 - 12px); }
+.slot .holder .chain { right: calc(50% - var(--iw) / 2 - 12px); bottom: calc(50% - var(--ih) / 2 - 8px); }

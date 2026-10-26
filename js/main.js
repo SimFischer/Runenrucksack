@@ -10,7 +10,7 @@ import { findTriples, mergeQuestion, applyMerge, canMerge, compoundPartner } fro
 import { G, loadData, save, loadRun, placedOf, itemsIn, gridOf, region, hero, playerCtx, emit } from './state.js';
 import { evaluateBag } from './mods.js';
 import {
-  $, fmt, fullName, genusChip, toast, bump, openModal, closeModal, modal, itemEl, buildGrid, drawItems, mergeAnimation,
+  $, fmt, fullName, genusChip, toast, bump, openModal, closeModal, modal, itemEl, buildGrid, drawItems, mergeAnimation, syncGold,
 } from './ui.js';
 import { startNight } from './battle-ui.js';
 import { runEncounter } from './encounters.js';
@@ -46,6 +46,7 @@ async function boot() {
 
   layout();
   window.addEventListener('resize', layout);
+  setInterval(syncGold, 200); // Gold ändert sich auch in Fenstern (Versuche, Belohnungen)
   registerServiceWorker();
 }
 
@@ -239,7 +240,7 @@ function renderTop() {
   $('stat-day').textContent = `${reg.emoji} ${reg.name} · Tag ${run.day} / ${CFG.lastDay}`;
   $('stat-hearts').textContent = '❤️'.repeat(Math.max(0, run.hearts)) + '🤍'.repeat(CFG.hearts - Math.max(0, run.hearts));
   $('stat-wins').textContent = `🏆 ${run.wins}`;
-  $('stat-gold').textContent = `🪙 ${run.gold}`;
+  syncGold();
   $('btn-reroll').disabled = run.gold < CFG.rerollCost;
 }
 
@@ -285,6 +286,9 @@ function renderShop() {
     if (sameRef(selected, { src: 'shop', slot: i })) it.classList.add('selected');
     if (run.gold < def.preis) it.classList.add('cant');
     holder.append(it);
+    // Abzeichen sitzen an der Ecke des Items (Größe für CSS)
+    holder.style.setProperty('--iw', `${def.w * mini}px`);
+    holder.style.setProperty('--ih', `${def.h * mini}px`);
     // Sammeln: wie viele gleiche besitzt du schon? Bei 2/3 leuchtet das Item.
     const n = canMerge(def) ? ownedCount(run, def.id) : 0;
     if (n > 0) {

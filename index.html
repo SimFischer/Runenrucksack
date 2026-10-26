@@ -60,7 +60,7 @@
       <div class="stat" id="stat-day"></div>
       <div class="stat" id="stat-hearts" data-tut="herzen"></div>
       <div class="stat" id="stat-wins" data-tut="siege"></div>
-      <div class="stat gold" id="stat-gold" data-tut="gold"></div>
+      <div class="stat gold" id="stat-gold" data-tut="gold" aria-label="Gold"><span class="coin">🪙</span><span class="gold-num" id="gold-num">0</span></div>
       <div class="spacer"></div>
       <button id="btn-menu" class="btn icon" aria-label="Menü" data-tut="menue">☰</button>
       <button id="btn-fight" class="btn primary fight" data-tut="kampf">⚔️ Zum Kampf</button>
@@ -79,6 +79,7 @@
       <section class="panel shop-panel" id="shop" data-tut="laden">
         <div class="shop-head">
           <h2>Laden</h2>
+          <span class="shop-gold" id="shop-gold" data-tut="ladengold">Du hast <b id="shop-gold-num">0</b> 🪙</span>
           <button id="btn-reroll" class="btn">🎲 Neu würfeln <span class="price">1 🪙</span></button>
         </div>
         <div class="shop-slots" id="shop-slots"></div>

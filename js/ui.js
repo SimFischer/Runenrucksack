@@ -24,6 +24,63 @@ export function toast(text) {
   toast.timer = setTimeout(() => { t.hidden = true; }, 2200);
 }
 
+// ---------- Gold: Zahl zählt hoch/runter, Münzen fliegen ----------
+
+let shownGold = null, goldRun = null, tween = 0;
+
+export function syncGold() {
+  const run = G.run;
+  const num = $('gold-num'), shop = $('shop-gold-num');
+  if (!run || !num) return;
+  const show = (v) => { num.textContent = v; if (shop) shop.textContent = v; };
+  if (goldRun !== run || shownGold === null || $('game').hidden) {
+    goldRun = run;
+    shownGold = run.gold;
+    show(run.gold);
+    return;
+  }
+  if (run.gold === shownGold) return;
+  const from = shownGold, to = run.gold;
+  shownGold = to;
+  flyCoins(to - from);
+  const chip = $('stat-gold');
+  chip.classList.remove('gain', 'spend');
+  void chip.offsetWidth;
+  chip.classList.add(to > from ? 'gain' : 'spend');
+  cancelAnimationFrame(tween);
+  const t0 = performance.now();
+  const step = (now) => {
+    const k = Math.min(1, (now - t0) / 600);
+    show(Math.round(from + (to - from) * k));
+    if (k < 1) tween = requestAnimationFrame(step);
+  };
+  tween = requestAnimationFrame(step);
+}
+
+function flyCoins(delta) {
+  const chip = $('stat-gold')?.getBoundingClientRect();
+  const shop = $('shop')?.getBoundingClientRect();
+  if (!chip || !shop || !document.body.animate) return;
+  const n = Math.min(6, Math.abs(delta));
+  const a = { x: chip.left + 24, y: chip.top + chip.height / 2 };
+  const b = { x: shop.left + shop.width / 2, y: shop.top + 40 };
+  const [from, to] = delta > 0 ? [b, a] : [a, b];
+  for (let i = 0; i < n; i++) {
+    const c = document.createElement('div');
+    c.className = 'coin-fly';
+    c.textContent = '🪙';
+    document.body.append(c);
+    const off = (i - n / 2) * 14;
+    c.animate([
+      { transform: `translate(${from.x + off}px, ${from.y}px) scale(.8)`, opacity: 0 },
+      { transform: `translate(${from.x + off}px, ${from.y - 20}px) scale(1)`, opacity: 1, offset: 0.15 },
+      { transform: `translate(${to.x}px, ${to.y}px) scale(.7)`, opacity: 1, offset: 0.9 },
+      { transform: `translate(${to.x}px, ${to.y}px) scale(.3)`, opacity: 0 },
+    ], { duration: 700 + i * 70, easing: 'ease-in-out' });
+    setTimeout(() => c.remove(), 800 + i * 70);
+  }
+}
+
 export function bump(id) {
   const el = $(id);
   el.classList.remove('bump');
