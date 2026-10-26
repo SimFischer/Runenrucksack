@@ -51,25 +51,25 @@
       <div class="brand">🎒<span class="brand-text"> Runenrucksack</span></div>
       <div class="stat" id="stat-hero"></div>
       <div class="stat" id="stat-day"></div>
-      <div class="stat" id="stat-hearts"></div>
-      <div class="stat" id="stat-wins"></div>
-      <div class="stat gold" id="stat-gold"></div>
+      <div class="stat" id="stat-hearts" data-tut="herzen"></div>
+      <div class="stat" id="stat-wins" data-tut="siege"></div>
+      <div class="stat gold" id="stat-gold" data-tut="gold"></div>
       <div class="spacer"></div>
-      <button id="btn-menu" class="btn icon" aria-label="Menü">☰</button>
-      <button id="btn-fight" class="btn primary fight">⚔️ Zum Kampf</button>
+      <button id="btn-menu" class="btn icon" aria-label="Menü" data-tut="menue">☰</button>
+      <button id="btn-fight" class="btn primary fight" data-tut="kampf">⚔️ Zum Kampf</button>
     </header>
 
     <main class="board">
-      <section class="panel bag-panel">
+      <section class="panel bag-panel" data-tut="rucksack">
         <h2>Rucksack</h2>
         <div class="grid" id="grid-bag" data-area="bag"></div>
       </section>
-      <section class="panel store-panel">
+      <section class="panel store-panel" data-tut="lager">
         <h2>Lager <span class="hint">wirkt nicht im Kampf</span></h2>
         <div class="grid store" id="grid-store" data-area="store"></div>
       </section>
-      <aside class="panel info-panel" id="info"></aside>
-      <section class="panel shop-panel" id="shop">
+      <aside class="panel info-panel" id="info" data-tut="info"></aside>
+      <section class="panel shop-panel" id="shop" data-tut="laden">
         <div class="shop-head">
           <h2>Laden</h2>
           <button id="btn-reroll" class="btn">🎲 Neu würfeln <span class="price">1 🪙</span></button>
@@ -86,7 +86,7 @@
       <div class="brand" id="battle-title">Nacht</div>
       <div class="stat" id="battle-time">0,0 s</div>
       <div class="spacer"></div>
-      <div class="speed" id="speed">
+      <div class="speed" id="speed" data-tut="tempo">
         <button class="btn" data-speed="1">1×</button>
         <button class="btn" data-speed="2">2×</button>
         <button class="btn" data-speed="4">4×</button>
@@ -94,7 +94,7 @@
       <button id="btn-skip" class="btn">⏭ Überspringen</button>
     </header>
     <main class="arena">
-      <div class="fighter" id="fighter-player"></div>
+      <div class="fighter" id="fighter-player" data-tut="kampf-rucksack"></div>
       <div class="versus">
         <div class="vs">VS</div>
         <button id="btn-start-battle" class="btn big primary">Los!</button>
@@ -104,7 +104,7 @@
   </section>
 
   <div id="modal" class="modal" hidden>
-    <div class="modal-card" id="modal-card"></div>
+    <div class="modal-card" id="modal-card" data-tut="fenster"></div>
   </div>
   <div id="toast" class="toast" hidden></div>
   <div id="rotate-hint" class="rotate-hint">

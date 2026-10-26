@@ -1,5 +1,5 @@
 {
-  "_hinweis": "Computer-Gegner. vorliebe gewichtet, welche Wirkungen der Gegner beim Packen bevorzugt. boss: Anführer am letzten Tag eines Gebiets (siehe regions.json). fehler: falsch geschriebene Wörter auf der Rüstung – vor jedem Kampf wird eines zufällig gewählt. optionen enthält genau eine richtige Schreibung (richtig).",
+  "_hinweis": "Computer-Gegner. uebung: nur im Tutorial, mit festen Gegenständen (ausruestung). vorliebe gewichtet, welche Wirkungen der Gegner beim Packen bevorzugt. boss: Anführer am letzten Tag eines Gebiets (siehe regions.json). fehler: falsch geschriebene Wörter auf der Rüstung – vor jedem Kampf wird eines zufällig gewählt. optionen enthält genau eine richtige Schreibung (richtig).",
   "gegner": [
     {
       "id": "spaeher", "name": "Späher-Ork", "emoji": "👺", "vorliebe": { "schaden": 2, "tempo": 3 },
@@ -56,6 +56,11 @@
         { "falsch": "das Mähne", "richtig": "die Mähne", "optionen": ["die Mähne", "das Mähne", "den Mähne"], "erklaerung": "Es heißt die Mähne." },
         { "falsch": "Stiefl", "richtig": "Stiefel", "optionen": ["Stiefel", "Stiefl", "Stifel"], "erklaerung": "Stiefel hat zwei Silben: Stie-fel." }
       ]
+    },
+    {
+      "id": "strohpuppe", "name": "Strohpuppen-Ork", "emoji": "🌾", "uebung": true, "vorliebe": {},
+      "ausruestung": [{ "id": "apfel", "x": 1, "y": 1 }],
+      "fehler": []
     }
   ]
 }

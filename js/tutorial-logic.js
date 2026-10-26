@@ -1,0 +1,138 @@
+// Tutorial „Der erste Tag“ ohne Darstellung: welche Schritte gelten, ob ein Schritt geschafft ist,
+// freundliches Zurücksetzen bei falschen Aktionen. Wird von js/tutorial.js und den Tests benutzt.
+import { newRun, findSpot, canPlace, bagGrid, sizeOf } from './logic.js';
+import { analyze, findFusions } from './grammar.js';
+
+// Funktionen, die es im Spiel gibt. Schritte mit einer fehlenden voraussetzung werden übersprungen.
+// Etappe 4 ergänzt hier z. B. 'buch' und 'heldencode'.
+export const FEATURES = new Set(['begegnungen', 'verschmelzen', 'siegel', 'runen', 'steigerung', 'unterklasse', 'taschen']);
+
+export function activeSteps(data, features = FEATURES) {
+  return data.schritte.filter((s) => !s.voraussetzung || features.has(s.voraussetzung));
+}
+
+// Ein echter Lauf, aber festgelegt: leerer Rucksack, fester Laden, kein Speichern.
+export function makeTutorialRun(items, regions, data) {
+  const run = newRun(items, regions, {});
+  run.tutorial = true;
+  run.gold = data.start.gold;
+  run.items = [];
+  run.queue = [];
+  run.shop = [];
+  return run;
+}
+
+// Fester Laden-Inhalt für einen Schritt: die genannten Items, die übrigen Plätze leer.
+export function applyShop(run, step, slots = 5) {
+  if (!step.laden) return;
+  run.shop = Array.from({ length: slots }, (_, i) => (step.laden[i] ? { id: step.laden[i], locked: false } : null));
+}
+
+const baseId = (id, defs) => defs[id]?.teile?.traeger || id;
+const bagItems = (run) => run.items.filter((p) => p.area === 'bag');
+const find = (run, id, area) => run.items.find((p) => p.id === id && (!area || p.area === area));
+
+// Vorbereitung eines Schritts, z. B. Platz links neben dem Schwert schaffen.
+export function prepareStep(run, step, defs) {
+  const id = step.vorbereitung?.platzLinksVon;
+  if (!id) return false;
+  const t = run.items.find((p) => baseId(p.id, defs) === id && p.area === 'bag');
+  if (!t) return false;
+  const grid = bagGrid(run);
+  const others = bagItems(run).filter((p) => p !== t);
+  const leftFree = (x, y, rot) => {
+    const s = sizeOf(defs[t.id], rot);
+    for (let dy = 0; dy < s.h; dy++) if (canPlace(others, defs, defs.feuer || { w: 1, h: 1 }, x - 1, y + dy, 0, grid)) return true;
+    return false;
+  };
+  if (leftFree(t.x, t.y, t.rot)) return false;
+  // Schwert so verschieben, dass links ein Feld frei ist.
+  for (let y = 0; y < grid.rows; y++)
+    for (let x = 1; x < grid.cols; x++)
+      if (canPlace(others, defs, defs[t.id], x, y, t.rot, grid) && leftFree(x, y, t.rot)) {
+        Object.assign(t, { x, y });
+        return true;
+      }
+  return false;
+}
+
+// Prüft einen Schritt. ev: letztes Ereignis { typ, id } (z. B. auswahl, drehen, kampfStart).
+// Ergebnis: { ok: true } | { falsch: Regel } | null (noch nicht geschafft).
+export function checkStep(step, run, defs, recipes, ev = null) {
+  const a = step.aktion;
+  let ok = false;
+  switch (a.typ) {
+    case 'kaufen':
+      ok = !!find(run, a.item, a.bereich);
+      break;
+    case 'antippen':
+      ok = ev?.typ === 'auswahl' && baseId(ev.id, defs) === a.item;
+      break;
+    case 'drehen':
+      ok = ev?.typ === 'drehen' && baseId(ev.id, defs) === a.item;
+      break;
+    case 'neben':
+      ok = findFusions(bagItems(run), defs, recipes).some((f) => f.kraft.id === a.kraft && f.traeger.id === a.traeger);
+      break;
+    case 'verschmelzen':
+      ok = !!find(run, a.ergebnis, 'bag');
+      break;
+    case 'siegel': {
+      const z = find(run, a.ziel, 'bag');
+      ok = !!z && analyze(bagItems(run), defs).get(z.uid).siegel.some((s) => s.ok && defs[find(run, a.siegel, 'bag')?.id]?.genus === s.genus);
+      break;
+    }
+    case 'rune': {
+      const z = find(run, a.ziel, 'bag');
+      ok = !!z && analyze(bagItems(run), defs).get(z.uid).adjektive.some((r) => r.id === a.rune);
+      break;
+    }
+    case 'ereignis':
+      ok = ev?.typ === a.name;
+      break;
+    default:
+      ok = false;
+  }
+  if (ok) return { ok: true };
+  for (const rule of step.falsch || []) {
+    if (find(run, rule.wenn.item, rule.wenn.bereich)) return { falsch: rule };
+  }
+  return null;
+}
+
+// Falsch abgelegtes Item freundlich zurück in den Laden legen (Gold zurück).
+export function resetWrong(run, rule, defs) {
+  const p = find(run, rule.wenn.item, rule.wenn.bereich);
+  if (!p) return;
+  run.items = run.items.filter((i) => i !== p);
+  run.gold += defs[p.id].preis;
+  const free = run.shop.findIndex((s) => !s);
+  run.shop[free >= 0 ? free : 0] = { id: p.id, locked: false };
+}
+
+// Feld für die Hand-Animation: links neben einem Item oder ein freies Nachbarfeld.
+export function targetCell(run, defs, spec) {
+  const [art, id] = spec.split(':');
+  if (!id) return null;
+  const t = run.items.find((p) => p.area === 'bag' && (p.id === id || baseId(p.id, defs) === id));
+  if (!t) return null;
+  const s = sizeOf(defs[t.id], t.rot);
+  const grid = bagGrid(run);
+  const occupied = new Set();
+  for (const p of bagItems(run)) {
+    const ps = sizeOf(defs[p.id], p.rot);
+    for (let dy = 0; dy < ps.h; dy++) for (let dx = 0; dx < ps.w; dx++) occupied.add(`${p.x + dx},${p.y + dy}`);
+  }
+  const free = (x, y) => x >= 0 && y >= 0 && x < grid.cols && y < grid.rows && grid.mask.has(`${x},${y}`) && !occupied.has(`${x},${y}`);
+  const cands = [];
+  if (art === 'links-von') for (let dy = 0; dy < s.h; dy++) cands.push([t.x - 1, t.y + dy]);
+  if (art === 'neben') {
+    for (let dy = 0; dy < s.h; dy++) cands.push([t.x - 1, t.y + dy], [t.x + s.w, t.y + dy]);
+    for (let dx = 0; dx < s.w; dx++) cands.push([t.x + dx, t.y - 1], [t.x + dx, t.y + s.h]);
+  }
+  const c = cands.find(([x, y]) => free(x, y));
+  return c ? { x: c[0], y: c[1] } : null;
+}
+
+// Für Tests: freien Platz für ein Item finden, das ein Kind in den Rucksack zieht.
+export const spotFor = (run, defs, id) => findSpot(bagItems(run), defs, defs[id], bagGrid(run));

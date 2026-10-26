@@ -68,7 +68,7 @@ test('Startfiguren: Start-Items und Boni', async () => {
 });
 
 test('Ork-Rüstungen: 3–5 Fehler, je genau eine richtige Schreibung', () => {
-  for (const e of ENEMIES) {
+  for (const e of ENEMIES.filter((x) => !x.uebung)) {
     assert.ok(e.fehler.length >= 3 && e.fehler.length <= 5, e.id);
     for (const f of e.fehler) {
       assert.equal(f.optionen.length, 3, `${e.id}: ${f.falsch}`);

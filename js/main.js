@@ -6,7 +6,7 @@ import {
 import {
   GENUS, SIEGEL_BONUS, findFusions, findSteigerungen, wrongOrderNeighbor, canRotate, nextRot, isNoun, isRune, runeBase,
 } from './grammar.js';
-import { G, loadData, save, loadRun, placedOf, itemsIn, gridOf, region, hero, playerCtx } from './state.js';
+import { G, loadData, save, loadRun, placedOf, itemsIn, gridOf, region, hero, playerCtx, emit } from './state.js';
 import { evaluateBag } from './mods.js';
 import {
   $, fmt, fullName, genusChip, toast, bump, openModal, closeModal, modal, itemEl, buildGrid, drawItems,
@@ -191,6 +191,7 @@ function render() {
   renderShop();
   renderInfo();
   save();
+  emit('render');
 }
 
 function renderTop() {
@@ -233,7 +234,7 @@ function renderShop() {
     slot.className = 'slot';
     if (!s) {
       slot.classList.add('empty');
-      slot.textContent = 'verkauft';
+      slot.textContent = run.tutorial ? '' : 'verkauft';
       box.append(slot);
       return;
     }
@@ -243,6 +244,7 @@ function renderShop() {
     const it = itemEl(def, 0, mini);
     it.dataset.src = 'shop';
     it.dataset.slot = i;
+    it.dataset.tut = 'laden-' + def.id;
     if (sameRef(selected, { src: 'shop', slot: i })) it.classList.add('selected');
     holder.append(it);
 
@@ -588,13 +590,14 @@ function rotateInPlace(uid) {
   const def = G.DEFS[p.id];
   if (!canRotate(def)) return;
   const rot = nextRot(def, p.rot || 0);
-  if (isRune(def)) { p.rot = rot; render(); return; }
+  if (isRune(def)) { p.rot = rot; render(); emit('drehen', { id: p.id }); return; }
   const grid = gridOf(p.area);
   const others = itemsIn(p.area, uid);
   for (const [dx, dy] of [[0, 0], [-1, 0], [0, -1], [-1, -1], [1, 0], [0, 1]]) {
     if (canPlace(others, G.DEFS, def, p.x + dx, p.y + dy, rot, grid)) {
       Object.assign(p, { x: p.x + dx, y: p.y + dy, rot });
       render();
+      emit('drehen', { id: p.id });
       return;
     }
   }
@@ -613,6 +616,7 @@ function onFight() {
   }
   selected = null;
   startNight(battleOver);
+  emit('kampfStart');
 }
 
 function openMenu() {
@@ -665,7 +669,7 @@ function showSteigerung(list, i, done) {
   const wrong = new Set();
 
   const draw = () => {
-    const paid = tries > 0;
+    const paid = tries > 0 && !run.tutorial;
     const broke = paid && run.gold < 1;
     const card = openModal(`
       <div class="fusion-eq">${[0, 1, 2].map(() => `<span class="fi">${from.emoji}<small>${from.name}</small></span>`).join('<span class="op">+</span>')}</div>
@@ -738,16 +742,17 @@ function showFusion(list, i, done) {
       <div class="row">${['der', 'die', 'das'].map((g) => `
         <button class="btn genus-btn" data-g="${g}" style="--genus:${GENUS[g].farbe}" ${wrong.has(g) || broke ? 'disabled' : ''}>${g}</button>`).join('')}
       </div>
-      <p class="cost">${paid ? `Jeder weitere Versuch kostet 1 🪙 · du hast ${run.gold} 🪙` : 'Erster Versuch kostenlos'}</p>
+      <p class="cost">${run.tutorial ? (tries ? 'Probier es noch einmal!' : '') : paid ? `Jeder weitere Versuch kostet 1 🪙 · du hast ${run.gold} 🪙` : 'Erster Versuch kostenlos'}</p>
       ${feedback ? `<p class="feedback">${feedback}</p>` : ''}
       ${broke ? '<p class="feedback">Kein Gold für einen weiteren Versuch.</p>' : ''}
-      <div class="row"><button class="btn small" data-later>Heute nicht verschmelzen</button></div>`);
+      ${run.tutorial ? '' : '<div class="row"><button class="btn small" data-later>Heute nicht verschmelzen</button></div>'}`);
     card.querySelectorAll('[data-g]').forEach((b) => { b.onclick = () => guess(b.dataset.g); });
-    card.querySelector('[data-later]').onclick = () => { closeModal(); showFusion(list, i + 1, done); };
+    const later = card.querySelector('[data-later]');
+    if (later) later.onclick = () => { closeModal(); showFusion(list, i + 1, done); };
   };
 
   const guess = (g) => {
-    if (tries > 0) {
+    if (tries > 0 && !run.tutorial) {
       if (run.gold < 1) return;
       run.gold -= 1;
       bump('stat-gold');
@@ -965,7 +970,11 @@ function drop(d) {
 
 function tap(ref) {
   if (sameRef(selected, ref) && ref.src !== 'shop') rotateInPlace(ref.uid);
-  else { selected = ref; render(); }
+  else {
+    selected = ref;
+    render();
+    if (ref.src !== 'shop') emit('auswahl', { id: placedOf(ref.uid).id, area: ref.src });
+  }
 }
 
 // ---------- Nach dem Kampf ----------
@@ -987,9 +996,11 @@ function battleOver(won, enemyName) {
       <p>Herzen: <b>${'❤️'.repeat(heartsLeft)}${'🤍'.repeat(CFG.hearts - heartsLeft)}</b></p>
       <div class="row"><button class="btn primary big" data-act="next">Weiter</button></div>`,
   { next: afterBattle });
+  emit('kampfEnde', { won });
 }
 
 function afterBattle() {
+  if (G.run.tutorial) { showGame(); render(); emit('nachKampf'); return; } // das Tutorial führt weiter
   if (G.run.over) { showRunEnd(); return; }
   showGame();
   toast(`Neuer Tag: +${income(G.run.day)} 🪙`);

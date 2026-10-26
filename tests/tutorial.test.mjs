@@ -1,0 +1,175 @@
+// Spielt das Tutorial „Der erste Tag“ auf Zustandsebene komplett durch (Aktionen werden simuliert)
+// und prüft: jeder Schritt ist erreichbar, falsche Aktionen werden zurückgesetzt, fehlende Funktionen
+// werden übersprungen, danach startet ein normaler Lauf ohne Tutorial-Reste.
+// Den Durchlauf in der echten Oberfläche prüft tools/tutorial-browsertest.mjs.
+import { test } from 'node:test';
+import assert from 'node:assert/strict';
+import { readFileSync } from 'node:fs';
+import {
+  FEATURES, activeSteps, makeTutorialRun, applyShop, prepareStep, checkStep, resetWrong, targetCell, spotFor,
+} from '../js/tutorial-logic.js';
+import { newRun, seededRng } from '../js/logic.js';
+import { buildCompounds, buildRuneLevels, analyze, DIRS } from '../js/grammar.js';
+import { makeFighter, Battle, runToEnd } from '../js/battle.js';
+
+const json = (f) => JSON.parse(readFileSync(new URL('../' + f, import.meta.url)));
+const TUT = json('tutorial.json');
+const ITEMS = json('items.json').items;
+const REGIONS = json('regions.json').gebiete;
+const RECIPES = json('recipes.json');
+const ENEMIES = json('enemies.json').gegner;
+const DEFS = Object.fromEntries(ITEMS.map((d) => [d.id, d]));
+for (const d of buildCompounds(DEFS, RECIPES)) DEFS[d.id] = d;
+for (const d of buildRuneLevels(DEFS)) DEFS[d.id] = d;
+
+const bag = (run) => run.items.filter((p) => p.area === 'bag');
+const findItem = (run, id) => run.items.find((p) => p.id === id);
+
+// Wie ein Kind: Item aus dem Laden kaufen und an eine Stelle legen.
+function buyTo(run, id, area, spot) {
+  const slot = run.shop.findIndex((s) => s?.id === id);
+  assert.ok(slot >= 0, `${id} liegt im Laden`);
+  assert.ok(run.gold >= DEFS[id].preis, `genug Gold für ${id}`);
+  run.gold -= DEFS[id].preis;
+  run.shop[slot] = null;
+  const p = { uid: run.nextUid++, id, area, rot: 0, ...spot };
+  run.items.push(p);
+  return p;
+}
+
+// Rune drehen, bis der Pfeil auf das Ziel zeigt.
+function pointRune(run, rune, zielId) {
+  for (let r = 0; r < 4; r++) {
+    rune.rot = r;
+    const z = findItem(run, zielId);
+    if (analyze(bag(run), DEFS).get(z.uid).adjektive.length) return true;
+  }
+  return false;
+}
+
+// Führt die Aktion eines Schritts aus und gibt das Ereignis zurück.
+function act(step, run) {
+  const a = step.aktion;
+  switch (a.typ) {
+    case 'kaufen': buyTo(run, a.item, a.bereich, spotFor(run, DEFS, a.item)); return null;
+    case 'antippen': return { typ: 'auswahl', id: findItem(run, a.item).id };
+    case 'drehen': findItem(run, a.item).rot = 1; return { typ: 'drehen', id: a.item };
+    case 'neben': {
+      const c = targetCell(run, DEFS, `links-von:${a.traeger}`);
+      assert.ok(c, 'links neben dem Schwert ist Platz');
+      buyTo(run, a.kraft, 'bag', c);
+      return null;
+    }
+    case 'verschmelzen': {
+      const k = findItem(run, 'feuer'), t = findItem(run, 'schwert');
+      run.items = run.items.filter((p) => p !== k);
+      t.id = a.ergebnis;
+      return null;
+    }
+    case 'siegel': buyTo(run, a.siegel, 'bag', targetCell(run, DEFS, `neben:${a.ziel}`)); return null;
+    case 'rune': {
+      const r = buyTo(run, a.rune, 'bag', targetCell(run, DEFS, `neben:${a.ziel}`));
+      assert.ok(pointRune(run, r, a.ziel), 'Rune lässt sich auf das Feuerschwert drehen');
+      return null;
+    }
+    case 'ereignis': return { typ: a.name };
+    default: return null;
+  }
+}
+
+test('tutorial.json: jeder Schritt hat id, kurzen Text und eine bekannte Aktion', () => {
+  const typen = ['weiter', 'kaufen', 'antippen', 'drehen', 'neben', 'verschmelzen', 'siegel', 'runen', 'rune', 'ereignis', 'abschluss'];
+  const ids = new Set();
+  for (const s of TUT.schritte) {
+    assert.ok(s.id && !ids.has(s.id), `doppelte oder fehlende id ${s.id}`);
+    ids.add(s.id);
+    assert.ok(typen.includes(s.aktion.typ), `${s.id}: ${s.aktion.typ}`);
+    const saetze = s.text.split(/[.!?](?:\s|$)/).filter((x) => x.trim()).length;
+    assert.ok(saetze <= 2, `${s.id}: höchstens zwei Sätze (${saetze})`);
+    assert.ok(Array.isArray(s.ziel), s.id);
+    for (const id of s.laden || []) assert.ok(DEFS[id], `${s.id}: Item ${id} fehlt`);
+  }
+  assert.equal(TUT.schritte.at(-1).aktion.typ, 'abschluss');
+  assert.ok(ENEMIES.find((e) => e.id === TUT.uebungsgegner && e.uebung));
+});
+
+test('Tutorial komplett durchspielen: jeder Schritt ist erreichbar', () => {
+  const steps = activeSteps(TUT);
+  const run = makeTutorialRun(ITEMS, REGIONS, TUT);
+  assert.equal(run.tutorial, true);
+  assert.equal(run.items.length, 0);
+  const geschafft = [];
+  for (const step of steps) {
+    applyShop(run, step);
+    prepareStep(run, step, DEFS);
+    if (['weiter', 'abschluss'].includes(step.aktion.typ)) { geschafft.push(step.id); continue; }
+    assert.equal(checkStep(step, run, DEFS, RECIPES, null)?.ok, undefined, `${step.id} ist nicht schon vorher geschafft`);
+    const ev = act(step, run);
+    assert.equal(checkStep(step, run, DEFS, RECIPES, ev)?.ok, true, `${step.id} wird geschafft`);
+    geschafft.push(step.id);
+
+    if (step.id === 'kampf-starten') {
+      // Übungskampf gegen den Strohpuppen-Ork: sicherer Sieg
+      const ork = ENEMIES.find((e) => e.id === TUT.uebungsgegner);
+      const items = ork.ausruestung.map((a, i) => ({ uid: i + 1, rot: 0, ...a }));
+      const b = new Battle(
+        makeFighter('Du', bag(run), DEFS, 1, { rng: seededRng(TUT.start.zufall) }),
+        makeFighter(ork.name, items, DEFS, 1, { rng: seededRng(TUT.start.zufall) }),
+      );
+      assert.equal(runToEnd(b), 'win', 'Übungskampf ist ein sicherer Sieg');
+    }
+  }
+  assert.deepEqual(geschafft, steps.map((s) => s.id));
+  // Am Ende: scharfes Feuerschwert mit Siegel
+  const fs = findItem(run, 'feuer+schwert');
+  const i = analyze(bag(run), DEFS).get(fs.uid);
+  assert.equal(i.phrase, 'scharfes Feuerschwert');
+  assert.ok(i.siegel.some((s) => s.ok));
+});
+
+test('Falsche Aktion: Schwert im Lager wird freundlich zurückgesetzt', () => {
+  const run = makeTutorialRun(ITEMS, REGIONS, TUT);
+  const step = TUT.schritte.find((s) => s.id === 'kaufen');
+  applyShop(run, TUT.schritte.find((s) => s.id === 'gold-laden'));
+  const gold = run.gold;
+  buyTo(run, 'schwert', 'store', { x: 0, y: 0 });
+  const r = checkStep(step, run, DEFS, RECIPES);
+  assert.match(r.falsch.text, /nicht ins Lager/);
+  assert.equal(r.falsch.zuruecksetzen, true);
+  resetWrong(run, r.falsch, DEFS);
+  assert.equal(run.items.length, 0);
+  assert.equal(run.gold, gold, 'Gold zurück');
+  assert.equal(run.shop.filter(Boolean)[0].id, 'schwert', 'Schwert wieder im Laden');
+
+  // Feuer rechts statt links: Hinweis ohne Strafe
+  const k = TUT.schritte.find((s) => s.id === 'kristall');
+  run.items = [{ uid: 1, id: 'schwert', area: 'bag', x: 1, y: 0, rot: 0 }, { uid: 2, id: 'feuer', area: 'bag', x: 2, y: 0, rot: 0 }];
+  assert.match(checkStep(k, run, DEFS, RECIPES).falsch.text, /links neben/);
+});
+
+test('Kein Platz links vom Schwert: Vorbereitung schiebt es zur Seite', () => {
+  const run = makeTutorialRun(ITEMS, REGIONS, TUT);
+  run.items = [{ uid: 1, id: 'schwert', area: 'bag', x: 0, y: 0, rot: 1 }];
+  const k = TUT.schritte.find((s) => s.id === 'kristall');
+  assert.equal(prepareStep(run, k, DEFS), true);
+  assert.ok(targetCell(run, DEFS, 'links-von:schwert'));
+});
+
+test('Schritte für fehlende Funktionen werden übersprungen', () => {
+  const ohne = activeSteps(TUT, new Set());
+  assert.ok(!ohne.some((s) => s.voraussetzung), 'ohne Funktionen nur Schritte ohne Voraussetzung');
+  const jetzt = activeSteps(TUT).map((s) => s.id);
+  assert.ok(jetzt.includes('begegnung'), 'Begegnungen gibt es schon');
+  assert.ok(!jetzt.includes('buch') && !jetzt.includes('heldencode'), 'Buch und Heldencode gibt es noch nicht');
+  const spaeter = activeSteps(TUT, new Set([...FEATURES, 'buch', 'heldencode'])).map((s) => s.id);
+  assert.ok(spaeter.includes('buch') && spaeter.includes('heldencode'));
+  assert.equal(spaeter.length, TUT.schritte.length);
+});
+
+test('Nach dem Tutorial startet ein normaler Lauf ohne Tutorial-Reste', () => {
+  const run = newRun(ITEMS, REGIONS, { hero: json('heroes.json').helden[0], fates: json('heroes.json').schicksalsrunen });
+  assert.equal(run.tutorial, undefined);
+  assert.equal(run.gold, 12);
+  assert.equal(run.shop.filter(Boolean).length, 5);
+  assert.ok(run.queue.includes('gebiet'));
+});

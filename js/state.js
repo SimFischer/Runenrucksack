@@ -16,6 +16,7 @@ export const G = {
   FATES: [],       // Schicksalsrunen
   ENCOUNTERS: null, // encounters.json
   EXERCISES: null,  // exercises.json
+  TUTORIAL: null,   // tutorial.json
   run: null,
 };
 
@@ -23,9 +24,9 @@ const SAVE_KEY = 'runenrucksack.lauf.v2';
 
 export async function loadData() {
   const get = (f) => fetch(f).then((r) => r.json());
-  const [itemData, enemyData, recipes, regions, heroes, encounters, exercises] = await Promise.all([
+  const [itemData, enemyData, recipes, regions, heroes, encounters, exercises, tutorial] = await Promise.all([
     get('items.json'), get('enemies.json'), get('recipes.json'), get('regions.json'), get('heroes.json'),
-    get('encounters.json'), get('exercises.json'),
+    get('encounters.json'), get('exercises.json'), get('tutorial.json'),
   ]);
   G.ITEMS = itemData.items;
   G.RAR = itemData.seltenheiten;
@@ -41,11 +42,13 @@ export async function loadData() {
   G.FATES = heroes.schicksalsrunen;
   G.ENCOUNTERS = encounters;
   G.EXERCISES = exercises;
+  G.TUTORIAL = tutorial;
 }
 
 // ---------- Speichern (Komfort, nur in diesem Browser) ----------
 
 export function save() {
+  if (G.run?.tutorial) return; // Das Tutorial zählt nicht und überschreibt keinen Lauf.
   try {
     if (G.run && !G.run.over) localStorage.setItem(SAVE_KEY, JSON.stringify(G.run));
     else localStorage.removeItem(SAVE_KEY);
@@ -61,6 +64,21 @@ export function loadRun() {
     r.shop = r.shop.map((s) => (s && G.DEFS[s.id] ? s : null));
     return r;
   } catch { return null; }
+}
+
+// ---------- Ereignisse (für das Tutorial und die Erste-Mal-Tipps) ----------
+
+const listeners = [];
+export const onEvent = (fn) => listeners.push(fn);
+export const emit = (typ, data = {}) => { for (const fn of listeners) fn({ typ, ...data }); };
+
+// ---------- Kleine Einstellungen auf diesem Gerät (immer mit try/catch) ----------
+
+export function getPref(key, fallback = null) {
+  try { return localStorage.getItem('runenrucksack.' + key) ?? fallback; } catch { return fallback; }
+}
+export function setPref(key, value) {
+  try { localStorage.setItem('runenrucksack.' + key, value); } catch { /* privater Modus */ }
 }
 
 // ---------- Abkürzungen ----------

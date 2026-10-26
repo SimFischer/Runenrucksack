@@ -1,0 +1,172 @@
+{
+  "_hinweis": "Das Tutorial „Der erste Tag“. Jeder Schritt: id, text (höchstens zwei kurze Sätze), tipp (Zusatz nach 8 Sekunden ohne Aktion), ziel (data-tut-Namen der Elemente, die hell bleiben und bedienbar sind), aktion (wie es weitergeht), optional voraussetzung (Schritt nur, wenn es die Funktion gibt), laden (fester Laden-Inhalt), hand (Tipp- oder Zieh-Animation), falsch (freundliche Hinweise bei falschen Aktionen), hilfe (Karte für „So geht's“). Ziele für Items: item-<id> im Rucksack, laden-<id> im Laden. Hand-Ziele: rucksack, links-von:<id>, neben:<id>.",
+  "begleiter": { "name": "Meister Fenwick", "emoji": "🧙", "bild": "assets/figur-fenwick.webp" },
+  "start": { "gold": 20, "zufall": 42 },
+  "uebungsgegner": "strohpuppe",
+  "schritte": [
+    {
+      "id": "begruessung",
+      "text": "Hallo, ich bin Meister Fenwick! In den Wanderlanden zerfallen die Wörter – mit deinem Runenrucksack rettest du sie.",
+      "ziel": [],
+      "aktion": { "typ": "weiter" }
+    },
+    {
+      "id": "gold-laden",
+      "text": "Oben siehst du dein Gold. Im Laden unten kaufst du Gegenstände.",
+      "ziel": ["gold", "laden"],
+      "aktion": { "typ": "weiter" },
+      "laden": ["schwert"]
+    },
+    {
+      "id": "kaufen",
+      "text": "Zieh das Schwert mit dem Finger in deinen Rucksack.",
+      "tipp": "Leg den Finger auf das Schwert und schieb es nach oben in den Rucksack.",
+      "ziel": ["laden-schwert", "rucksack"],
+      "aktion": { "typ": "kaufen", "item": "schwert", "bereich": "bag" },
+      "hand": { "typ": "ziehen", "von": "laden-schwert", "nach": "rucksack" },
+      "falsch": [{ "wenn": { "item": "schwert", "bereich": "store" }, "text": "Fast! Zieh es in den Rucksack, nicht ins Lager.", "zuruecksetzen": true }],
+      "hilfe": { "titel": "Kaufen", "emoji": "🛒", "animation": "ziehen", "text": "Zieh einen Gegenstand aus dem Laden in deinen Rucksack." }
+    },
+    {
+      "id": "info",
+      "text": "Tipp das Schwert an. Rechts steht dann, was es kann.",
+      "tipp": "Einmal kurz auf das Schwert tippen.",
+      "ziel": ["item-schwert", "info"],
+      "aktion": { "typ": "antippen", "item": "schwert" },
+      "hand": { "typ": "tippen", "auf": "item-schwert" },
+      "hilfe": { "titel": "Infos", "emoji": "ℹ️", "animation": "tippen", "text": "Tippst du einen Gegenstand an, siehst du rechts, was er kann." }
+    },
+    {
+      "id": "drehen",
+      "text": "Tipp es noch einmal an, um es zu drehen.",
+      "tipp": "Noch ein Tipp auf das Schwert – dann liegt es quer.",
+      "ziel": ["item-schwert", "info"],
+      "aktion": { "typ": "drehen", "item": "schwert" },
+      "hand": { "typ": "tippen", "auf": "item-schwert" },
+      "hilfe": { "titel": "Drehen", "emoji": "🔄", "animation": "drehen", "text": "Tipp einen Gegenstand zweimal an, dann dreht er sich. Beim Ziehen dreht auch ein zweiter Finger." }
+    },
+    {
+      "id": "lager",
+      "text": "Im Lager kannst du Dinge aufheben. Dort kämpfen sie aber nicht mit.",
+      "ziel": ["lager"],
+      "aktion": { "typ": "weiter" },
+      "hilfe": { "titel": "Lager", "emoji": "📦", "animation": "wackeln", "text": "Im Lager liegen Dinge sicher – im Kampf helfen sie aber nicht." }
+    },
+    {
+      "id": "kristall",
+      "text": "Kauf den Feuer-Kristall und leg ihn direkt links neben das Schwert.",
+      "tipp": "Zieh das Feuer auf das leuchtende Feld links vom Schwert.",
+      "ziel": ["laden-feuer", "rucksack"],
+      "laden": ["feuer"],
+      "vorbereitung": { "platzLinksVon": "schwert" },
+      "aktion": { "typ": "neben", "kraft": "feuer", "traeger": "schwert" },
+      "hand": { "typ": "ziehen", "von": "laden-feuer", "nach": "links-von:schwert" },
+      "falsch": [
+        { "wenn": { "item": "feuer", "bereich": "store" }, "text": "Fast! Das Feuer gehört in den Rucksack, nicht ins Lager.", "zuruecksetzen": true },
+        { "wenn": { "item": "feuer", "bereich": "bag" }, "text": "Fast! Schieb das Feuer direkt links neben das Schwert." }
+      ],
+      "hilfe": { "titel": "Kraft-Kristalle", "emoji": "🔥", "animation": "ziehen", "text": "Leg einen Kristall links neben oder über einen Gegenstand. Am nächsten Morgen verschmelzen sie." }
+    },
+    {
+      "id": "verschmelzen",
+      "text": "Jetzt verschmelzen beide zum Feuerschwert! Im Wort steht „Schwert“ am Ende – darum bestimmt das Schwert den Artikel.",
+      "tipp": "Wie heißt es: der, die oder das Schwert?",
+      "ziel": ["fenster"],
+      "aktion": { "typ": "verschmelzen", "ergebnis": "feuer+schwert" },
+      "hinweis": "Im Spiel passiert das sonst am nächsten Morgen.",
+      "hilfe": { "titel": "Verschmelzen", "emoji": "✨", "animation": "pulsieren", "text": "Feuer + Schwert = das Feuerschwert. Das letzte Wort bestimmt den Artikel." }
+    },
+    {
+      "id": "siegel",
+      "text": "Leg das grüne das-Siegel direkt neben dein Feuerschwert. Passt der Artikel, wird es stärker.",
+      "tipp": "Zieh das Siegel auf ein Feld, das das Feuerschwert berührt.",
+      "ziel": ["laden-siegel-das", "rucksack"],
+      "laden": ["siegel-das"],
+      "aktion": { "typ": "siegel", "siegel": "siegel-das", "ziel": "feuer+schwert" },
+      "hand": { "typ": "ziehen", "von": "laden-siegel-das", "nach": "neben:feuer+schwert" },
+      "falsch": [
+        { "wenn": { "item": "siegel-das", "bereich": "store" }, "text": "Fast! Das Siegel wirkt nur im Rucksack.", "zuruecksetzen": true },
+        { "wenn": { "item": "siegel-das", "bereich": "bag" }, "text": "Fast! Das Siegel muss das Feuerschwert berühren." }
+      ],
+      "hilfe": { "titel": "Artikel-Siegel", "emoji": "🟢", "animation": "pulsieren", "text": "Ein Siegel mit dem richtigen Artikel neben einem Nomen macht es 25 % stärker." }
+    },
+    {
+      "id": "rune",
+      "text": "Leg die Rune „scharf“ so, dass ihr Pfeil auf das Feuerschwert zeigt. Dann hast du ein scharfes Feuerschwert!",
+      "tipp": "Tipp die Rune zweimal an – so dreht sich ihr Pfeil.",
+      "ziel": ["laden-rune-scharf", "rucksack"],
+      "laden": ["rune-scharf"],
+      "aktion": { "typ": "rune", "rune": "rune-scharf", "ziel": "feuer+schwert" },
+      "hand": { "typ": "ziehen", "von": "laden-rune-scharf", "nach": "neben:feuer+schwert" },
+      "falsch": [
+        { "wenn": { "item": "rune-scharf", "bereich": "store" }, "text": "Fast! Die Rune wirkt nur im Rucksack.", "zuruecksetzen": true },
+        { "wenn": { "item": "rune-scharf", "bereich": "bag" }, "text": "Fast! Tipp die Rune zweimal an, bis der Pfeil auf das Feuerschwert zeigt." }
+      ],
+      "hilfe": { "titel": "Adjektiv-Runen", "emoji": "🔺", "animation": "drehen", "text": "Der Pfeil einer Rune muss auf ein passendes Nomen zeigen: scharfes Schwert." }
+    },
+    {
+      "id": "kampf-starten",
+      "text": "Dein Rucksack ist bereit. Tipp auf „Zum Kampf“!",
+      "ziel": ["kampf"],
+      "aktion": { "typ": "ereignis", "name": "kampfStart" },
+      "hand": { "typ": "tippen", "auf": "kampf" }
+    },
+    {
+      "id": "kampf",
+      "text": "Dein Rucksack kämpft von allein. Die gelben Balken zeigen, wann ein Gegenstand wieder zuschlägt – mit 2× geht es schneller.",
+      "ziel": ["kampf-rucksack", "tempo"],
+      "aktion": { "typ": "weiter" },
+      "kampfPause": true,
+      "hilfe": { "titel": "Kampf", "emoji": "⚔️", "animation": "pulsieren", "text": "Nachts kämpft dein Rucksack von allein. Jeder Gegenstand schlägt zu, wenn sein Balken voll ist." }
+    },
+    {
+      "id": "sieg",
+      "text": "Gewonnen – dafür gibt es eine Trophäe 🏆! Verlierst du einen Kampf, kostet das ein Herz ❤️.",
+      "ziel": ["fenster"],
+      "zeigenBei": "kampfEnde",
+      "aktion": { "typ": "ereignis", "name": "nachKampf" },
+      "hilfe": { "titel": "Herzen und Siege", "emoji": "🏆", "animation": "pulsieren", "text": "Jeder Sieg bringt eine Trophäe, jede Niederlage kostet ein Herz – du hast fünf. Nach zehn Tagen ist die Reise geschafft." }
+    },
+    {
+      "id": "begegnung",
+      "voraussetzung": "begegnungen",
+      "text": "Am Morgen triffst du jemanden am Wegesrand. Löse die Aufgabe für eine Belohnung!",
+      "ziel": ["fenster"],
+      "aktion": { "typ": "ereignis", "name": "begegnungFertig" },
+      "begegnung": {
+        "id": "zwerg",
+        "fragen": [{ "wort": "Schwert", "artikel": "das" }],
+        "belohnung": { "typ": "gold", "menge": 3, "text": "3 Gold" }
+      },
+      "hilfe": { "titel": "Begegnungen", "emoji": "🌅", "animation": "pulsieren", "text": "Am Morgen triffst du Gestalten am Wegesrand. Für richtige Antworten gibt es Belohnungen." }
+    },
+    {
+      "id": "buch",
+      "voraussetzung": "buch",
+      "text": "Jede neue Kombination landet im Buch der Wörter. Kannst du alle finden?",
+      "ziel": ["buch"],
+      "aktion": { "typ": "weiter" },
+      "hilfe": { "titel": "Buch der Wörter", "emoji": "📖", "animation": "pulsieren", "text": "Neue Kombinationen landen im Buch der Wörter." }
+    },
+    {
+      "id": "heldencode",
+      "voraussetzung": "heldencode",
+      "text": "Am Ende bekommst du einen Code. Schreib ihn ab oder fotografiere ihn, dann kannst du nächstes Mal weiterspielen.",
+      "ziel": ["heldencode"],
+      "aktion": { "typ": "weiter" },
+      "hilfe": { "titel": "Heldencode", "emoji": "🔑", "animation": "pulsieren", "text": "Mit deinem Heldencode spielst du nächstes Mal weiter." }
+    },
+    {
+      "id": "abschluss",
+      "text": "Super gemacht! Jetzt bist du dran – rette die Wörter der Wanderlande!",
+      "ziel": [],
+      "aktion": { "typ": "abschluss" }
+    }
+  ],
+  "tipps": {
+    "boss": "Achtung: Heute kommt ein Anführer der Orks! Er ist stärker als die anderen – pack deinen besten Rucksack.",
+    "gebiet": "Ein neues Gebiet! Hier gibt es neue Gegenstände im Laden und neue Gegner.",
+    "steigerung": "Drei gleiche Runen nebeneinander werden gesteigert: scharf → schärfer → am schärfsten.",
+    "unterklasse": "Jetzt wählst du eine Unterklasse. Sie macht deine Figur in einer Sache besonders stark."
+  }
+}

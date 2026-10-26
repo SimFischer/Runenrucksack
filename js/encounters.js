@@ -12,10 +12,20 @@ let done = null, rerender = null;
 const findEnc = (id) => G.ENCOUNTERS.begegnungen.find((b) => b.id === id);
 
 // Zeigt die Auswahl der Begegnungen. fertig() wird danach aufgerufen, neuZeichnen() nach Änderungen am Rucksack.
-export function runEncounter(fertig, neuZeichnen) {
+// erzwungen (Tutorial): { id, fragen: [{ wort, artikel }], belohnung } – ohne Auswahl, mit eigenen Fragen.
+export function runEncounter(fertig, neuZeichnen, erzwungen = null) {
   done = fertig;
   rerender = neuZeichnen;
   const run = G.run;
+  if (erzwungen) {
+    const enc = { ...findEnc(erzwungen.id), belohnung: erzwungen.belohnung };
+    const tasks = erzwungen.fragen.map((q) => ({
+      prompt: `<span class="blank">___</span> <b>${q.wort}</b>`,
+      options: ['der', 'die', 'das'], correct: q.artikel, explain: `Es heißt ${q.artikel} ${q.wort}.`, genus: true,
+    }));
+    intro(enc, () => runTasks(enc, tasks, () => reward(enc)));
+    return;
+  }
   if (!run.begegnung || run.begegnung.tag !== run.day) {
     run.begegnung = { tag: run.day, ids: pickEncounters(run, G.ENCOUNTERS, G.REGIONS) };
     save();
@@ -45,7 +55,7 @@ function finish(id) {
   done();
 }
 
-function intro(enc) {
+function intro(enc, los = null) {
   const card = openModal(`
     <div class="big-emoji">${enc.emoji}</div>
     <h2>${enc.name}</h2>
@@ -55,8 +65,10 @@ function intro(enc) {
       <button class="btn" data-back>Zurück</button>
       <button class="btn primary big" data-go>${enc.aufgabe.typ === 'tausch' ? 'Angebote ansehen' : 'Los geht’s'}</button>
     </div>`);
-  card.querySelector('[data-back]').onclick = () => runEncounter(done, rerender);
-  card.querySelector('[data-go]').onclick = () => startTask(enc);
+  const back = card.querySelector('[data-back]');
+  if (los) back.remove();
+  else back.onclick = () => runEncounter(done, rerender);
+  card.querySelector('[data-go]').onclick = () => (los ? los() : startTask(enc));
 }
 
 function startTask(enc) {
@@ -77,7 +89,7 @@ function runTasks(enc, tasks, end, opts = {}) {
 
   const draw = () => {
     const q = tasks[qi];
-    const paid = tries > 0;
+    const paid = tries > 0 && !run.tutorial;
     const broke = paid && run.gold < 1 && !solved;
     const body = q.tap ? drawTap(q, wrong, solved) : drawChoice(q, wrong, solved, broke);
     const card = openModal(`
@@ -106,7 +118,7 @@ function runTasks(enc, tasks, end, opts = {}) {
   const answer = (a) => {
     if (solved) return;
     const q = tasks[qi];
-    if (tries > 0) {
+    if (tries > 0 && !run.tutorial) {
       if (run.gold < 1) return;
       run.gold -= 1;
       bump('stat-gold');

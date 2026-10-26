@@ -158,6 +158,7 @@ export function drawItems(gridEl, grid, placed, size, info, area) {
   for (const p of placed) {
     const def = G.DEFS[p.id];
     const it = itemEl(def, p.rot, size);
+    it.dataset.tut = 'item-' + p.id;
     it.style.left = p.x * size + 'px';
     it.style.top = p.y * size + 'px';
     const i = info?.get(p.uid);

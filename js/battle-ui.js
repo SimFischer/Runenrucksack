@@ -1,5 +1,5 @@
 // Nacht: Kampfanzeige mit Lebensbalken, Abklingzeiten und Schadenszahlen.
-import { CFG, makeEnemy, pickEnemy, rectGrid, pickOne, shuffle, ARMOR_BONUS, enemyPool } from './logic.js';
+import { CFG, makeEnemy, pickEnemy, rectGrid, pickOne, shuffle, ARMOR_BONUS, enemyPool, seededRng } from './logic.js';
 import { Battle, makeFighter, runToEnd } from './battle.js';
 import { analyze } from './grammar.js';
 import { G, itemsIn, gridOf, region, hero, playerCtx } from './state.js';
@@ -7,7 +7,14 @@ import { evaluateBag } from './mods.js';
 import { $, fmt, buildGrid, drawItems, openModal, closeModal } from './ui.js';
 
 let battle = null, enemy = null, speed = 1, rafId = 0, lastFrame = 0, itemEls = {}, onDone = null;
-let bcell = 100, selfHit = 0, armor = null;
+let bcell = 100, selfHit = 0, armor = null, paused = false;
+
+// Für das Tutorial: Kampf von außen starten und kurz anhalten.
+export const battleControl = {
+  start: () => { if (!$('btn-start-battle').hidden) beginBattle(); },
+  pause: () => { paused = true; },
+  resume: () => { paused = false; },
+};
 
 function cellSize(cols, rows) {
   const w = window.innerWidth, h = window.innerHeight;
@@ -18,19 +25,25 @@ function cellSize(cols, rows) {
 // Startet die Nacht. done(won, enemyName) wird nach dem Ergebnisfenster aufgerufen.
 export function startNight(done) {
   onDone = done;
+  paused = false;
   const run = G.run;
   const reg = region();
-  const foeDef = pickEnemy(run.day, G.REGIONS, G.ENEMIES);
-  enemy = makeEnemy(run.day, foeDef, enemyPool(G.ITEMS, G.COMPOUNDS, run.day), G.DEFS);
+  // Im Tutorial: schwacher Übungsgegner mit festen Gegenständen und festem Zufall.
+  const tut = run.tutorial && G.ENEMIES.find((e) => e.id === G.TUTORIAL.uebungsgegner);
+  const rng = tut ? seededRng(G.TUTORIAL.start.zufall) : Math.random;
+  const foeDef = tut || pickEnemy(run.day, G.REGIONS, G.ENEMIES);
+  enemy = tut
+    ? { ...tut, items: tut.ausruestung.map((a, i) => ({ uid: i + 1, rot: 0, ...a })) }
+    : makeEnemy(run.day, foeDef, enemyPool(G.ITEMS, G.COMPOUNDS, run.day), G.DEFS);
   armor = foeDef.fehler?.length ? { ...pickOne(foeDef.fehler), status: 'offen' } : null;
 
   const ctx = playerCtx();
   const bag = itemsIn('bag');
   const player = makeFighter(hero()?.name || 'Dein Rucksack', bag, G.DEFS, run.day, {
-    info: evaluateBag(bag, G.DEFS, ctx), leben: ctx.leben, tempo: ctx.tempo, selbstschaden: ctx.selbstschaden,
+    info: evaluateBag(bag, G.DEFS, ctx), leben: ctx.leben, tempo: ctx.tempo, selbstschaden: ctx.selbstschaden, rng,
   });
   selfHit = ctx.selbstschaden;
-  const foe = makeFighter(enemy.name, enemy.items, G.DEFS, run.day);
+  const foe = makeFighter(enemy.name, enemy.items, G.DEFS, run.day, { rng });
   battle = new Battle(player, foe);
   itemEls = { player: {}, enemy: {} };
 
@@ -86,7 +99,7 @@ function beginBattle() {
 }
 
 function frame(now) {
-  const dt = Math.min(0.1, (now - lastFrame) / 1000) * speed;
+  const dt = paused ? 0 : Math.min(0.1, (now - lastFrame) / 1000) * speed;
   lastFrame = now;
   const events = battle.advance(dt);
   for (const ev of events) showEvent(ev);
