@@ -835,6 +835,7 @@ function openMenu() {
     ${l.richtig + l.falsch ? `<p>Grammatik-Aufgaben: ${l.richtig} richtig, ${l.falsch} daneben</p>` : ''}
     <div class="row">
       <button class="btn primary" data-act="close">Weiterspielen</button>
+      ${run.tutorial ? '' : '<button class="btn" data-act="pause">🧳 Lauf unterbrechen</button>'}
       <button class="btn danger" data-act="new">Neuer Lauf</button>
     </div>
     <div class="row">
@@ -853,6 +854,8 @@ function openMenu() {
     buch: () => zeigeBuch(openMenu),
     sammlung: () => zeigeSammlung(openMenu),
     code: () => zeigeCode({ zurueck: openMenu }),
+    // Reisecode: Helden-Fortschritt + laufender Lauf; danach zum Start (der Lauf bleibt auch im Browser gemerkt)
+    pause: () => zeigeCode({ reise: true, zurueck: (beenden) => { if (beenden) { save(); showStart(); } } }),
     neustart: () => neuBeginnen(() => { wendeDesignAn(); showAsk(); }),
     tips: () => { setTips(!tipsOn()); toast(`Erste-Mal-Tipps sind jetzt ${tipsOn() ? 'an' : 'aus'}.`); openMenu(); },
     klang: () => { setPref('klang', klangAn() ? 'aus' : 'an'); toast(`Klang beim Verbinden ist jetzt ${klangAn() ? 'an' : 'aus'}.`); openMenu(); },
