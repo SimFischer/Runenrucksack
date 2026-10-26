@@ -48,6 +48,7 @@ async function boot() {
   window.addEventListener('pointerup', onUp);
   window.addEventListener('pointercancel', onCancel);
   document.addEventListener('contextmenu', (e) => e.preventDefault());
+  fastTap();
 
   layout();
   window.addEventListener('resize', layout);
@@ -55,6 +56,25 @@ async function boot() {
   // Belohnungen aus Begegnungen verbinden sich sofort mit gleichen Items.
   onEvent((ev) => { if (ev.typ === 'neuesItem') pruefe({ uid: ev.uid, paar: true }); });
   registerServiceWorker();
+}
+
+// Schnelles Tippen: Knöpfe reagieren schon, wenn der Finger losgelassen wird. Manche Browser verschlucken
+// sonst den Klick, solange gerade Münzen fliegen. Der danach eventuell noch kommende echte Klick wird
+// ignoriert – auch auf einem Knopf, der inzwischen an derselben Stelle steht (keine doppelte Antwort).
+function fastTap() {
+  let down = null, done = 0;
+  document.addEventListener('pointerdown', (e) => { down = e.pointerType === 'touch' ? e.target.closest('button') : null; }, true);
+  document.addEventListener('pointerup', (e) => {
+    const b = e.target.closest?.('button');
+    const ok = down && b === down && !b.disabled;
+    down = null;
+    if (!ok) return;
+    done = performance.now();
+    b.click();
+  }, true);
+  document.addEventListener('click', (e) => {
+    if (e.isTrusted && performance.now() - done < 600) { e.stopPropagation(); e.preventDefault(); }
+  }, true);
 }
 
 // Startbildschirm: zuerst die Frage, ob man zum ersten Mal hier ist.

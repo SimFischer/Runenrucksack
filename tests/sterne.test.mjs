@@ -201,3 +201,20 @@ test('Dreimal gleich richtig beantwortet: Die Frage kommt in diesem Lauf nicht m
   assert.equal(istGekonnt(run, { ...q, art: 'artikel' }), false);
   assert.equal(istGekonnt(leererLauf([]), q), false, 'neuer Lauf: wieder fragen');
 });
+
+test('Falsch nie stärker: Ein verbundenes Item wirkt mehr als die zwei unverbundenen (ohne richtige Antwort)', async () => {
+  const { EFFECT_KEYS } = await import('../js/grammar.js');
+  const { canMerge: kann } = await import('../js/sterne.js');
+  const summe = (d) => EFFECT_KEYS.reduce((s, k) => s + (d[k] || 0), 0);
+  for (const d of Object.values(DEFS)) {
+    if (d.art === 'rune' || !kann(d)) continue;
+    for (let s = 1; s < MAX_STERN; s++) {
+      assert.ok(summe(starDef(d, s + 1)) > 2 * summe(starDef(d, s)) - 1e-9, `${d.id} ★${s + 1} gegen 2× ★${s}`);
+    }
+  }
+  // Ohne richtige Antwort bleiben es zwei einzelne – zusammen schwächer als das verbundene Item
+  const run = leererLauf([{ uid: 1, id: 'axt', area: 'bag', x: 0, y: 0, rot: 0 }]);
+  verbindeAlles(run, DEFS, RECIPES, [{ uid: placeNew(run, DEFS, 'axt').uid, paar: true }], () => 'nein');
+  const getrennt = run.items.reduce((s, p) => s + starDef(DEFS[p.id], p.stern).schaden, 0);
+  assert.ok(starDef(DEFS.axt, 2).schaden > getrennt);
+});
