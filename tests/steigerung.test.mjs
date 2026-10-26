@@ -3,7 +3,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { analyze, buildRuneLevels, adjectiveForm, phraseFor } from '../js/grammar.js';
-import { findTriples } from '../js/sterne.js';
+import { partnerOf } from '../js/sterne.js';
 
 const json = (f) => JSON.parse(readFileSync(new URL('../' + f, import.meta.url)));
 const ITEMS = json('items.json').items;
@@ -42,30 +42,33 @@ test('Formen vor dem Nomen: scharfes, schärferes, das schärfste Schwert', () =
   assert.equal(adjectiveForm(DEFS['rune-edel@2'], 'das'), 'edleres');
 });
 
-test('Drei gleiche Runen irgendwo in Rucksack oder Lager werden erkannt', () => {
-  const runes = (list) => findTriples(list, DEFS).filter((g) => g.typ === 'rune');
-  const row = runes([P('rune-scharf', 0, 0), P('rune-scharf', 1, 0), P('rune-scharf', 2, 0)]);
-  assert.equal(row.length, 1);
-  assert.equal(row[0].neu.id, 'rune-scharf@2');
-  assert.equal(runes([P('rune-gut@2', 1, 0), P('rune-gut@2', 3, 2), { ...P('rune-gut@2', 0, 0), area: 'store' }])[0].neu.id, 'rune-gut@3', 'verstreut und im Lager');
-  assert.equal(runes([P('rune-scharf', 0, 0), P('rune-scharf@2', 1, 0), P('rune-scharf', 2, 0)]).length, 0, 'gleiche Stufe nötig');
-  assert.equal(runes([P('rune-scharf', 0, 0), P('rune-schwer', 1, 0), P('rune-scharf', 2, 0)]).length, 0);
-  assert.equal(runes([P('rune-scharf@3', 0, 0), P('rune-scharf@3', 1, 0), P('rune-scharf@3', 2, 0)]).length, 0, 'Superlativ ist das Ende');
+test('Zwei gleiche Runen irgendwo in Rucksack oder Lager finden sich', () => {
+  const partner = (list) => partnerOf(list, DEFS, list[0]);
+  const bag = (p) => ({ ...p, area: 'bag' });
+  assert.ok(partner([bag(P('rune-scharf', 0, 0)), bag(P('rune-scharf', 3, 2))]));
+  assert.ok(partner([bag(P('rune-gut@2', 1, 0)), { ...P('rune-gut@2', 0, 0), area: 'store' }]), 'verstreut und im Lager');
+  assert.equal(partner([bag(P('rune-scharf', 0, 0)), bag(P('rune-scharf@2', 1, 0))]), null, 'gleiche Stufe nötig');
+  assert.equal(partner([bag(P('rune-scharf', 0, 0)), bag(P('rune-schwer', 1, 0))]), null);
+  assert.ok(partner([bag(P('rune-scharf@3', 0, 0)), bag(P('rune-scharf@3', 1, 0))]), 'Superlativ + Superlativ = Krone');
+  assert.equal(partner([bag(P('rune-scharf@4', 0, 0)), bag(P('rune-scharf@4', 1, 0))]), null, 'die Krone ist das Ende');
+  assert.equal(DEFS['rune-scharf@4'].name, 'am schärfsten');
+  assert.equal(phraseFor([DEFS['rune-scharf@4']], DEFS.schwert), 'das schärfste Schwert');
 });
 
-test('Jede Stufe wirkt 50 % stärker, falsch gerichtet wirkt keine', () => {
+test('Jede Stufe wirkt deutlich stärker (wie Sternstufen), falsch gerichtet wirkt keine', () => {
   const dmg = (runeId, rot = 0) => {
     const t = P('schwert', 1, 0);
     return analyze([t, P(runeId, 0, 0, rot)], DEFS).get(t.uid).def.schaden;
   };
   const base = DEFS.schwert.schaden;
   assert.equal(dmg('rune-scharf') - base, 3);
-  assert.ok(dmg('rune-scharf@2') - base >= 4.5);
-  assert.ok(dmg('rune-scharf@3') - base >= 6.75);
+  assert.ok(dmg('rune-scharf@2') - base >= 6);
+  assert.ok(dmg('rune-scharf@3') - base >= 15);
+  assert.ok(dmg('rune-scharf@4') - base >= 33);
   assert.equal(dmg('rune-scharf@3', 2), base);
   const pct = (runeId) => {
     const t = P('schwert', 1, 0);
     return analyze([t, P(runeId, 0, 0)], DEFS).get(t.uid).def.schaden;
   };
-  assert.ok(pct('rune-gut@3') > pct('rune-gut@2') && pct('rune-gut@2') > pct('rune-gut') && pct('rune-gut') > base);
+  assert.ok(pct('rune-gut@4') > pct('rune-gut@3') && pct('rune-gut@3') > pct('rune-gut@2') && pct('rune-gut@2') > pct('rune-gut') && pct('rune-gut') > base);
 });

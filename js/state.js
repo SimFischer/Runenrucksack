@@ -2,6 +2,7 @@
 import { bagGrid, STORE_GRID, regionOf } from './logic.js';
 import { buildCompounds, buildRuneLevels } from './grammar.js';
 import { playerContext } from './mods.js';
+import { placeWaiting } from './sterne.js';
 
 export const G = {
   ITEMS: [],      // Items im Laden (items.json)
@@ -64,6 +65,8 @@ export function loadRun() {
     if (!r || r.version !== 2 || r.over) return null;
     // Items, die es nicht mehr gibt, fallen weg.
     r.items = r.items.filter((p) => G.DEFS[p.id]);
+    // Ein Item, das beim Schließen gerade aufs Verbinden wartete, kommt in Rucksack oder Lager.
+    for (const p of r.items.filter((i) => i.area === 'neu')) if (!placeWaiting(r, G.DEFS, p)) r.items = r.items.filter((i) => i !== p);
     r.shop = r.shop.map((s) => (s && G.DEFS[s.id] ? s : null));
     return r;
   } catch { return null; }

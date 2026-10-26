@@ -13,15 +13,16 @@ export const CFG = {
 export const income = (day) => 8 + day;
 export const ARMOR_BONUS = 0.15; // Rüstungsfehler richtig verbessert: Gegner startet mit 15 % weniger Leben
 export const baseHp = (day) => Math.round(60 + 14 * (day - 1) + 2.5 * (day - 1) ** 2);
-// Sternstufen: drei gleiche Gegenstände werden zu einem der nächsten Stufe.
-// ★★ wirkt 1,8-fach, ★★★ 3-fach – auch der Verkaufspreis steigt so.
-export const STERN_FAKTOR = { 1: 1, 2: 1.8, 3: 3 };
-export const MAX_STERN = 3;
+// Sternstufen: Zwei gleiche Gegenstände verbinden sich sofort zu einem der nächsten Stufe.
+// Jede Stufe ist deutlich stärker als zwei der Stufe darunter (man spart ja auch Platz):
+// ★★ wirkt 2,2-fach, ★★★ 5-fach, ★★★★ (legendär) 11-fach – auch der Verkaufspreis steigt so.
+export const STERN_FAKTOR = { 1: 1, 2: 2.2, 3: 5, 4: 11 };
+export const MAX_STERN = 4;
 export const sternOf = (p) => p?.stern || 1;
 // Items, die man schon besitzt, kommen im Laden so viel häufiger, damit Sammeln sich lohnt.
 export const SAMMEL_GEWICHT = 2.5;
 
-// Wie viele gleiche (★, bei Runen gleiche Stufe) liegen schon in Rucksack und Lager?
+// Wie viele gleiche ★-Items (Runen: Grundstufe) liegen schon in Rucksack und Lager?
 export const ownedCount = (run, id) => run.items.filter((p) => p.id === id && sternOf(p) === 1).length;
 export const sellValue = (def, stern = 1) => Math.max(1, Math.floor((def.preis * STERN_FAKTOR[stern]) / 2));
 

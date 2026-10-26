@@ -2,10 +2,10 @@
 // Annahmen über das Kind: löst Aufgaben meist richtig, kauft das Beste, was es sich leisten kann.
 import {
   CFG, newRun, finishBattle, rollShop, pickEnemy, makeEnemy, findSpot, bagGrid, STORE_GRID,
-  growBag, addItem, attachTasche, enemyPool, shopPool, pickEncounters, pickOne, sellValue, seededRng, ARMOR_BONUS,
+  growBag, attachTasche, enemyPool, shopPool, pickEncounters, pickOne, sellValue, seededRng, ARMOR_BONUS,
 } from './logic.js';
 import { buildCompounds, buildRuneLevels, findFusions } from './grammar.js';
-import { findTriples, applyMerge } from './sterne.js';
+import { partnerOf, placeNew, verbindeAlles } from './sterne.js';
 import { playerContext, evaluateBag } from './mods.js';
 import { Battle, makeFighter, runToEnd } from './battle.js';
 
@@ -27,17 +27,26 @@ function worth(d) {
   return per / d.abklingzeit;
 }
 
-function shop(run, data, rng) {
+function shop(run, data, rng, skill) {
   const { defs, items, regions } = data;
+  // Ein gleiches besitzt man schon: Kaufen verbindet sofort (braucht keinen Platz, spart sogar welchen).
+  const value = (d) => worth(d) * (partnerOf(run.items, defs, { uid: -1, id: d.id }) ? 1.3 : 1);
   for (let round = 0; round < 3; round++) {
     let bought = true;
     while (bought) {
       bought = false;
       const offers = run.shop.map((s, i) => (s ? { i, d: defs[s.id] } : null)).filter(Boolean)
         .filter((o) => o.d.preis <= run.gold && (worth(o.d) > 0 || o.d.art === 'tasche'))
-        .sort((a, b) => worth(b.d) / b.d.preis - worth(a.d) / a.d.preis);
+        .sort((a, b) => value(b.d) / b.d.preis - value(a.d) / a.d.preis);
       for (const o of offers) {
         if (o.d.art === 'tasche') { run.gold -= o.d.preis; run.shop[o.i] = null; attachTasche(run, o.d); bought = true; break; }
+        if (partnerOf(run.items, defs, { uid: -1, id: o.d.id })) {
+          run.gold -= o.d.preis;
+          run.shop[o.i] = null;
+          verbinde(run, data, rng, skill, placeNew(run, defs, o.d.id));
+          bought = true;
+          break;
+        }
         const bag = run.items.filter((p) => p.area === 'bag');
         let spot = findSpot(bag, defs, o.d, bagGrid(run));
         if (!spot) {
@@ -60,14 +69,13 @@ function shop(run, data, rng) {
   }
 }
 
-// Drei gleiche sofort verschmelzen (falsche Antwort kostet 1 Gold).
-function mergeAll(run, defs, rng, skill) {
-  for (let i = 0; i < 10; i++) {
-    const [g] = findTriples(run.items, defs);
-    if (!g) return;
-    if (rng() > skill) run.gold = Math.max(0, run.gold - 1);
-    applyMerge(run, g, defs);
-  }
+// Zwei gleiche sofort verbinden, auch als Kette (eine falsche erste Antwort kostet 1 Gold).
+function verbinde(run, data, rng, skill, p) {
+  if (!p) return;
+  verbindeAlles(run, data.defs, data.recipes, [{ uid: p.uid, paar: true }], (a, q) => {
+    if (q && rng() > skill) run.gold = Math.max(0, run.gold - 1);
+    return 'richtig';
+  });
 }
 
 function morning(run, data, rng, skill) {
@@ -88,11 +96,11 @@ function morning(run, data, rng, skill) {
       if (b.typ === 'mod' && ok) run.mods.push(b.mod);
       if (b.typ === 'item' && ok) {
         const pool = shopPool(run, data.items, data.regions).filter((d) => d.seltenheit === 'selten' && worth(d) > 0);
-        if (pool.length) addItem(run, defs, pickOne(pool, rng).id);
+        if (pool.length) verbinde(run, data, rng, skill, placeNew(run, defs, pickOne(pool, rng).id));
       }
       if (b.typ === 'kobold') {
         const e = pickOne(data.exercises.kobold, rng);
-        addItem(run, defs, e.item, ok ? {} : { fluch: e.teile.join('') });
+        verbinde(run, data, rng, skill, placeNew(run, defs, e.item, null, ok ? {} : { fluch: e.teile.join('') }));
       }
     }
     if (step === 'verschmelzen') {
@@ -102,7 +110,6 @@ function morning(run, data, rng, skill) {
         run.items = run.items.filter((p) => p.uid !== f.kraft.uid);
         f.traeger.id = f.id;
       }
-      mergeAll(run, defs, rng, skill);
     }
   }
   run.queue = [];
@@ -117,7 +124,7 @@ export function simulateRun(data, rng, opts = {}) {
   const days = [];
   while (!run.over) {
     morning(run, data, rng, skill);
-    shop(run, data, rng);
+    shop(run, data, rng, skill);
     const ctx = playerContext(run, ctxData);
     const bag = run.items.filter((p) => p.area === 'bag');
     const player = makeFighter('p', bag, data.defs, run.day, {

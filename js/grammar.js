@@ -38,7 +38,7 @@ export function compoundId(kraftId, traegerId) {
 
 const roundUp = (key, v) => (DECIMAL_KEYS.has(key) ? Math.ceil(v * 10 - 1e-9) / 10 : Math.ceil(v - 1e-9));
 
-// Werte eines Gegenstands mit Sternstufe (★★ 1,8-fach, ★★★ 3-fach).
+// Werte eines Gegenstands mit Sternstufe (★★ 2,2-fach, ★★★ 5-fach, ★★★★ 11-fach).
 export function starDef(def, stern = 1) {
   if (!stern || stern === 1) return def;
   const f = STERN_FAKTOR[stern];
@@ -214,32 +214,34 @@ export function runeFits(rd, td) {
 // Adjektiv vor dem Nomen: ohne Artikel stark (scharfes Schwert), nach „der/die/das“ schwach (das scharfe Schwert).
 export function adjectiveForm(rd, artikel, schwach = false) {
   const st = rd.stufe || 1;
-  const stamm = st === 3 ? rd.steigerung.sStamm : st === 2 ? rd.steigerung.kStamm : rd.adjektiv.stamm;
-  if (schwach || st === 3) return stamm + 'e';
+  const stamm = st >= 3 ? rd.steigerung.sStamm : st === 2 ? rd.steigerung.kStamm : rd.adjektiv.stamm;
+  if (schwach || st >= 3) return stamm + 'e';
   return stamm + ({ der: 'er', die: 'e', das: 'es' }[artikel] || 'e');
 }
 
 export function phraseFor(adjs, def) {
   if (!adjs.length) return null;
-  const sup = adjs.some((a) => a.stufe === 3);
+  const sup = adjs.some((a) => a.stufe >= 3);
   const words = adjs.map((a) => adjectiveForm(a, def.artikel, sup)).join(', ');
   return sup ? `${def.artikel} ${words} ${def.name}` : `${words} ${def.name}`;
 }
 
 // ---------- Steigerung ----------
 
-export const STEIGERUNG_FAKTOR = 1.5; // jede Stufe +50 % Wirkung
+// Runen steigen wie alle Items: Zwei gleiche ergeben die nächste Stufe, mit denselben Faktoren
+// (STERN_FAKTOR). Stufe 2 = Komparativ, 3 = Superlativ, 4 = Superlativ mit leuchtender Krone.
+export const MAX_RUNENSTUFE = 4;
 export const runeBase = (d) => d.basis || d.id;
 
-// Baut aus jeder Rune Komparativ (Stufe 2) und Superlativ (Stufe 3).
+// Baut aus jeder Rune Komparativ (Stufe 2), Superlativ (Stufe 3) und Kronen-Superlativ (Stufe 4).
 export function buildRuneLevels(defs) {
   const out = [];
   const bump = { gewoehnlich: 'selten', selten: 'episch', episch: 'legendaer', legendaer: 'legendaer' };
   for (const d of Object.values(defs)) {
     if (!isRune(d) || !d.steigerung || d.stufe) continue;
     let prev = d;
-    for (const stufe of [2, 3]) {
-      const f = STEIGERUNG_FAKTOR ** (stufe - 1);
+    for (let stufe = 2; stufe <= MAX_RUNENSTUFE; stufe++) {
+      const f = STERN_FAKTOR[stufe];
       const adj = { ...d.adjektiv, bonus: {} };
       for (const [k, v] of Object.entries(d.adjektiv.bonus || {})) adj.bonus[k] = roundUp(k, v * f);
       if (d.adjektiv.bonusProzent) adj.bonusProzent = Math.round(d.adjektiv.bonusProzent * f);
@@ -249,9 +251,10 @@ export function buildRuneLevels(defs) {
         basis: d.id,
         stufe,
         name: stufe === 2 ? d.steigerung.komparativ : d.steigerung.superlativ,
-        abzeichen: stufe === 2 ? 'Ⅱ' : 'Ⅲ',
-        seltenheit: bump[prev.seltenheit],
-        preis: d.preis * (stufe === 2 ? 3 : 9),
+        abzeichen: stufe === 4 ? '👑' : null,
+        krone: stufe === 4,
+        seltenheit: stufe === 4 ? 'legendaer' : bump[prev.seltenheit],
+        preis: d.preis * 2 ** (stufe - 1),
         adjektiv: adj,
         laden: false,
       };
@@ -262,7 +265,7 @@ export function buildRuneLevels(defs) {
   return out;
 }
 
-export const nextLevelId = (d) => (d.stufe === 3 ? null : `${runeBase(d)}@${(d.stufe || 1) + 1}`);
+export const nextLevelId = (d) => ((d.stufe || 1) >= MAX_RUNENSTUFE ? null : `${runeBase(d)}@${(d.stufe || 1) + 1}`);
 
 // Wertet einen Rucksack aus: wirksame Werte jedes Items und Erklärungen für das Info-Feld.
 // Ergebnis: Map uid → { def, siegel: [{uid, genus, ok}], runen: [{uid, def, ok}], phrase, ziele }

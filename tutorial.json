@@ -384,12 +384,11 @@
     },
     {
       "id": "sammeln",
-      "text": "Ich schenke dir zwei Dolche – sie liegen im Lager. Kauf den dritten Dolch: Drei gleiche werden zu einem stärkeren!",
-      "tipp": "Zieh den Dolch aus dem Laden in deinen Rucksack.",
+      "text": "Ich schenke dir einen Dolch – er liegt in deinem Rucksack. Kauf den zweiten Dolch: Zwei gleiche werden sofort zu einem stärkeren!",
+      "tipp": "Zieh den Dolch aus dem Laden in deinen Rucksack – oder direkt auf den anderen Dolch.",
       "ziel": [
         "laden-dolch",
-        "rucksack",
-        "lager"
+        "rucksack"
       ],
       "laden": [
         "dolch"
@@ -398,18 +397,14 @@
         "geschenk": [
           {
             "id": "dolch",
-            "bereich": "store"
-          },
-          {
-            "id": "dolch",
-            "bereich": "store"
+            "bereich": "bag"
           }
         ]
       },
       "aktion": {
         "typ": "anzahl",
         "item": "dolch",
-        "min": 3
+        "min": 2
       },
       "hand": {
         "typ": "ziehen",
@@ -420,12 +415,12 @@
         "titel": "Sternstufen",
         "emoji": "⭐",
         "animation": "pulsieren",
-        "text": "Drei gleiche Gegenstände werden zu einem stärkeren: ★ → ★★ → ★★★. Rucksack und Lager zählen zusammen."
+        "text": "Zwei gleiche Gegenstände werden sofort zu einem stärkeren: ★ → ★★ → ★★★ → ★★★★. Rucksack und Lager zählen zusammen."
       }
     },
     {
       "id": "sammeln-frage",
-      "text": "Drei Dolche! Wie heißt die Mehrzahl von „der Dolch“?",
+      "text": "Zwei Dolche! Wie heißt die Mehrzahl von „der Dolch“?",
       "tipp": "Ein Dolch, zwei …?",
       "ziel": [
         "fenster"
@@ -437,7 +432,7 @@
     },
     {
       "id": "sammeln-abzeichen",
-      "text": "Siehst du das „2/3“? Du hast schon zwei Äpfel – noch einer, dann wird er stärker!",
+      "text": "Siehst du das „1/2“? Du hast schon einen Apfel – kaufst du noch einen, wird er sofort stärker!",
       "ziel": [
         "laden-apfel",
         "sammeln-apfel"
@@ -447,10 +442,6 @@
       ],
       "vorbereitung": {
         "geschenk": [
-          {
-            "id": "apfel",
-            "bereich": "store"
-          },
           {
             "id": "apfel",
             "bereich": "store"
@@ -620,9 +611,9 @@
   "tipps": {
     "boss": "Achtung: Heute kommt ein Anführer der Orks! Er ist stärker als die anderen – pack deinen besten Rucksack.",
     "gebiet": "Ein neues Gebiet! Hier gibt es neue Gegenstände im Laden und neue Gegner.",
-    "steigerung": "Drei gleiche Runen nebeneinander werden gesteigert: scharf → schärfer → am schärfsten.",
+    "steigerung": "Zwei gleiche Runen werden sofort gesteigert: scharf → schärfer → am schärfsten.",
     "unterklasse": "Jetzt wählst du eine Unterklasse. Sie macht deine Figur in einer Sache besonders stark.",
-    "sterne": "Drei gleiche Gegenstände werden zu einem stärkeren – Rucksack und Lager zählen zusammen!",
+    "sterne": "Zwei gleiche Gegenstände werden sofort zu einem stärkeren – egal, ob sie im Rucksack oder im Lager liegen!",
     "verben": "Eine Schriftrolle braucht ein Subjekt: Dreh ihren Pfeil auf ein Nomen, dann wirkt sie voll.",
     "ruestung": "Auf der Rüstung des Orks steht ein Fehler. Tipp ihn an – richtig verbessert startet er geschwächt."
   }

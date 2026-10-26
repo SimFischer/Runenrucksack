@@ -11,7 +11,7 @@ import {
 import { newRun, seededRng } from '../js/logic.js';
 import { buildCompounds, buildRuneLevels, analyze, DIRS } from '../js/grammar.js';
 import { makeFighter, Battle, runToEnd } from '../js/battle.js';
-import { findTriples, applyMerge } from '../js/sterne.js';
+import { verbindeAlles } from '../js/sterne.js';
 
 const json = (f) => JSON.parse(readFileSync(new URL('../' + f, import.meta.url)));
 const TUT = json('tutorial.json');
@@ -84,7 +84,12 @@ function act(step, run) {
       return null;
     }
     case 'ereignis':
-      if (a.name === 'verschmolzen') { applyMerge(run, findTriples(run.items, DEFS)[0], DEFS); return { typ: a.name }; }
+      if (a.name === 'verschmolzen') {
+        // Das Spiel stellt die Mehrzahl-Frage; richtig beantwortet verbinden sich beide Dolche.
+        const neu = run.items.filter((p) => p.id === 'dolch').at(-1);
+        assert.equal(verbindeAlles(run, DEFS, RECIPES, [{ uid: neu.uid, paar: true }]).length, 1);
+        return { typ: a.name };
+      }
       if (a.name === 'satz') {
         const r = run.items.find((p) => p.id === 'schlagen');
         const v = analyze(bag(run), DEFS).get(r.uid).verb;

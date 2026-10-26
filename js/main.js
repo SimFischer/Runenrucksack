@@ -6,11 +6,12 @@ import {
 import {
   GENUS, SIEGEL_BONUS, findFusions, wrongOrderNeighbor, canRotate, nextRot, isNoun, isRune, isVerb, runeBase, starDef,
 } from './grammar.js';
-import { findTriples, mergeQuestion, applyMerge, canMerge, compoundPartner } from './sterne.js';
-import { G, loadData, save, loadRun, placedOf, itemsIn, gridOf, region, hero, playerCtx, emit, figurBild, hintergrundBild } from './state.js';
+import { canMerge, compoundPartner, placeNew, placeWaiting, findeVerbindung, fuehreAus, frageFuer, sameKind } from './sterne.js';
+import { G, loadData, save, loadRun, placedOf, itemsIn, gridOf, region, hero, playerCtx, emit, onEvent, figurBild, hintergrundBild } from './state.js';
 import { evaluateBag } from './mods.js';
 import {
   $, fmt, fullName, genusChip, toast, bump, openModal, closeModal, modal, itemEl, buildGrid, drawItems, mergeAnimation, syncGold, iconHtml,
+  openQuick, closeQuick, sternVon,
 } from './ui.js';
 import { startNight } from './battle-ui.js';
 import { runEncounter } from './encounters.js';
@@ -47,6 +48,8 @@ async function boot() {
   layout();
   window.addEventListener('resize', layout);
   setInterval(syncGold, 200); // Gold ändert sich auch in Fenstern (Versuche, Belohnungen)
+  // Belohnungen aus Begegnungen verbinden sich sofort mit gleichen Items.
+  onEvent((ev) => { if (ev.typ === 'neuesItem') pruefe({ uid: ev.uid, paar: true }); });
   registerServiceWorker();
 }
 
@@ -110,6 +113,9 @@ function showScreen(name) {
 }
 
 function showGame() {
+  pending.length = 0; // offene Prüfungen gehören zum vorigen Lauf
+  merging = false;
+  closeQuick();
   showScreen('game');
   layout();
 }
@@ -291,15 +297,15 @@ function renderShop() {
     // Abzeichen sitzen an der Ecke des Items (Größe für CSS)
     holder.style.setProperty('--iw', `${def.w * mini}px`);
     holder.style.setProperty('--ih', `${def.h * mini}px`);
-    // Sammeln: wie viele gleiche besitzt du schon? Bei 2/3 leuchtet das Item.
+    // Sammeln: Besitzt du schon ein gleiches, wird es beim Kaufen sofort ★★ – das Item leuchtet.
     const n = canMerge(def) ? ownedCount(run, def.id) : 0;
     if (n > 0) {
       const badge = document.createElement('span');
-      badge.className = 'collect' + (n >= 2 ? ' almost' : '');
+      badge.className = 'collect almost';
       badge.dataset.tut = 'sammeln-' + def.id;
-      badge.textContent = `${Math.min(n, 2)}/3`;
+      badge.textContent = '1/2';
       holder.append(badge);
-      if (n >= 2) it.classList.add('almost');
+      it.classList.add('almost');
     }
     // Ketten-Symbol: ergibt mit etwas im Rucksack ein Kompositum
     if (compoundPartner(def, itemsIn('bag'), G.DEFS, G.RECIPES)) {
@@ -447,16 +453,14 @@ function collectNotes(base, ref) {
     const next = starDef(base, stern + 1);
     const keys = ['schaden', 'block', 'heilung', 'gift', 'brand', 'regeneration', 'tempo', 'leben', 'startblock'].filter((k) => base[k]);
     const vorschau = keys.slice(0, 3).map((k) => `${STAT_ROWS.find((r) => r[0] === k)[1]} ${fmt(next[k])}`).join(' · ');
-    out.push(`<p class="gram star-line"><b class="star-big">${'★'.repeat(stern)}${'☆'.repeat(MAX_STERN - stern)}</b> Stufe ${stern} von ${MAX_STERN}<br>Drei gleiche ergeben ${'★'.repeat(stern + 1)} – ${fmt(STERN_FAKTOR[stern + 1])}-fache Wirkung${vorschau && !isVerb(base) ? `: ${vorschau}` : ''}</p>`);
+    out.push(`<p class="gram star-line"><b class="star-big">${'★'.repeat(stern)}${'☆'.repeat(MAX_STERN - stern)}</b> Stufe ${stern} von ${MAX_STERN}<br>Zwei gleiche ergeben sofort ${'★'.repeat(stern + 1)} – ${fmt(STERN_FAKTOR[stern + 1])}-fache Wirkung${vorschau && !isVerb(base) ? `: ${vorschau}` : ''}</p>`);
   } else if (!isRune(base) && stern === MAX_STERN) {
-    out.push(`<p class="gram star-line"><b class="star-big">★★★</b> Höchste Stufe!</p>`);
+    out.push(`<p class="gram star-line"><b class="star-big">★★★★</b> Höchste Stufe – legendär!</p>`);
   } else if (isRune(base) && base.steigerung) {
-    out.push(`<p class="gram star-line">Drei gleiche Runen werden gesteigert: ${base.steigerung.komparativ} → ${base.steigerung.superlativ}</p>`);
+    out.push(`<p class="gram star-line">Zwei gleiche Runen werden sofort gesteigert: ${base.steigerung.komparativ} → ${base.steigerung.superlativ} → 👑</p>`);
   }
   if (ref.src === 'shop' && canMerge(base)) {
-    const n = ownedCount(G.run, base.id);
-    if (n >= 2) out.push('<p class="gram ok"><b>2/3 – Noch einer, dann wird er stärker!</b></p>');
-    else if (n === 1) out.push('<p class="gram">1/3 – Du hast schon einen davon. Drei gleiche werden zu einem stärkeren.</p>');
+    if (ownedCount(G.run, base.id) > 0) out.push('<p class="gram ok"><b>1/2 – Du hast schon eins davon. Kaufen = sofort ★★!</b></p>');
     const c = compoundPartner(base, itemsIn('bag'), G.DEFS, G.RECIPES);
     if (c) out.push(`<p class="gram ok">⛓️ Mit ${dativ(c.mit).replace(/^(dem|der) /, (m) => m === 'dem ' ? 'deinem ' : 'deiner ')} wird daraus: <b>${fullName(G.DEFS[c.id])}</b></p>`);
   }
@@ -525,7 +529,7 @@ function grammarNotes(base, ana, ref) {
     const b0 = G.DEFS[runeBase(base)];
     if (b0.steigerung) {
       const lv = base.stufe || 1;
-      out.push({ html: `Steigerung: ${b0.name} → ${b0.steigerung.komparativ} → ${b0.steigerung.superlativ}. ${lv === 3 ? 'Das ist schon die höchste Stufe (Superlativ).' : `Drei gleiche Runen direkt nebeneinander werden zu Beginn des Tages gesteigert (+50 %).`}` });
+      out.push({ html: `Steigerung: ${b0.name} → ${b0.steigerung.komparativ} → ${b0.steigerung.superlativ}. ${lv >= 4 ? 'Das ist die höchste Stufe: der Superlativ mit Krone 👑.' : lv === 3 ? 'Superlativ! Noch eine gleiche Rune, dann bekommt sie die Krone 👑.' : 'Zwei gleiche Runen werden sofort gesteigert.'}` });
     }
     const z = ana?.ziel;
     if (ana && !z) out.push({ cls: 'bad', html: '✗ Der Pfeil zeigt auf kein Item. Tippe nochmal, um ihn zu drehen.' });
@@ -621,26 +625,29 @@ function buyAuto(slot) {
   const def = G.DEFS[G.run.shop[slot].id];
   if (G.run.gold < def.preis) { toast('Zu wenig Gold'); return; }
   if (def.art === 'tasche') { buyTasche(slot); return; }
-  for (const area of ['bag', 'store']) {
-    const spot = findSpot(itemsIn(area), G.DEFS, def, gridOf(area));
-    if (spot) {
-      buy(slot, area, spot);
-      if (area === 'store') toast('Rucksack voll – ins Lager gelegt');
-      return;
-    }
-  }
-  toast('Kein Platz mehr – verkaufe etwas');
+  // Rucksack, sonst Lager – und ist alles voll, aber ein gleiches da, wird es trotzdem sofort verbunden.
+  const p = placeNew(G.run, G.DEFS, def.id);
+  if (!p) { toast('Kein Platz mehr – verkaufe etwas'); return; }
+  if (p.area === 'store') toast('Rucksack voll – ins Lager gelegt');
+  paid(slot, p);
 }
 
-function buy(slot, area, spot) {
+// Kauf an eine bestimmte Stelle (Ziehen aus dem Laden). mit: uid eines gleichen Items, auf das es fällt.
+function buy(slot, area, spot, mit = null) {
+  const def = G.DEFS[G.run.shop[slot].id];
+  const p = placeNew(G.run, G.DEFS, def.id, mit ? { area: 'neu', x: 0, y: 0 } : { area, ...spot });
+  paid(slot, p, mit);
+}
+
+function paid(slot, p, mit = null) {
   const run = G.run;
-  const def = G.DEFS[run.shop[slot].id];
+  const def = G.DEFS[p.id];
   run.gold -= def.preis;
   run.shop[slot] = null;
-  const uid = run.nextUid++;
-  run.items.push({ uid, id: def.id, area, ...spot });
-  selected = run.tutorial ? null : { src: area, uid }; // im Tutorial soll das erste Antippen die Infos zeigen
+  selected = run.tutorial || p.area === 'neu' ? null : { src: p.area, uid: p.uid }; // im Tutorial zeigt erst das Antippen die Infos
   bump('stat-gold');
+  // Gibt es schon ein gleiches? Dann verbinden sie sich sofort.
+  pruefe(mit ? { uid: p.uid, mit, kauf: { slot, id: def.id, preis: def.preis } } : { uid: p.uid, paar: true, kauf: { slot, id: def.id, preis: def.preis } });
   render();
 }
 
@@ -753,18 +760,100 @@ function runFusions(done) {
   showFusion(findFusions(itemsIn('bag'), G.DEFS, G.RECIPES), 0, done);
 }
 
-// ---------- Drei gleiche ergeben einen besseren (Sternstufen) ----------
+// ---------- Verbinden: zwei gleiche ergeben sofort die nächste Stufe ----------
 
 let merging = false;
+const pending = []; // Prüfungen { uid, paar, mit, kauf } – werden nacheinander abgearbeitet
+const itemNode = (uid) => document.querySelector(`.board .item[data-uid="${uid}"]`);
 
-// Prüft nach jeder Änderung, ob drei gleiche Gegenstände im Besitz sind (Rucksack + Lager).
+function pruefe(...checks) {
+  pending.push(...checks);
+  setTimeout(checkMerges, 0);
+}
+
+// Nach jeder Änderung: offene Verbindungen nacheinander abarbeiten (Ketten mit eigener Animation),
+// danach Verb-Rollen, die auf ein neues Subjekt zeigen.
 function checkMerges() {
   if (merging || !G.run || G.run.over || !$('modal').hidden || drag || $('game').hidden) return;
-  const groups = findTriples(G.run.items, G.DEFS);
-  if (groups.length) { merging = true; showMerge(groups[0]); return; }
-  // Danach: Zeigt eine Verb-Rolle auf ein neues Subjekt? Dann nach der Personalform fragen.
+  while (pending.length) {
+    const c = pending.shift();
+    const a = findeVerbindung(G.run, G.DEFS, G.RECIPES, c);
+    if (a) { merging = true; askMerge(a, c); return; }
+  }
   const offen = itemsIn('bag').find((p) => bagInfo.get(p.uid)?.verb?.status === 'offen');
   if (offen) { merging = true; askVerb(offen); }
+}
+
+// Kleines Frage-Fenster direkt am Item: große Antwortknöpfe, ein Tipp genügt. Erster Versuch frei,
+// jeder weitere kostet 1 Gold (im Tutorial nicht). opts: { q, anchor, kopf, richtig(ersterVersuch), trotzdem, nein, neinText }
+function quiz(opts) {
+  const run = G.run, q = opts.q;
+  let tries = 0, feedback = '';
+  const wrong = new Set();
+  const draw = () => {
+    const extra = tries > 0 && !run.tutorial;
+    const broke = extra && run.gold < 1;
+    const cost = run.tutorial ? (tries ? 'Probier es noch einmal!' : '') : extra ? `Nächster Versuch: 1 🪙 (du hast ${run.gold})` : 'Erster Versuch frei';
+    const card = openQuick(`
+      <div class="quick-head">${opts.kopf || ''}<span class="quick-title">${q.titel}</span></div>
+      <div class="quick-q">${q.prompt}</div>
+      <div class="quick-opts">${q.options.map((o, k) => `<button class="btn opt-btn${q.genus ? ' genus-btn' : ''}" data-k="${k}"${q.genus ? ` style="--genus:${GENUS[o].farbe}"` : ''}${wrong.has(k) || broke ? ' disabled' : ''}>${o}</button>`).join('')}</div>
+      ${feedback ? `<p class="quick-fb">${feedback}</p>` : ''}
+      <div class="quick-foot"><span class="cost">${cost}</span>
+        ${broke && opts.trotzdem ? '<button class="btn small primary" data-anyway>Trotzdem verbinden</button>' : ''}
+        ${opts.nein ? `<button class="btn small quick-no" data-no>${opts.neinText || 'Nicht verbinden'}</button>` : ''}</div>`, opts.anchor);
+    card.querySelectorAll('[data-k]').forEach((b) => { b.onclick = () => guess(+b.dataset.k); });
+    card.querySelector('[data-anyway]')?.addEventListener('click', () => opts.trotzdem());
+    card.querySelector('[data-no]')?.addEventListener('click', () => opts.nein());
+  };
+  const guess = (k) => {
+    if (tries > 0 && !run.tutorial) {
+      if (run.gold < 1) return;
+      run.gold -= 1;
+      bump('stat-gold');
+    }
+    tries++;
+    if (q.options[k] === q.correct) { run.lernen.richtig++; opts.richtig(tries === 1); return; }
+    run.lernen.falsch++;
+    wrong.add(k);
+    feedback = `✗ ${q.explain}`;
+    save();
+    draw();
+  };
+  draw();
+}
+
+// Zwei gleiche gefunden: Frage stellen, bei richtiger Antwort sofort verbinden.
+function askMerge(a) {
+  const run = G.run;
+  const d = G.DEFS[a.alt.id];
+  const q = frageFuer(a, G.DEFS);
+  emit('tipp', { key: isRune(d) ? 'steigerung' : 'sterne' });
+  if (!q) { doMerge(a); return; } // Superlativ → Krone: ohne neue Frage
+  const ziel = '★'.repeat(sternVon(a.alt) + 1);
+  quiz({
+    q,
+    anchor: itemNode(a.alt.uid),
+    kopf: `<span class="quick-eq">${iconHtml(d, 'ic small')}<b>+</b>${iconHtml(d, 'ic small')}<b>=</b><em class="goal-stars">${ziel}</em></span>`,
+    richtig: () => doMerge(a),
+    trotzdem: () => doMerge(a),
+  });
+}
+
+function doMerge(a) {
+  const run = G.run;
+  const from = [a.neu, a.alt].map((p) => itemNode(p.uid)?.getBoundingClientRect()).filter(Boolean);
+  closeQuick();
+  const p = fuehreAus(run, a, G.DEFS);
+  selected = run.tutorial ? null : { src: p.area, uid: p.uid };
+  render();
+  const nd = G.DEFS[p.id];
+  mergeAnimation(from, itemNode(p.uid), nd.emoji);
+  toast(isRune(nd) ? `Rune gesteigert: ${nd.name}${nd.krone ? ' 👑' : ''}!` : `${'★'.repeat(p.stern)} ${nd.name}: jetzt viel stärker!`);
+  emit('verschmolzen', { id: p.id, stern: sternVon(p) });
+  // Kette: Gibt es zum neuen Item wieder ein gleiches? Erst nach der Animation weiter.
+  pending.unshift({ uid: p.uid, paar: true });
+  setTimeout(() => { merging = false; checkMerges(); }, 950);
 }
 
 // „Das Feuerschwert ___ (schlagen)“ – die Antwort gilt, solange Rolle und Subjekt so liegen.
@@ -772,108 +861,23 @@ function askVerb(p) {
   const run = G.run;
   const d = G.DEFS[p.id];
   const v = bagInfo.get(p.uid).verb;
-  const options = shuffle([v.richtig, ...v.falsch]);
   emit('tipp', { key: 'verben' });
-  let tries = 0, feedback = '';
-  const wrong = new Set();
   const store = (ok) => {
     p.satz = { uid: v.subjekt.uid, id: v.subjekt.id, stern: v.subjekt.stern, ok };
-    closeModal();
+    closeQuick();
     merging = false;
     render();
     emit('satz', { ok, verb: p.id, subjekt: v.subjekt.id });
     if (ok) toast(`„${v.satz}“ – jetzt wirkt die Rolle voll!`);
   };
-  const draw = () => {
-    const paid = tries > 0 && !run.tutorial;
-    const broke = paid && run.gold < 1;
-    const card = openModal(`
-      <div class="fusion-eq"><span class="fi">${iconHtml(d)}<small>${d.name}</small></span><span class="op">➤</span>
-        <span class="fi">${iconHtml(v.subjekt.def)}${v.subjekt.stern > 1 ? `<em class="goal-stars">${'★'.repeat(v.subjekt.stern)}</em>` : ''}<small>${v.subjekt.def.name}</small></span></div>
-      <p class="enc-progress">Die Rolle zeigt auf ein Subjekt. Wie heißt der Satz?</p>
-      <h2 class="enc-q">${v.subjektText} <span class="blank">___</span>. <small>(${d.name})</small></h2>
-      <div class="row wrap">${options.map((o, k) => `<button class="btn opt-btn" data-k="${k}" ${wrong.has(k) || broke ? 'disabled' : ''}>${o}</button>`).join('')}</div>
-      <p class="cost">${run.tutorial ? (tries ? 'Probier es noch einmal!' : '') : paid ? `Jeder weitere Versuch kostet 1 🪙 · du hast ${run.gold} 🪙` : 'Erster Versuch kostenlos'}</p>
-      ${feedback ? `<p class="feedback">${feedback}</p>` : ''}
-      ${run.tutorial ? '' : '<div class="row"><button class="btn small" data-leave>So lassen (Rolle wirkt nur halb)</button></div>'}`, 'merge-card');
-    card.querySelectorAll('[data-k]').forEach((b) => { b.onclick = () => guess(+b.dataset.k); });
-    card.querySelector('[data-leave]')?.addEventListener('click', () => store(false));
-  };
-  const guess = (k) => {
-    if (tries > 0 && !run.tutorial) {
-      if (run.gold < 1) return;
-      run.gold -= 1;
-      bump('stat-gold');
-    }
-    tries++;
-    if (options[k] === v.richtig) { run.lernen.richtig++; store(true); return; }
-    run.lernen.falsch++;
-    wrong.add(k);
-    feedback = `✗ ${v.regel}`;
-    save();
-    draw();
-  };
-  draw();
-}
-
-function showMerge(group) {
-  const run = G.run;
-  const d = G.DEFS[group.ziel.id];
-  const q = mergeQuestion(group, G.DEFS);
-  const sternNeu = group.neu.stern;
-  const ziel = sternNeu ? '★'.repeat(sternNeu) : G.DEFS[group.neu.id].abzeichen;
-  if (group.typ === 'rune') emit('tipp', { key: 'steigerung' });
-  else emit('tipp', { key: 'sterne' });
-  let tries = 0, feedback = '';
-  const wrong = new Set();
-
-  const draw = () => {
-    const paid = tries > 0 && !run.tutorial;
-    const broke = paid && run.gold < 1;
-    const card = openModal(`
-      <div class="fusion-eq">${[0, 1, 2].map(() => `<span class="fi">${iconHtml(d)}<small>${d.name}</small></span>`).join('<span class="op">+</span>')}
-        <span class="op">=</span><span class="fi glowing merge-goal" style="--glow:#ffd65a">${iconHtml(d)}<em class="goal-stars">${ziel}</em></span></div>
-      <p class="enc-progress">Drei gleiche werden zu einem stärkeren! ${q.titel}</p>
-      <h2 class="enc-q">${q.prompt}</h2>
-      <div class="row wrap">${q.options.map((o, k) => `<button class="btn opt-btn" data-k="${k}" ${wrong.has(k) || broke ? 'disabled' : ''}>${o}</button>`).join('')}</div>
-      <p class="cost">${run.tutorial ? (tries ? 'Probier es noch einmal!' : '') : paid ? `Jeder weitere Versuch kostet 1 🪙 · du hast ${run.gold} 🪙` : 'Erster Versuch kostenlos'}</p>
-      ${feedback ? `<p class="feedback">${feedback}</p>` : ''}
-      ${broke ? '<div class="row"><button class="btn primary" data-anyway>Trotzdem verschmelzen</button></div>' : ''}`, 'merge-card');
-    card.querySelectorAll('[data-k]').forEach((b) => { b.onclick = () => guess(+b.dataset.k); });
-    card.querySelector('[data-anyway]')?.addEventListener('click', () => doMerge());
-  };
-
-  const guess = (k) => {
-    if (tries > 0 && !run.tutorial) {
-      if (run.gold < 1) return;
-      run.gold -= 1;
-      bump('stat-gold');
-    }
-    tries++;
-    if (q.options[k] === q.correct) { run.lernen.richtig++; doMerge(); return; }
-    run.lernen.falsch++;
-    wrong.add(k);
-    feedback = `✗ ${q.explain}`;
-    save();
-    draw();
-  };
-
-  const doMerge = () => {
-    const rects = group.teile.map((p) => document.querySelector(`.item[data-uid="${p.uid}"]`)?.getBoundingClientRect()).filter(Boolean);
-    closeModal();
-    const p = applyMerge(run, group, G.DEFS);
-    selected = p && !run.tutorial ? { src: p.area, uid: p.uid } : null;
-    merging = false;
-    render();
-    if (p) {
-      const nd = G.DEFS[p.id];
-      mergeAnimation(rects, document.querySelector(`.item[data-uid="${p.uid}"]`), nd.emoji);
-      toast(p.stern ? `${'★'.repeat(p.stern)} ${nd.name}: jetzt viel stärker!` : `Rune gesteigert: ${nd.name}!`);
-      emit('verschmolzen', { id: p.id, stern: p.stern || 1 });
-    }
-  };
-
-  draw();
+  quiz({
+    q: { titel: 'Wie heißt der Satz?', prompt: `${v.subjektText} <span class="blank">___</span>. <small>(${d.name})</small>`, options: shuffle([v.richtig, ...v.falsch]), correct: v.richtig, explain: v.regel },
+    anchor: itemNode(p.uid),
+    kopf: `<span class="quick-eq">${iconHtml(d, 'ic small')}<b>➤</b>${iconHtml(v.subjekt.def, 'ic small')}</span>`,
+    richtig: () => store(true),
+    nein: run.tutorial ? null : () => store(false),
+    neinText: 'So lassen (wirkt nur halb)',
+  });
 }
 
 function showFusion(list, i, done) {
@@ -953,7 +957,7 @@ function onDown(e) {
     }
     return;
   }
-  if ($('game').hidden || !$('modal').hidden) return;
+  if ($('game').hidden || !$('modal').hidden || $('quick')) return;
   const el = e.target.closest('.item[data-src]');
   if (!el) {
     if (selected && e.target.closest('.board') && !e.target.closest('.info-panel, .btn, .lock')) {
@@ -1012,7 +1016,7 @@ function startDrag() {
 
 function makeGhost() {
   drag.ghost?.remove();
-  drag.ghost = itemEl(drag.def, drag.rot, cell, drag.ref.uid ? placedOf(drag.ref.uid).stern || 1 : 1);
+  drag.ghost = itemEl(drag.def, drag.rot, cell, drag.ref.uid ? sternVon(placedOf(drag.ref.uid)) : 1);
   drag.ghost.classList.add('ghost');
   document.body.append(drag.ghost);
 }
@@ -1076,19 +1080,22 @@ function updateTarget() {
   }
 }
 
-// Darf das gezogene Item hier hin? Im Rucksack werden überdeckte Items ins Lager geschoben.
+// Darf das gezogene Item hier hin? Direkt auf einem gleichen Item verbinden sich beide;
+// im Rucksack werden andere überdeckte Items ins Lager geschoben.
 function evaluate(area, x, y, s) {
   const selfUid = drag.ref.uid;
   if (drag.ref.src === 'shop' && G.run.gold < drag.def.preis) return { status: 'bad', reason: 'gold' };
   if (drag.def.art === 'tasche') return area === 'bag' ? { status: 'ok' } : { status: 'bad' };
   const grid = gridOf(area);
   const list = itemsIn(area, selfUid);
+  const hit = overlapping(list, G.DEFS, x, y, s.w, s.h);
+  const me = selfUid ? placedOf(selfUid) : { id: drag.def.id };
+  if (hit.length === 1 && sameKind(hit[0], me) && canMerge(drag.def, sternVon(me))) return { status: 'merge', mit: hit[0].uid };
   if (canPlace(list, G.DEFS, drag.def, x, y, drag.rot, grid)) return { status: 'ok' };
   if (area !== 'bag') return { status: 'bad' };
   // Felder müssen trotzdem zum Rucksack gehören.
   if (!canPlace([], G.DEFS, drag.def, x, y, drag.rot, grid)) return { status: 'bad' };
 
-  const hit = overlapping(list, G.DEFS, x, y, s.w, s.h);
   const store = itemsIn('store', selfUid);
   const moves = [];
   for (const o of hit) {
@@ -1116,6 +1123,13 @@ function drop(d) {
   if (d.def.art === 'tasche') { buyTasche(d.ref.slot); return; }
   if (t.status === 'bad') {
     if (t.reason === 'gold') toast('Zu wenig Gold');
+    render();
+    return;
+  }
+  if (t.status === 'merge') {
+    // Direkt auf ein gleiches Item gelegt: beide verbinden sich.
+    if (d.ref.src === 'shop') { buy(d.ref.slot, null, null, t.mit); return; }
+    pruefe({ uid: d.ref.uid, mit: t.mit });
     render();
     return;
   }

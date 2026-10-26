@@ -118,7 +118,46 @@ export function modal(html, handlers = {}, cls = '') {
   return card;
 }
 
+// Kleines Frage-Fenster direkt über einem Item (nicht bildschirmfüllend). Eine durchsichtige Fläche
+// dahinter hält das Spiel an, bis die Frage beantwortet ist. Gibt das Fenster zurück.
+export function openQuick(html, anchor) {
+  let layer = $('quick');
+  const rect = anchor?.getBoundingClientRect?.() || layer?.anchorRect || null;
+  if (!layer) {
+    layer = document.createElement('div');
+    layer.id = 'quick';
+    layer.innerHTML = '<div class="quick-card" data-tut="fenster"></div>';
+    document.body.append(layer);
+  }
+  layer.anchorRect = rect;
+  const card = layer.firstChild;
+  card.innerHTML = html;
+  placeQuick(card, rect);
+  return card;
+}
+
+export const closeQuick = () => $('quick')?.remove();
+
+// Über dem Item, sonst darunter; immer ganz im Bild.
+function placeQuick(card, r) {
+  const m = 8, cw = card.offsetWidth, ch = card.offsetHeight;
+  let left = r ? r.left + r.width / 2 - cw / 2 : (innerWidth - cw) / 2;
+  let top = r ? r.top - ch - 14 : (innerHeight - ch) / 2;
+  let below = false;
+  if (r && top < m) { top = r.bottom + 14; below = true; }
+  left = Math.max(m, Math.min(innerWidth - cw - m, left));
+  top = Math.max(m, Math.min(innerHeight - ch - m, top));
+  card.style.left = left + 'px';
+  card.style.top = top + 'px';
+  card.classList.toggle('below', below);
+  card.style.setProperty('--tip', r ? `${Math.max(16, Math.min(cw - 16, r.left + r.width / 2 - left))}px` : '50%');
+  card.classList.toggle('no-tip', !r);
+}
+
 // ---------- Items ----------
+
+// Sternstufe eines Items im Rucksack; Runen zeigen ihre Steigerungsstufe als Sterne.
+export const sternVon = (p) => p?.stern || G.DEFS[p?.id]?.stufe || 1;
 
 export function itemEl(def, rot, size, stern = 1) {
   const s = sizeOf(def, rot);
@@ -260,7 +299,7 @@ export function drawItems(gridEl, grid, placed, size, info, area) {
 
   for (const p of placed) {
     const def = G.DEFS[p.id];
-    const it = itemEl(def, p.rot, size, p.stern || 1);
+    const it = itemEl(def, p.rot, size, sternVon(p));
     it.dataset.tut = 'item-' + p.id;
     it.style.left = p.x * size + 'px';
     it.style.top = p.y * size + 'px';

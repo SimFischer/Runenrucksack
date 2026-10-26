@@ -1,11 +1,12 @@
 // Morgen: Begegnungen am Wegesrand mit kurzen Grammatik-Aufgaben (Inhalte aus encounters.json und exercises.json).
 // Regeln für alle Aufgaben: erster Versuch kostenlos, jeder weitere 1 Gold, bei Fehlern eine kurze Erklärzeile.
 import {
-  pickEncounters, makeTask, koboldTask, growBag, addItem, shopPool, rarityWeights, pickWeighted, pickOne,
+  pickEncounters, makeTask, koboldTask, growBag, shopPool, rarityWeights, pickWeighted, pickOne,
   canPlace, bagGrid, STORE_GRID,
 } from './logic.js';
 import { GENUS } from './grammar.js';
-import { G, save, region } from './state.js';
+import { placeNew } from './sterne.js';
+import { G, save, region, emit } from './state.js';
 import { openModal, closeModal, toast, bump, fullName, nameAkk, iconHtml } from './ui.js';
 
 let done = null, rerender = null;
@@ -180,6 +181,14 @@ function giveUp(enc) {
 
 // ---------- Belohnungen ----------
 
+// Neues Item in Rucksack oder Lager legen. Gibt es schon ein gleiches, verbindet es sich sofort
+// (sobald das Fenster zu ist) – dann geht es auch, wenn kein Platz mehr frei ist.
+function gewinn(id, extra = {}) {
+  const p = placeNew(G.run, G.DEFS, id, null, extra);
+  if (p) emit('neuesItem', { uid: p.uid });
+  return p;
+}
+
 function reward(enc) {
   const run = G.run, b = enc.belohnung;
   let text = '';
@@ -190,7 +199,7 @@ function reward(enc) {
   } else if (b.typ === 'item') {
     const pool = shopPool(run, G.ITEMS, G.REGIONS).filter((d) => d.seltenheit === (b.seltenheit || 'selten'));
     const def = pickOne(pool);
-    const p = def && addItem(run, G.DEFS, def.id);
+    const p = def && gewinn(def.id);
     if (p) text = `Du bekommst ${nameAkk(def)} ${def.emoji}!${p.area === 'store' ? ' (im Lager)' : ''}`;
     else { run.gold += 3; text = 'Kein Platz für ein Item – dafür bekommst du 3 🪙.'; }
   } else if (b.typ === 'gold') {
@@ -273,10 +282,11 @@ function swap(enc, uid, newDef) {
     if (canPlace(same, G.DEFS, newDef, old.x, old.y, rot, grid)) {
       placed = { uid: run.nextUid++, id: newDef.id, area: old.area, x: old.x, y: old.y, rot };
       run.items.push(placed);
+      emit('neuesItem', { uid: placed.uid });
       break;
     }
   }
-  if (!placed) placed = addItem(run, G.DEFS, newDef.id);
+  if (!placed) placed = gewinn(newDef.id);
   if (!placed) {
     run.items.push(old);
     toast('Dafür ist kein Platz – wähle ein größeres Item zum Tauschen.');
@@ -296,7 +306,7 @@ function kobold(enc) {
   const task = koboldTask(entry);
   const vorher = `<div class="kobold-gift"><span class="big-emoji glowing" style="--glow:#a259d9">${iconHtml(def, 'ic big')}${def.abzeichen ? `<em>${def.abzeichen}</em>` : ''}</span></div>`;
   runTasks(enc, [task], (ok) => {
-    const p = addItem(run, G.DEFS, def.id, ok ? {} : { fluch: task.falscherName });
+    const p = gewinn(def.id, ok ? {} : { fluch: task.falscherName });
     if (!p) { toast('Kein Platz im Rucksack – der Kobold zieht beleidigt ab.'); finish(enc.id); return; }
     if (ok) showReward(enc, `Fehler gefunden! ${fullName(def)} ${def.emoji} ist jetzt ganz normal stark.`);
     else {
