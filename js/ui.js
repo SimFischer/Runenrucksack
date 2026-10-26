@@ -1,7 +1,7 @@
 // Gemeinsame Bausteine der Oberfläche: Fenster, Hinweise, Item-Kacheln und Raster.
 import { sizeOf } from './logic.js';
 import { GENUS, findFusions, isRune, isVerb, runeTargetCell, verbTargetCell } from './grammar.js';
-import { G, bildFuer } from './state.js';
+import { G, bildFuer, getPref } from './state.js';
 
 export const $ = (id) => document.getElementById(id);
 export const fmt = (n) => n.toLocaleString('de-DE', { maximumFractionDigits: 1 });
@@ -383,37 +383,93 @@ function drawRuneLines(gridEl, grid, placed, size, info) {
   gridEl.append(svg);
 }
 
-// Verschmelz-Animation: die drei Teile fliegen zusammen, Glanz, Sterne erscheinen.
-export function mergeAnimation(fromRects, toEl, emoji) {
+// Verbinden-Animation: Beide Teile fliegen zusammen, kurzer Lichtblitz, die Sterne erscheinen nacheinander,
+// ein kurzer Klang, und der Gewinn („+120 % Schaden“) steigt auf. opts: { icon, sterne, gewinn, gross }
+// gross (★★★★ oder Krone): Glanz über den ganzen Rucksack.
+export function mergeAnimation(fromRects, toEl, opts = {}) {
   if (!toEl) return;
   const to = toEl.getBoundingClientRect();
   const cx = to.left + to.width / 2, cy = to.top + to.height / 2;
-  for (const r of fromRects) {
+  const fly = (html, cls, x, y) => {
     const f = document.createElement('div');
-    f.className = 'merge-fly';
-    f.textContent = emoji;
+    f.className = cls;
+    f.innerHTML = html;
+    f.style.left = x + 'px';
+    f.style.top = y + 'px';
     document.body.append(f);
+    return f;
+  };
+  // 1. Die Teile fliegen zusammen
+  for (const r of fromRects) {
+    const f = fly(opts.icon || '✨', 'merge-fly', 0, 0);
     const sx = r.left + r.width / 2, sy = r.top + r.height / 2;
     f.animate?.([
-      { transform: `translate(${sx - 24}px, ${sy - 24}px) scale(1)`, opacity: 1 },
-      { transform: `translate(${cx - 24}px, ${cy - 24}px) scale(.6)`, opacity: 1, offset: 0.8 },
-      { transform: `translate(${cx - 24}px, ${cy - 24}px) scale(.2)`, opacity: 0 },
-    ], { duration: 700, easing: 'ease-in' });
-    setTimeout(() => f.remove(), 720);
+      { transform: `translate(${sx - 28}px, ${sy - 28}px) scale(1)`, opacity: 1 },
+      { transform: `translate(${cx - 28}px, ${cy - 28}px) scale(.75)`, opacity: 1, offset: 0.85 },
+      { transform: `translate(${cx - 28}px, ${cy - 28}px) scale(.3)`, opacity: 0 },
+    ], { duration: 520, easing: 'ease-in' });
+    setTimeout(() => f.remove(), 540);
   }
   setTimeout(() => {
+    // 2. Lichtblitz und Klang
     toEl.classList.add('merged');
-    for (let i = 0; i < 10; i++) {
-      const s = document.createElement('div');
-      s.className = 'merge-star';
-      s.textContent = i % 2 ? '★' : '✨';
-      document.body.append(s);
-      const a = (i / 10) * Math.PI * 2;
+    const flash = fly('', 'merge-flash' + (opts.gross ? ' gross' : ''), cx, cy);
+    setTimeout(() => flash.remove(), 700);
+    klang(opts.sterne || 2);
+    for (let i = 0; i < (opts.gross ? 18 : 8); i++) {
+      const s = fly(i % 2 ? '★' : '✨', 'merge-star', 0, 0);
+      const w = (i / (opts.gross ? 18 : 8)) * Math.PI * 2, d = opts.gross ? 150 : 80;
       s.animate?.([
         { transform: `translate(${cx - 12}px, ${cy - 12}px) scale(.4)`, opacity: 1 },
-        { transform: `translate(${cx - 12 + Math.cos(a) * 90}px, ${cy - 12 + Math.sin(a) * 90}px) scale(1.2)`, opacity: 0 },
-      ], { duration: 900, easing: 'ease-out' });
-      setTimeout(() => s.remove(), 920);
+        { transform: `translate(${cx - 12 + Math.cos(w) * d}px, ${cy - 12 + Math.sin(w) * d}px) scale(1.2)`, opacity: 0 },
+      ], { duration: 800, easing: 'ease-out' });
+      setTimeout(() => s.remove(), 820);
     }
-  }, 650);
+    // 3. Die Sterne erscheinen nacheinander über dem Item
+    const n = opts.sterne || 0;
+    for (let i = 0; i < n; i++) {
+      setTimeout(() => {
+        const s = fly('★', 'merge-bigstar', cx + (i - (n - 1) / 2) * 30, to.top - 6);
+        setTimeout(() => s.remove(), 1100 - i * 120);
+      }, 60 + i * 160);
+    }
+    // 4. Gewinn steigt auf
+    if (opts.gewinn) {
+      const g = fly(opts.gewinn, 'merge-gain', cx, to.top + to.height * 0.35);
+      setTimeout(() => g.remove(), 1500);
+    }
+    // ★★★★: Glanz über den ganzen Rucksack
+    if (opts.gross) {
+      const bag = document.getElementById('grid-bag');
+      bag?.classList.remove('feier');
+      void bag?.offsetWidth;
+      bag?.classList.add('feier');
+      setTimeout(() => bag?.classList.remove('feier'), 1900);
+    }
+  }, 480);
+}
+
+// Kurzer, leiser Klang beim Verbinden (Web Audio, im Menü abschaltbar). Höhere Stufe = längere Tonfolge.
+let audio = null;
+export const klangAn = () => getPref('klang', 'an') !== 'aus';
+export function klang(stufe = 2) {
+  if (!klangAn()) return;
+  try {
+    audio ||= new (window.AudioContext || window.webkitAudioContext)();
+    if (audio.state === 'suspended') audio.resume();
+    const toene = stufe >= 4 ? [523, 659, 784, 1047, 1319, 1568] : stufe === 3 ? [523, 659, 784, 1047] : [587, 784, 988];
+    const t0 = audio.currentTime + 0.02;
+    toene.forEach((f, i) => {
+      const o = audio.createOscillator(), g = audio.createGain();
+      o.type = 'triangle';
+      o.frequency.value = f;
+      const s = t0 + i * 0.08;
+      g.gain.setValueAtTime(0.0001, s);
+      g.gain.exponentialRampToValueAtTime(0.06, s + 0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001, s + 0.32);
+      o.connect(g).connect(audio.destination);
+      o.start(s);
+      o.stop(s + 0.35);
+    });
+  } catch { /* ohne Ton */ }
 }

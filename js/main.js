@@ -9,11 +9,13 @@ import {
 import {
   canMerge, compoundPartner, placeNew, findeVerbindung, fuehreAus, frageFuer, sameKind, istGekonnt, merkeRichtig, nichtVerbinden,
 } from './sterne.js';
-import { G, loadData, save, loadRun, placedOf, itemsIn, gridOf, region, hero, playerCtx, emit, onEvent, figurBild, hintergrundBild } from './state.js';
+import {
+  G, loadData, save, loadRun, placedOf, itemsIn, gridOf, region, hero, playerCtx, emit, onEvent, figurBild, hintergrundBild, setPref,
+} from './state.js';
 import { evaluateBag } from './mods.js';
 import {
   $, fmt, fullName, genusChip, toast, bump, openModal, closeModal, modal, itemEl, buildGrid, drawItems, mergeAnimation, syncGold, iconHtml,
-  openQuick, closeQuick, sternVon, hinweisAm,
+  openQuick, closeQuick, sternVon, hinweisAm, klangAn,
 } from './ui.js';
 import { startNight } from './battle-ui.js';
 import { runEncounter } from './encounters.js';
@@ -320,6 +322,11 @@ function renderShop() {
     const price = document.createElement('div');
     price.className = 'price-tag' + (run.gold < def.preis ? ' cant' : '');
     price.textContent = `${def.preis} 🪙`;
+    if (n > 0) {
+      price.classList.add('merge-hint');
+      price.innerHTML = `${def.preis} 🪙 <small>= sofort ★★</small>`;
+      price.title = 'Kaufen = sofort ★★';
+    }
 
     const lock = document.createElement('button');
     lock.className = 'lock' + (s.locked ? ' on' : '');
@@ -464,7 +471,7 @@ function collectNotes(base, ref) {
   if (ref.src === 'shop' && canMerge(base)) {
     if (ownedCount(G.run, base.id) > 0) out.push('<p class="gram ok"><b>1/2 – Du hast schon eins davon. Kaufen = sofort ★★!</b></p>');
     const c = compoundPartner(base, itemsIn('bag'), G.DEFS, G.RECIPES);
-    if (c) out.push(`<p class="gram ok">⛓️ Mit ${dativ(c.mit).replace(/^(dem|der) /, (m) => m === 'dem ' ? 'deinem ' : 'deiner ')} wird daraus: <b>${fullName(G.DEFS[c.id])}</b></p>`);
+    if (c) out.push(`<p class="gram ok">⛓️ Mit ${dativ(c.mit).replace(/^(dem|der) /, (m) => m === 'dem ' ? 'deinem ' : 'deiner ')} wird daraus sofort: <b>${fullName(G.DEFS[c.id])}</b></p>`);
   }
   return out;
 }
@@ -740,11 +747,13 @@ function openMenu() {
       <button class="btn small" data-act="help">📖 So geht's</button>
       <button class="btn small" data-act="tutorial">🧙 Tutorial wiederholen</button>
       <button class="btn small" data-act="tips">💡 Erste-Mal-Tipps: ${tipsOn() ? 'an' : 'aus'}</button>
+      <button class="btn small" data-act="klang">${klangAn() ? '🔊' : '🔇'} Klang: ${klangAn() ? 'an' : 'aus'}</button>
     </div>`, {
     new: () => confirmNew(),
     tutorial: startTutorial,
     help: () => showHelp(openMenu),
     tips: () => { setTips(!tipsOn()); toast(`Erste-Mal-Tipps sind jetzt ${tipsOn() ? 'an' : 'aus'}.`); openMenu(); },
+    klang: () => { setPref('klang', klangAn() ? 'aus' : 'an'); toast(`Klang beim Verbinden ist jetzt ${klangAn() ? 'an' : 'aus'}.`); openMenu(); },
   });
 }
 
@@ -866,23 +875,45 @@ function dontMerge(a, c) {
   render();
 }
 
+// Was das Verbinden bringt, für die aufsteigende Zahl: „+120 % Schaden“, „+3 Brand“.
+const GEWINN = [['schaden', 'Schaden'], ['block', 'Block'], ['heilung', 'Heilung'], ['gift', 'Gift'], ['brand', 'Brand'],
+  ['regeneration', 'Heilung'], ['leben', 'Leben'], ['startblock', 'Startblock'], ['tempo', 'Tempo'], ['glueck', 'Glück']];
+function gewinnText(a, p) {
+  const nd = G.DEFS[p.id];
+  if (a.typ === 'kompositum') {
+    const alt = starDef(G.DEFS[a.traeger.id], p.stern || 1), neu = starDef(nd, p.stern || 1, p.kraftStern || 1);
+    const k = GEWINN.find(([key]) => (neu[key] || 0) > (alt[key] || 0));
+    if (!k) return '';
+    return alt[k[0]] ? `+${Math.round((neu[k[0]] / alt[k[0]] - 1) * 100)} % ${k[1]}` : `+${fmt(neu[k[0]])} ${k[1]}`;
+  }
+  const s = sternVon(p);
+  const pct = Math.round((STERN_FAKTOR[s] / STERN_FAKTOR[s - 1] - 1) * 100);
+  if (isRune(nd)) return `+${pct} % Wirkung`;
+  const k = GEWINN.find(([key]) => nd[key]);
+  return `+${pct} % ${k ? k[1] : 'Wirkung'}`;
+}
+
 function doMerge(a, kurz = null) {
   const run = G.run;
   const teile = a.typ === 'kompositum' ? [a.kraft, a.traeger] : [a.neu, a.alt];
   const from = teile.map((p) => itemNode(p.uid)?.getBoundingClientRect()).filter(Boolean);
+  const icon = iconHtml(G.DEFS[teile[0].id], 'fly-img');
   closeQuick();
   const p = fuehreAus(run, a, G.DEFS);
   selected = run.tutorial ? null : { src: p.area, uid: p.uid };
   render();
   const nd = G.DEFS[p.id];
-  mergeAnimation(from, itemNode(p.uid), nd.emoji);
+  const st = sternVon(p);
+  const gross = st >= 4;
+  mergeAnimation(from, itemNode(p.uid), { icon, sterne: a.typ === 'kompositum' ? 0 : st, gewinn: gewinnText(a, p), gross });
+  if (gross) toast(isRune(nd) ? `👑 ${nd.name}! Die Rune trägt jetzt die Krone.` : `★★★★ ${nd.name} – legendär!`);
   if (kurz) hinweisAm(itemNode(p.uid), kurz);
-  else if (a.typ === 'kompositum') toast(`${fullName(nd)} ist entstanden!`);
+  else if (gross) { /* Feier-Toast steht oben */ } else if (a.typ === 'kompositum') toast(`${fullName(nd)} ist entstanden!`);
   else toast(isRune(nd) ? `Rune gesteigert: ${nd.name}${nd.krone ? ' 👑' : ''}!` : `${'★'.repeat(p.stern)} ${nd.name}: jetzt viel stärker!`);
   emit('verschmolzen', { id: p.id, stern: sternVon(p), typ: a.typ });
   // Kette: Gibt es zum neuen Item wieder ein gleiches? Erst nach der Animation weiter.
   pending.unshift({ uid: p.uid, paar: true });
-  setTimeout(() => { merging = false; checkMerges(); }, 950);
+  setTimeout(() => { merging = false; checkMerges(); }, gross ? 1900 : 1250);
 }
 
 // „Das Feuerschwert ___ (schlagen)“ – die Antwort gilt, solange Rolle und Subjekt so liegen.

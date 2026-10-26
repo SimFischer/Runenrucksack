@@ -1099,3 +1099,52 @@ body {
   80% { opacity: 1; margin-top: -14px; }
   100% { opacity: 0; margin-top: -22px; }
 }
+
+/* ---------- Verbinden: Belohnung ---------- */
+.merge-fly { width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; }
+.merge-fly .fly-img { width: 56px; height: 56px; object-fit: contain; }
+.merge-flash {
+  position: fixed; z-index: 490; width: 30px; height: 30px; margin: -15px 0 0 -15px; border-radius: 50%;
+  background: radial-gradient(circle, #fff 0%, #fff6c8 35%, rgba(255,210,63,.6) 60%, rgba(255,210,63,0) 72%);
+  pointer-events: none; animation: flash .6s ease-out forwards;
+}
+.merge-flash.gross { animation-duration: .9s; }
+@keyframes flash { 0% { transform: scale(.4); opacity: 1; } 60% { opacity: .95; } 100% { transform: scale(9); opacity: 0; } }
+.merge-flash.gross { animation-name: flashGross; }
+@keyframes flashGross { 0% { transform: scale(.4); opacity: 1; } 100% { transform: scale(22); opacity: 0; } }
+.merge-bigstar {
+  position: fixed; z-index: 495; transform: translate(-50%, -100%); pointer-events: none;
+  font-size: 30px; font-weight: 900; color: #ffd23f; text-shadow: 0 0 3px #7a4a00, 0 0 12px #ffb800;
+  animation: bigStar 1s ease-out forwards;
+}
+@keyframes bigStar { 0% { opacity: 0; transform: translate(-50%, -60%) scale(.2); } 25% { opacity: 1; transform: translate(-50%, -100%) scale(1.5); } 45% { transform: translate(-50%, -100%) scale(1); } 80% { opacity: 1; } 100% { opacity: 0; transform: translate(-50%, -130%) scale(1); } }
+.merge-gain {
+  position: fixed; z-index: 496; transform: translate(-50%, 0); pointer-events: none; white-space: nowrap;
+  font-size: 22px; font-weight: 900; color: #fff; padding: 2px 12px; border-radius: 999px;
+  background: linear-gradient(180deg, #4fb04a, #2f7d32); border: 2px solid #fff; box-shadow: 0 4px 14px rgba(0,0,0,.45);
+  animation: gainUp 1.5s ease-out forwards;
+}
+@keyframes gainUp { 0% { opacity: 0; margin-top: 10px; } 15% { opacity: 1; margin-top: 0; } 75% { opacity: 1; margin-top: -40px; } 100% { opacity: 0; margin-top: -56px; } }
+/* ★★★★ (legendär): eigener Rahmen mit wanderndem Glanz */
+.item.s4 {
+  border-color: #fff1a8;
+  background: linear-gradient(160deg, #fff3c4, #ffc94a 55%, #ff9f1c);
+  box-shadow: 0 3px 0 var(--line), 0 0 0 2px #b8860b, 0 0 26px #ffb800, 0 0 40px rgba(255,120,0,.6);
+  overflow: hidden;
+}
+.item.s4::after {
+  content: ''; position: absolute; inset: -40%; z-index: 1; pointer-events: none;
+  background: linear-gradient(115deg, transparent 40%, rgba(255,255,255,.75) 50%, transparent 60%);
+  animation: glanz 2.6s linear infinite;
+}
+@keyframes glanz { 0% { transform: translateX(-60%); } 100% { transform: translateX(60%); } }
+#grid-bag.feier { animation: feier 1.8s ease-out; }
+#grid-bag.feier::after {
+  content: ''; position: absolute; inset: 0; z-index: 6; pointer-events: none; border-radius: 10px;
+  background: linear-gradient(115deg, transparent 30%, rgba(255,240,170,.85) 50%, transparent 70%);
+  background-size: 250% 100%; animation: feierGlanz 1.8s ease-out forwards;
+}
+@keyframes feier { 0%, 100% { box-shadow: none; } 30% { box-shadow: 0 0 0 4px #ffd23f, 0 0 60px #ffb800; } }
+@keyframes feierGlanz { 0% { background-position: 120% 0; opacity: 1; } 100% { background-position: -120% 0; opacity: 0; } }
+/* Laden: „= sofort ★★“ unter Items, die man schon hat */
+.slot .price-tag.merge-hint small { display: block; font-size: 12px; font-weight: 900; color: #a86b00; line-height: 1.1; text-align: center; }
