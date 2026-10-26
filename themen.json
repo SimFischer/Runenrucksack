@@ -1,0 +1,122 @@
+{
+  "_hinweis": "Themen der Aufgaben mit je drei Stufen (leicht → schwer). stufen: Beschreibung und die Aufgabenformate, die auf dieser Stufe vorkommen. regeln: die Regelkarten (Merkhilfen), die ein Kind nach einer Aufgabe sieht und im Buch der Wörter sammelt – neue nur hinten anhängen. Formate: auswahl, luecke, buchstaben, eintippen, baukasten, sortieren, fehler, ordnen, passtnicht, regel, paare.",
+  "themen": [
+    { "id": "artikel", "name": "Artikel und Genus", "emoji": "🟢", "stufen": [
+        { "text": "häufige Alltagsnomen", "formate": ["auswahl", "luecke", "sortieren"] },
+        { "text": "weniger bekannte Nomen", "formate": ["auswahl", "luecke", "sortieren"] },
+        { "text": "Komposita: das Grundwort bestimmt den Artikel", "formate": ["auswahl", "regel", "sortieren"] } ],
+      "regeln": [
+        { "id": "artikel-lernen", "text": "Jedes Nomen hat einen Artikel: der, die oder das. Lerne Nomen immer mit Artikel." },
+        { "id": "artikel-grundwort", "text": "Bei zusammengesetzten Nomen bestimmt das letzte Wort den Artikel: das Feuer + der Wurm → der Feuerwurm." } ] },
+    { "id": "mehrzahl", "name": "Mehrzahl", "emoji": "👥", "stufen": [
+        { "text": "-e, -n, -en", "formate": ["luecke", "auswahl", "paare", "regel"] },
+        { "text": "Umlaut und -er", "formate": ["luecke", "auswahl", "buchstaben", "paare", "regel"] },
+        { "text": "unverändert, -s und Sonderfälle", "formate": ["luecke", "buchstaben", "eintippen", "regel"] } ],
+      "regeln": [
+        { "id": "mehrzahl-e", "text": "Viele Nomen bekommen in der Mehrzahl ein -e: der Hund – die Hunde." },
+        { "id": "mehrzahl-n", "text": "Nomen auf -e bekommen in der Mehrzahl oft ein -n: die Blume – die Blumen." },
+        { "id": "mehrzahl-en", "text": "Manche Nomen bekommen -en: die Tür – die Türen." },
+        { "id": "mehrzahl-umlaut", "text": "Oft kommt in der Mehrzahl ein Umlaut dazu: die Axt – die Äxte, der Vogel – die Vögel." },
+        { "id": "mehrzahl-er", "text": "Manche Nomen bekommen -er, oft mit Umlaut: das Buch – die Bücher." },
+        { "id": "mehrzahl-gleich", "text": "Manche Nomen bleiben in der Mehrzahl gleich – nur der Artikel ändert sich: der Keller – die Keller." },
+        { "id": "mehrzahl-s", "text": "Nomen auf a, i, o, u oder y bekommen oft ein -s: das Auto – die Autos." },
+        { "id": "mehrzahl-in", "text": "Nomen auf -in verdoppeln das n: die Königin – die Königinnen." },
+        { "id": "mehrzahl-nis", "text": "Nomen auf -nis und -is verdoppeln das s: das Zeugnis – die Zeugnisse." } ] },
+    { "id": "wortarten", "name": "Wortarten", "emoji": "🧩", "stufen": [
+        { "text": "Wortarten in Einzelwörtern", "formate": ["sortieren", "auswahl", "passtnicht"] },
+        { "text": "Wortarten im Satz", "formate": ["auswahl", "fehler"] },
+        { "text": "dasselbe Wort in verschiedener Funktion", "formate": ["auswahl", "sortieren"] } ],
+      "regeln": [
+        { "id": "wortart-nomen", "text": "Nomen bezeichnen Menschen, Tiere, Dinge und Gedanken. Sie haben einen Artikel und werden großgeschrieben." },
+        { "id": "wortart-verb", "text": "Verben sagen, was jemand tut oder was geschieht. Man kann sie beugen: ich laufe, du läufst." },
+        { "id": "wortart-adjektiv", "text": "Adjektive sagen, wie etwas ist. Man kann die meisten steigern: schnell, schneller, am schnellsten." },
+        { "id": "wortart-klein", "text": "Artikel (der, ein), Pronomen (ich, er, wir) und Präpositionen (in, auf, über) sind kurze Begleiter und Wegweiser im Satz." },
+        { "id": "wortart-funktion", "text": "Steht ein Artikel oder „beim“ davor, wird ein Verb zum Nomen: das Laufen, beim Lesen." } ] },
+    { "id": "grossklein", "name": "Groß- und Kleinschreibung", "emoji": "🔠", "stufen": [
+        { "text": "Nomen erkennen", "formate": ["auswahl", "sortieren"] },
+        { "text": "Satzanfang und Nomen im Satz", "formate": ["fehler"] },
+        { "text": "Nominalisierungen nach Artikel", "formate": ["sortieren", "luecke"] } ],
+      "regeln": [
+        { "id": "gross-nomen", "text": "Nomen schreibt man groß. Probe: Kann man „der, die oder das“ davorsetzen?" },
+        { "id": "gross-satzanfang", "text": "Das erste Wort eines Satzes schreibt man immer groß." },
+        { "id": "gross-nominalisierung", "text": "Steht „das“ oder „beim“ vor einem Verb, wird es zum Nomen und groß geschrieben: das Lesen." } ] },
+    { "id": "personalformen", "name": "Personalformen", "emoji": "🙋", "stufen": [
+        { "text": "regelmäßige Verben", "formate": ["luecke", "paare", "buchstaben"] },
+        { "text": "Vokalwechsel bei du und er: fährst, liest", "formate": ["luecke", "buchstaben", "auswahl"] },
+        { "text": "sein, haben, werden und andere unregelmäßige", "formate": ["luecke", "eintippen", "paare"] } ],
+      "regeln": [
+        { "id": "person-endung", "text": "Die Endung des Verbs zeigt, wer etwas tut: ich spiel-e, du spiel-st, er spiel-t, wir spiel-en." },
+        { "id": "person-vokal", "text": "Manche Verben ändern bei du und er/sie/es ihren Vokal: fahren – du fährst – er fährt." },
+        { "id": "person-sein", "text": "sein, haben und werden muss man auswendig lernen: ich bin, du bist, er ist – ich habe, du hast, er hat." } ] },
+    { "id": "zeitformen", "name": "Zeitformen", "emoji": "⏳", "stufen": [
+        { "text": "Präteritum regelmäßig", "formate": ["luecke", "paare", "regel"] },
+        { "text": "Präteritum unregelmäßig", "formate": ["luecke", "paare", "buchstaben"] },
+        { "text": "Perfekt mit haben oder sein, Zeitform erkennen", "formate": ["luecke", "auswahl"] } ],
+      "regeln": [
+        { "id": "zeit-te", "text": "Regelmäßige Verben bilden das Präteritum mit -te: spielen – er spielte." },
+        { "id": "zeit-stark", "text": "Unregelmäßige Verben ändern im Präteritum ihren Vokal: schlagen – er schlug, finden – er fand." },
+        { "id": "zeit-perfekt", "text": "Das Perfekt bildet man mit haben oder sein und dem Partizip: Er hat geschlagen. Er ist gelaufen." },
+        { "id": "zeit-erkennen", "text": "Präsens: jetzt (er reitet). Präteritum: erzählte Vergangenheit (er ritt). Perfekt: haben/sein + Partizip (er ist geritten)." } ] },
+    { "id": "steigerung", "name": "Steigerung", "emoji": "📈", "stufen": [
+        { "text": "regelmäßig", "formate": ["luecke", "paare", "regel"] },
+        { "text": "mit Umlaut", "formate": ["luecke", "buchstaben", "paare"] },
+        { "text": "unregelmäßig: gut, viel, gern", "formate": ["luecke", "eintippen", "paare"] } ],
+      "regeln": [
+        { "id": "steigerung-regel", "text": "Steigern: schnell – schneller – am schnellsten. Komparativ mit -er, Superlativ mit am …sten." },
+        { "id": "steigerung-umlaut", "text": "Viele kurze Adjektive bekommen beim Steigern einen Umlaut: alt – älter – am ältesten." },
+        { "id": "steigerung-unregel", "text": "Einige Adjektive sind unregelmäßig: gut – besser – am besten, viel – mehr – am meisten." } ] },
+    { "id": "verlaengerung", "name": "Verlängerungsprobe d/t, b/p, g/k", "emoji": "🔍", "stufen": [
+        { "text": "häufige Wörter", "formate": ["sortieren", "auswahl"] },
+        { "text": "Buchstaben ergänzen", "formate": ["buchstaben", "fehler"] },
+        { "text": "ganze Wörter und Sätze", "formate": ["eintippen", "fehler"] } ],
+      "regeln": [
+        { "id": "verlaengern", "text": "Am Wortende hört man d und t, b und p, g und k gleich. Verlängere das Wort: Hund – Hunde, darum d." } ] },
+    { "id": "ableitung", "name": "Ableitung ä/e und äu/eu", "emoji": "🌿", "stufen": [
+        { "text": "häufige Wörter", "formate": ["auswahl"] },
+        { "text": "Buchstaben ergänzen", "formate": ["buchstaben", "fehler"] },
+        { "text": "ganze Wörter und Sätze", "formate": ["fehler", "eintippen"] } ],
+      "regeln": [
+        { "id": "ableiten", "text": "Suche ein verwandtes Wort mit a oder au: Gärtner kommt von Garten, Räuber von rauben – darum ä und äu." } ] },
+    { "id": "doppel", "name": "Doppelkonsonant", "emoji": "✌️", "stufen": [
+        { "text": "häufige Wörter", "formate": ["auswahl"] },
+        { "text": "Buchstaben ergänzen", "formate": ["buchstaben", "fehler"] },
+        { "text": "ganze Wörter und Sätze", "formate": ["eintippen", "fehler"] } ],
+      "regeln": [
+        { "id": "doppel-kurz", "text": "Nach einem kurzen, betonten Vokal folgen oft zwei gleiche Mitlaute: Ham-mer, Kis-sen, Bet-ten. Sprich langsam in Silben." } ] },
+    { "id": "ie", "name": "Langes i: ie", "emoji": "🐝", "stufen": [
+        { "text": "häufige Wörter", "formate": ["auswahl"] },
+        { "text": "Buchstaben ergänzen", "formate": ["buchstaben", "fehler"] },
+        { "text": "ganze Wörter und Sätze", "formate": ["eintippen", "fehler"] } ],
+      "regeln": [
+        { "id": "ie-lang", "text": "Ein lang gesprochenes i schreibt man meistens ie: Biene, Spiegel, Brief." } ] },
+    { "id": "tzck", "name": "tz und ck", "emoji": "🪝", "stufen": [
+        { "text": "häufige Wörter", "formate": ["auswahl"] },
+        { "text": "Buchstaben ergänzen", "formate": ["buchstaben", "fehler"] },
+        { "text": "ganze Wörter und Sätze", "formate": ["eintippen", "fehler"] } ],
+      "regeln": [
+        { "id": "tzck-kurz", "text": "Nach einem kurzen Vokal schreibt man tz statt zz und ck statt kk: Katze, Decke." } ] },
+    { "id": "komposita", "name": "Komposita", "emoji": "🔗", "stufen": [
+        { "text": "zusammensetzen", "formate": ["baukasten", "auswahl"] },
+        { "text": "Artikel bestimmen", "formate": ["auswahl", "regel"] },
+        { "text": "Fugenelemente -s-, -n-, -en-", "formate": ["baukasten"] } ],
+      "regeln": [
+        { "id": "kompositum-bauen", "text": "Ein Kompositum besteht aus Bestimmungswort und Grundwort und wird zusammengeschrieben: Feuer + Schwert = Feuerschwert." },
+        { "id": "kompositum-artikel", "text": "Das letzte Wort (Grundwort) bestimmt den Artikel: der Apfel + der Baum = der Apfelbaum, die Sonne + die Blume = die Sonnenblume." },
+        { "id": "kompositum-fuge", "text": "Zwischen den Wörtern steht manchmal ein Fugenelement: Geburt-s-tag, Sonne-n-blume, Held-en-schwert." } ] },
+    { "id": "satzglieder", "name": "Satzglieder", "emoji": "🧱", "stufen": [
+        { "text": "Subjekt finden", "formate": ["ordnen"] },
+        { "text": "Prädikat finden", "formate": ["ordnen"] },
+        { "text": "Umstellprobe", "formate": ["ordnen", "auswahl"] } ],
+      "regeln": [
+        { "id": "satz-subjekt", "text": "Das Subjekt findest du mit der Frage „Wer oder was?“: Wer schmiedet? – Borga." },
+        { "id": "satz-praedikat", "text": "Das Prädikat ist das Verb im Satz. Im Aussagesatz steht es an zweiter Stelle." },
+        { "id": "satz-umstellen", "text": "Umstellprobe: Wörter, die beim Umstellen zusammenbleiben, sind ein Satzglied. Das Prädikat bleibt an zweiter Stelle." } ] },
+    { "id": "wortfelder", "name": "Wortfelder und Wortfamilien", "emoji": "🌳", "stufen": [
+        { "text": "Wort passt nicht ins Wortfeld", "formate": ["passtnicht"] },
+        { "text": "Wortfamilie erkennen", "formate": ["passtnicht"] },
+        { "text": "Wortfamilie mit ähnlichen Wörtern", "formate": ["passtnicht"] } ],
+      "regeln": [
+        { "id": "wortfeld", "text": "Ein Wortfeld sind Wörter zu einem Thema: Stall, Sattel, Huf und Zügel gehören zum Wortfeld Pferd." },
+        { "id": "wortfamilie", "text": "Eine Wortfamilie hat denselben Wortstamm: fahr- in fahren, Fahrer, Fahrt und Fahrrad." } ] }
+  ]
+}
