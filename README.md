@@ -10,7 +10,7 @@ Spielen: <https://simfischer.github.io/Runenrucksack/> – auf dem iPad in Safar
 
 Beim Öffnen fragt das Spiel: **„Ich bin zum ersten Mal hier“** (startet das Tutorial) oder **„Ich kenne das schon“** (Startmenü). Hat das Gerät das Tutorial schon einmal abgeschlossen, ist „Ich kenne das schon“ hervorgehoben – gefragt wird trotzdem, weil sich oft mehrere Kinder ein iPad teilen.
 
-Meister Fenwick 🧙 führt in 3–4 Minuten durch einen echten, aber festgelegten Lauf: Schwert kaufen, Infos ansehen, drehen, Lager, Feuer-Kristall verschmelzen (mit Artikelwahl), das-Siegel, Rune „scharf“, Kampf gegen den Strohpuppen-Ork, Sieg und Herzen, eine leichte Begegnung. Alles außer dem Ziel ist abgedunkelt, eine Hand zeigt Tippen und Ziehen, nach 8 Sekunden ohne Aktion kommt ein Zusatz-Tipp, 🔊 liest vor (wenn das Gerät eine deutsche Stimme hat). Falsche Aktionen werden freundlich zurückgesetzt. Der Tutorial-Lauf wird nicht gespeichert und zählt nicht.
+Meister Fenwick 🧙 führt in 3–4 Minuten durch einen echten, aber festgelegten Lauf: Schwert kaufen, Infos ansehen, drehen, Lager, Feuer-Kristall neben das Schwert legen (das Feuerschwert entsteht sofort, mit Artikelwahl), das-Siegel, Rune „scharf“, Kampf gegen den Strohpuppen-Ork, Sieg und Herzen, eine leichte Begegnung. Am zweiten Tag: Fenwick schenkt einen Dolch, der zweite aus dem Laden macht sofort einen ★★-Dolch; eine Verb-Rolle mit Subjekt; ein Fehler auf der Ork-Rüstung. Alles außer dem Ziel ist abgedunkelt, eine Hand zeigt Tippen und Ziehen, nach 8 Sekunden ohne Aktion kommt ein Zusatz-Tipp, 🔊 liest vor (wenn das Gerät eine deutsche Stimme hat). Falsche Aktionen werden freundlich zurückgesetzt. Der Tutorial-Lauf wird nicht gespeichert und zählt nicht.
 
 Jederzeit: **„Tutorial überspringen“** oben rechts. Im Menü: **„Tutorial wiederholen“**, **„So geht's“** (Übersicht zum Nachschlagen) und **„Erste-Mal-Tipps“** an/aus (Fenwick meldet sich einmal pro Lauf beim ersten Boss, Gebietswechsel, der ersten Steigerung und der Unterklasse).
 
@@ -52,8 +52,8 @@ Nach Änderungen: `node --test` prüft, dass jeder Schritt erreichbar ist und h�
 2. **Schicksalsrune:** Eine von sechs zufälligen Regeln gilt für den ganzen Lauf, z. B. „Feuer-Komposita doppelt so stark“ oder „Laden hat 6 Plätze“.
 3. **Zehn Tage, zwei Gebiete:** Kleinwurzel (Tag 1–5, Boss: Ork-Plünderer) und Hrossmark (Tag 6–10, Boss: Wolfsreiter-Häuptling). Beim Gebietswechsel gibt es einen Übergangsbildschirm, in Hrossmark wählt man eine **Unterklasse**.
 4. **Jeder Tag:**
-   - **Morgen:** Begegnung am Wegesrand (drei zur Wahl), danach verschmelzen Kristalle mit Trägern.
-   - **Tag:** Laden mit 5 Items, Neu würfeln für 1 Gold, Reservieren, Verkaufen, Verschieben, Drehen. Abzeichen „1/3“ und „2/3“ zeigen, wie viele gleiche man besitzt; drei gleiche verschmelzen sofort zur nächsten Sternstufe.
+   - **Morgen:** Begegnung am Wegesrand (drei zur Wahl).
+   - **Tag:** Laden mit 5 Items, Neu würfeln für 1 Gold, Reservieren, Verkaufen, Verschieben, Drehen. Alles Verbinden passiert sofort: zwei gleiche werden zur nächsten Sternstufe, ein Kristall neben einem Träger zum Kompositum. Das Abzeichen „1/2“ mit „= sofort ★★“ zeigt Items, von denen man schon eins hat.
    - **Nacht:** Automatischer Kampf. Vorher kann man den Fehler auf der Ork-Rüstung verbessern (ein Versuch, richtig: Ork startet mit 15 % weniger Leben).
 5. **Ende:** nach dem 10. Kampf („Reise geschafft“, mit Sternen nach Siegen) oder wenn alle 5 Herzen weg sind.
 
@@ -61,17 +61,19 @@ Nach Änderungen: `node --test` prüft, dass jeder Schritt erreichbar ist und h�
 
 | Mechanik | Regel | Lernziel |
 | --- | --- | --- |
-| Komposita | Kraft-Kristall links neben oder über einem Träger → Artikel wählen: „Feuer + Schwert = ___ Feuerschwert“ | Das letzte Wort bestimmt den Artikel |
+| Komposita | Kraft-Kristall links neben oder über einem Träger → sofort Artikel wählen: „Feuer + Schwert = ___ Feuerschwert“ | Das letzte Wort bestimmt den Artikel |
 | Artikel-Siegel | der/die/das neben einem Nomen mit passendem Genus: +25 % | Genus der Nomen |
 | Adjektiv-Runen | Pfeil zeigt auf ein passendes Nomen: „scharfes Schwert“ | Adjektiv vor dem Nomen, Endungen |
-| Steigerung | Drei gleiche Runen in einer Reihe → Komparativ → Superlativ (+50 % je Stufe) | scharf – schärfer – am schärfsten, gut – besser – am besten |
+| Steigerung | Zwei gleiche Runen → Komparativ (★★) → Superlativ (★★★) → Superlativ mit Krone (★★★★), Werte wie die Sternstufen | scharf – schärfer – am schärfsten, gut – besser – am besten |
 | Begegnungen | Plural, Artikel, Rechtschreibung auf der Speisekarte, Personalformen, Fehler im Namen | Wiederholung Klasse 5 |
 | Ork-Rüstung | Falsch geschriebenes Wort verbessern | Rechtschreibung |
 | Wortfeld-Taschen | Gartentasche, Satteltasche: Items aus dem passenden Wortfeld +20 % | Wortfelder |
-| Sternstufen | Drei gleiche Items (Rucksack + Lager) werden zu ★★ (1,8-fach) und ★★★ (3-fach); vorher Mehrzahl-, Präteritum- oder Steigerungsfrage | die Axt → die Äxte, gestern schlug er |
+| Sternstufen | Zwei gleiche Items (Rucksack + Lager) werden sofort zu ★★ (2,2-fach), ★★★ (5-fach), ★★★★ (11-fach, legendär); vorher Mehrzahl-, Präteritum- oder Steigerungsfrage | zwei Äxte, gestern schlug er |
 | Verben mit Subjekt | Pfeil der Schriftrolle zeigt auf ein Nomen, Frage nach der Personalform; richtig: Rolle voll und das Subjekt schlägt mit, sonst nur halbe Wirkung | Das Feuerschwert schlägt. Die Speere schlagen. |
 
 **Regel für alle Aufgaben:** Der erste Versuch ist kostenlos, jeder weitere kostet 1 Gold, bei Fehlern erscheint eine kurze Erklärzeile. **Eine grammatisch falsche Kombination ist nie stärker als eine richtige** – die Tests prüfen das.
+
+**Verbinden ohne Bremse:** Die Fragen zum Verbinden erscheinen als kleines Fenster direkt am Item. Wer dieselbe Frage (gleiches Wort, gleiche Art) in einem Lauf dreimal gleich richtig beantwortet hat, bekommt sie nicht mehr – das Verbinden passiert dann direkt mit einem Hinweis wie „die Äxte ✓“. Mit „Nicht verbinden“ bleiben die Items getrennt. Im Menü lässt sich der Klang beim Verbinden ausschalten.
 
 ## Inhalte ändern (ohne Programmieren)
 
@@ -154,8 +156,9 @@ node --test
 | `tests/steigerung.test.mjs` | Steigerungsformen, Deklination, Erkennung von drei Runen, +50 % je Stufe |
 | `tests/begegnungen.test.mjs` | Begegnungen, Aufgaben (genau eine Lösung), Rucksack-Wachstum, Kobold-Fluch |
 | `tests/ablauf.test.mjs` | Gebiete, Bosse, Figuren, Schicksalsrunen, Unterklassen, Taschen, Ork-Rüstungen |
-| `tests/balance.test.mjs` | 200 simulierte Läufe: Siegquote pro Tag, Siege und Spielzeit |
-| `tests/sterne.test.mjs` | Mehrzahl- und Verbformen aller Items, Verschmelzen über Rucksack und Lager, Laden-Gewichtung |
+| `tests/balance.test.mjs` | 200 simulierte Läufe: Siegquote pro Tag, Siege und Spielzeit; Sternstufen der Gegner |
+| `tests/sterne.test.mjs` | Mehrzahl- und Verbformen aller Items, Verbinden beim Kaufen, beim Ziehen auf ein gleiches Item, bei Belohnungen und als Kette, „Nicht verbinden“, gekonnte Fragen, Laden-Gewichtung |
+| `tests/komposita.test.mjs` | Komposita entstehen sofort beim Ablegen und Drehen, Stufe vom Träger, Feueraxt ★ + ★ → ★★, falsch nie stärker |
 | `tests/verben.test.mjs` | Pfeil, Personalform, Verb mit und ohne Subjekt (falsch nie stärker) |
 | `tests/tutorial.test.mjs` | Tutorial komplett durchspielen, Zurücksetzen, Überspringen fehlender Funktionen, danach normaler Lauf |
 
@@ -167,7 +170,7 @@ node tools/tutorial-browsertest.mjs http://localhost:8080/ 1180 820
 
 Breite und Höhe lassen sich ändern, z. B. `1024 768` für kleinere iPads.
 
-Aktuelle Balance (200 Läufe, einfache Kaufstrategie, Aufgaben zu 75 % richtig): Tag 1 etwa 83 % Siegchance, im Schnitt 7,4 Siege, geschätzt 14 Minuten pro Lauf, Kämpfe etwa 12 Sekunden. Die Stellschrauben stehen oben in `js/logic.js` (Startgold, Gold pro Tag, Leben pro Tag, `STERN_FAKTOR`, `SAMMEL_GEWICHT`) und im Abschnitt „Gegner“ (Gegnerbudget, `GEGNER_STERNE_AB`).
+Aktuelle Balance (200 Läufe, einfache Kaufstrategie, Aufgaben zu 75 % richtig): Tag 1 etwa 85 % Siegchance, im Schnitt 7,8 Siege, geschätzt 14 Minuten pro Lauf, Kämpfe etwa 10 Sekunden. Die Stellschrauben stehen oben in `js/logic.js` (Startgold, Gold pro Tag, Leben pro Tag, `STERN_FAKTOR`, `SAMMEL_GEWICHT`) und im Abschnitt „Gegner“ (Gegnerbudget, `GEGNER_STERNE_AB`: ★★ ab Tag 3, ★★★ ab Tag 6; `GEGNER_LEGENDAER_TAG`: Boss mit ★★★★).
 
 ## Auf GitHub Pages veröffentlichen
 
@@ -180,16 +183,16 @@ Aktuelle Balance (200 Läufe, einfache Kaufstrategie, Aufgaben zu 75 % richtig):
 | Datei | Inhalt |
 | --- | --- |
 | `index.html`, `style.css` | Bildschirme und Aussehen |
-| `js/main.js` | Ablauf eines Laufs, Laden, Rucksack (Ziehen und Drehen), Info-Feld, Verschmelzen und Steigern |
+| `js/main.js` | Ablauf eines Laufs, Laden, Rucksack (Ziehen und Drehen), Info-Feld, Verbinden mit Frage-Fenster am Item |
 | `js/encounters.js` | Begegnungen am Morgen mit ihren Aufgaben |
 | `js/tutorial.js` | Tutorial: Spotlight, Sprechblase, Hand, Vorlesen, „So geht's“, Erste-Mal-Tipps |
 | `js/tutorial-logic.js` | Tutorial ohne Darstellung: aktive Schritte, Prüfen, Zurücksetzen (testbar) |
 | `js/battle-ui.js` | Kampfanzeige und Fehler auf der Ork-Rüstung |
-| `js/ui.js` | Gemeinsame Bausteine: Fenster, Item-Kacheln, Raster |
+| `js/ui.js` | Gemeinsame Bausteine: Fenster, Frage-Fenster am Item, Item-Kacheln, Raster, Verbinden-Animation und Klang |
 | `js/state.js` | Geladene Inhalte und Speichern im Browser |
 | `js/logic.js` | Regeln: Raster, Laden, Gold, Gebiete, Lauf, Gegner, Begegnungen |
 | `js/grammar.js` | Grammatik-Regeln: Komposita, Siegel, Runen, Steigerung, Verben mit Subjekt, Mehrzahl |
-| `js/sterne.js` | Sammeln und Aufwerten: drei gleiche finden, Frage bauen, verschmelzen |
+| `js/sterne.js` | Sofortiges Verbinden: zwei gleiche und Kristall + Träger finden, Frage bauen, verbinden (auch als Kette), gekonnte Fragen |
 | `js/mods.js` | Boni von Figur, Unterklasse, Schicksalsrune, Begegnungen und Taschen |
 | `js/battle.js` | Kampfsimulation |
 | `js/sim.js` | Simulation ganzer Läufe für die Balance |

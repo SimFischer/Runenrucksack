@@ -910,7 +910,7 @@ function doMerge(a, kurz = null) {
   if (kurz) hinweisAm(itemNode(p.uid), kurz);
   else if (gross) { /* Feier-Toast steht oben */ } else if (a.typ === 'kompositum') toast(`${fullName(nd)} ist entstanden!`);
   else toast(isRune(nd) ? `Rune gesteigert: ${nd.name}${nd.krone ? ' 👑' : ''}!` : `${'★'.repeat(p.stern)} ${nd.name}: jetzt viel stärker!`);
-  emit('verschmolzen', { id: p.id, stern: sternVon(p), typ: a.typ });
+  emit('verschmolzen', { id: p.id, stern: sternVon(p), art: a.typ });
   // Kette: Gibt es zum neuen Item wieder ein gleiches? Erst nach der Animation weiter.
   pending.unshift({ uid: p.uid, paar: true });
   setTimeout(() => { merging = false; checkMerges(); }, gross ? 1900 : 1250);

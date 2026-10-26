@@ -1,5 +1,5 @@
 {
-  "_hinweis": "Kombinationsregeln. Ein Kraft-Kristall direkt links neben oder über einem Träger verschmilzt zu Beginn des Tages zum Kompositum: Bestimmungswort (Kraft) vorne, Grundwort (Träger) hinten, der Artikel kommt vom Grundwort. Das Kompositum hat die Werte des Trägers, behält die Wirkung des Kristalls (umgerechnet auf die Abklingzeit des Trägers) und bekommt die Verschmelzungs-Wirkung unten obendrauf. So ist richtig Verschmolzenes immer stärker als beide Teile getrennt.",
+  "_hinweis": "Kombinationsregeln. Ein Kraft-Kristall direkt links neben oder über einem Träger wird sofort mit ihm zum Kompositum (Stufe des Trägers; ein höherstufiger Kristall verstärkt die Kraft): Bestimmungswort (Kraft) vorne, Grundwort (Träger) hinten, der Artikel kommt vom Grundwort. Das Kompositum hat die Werte des Trägers, behält die Wirkung des Kristalls (umgerechnet auf die Abklingzeit des Trägers) und bekommt die Verschmelzungs-Wirkung unten obendrauf. So ist richtig Verschmolzenes immer stärker als beide Teile getrennt.",
   "regel": "Das letzte Wort bestimmt den Artikel.",
   "komposita": {
     "traeger": ["dolch", "schwert", "axt", "bogen", "stab", "schild", "helm", "laterne", "speer", "hammer"],

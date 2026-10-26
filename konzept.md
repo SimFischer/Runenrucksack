@@ -71,16 +71,15 @@ Man trifft eine Figur am Wegesrand und wählt aus zwei bis drei Boni. Jede Begeg
 
 ### Tag: Laden und Rucksack
 
-- Zu Beginn des Tages verschmelzen Kraft-Kristalle mit dem Träger rechts daneben oder darunter zum Kompositum.
 - Gold pro Tag, steigend mit den Tagen; die Goldanzeige ist groß und zählt beim Ausgeben und Bekommen mit.
-- Laden mit 5 Items; neu würfeln kostet 1 Gold, Items lassen sich reservieren. Ein Abzeichen „1/3“ oder „2/3“ zeigt, wie viele gleiche man schon besitzt; solche Items erscheinen häufiger. Ein Ketten-Symbol zeigt Items, die mit etwas im Rucksack ein Kompositum ergeben.
-- Items kaufen, verkaufen, verschieben, drehen. Drei gleiche Items verschmelzen sofort zur nächsten Sternstufe (siehe „Sternstufen“).
+- Laden mit 5 Items; neu würfeln kostet 1 Gold, Items lassen sich reservieren. Ein leuchtendes Abzeichen „1/2“ mit „= sofort ★★“ zeigt Items, von denen man schon eins besitzt; solche Items erscheinen etwas häufiger. Ein Ketten-Symbol zeigt Items, die mit etwas im Rucksack ein Kompositum ergeben („Mit deiner Axt wird daraus sofort: die Feueraxt“).
+- Items kaufen, verkaufen, verschieben, drehen. Alles Verbinden passiert sofort, wie in Backpack Rush: zwei gleiche Items werden zur nächsten Sternstufe, ein Kristall links neben oder über einem Träger wird zum Kompositum (siehe „Kombinieren“).
 
 ### Nacht: Kampf
 
 - Der Rucksack kämpft automatisch gegen einen Ork-Rucksack; zuschauen, Kombos feiern.
 - Vorher optional: einen Fehler auf der Gegnerrüstung korrigieren (ein Versuch), dann startet der Ork mit 15 % weniger Leben.
-- Ab Tag 4 bringen Orks auch Items mit ★★ mit, ab Tag 8 auch mit ★★★.
+- Ab Tag 3 bringen Orks auch Items mit ★★ mit, ab Tag 6 auch mit ★★★; der Boss an Tag 10 hat immer ein legendäres ★★★★-Item.
 - Sieg = Trophäe, Niederlage = 1 Herz weniger.
 
 ### Ende eines Laufs
@@ -116,12 +115,18 @@ Bedeutung und Wirkung fallen zusammen: Ein scharfes Schwert macht mehr Schaden, 
 - Mit richtigem Subjekt wirkt die Rolle voll, und das Subjekt löst zusätzlich seine eigene Wirkung aus. Ohne Subjekt oder mit falscher Form wirkt die Rolle nur halb.
 - Passende Subjekte geben Extras: stechen mit Speer oder Dolch, schießen mit dem Bogen, leuchten mit der Laterne, brennen mit Feuer-Komposita (+Brand).
 
-### Sternstufen: drei gleiche ergeben einen besseren
+### Sternstufen: zwei gleiche ergeben sofort einen besseren
 
-- Jedes Item hat eine Sternstufe: ★, ★★ (1,8-fache Wirkung), ★★★ (3-fache Wirkung). Auch der Verkaufspreis steigt.
-- Besitzt man drei Items mit gleicher id und Stufe (Rucksack und Lager zählen zusammen), verschmelzen sie sofort – beim Kauf, Ablegen oder einer Belohnung. Das neue Item liegt dort, wo das zuletzt hinzugekommene lag.
-- Vorher eine Grammatik-Frage: Nomen, Träger, Komposita und Kristalle → **Mehrzahl** („der Speer + der Speer + der Speer = die ___“), Verben → **Präteritum** („Gestern ___ der Ritter“), Adjektiv-Runen → **Steigerung**. Siegel und Taschen verschmelzen nicht.
-- Erster Versuch kostenlos, jeder weitere 1 Gold, bei Fehlern eine Zeile Erklärung („Viele Nomen bekommen in der Mehrzahl einen Umlaut: die Axt → die Äxte“).
+- Jedes Item hat eine Sternstufe: ★ → ★★ → ★★★ → ★★★★. ★★★★ zählt als legendär, mit eigenem Rahmen und Glanz.
+- Jede Stufe ist deutlich stärker als zwei Items der Stufe darunter zusammen, weil man dabei auch Platz spart: ★★ wirkt 2,2-fach, ★★★ 5-fach, ★★★★ 11-fach (Werte zentral in `js/logic.js`). Auch der Verkaufspreis steigt.
+- Zwei Items mit gleicher id und gleicher Stufe verbinden sich **sofort** zur nächsten Stufe – nicht erst am Morgen oder nach dem Kampf:
+  - **beim Kaufen:** Besitzt man schon ein gleiches (egal ob im Rucksack oder Lager), verbinden sie sich. Das neue Item liegt dort, wo das vorhandene lag. Das klappt auch, wenn gerade kein Feld frei ist.
+  - **beim Ziehen:** Ein Item direkt auf ein gleiches Item fallen lassen.
+  - **bei Belohnungen** aus Begegnungen: wie beim Kaufen.
+  - **als Kette:** Gibt es zum neuen Item wieder ein gleiches, geht es gleich weiter (★★ + vorhandenes ★★ → ★★★), jeweils mit eigener Animation nacheinander.
+- Gilt für Nomen, Träger, Kraft-Kristalle, Komposita, Verben und Adjektiv-Runen. Artikel-Siegel und Taschen verbinden sich nicht, zwei verschiedene Komposita (Feueraxt + Eisaxt) auch nicht.
+- Vorher eine Grammatik-Frage: Nomen, Träger, Komposita und Kristalle → **Mehrzahl** („zwei ___“: Äxte / Axts / Axten), Verben → **Präteritum** („Gestern ___ der Ritter“), Adjektiv-Runen → **Steigerung**. Kristall + Träger → **Artikel** des Kompositums.
+- Belohnung: Beide Teile fliegen zusammen, kurzer Lichtblitz, die Sterne erscheinen nacheinander, ein leiser Klang (im Menü abschaltbar), „+120 % Schaden“ steigt auf. Bei ★★★★ glänzt der ganze Rucksack.
 
 ### Zeitformen als Wirkung (ab Pfad 2)
 
@@ -133,7 +138,7 @@ Beim Aufwerten wählt das Kind die richtige Form („heilen → er heilte“).
 
 ### Seltenheit
 
-Gewöhnlich, selten, episch, legendär – jeweils mit eigenem Rahmen und Leuchten. Mit jeder Runde steigt die Chance auf seltenere Items im Laden.
+Gewöhnlich, selten, episch, legendär – jeweils mit eigenem Rahmen und Leuchten. Mit jeder Runde steigt die Chance auf seltenere Items im Laden. Jedes Item mit ★★★★ zählt als legendär.
 
 ### Kampfwerte
 
@@ -141,22 +146,30 @@ Abklingzeit, Schaden, Block, Heilung sowie Zustände, die zu den Kräften passen
 
 ## Kombinieren
 
-Das Kombinieren ist die größte Stärke des Spiels: Kristalle verschmelzen zu Beginn des nächsten Tages mit Trägern, drei gleiche Items sofort zur nächsten Sternstufe, und es entsteht immer etwas Neues. Die Regeln dahinter sind echte deutsche Grammatik.
+Das Kombinieren ist die größte Stärke des Spiels, und es belohnt sofort wie in Backpack Rush: Ein Kristall neben einem Träger wird im selben Moment zum Kompositum, zwei gleiche Items werden sofort zur nächsten Sternstufe, und es entsteht immer etwas Neues. Die Regeln dahinter sind echte deutsche Grammatik.
+
+### Grammatik-Fragen ohne Bremse
+
+- Die Frage erscheint als kleines, schnelles Fenster direkt über dem Item, mit großen Antwortknöpfen; ein Tipp genügt.
+- Richtig: sofort verbinden mit Animation. Falsch: eine kurze Erklärzeile, dann ein neuer Versuch; ab dem zweiten Versuch kostet jeder weitere 1 Gold.
+- Hat ein Kind dieselbe Frage (gleiches Wort, gleiche Art) in einem Lauf dreimal gleich beim ersten Versuch richtig beantwortet, kommt sie in diesem Lauf nicht mehr; das Verbinden passiert dann direkt mit einem kleinen Hinweis („die Äxte ✓“).
+- Jedes Fenster hat einen kleinen Knopf „Nicht verbinden“: Das Item wird ohne Verbinden abgelegt (beim Kaufen ins Lager, falls kein Platz).
 
 ### Komposita: Kraft + Träger
 
 - **Bestimmungswort (vorne)** = die Kraft: Feuer, Gift, Eis, Blitz …
 - **Grundwort (hinten)** = der Gegenstand und sein Artikel: Schwert, Bogen, Schild …
 - Feuer + Schwert = **das Feuerschwert**, Gift + Bogen = **der Giftbogen**, Eis + Schild = **der Eisschild**.
-- Beim Verschmelzen wählt das Kind den Artikel. Merksatz im Feedback: „Das letzte Wort bestimmt den Artikel.“
+- Sobald ein Kristall direkt links neben oder direkt über einem Träger liegt (durch Kaufen, Ziehen oder Drehen), entsteht sofort das Kompositum. Das Kind wählt den Artikel. Merksatz im Feedback: „Das letzte Wort bestimmt den Artikel.“
+- Das Kompositum hat die Stufe des Trägers; ein höherstufiger Kristall gibt eine stärkere Kraftwirkung. Danach verbinden sich gleiche Komposita wie alle Items: Feueraxt ★ + Feueraxt ★ → Feueraxt ★★.
 - **Reihenfolge zählt:** Schwert + Feuer ergibt ein Schwertfeuer – eine Feuerwand aus Klingen, also ein anderes Item. Das lädt zum Experimentieren ein.
 - **Dreifach-Komposita** sind legendär: Drache + Feuer + Schwert = das Drachenfeuerschwert.
 - **Unsinn-Kombinationen** dürfen witzig sein (Stiefelsuppe), sind aber schwach.
 
-### Steigerung: dreimal dasselbe Adjektiv
+### Steigerung: zweimal dasselbe Adjektiv
 
-- Drei gleiche Adjektiv-Runen irgendwo in Rucksack oder Lager werden gesteigert – nach derselben Regel wie die Sternstufen.
-- scharf → schärfer → am schärfsten
+- Zwei gleiche Adjektiv-Runen irgendwo in Rucksack oder Lager werden sofort gesteigert – nach derselben Regel wie die Sternstufen: ★★ = Komparativ, ★★★ = Superlativ, ★★★★ = Superlativ mit leuchtender Krone (ohne neue Frage).
+- scharf → schärfer → am schärfsten → am schärfsten 👑
 - Unregelmäßige Formen (gut → besser → am besten, viel → mehr → am meisten) sind seltene, besonders starke Rezepte.
 
 ### Weitere Rezepte (höhere Pfade)

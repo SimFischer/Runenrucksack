@@ -91,10 +91,12 @@ try {
   await tap('#grid-bag [data-tut="item-schwert"]'); await expect('Lager');
   await tap('#tut-next'); await expect('Feuer-Kristall');
   const sw = await rect('#grid-bag [data-tut="item-schwert"]');
-  await drag('[data-tut="laden-feuer"]', sw.left - c / 2, sw.top + c / 2); await expect('verschmelzen');
-  await tap('#modal [data-g="der"]');
-  check((await ev(`document.querySelector('#modal .feedback')?.textContent || ''`)).includes('Das letzte Wort'), 'Erklärung nach falschem Artikel');
-  await tap('#modal [data-g="das"]'); await tap('#modal [data-next]'); await expect('Siegel');
+  await drag('[data-tut="laden-feuer"]', sw.left - c / 2, sw.top + c / 2); await expect('sofort zum Feuerschwert');
+  check(await ev(`!!document.querySelector('#quick .quick-card') && document.getElementById('modal').hidden`), 'kleines Frage-Fenster am Schwert (kein großes Fenster)');
+  await tap('#quick [data-k="0"]'); // „der“ – falsch
+  check((await ev(`document.querySelector('#quick .quick-fb')?.textContent || ''`)).includes('Das letzte Wort'), 'Erklärung nach falschem Artikel');
+  await tap('#quick [data-k="2"]'); await expect('Siegel'); // „das“
+  check(await ev(`!!document.querySelector('#grid-bag [data-tut="item-feuer+schwert"]')`), 'Feuerschwert ist sofort entstanden');
   let p = await freeNextTo('#grid-bag [data-tut="item-feuer+schwert"]');
   await drag('[data-tut="laden-siegel-das"]', p[0], p[1]); await expect('Rune');
   p = await freeNextTo('#grid-bag [data-tut="item-feuer+schwert"]');
@@ -116,16 +118,16 @@ try {
     for (let y = 0; y < 3; y++) for (let x = 0; x < 4; x++) { const px = g.left + 3 + (x + .5) * c, py = g.top + 3 + (y + .5) * c;
       if (!document.elementsFromPoint(px, py).some((e) => e.classList?.contains('item'))) return [px, py]; } return null; })()`);
   await drag('[data-tut="laden-dolch"]', frei[0], frei[1]); await expect('Mehrzahl');
-  const optsD = await ev(`[...document.querySelectorAll('#modal [data-k]')].map((x) => x.textContent)`);
-  await tap(`#modal [data-k="${optsD.indexOf('Dolche')}"]`); await sleep(1200);
-  check(await ev(`!!document.querySelector('#grid-bag .item.s2, #grid-store .item.s2')`), 'drei Dolche werden zu einem ★★-Dolch');
-  await expect('2/3');
-  check(await ev(`document.querySelector('[data-tut="sammeln-apfel"]')?.textContent === '2/3'`), 'Abzeichen 2/3 im Laden');
+  const optsD = await ev(`[...document.querySelectorAll('#quick [data-k]')].map((x) => x.textContent)`);
+  await tap(`#quick [data-k="${optsD.indexOf('Dolche')}"]`); await sleep(1200);
+  check(await ev(`!!document.querySelector('#grid-bag .item.s2')`), 'zwei Dolche werden sofort zu einem ★★-Dolch');
+  await expect('1/2');
+  check(await ev(`document.querySelector('[data-tut="sammeln-apfel"]')?.textContent === '1/2'`), 'Abzeichen 1/2 im Laden');
   await tap('#tut-next'); await expect('Verben');
-  for (let i = 0; i < 6 && (await ev('document.getElementById("modal").hidden')); i++) await tap('#grid-bag [data-tut="item-schlagen"]');
+  for (let i = 0; i < 6 && !(await ev('!!document.getElementById("quick")')); i++) await tap('#grid-bag [data-tut="item-schlagen"]');
   await expect('welche Form');
-  const optsV = await ev(`[...document.querySelectorAll('#modal [data-k]')].map((x) => x.textContent)`);
-  await tap(`#modal [data-k="${optsV.indexOf('schlägt')}"]`); await expect('schlägt dein Feuerschwert');
+  const optsV = await ev(`[...document.querySelectorAll('#quick [data-k]')].map((x) => x.textContent)`);
+  await tap(`#quick [data-k="${optsV.indexOf('schlägt')}"]`); await expect('schlägt dein Feuerschwert');
   check(await ev(`!!document.querySelector('#grid-bag .rune-lines line.verb')`), 'Leuchtlinie von der Rolle zum Feuerschwert');
   await tap('#tut-next'); await expect('zweiten Kampf');
   await tap('#btn-fight'); await expect('Rüstung des Orks');
