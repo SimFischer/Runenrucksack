@@ -1,8 +1,8 @@
-// Ende eines Laufs: Ergebnis, Erfahrung und Rang (mit Feier beim Aufstieg).
+// Ende eines Laufs: Ergebnis, Lernbericht (nur für das Kind), Erfahrung und Rang (mit Feier beim Aufstieg).
 import { CFG } from './logic.js';
 import { G, region } from './state.js';
-import { laufStand } from './fortschritt.js';
-import { modal, klang } from './ui.js';
+import { laufStand, lernbericht } from './fortschritt.js';
+import { modal, klang, iconHtml } from './ui.js';
 import { figurBild } from './state.js';
 
 const rangBalken = (r) => {
@@ -38,10 +38,31 @@ export function zeigeLaufende(run, abschluss, aktionen) {
     ...(a.erfolge || []).map((id) => { const e = G.ACH.erfolge.find((x) => x.id === id); return `<div class="frei-neu"><span class="frei-emoji">${e.emoji}</span><span><small>Neuer Erfolg!</small><b>${e.name}</b></span></div>`; }),
     ...a.frei.designs.map((id) => { const d = G.ACH.designs.find((x) => x.id === id); return `<div class="frei-neu"><span class="frei-emoji">${d.emoji}</span><span><small>Neues Rucksack-Design!</small><b>${d.name}</b></span></div>`; }),
   ].join('') : '';
-  modal(`${kopf}${xp}${frei ? `<div class="frei-liste">${frei}</div>` : ''}
+  modal(`${kopf}
+      <div class="ende-spalten">
+        <div>${berichtHtml(run, a)}</div>
+        <div>${xp}${frei ? `<div class="frei-liste">${frei}</div>` : ''}</div>
+      </div>
       <div class="row"><button class="btn primary big" data-act="neu">Neuer Lauf</button><button class="btn" data-act="home">Zum Start</button></div>`,
   { neu: aktionen.neu, home: aktionen.home }, 'wide ende');
   if (a?.aufgestiegen) setTimeout(() => rangFeier(a.nachher), 700);
+}
+
+// Lernbericht: Siege, neue Entdeckungen, „Das sitzt schon“ und „Das üben wir noch“ – freundlich, ohne Noten.
+function berichtHtml(run, a) {
+  const b = lernbericht(run);
+  const neu = (a?.neu || []).map((id) => G.BUCH.byId.get(id)).filter(Boolean);
+  const zeige = neu.slice(0, 6);
+  return `<div class="bericht">
+    <h3>📝 Dein Lernbericht</h3>
+    <p class="bericht-zeile">⚔️ Du hast <b>${run.wins}</b> ${run.wins === 1 ? 'Kampf' : 'Kämpfe'} gewonnen.</p>
+    ${neu.length ? `<p class="bericht-zeile">📚 Neu im Buch der Wörter: <b>${neu.length}</b></p>
+      <div class="bericht-neu">${zeige.map((e) => `<span title="${e.name}">${iconHtml(e.def, 'bericht-img')}<small>${e.seite === 'stufen' ? '★'.repeat(e.stern) + ' ' : ''}${e.name}</small></span>`).join('')}${neu.length > zeige.length ? `<span class="bericht-mehr">+${neu.length - zeige.length}</span>` : ''}</div>` : ''}
+    ${b.sitzt.length ? `<h4>💪 Das sitzt schon</h4><ul class="bericht-liste gut">${b.sitzt.map((r) => `<li>✓ ${r.name}</li>`).join('')}</ul>` : ''}
+    ${b.ueben.length ? `<h4>🌱 Das üben wir noch</h4><ul class="bericht-liste ueben">${b.ueben.map((r) => `<li><b>${r.name}</b><small>${r.tipp}</small></li>`).join('')}</ul>` : ''}
+    ${!b.sitzt.length && !b.ueben.length ? '<p class="muted">In diesem Lauf gab es keine Grammatik-Fragen.</p>' : ''}
+    ${b.ueben.length === 0 && b.sitzt.length ? '<p class="bericht-lob">Kein einziger Fehler – stark!</p>' : ''}
+  </div>`;
 }
 
 // Feier-Einblendung beim Aufstieg in einen neuen Rang.

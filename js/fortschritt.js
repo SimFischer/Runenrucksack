@@ -177,3 +177,26 @@ export function pruefeErfolge(profil, ctx) {
   }
   return neu;
 }
+
+// ---------- Lernbericht (nur für das Kind: keine Noten, keine Prozentzahlen) ----------
+
+export const TIPPS = {
+  artikel: 'Bei zusammengesetzten Wörtern bestimmt das letzte Wort den Artikel: Feuer + das Schwert = das Feuerschwert.',
+  mehrzahl: 'Viele Nomen bekommen in der Mehrzahl einen Umlaut oder eine Endung: die Axt → die Äxte, das Schwert → die Schwerter.',
+  personalform: 'Bei einem (er, sie, es) endet das Verb meist auf -t: die Axt schlägt. Bei mehreren bleibt die Grundform: die Äxte schlagen.',
+  praeteritum: 'Viele Verben ändern im Präteritum ihren Vokal: schlagen → schlug, stechen → stach.',
+  steigerung: 'Steigern geht so: scharf → schärfer → am schärfsten. Oft kommt ein Umlaut dazu.',
+  rechtschreibung: 'Sprich das Wort langsam in Silben und achte auf doppelte Buchstaben: Ham-mer, Schup-pe.',
+};
+
+// Welche Regeln saßen, welche üben wir noch? (aus den Antworten des Laufs)
+export function lernbericht(run) {
+  const p = laufStand(run);
+  const sitzt = [], ueben = [];
+  for (const regel of Object.keys(REGELN)) {
+    const [richtig, falsch] = p.regeln[regel] || [0, 0];
+    if (falsch) ueben.push({ regel, name: REGELN[regel], tipp: TIPPS[regel] });
+    else if (richtig) sitzt.push({ regel, name: REGELN[regel] });
+  }
+  return { sitzt, ueben };
+}

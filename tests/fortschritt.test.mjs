@@ -135,3 +135,19 @@ test('Erfolge: mindestens 15, jeder erreichbar geprüft, Silberbanner nach „Al
   assert.deepEqual(pruefeErfolge(p, ctx), ['alle-figuren']);
   assert.ok(pruefeFreischaltungen(p, ctx).designs.includes('silberbanner'));
 });
+
+test('Lernbericht: Das sitzt schon / Das üben wir noch – ohne Prozentzahlen', async () => {
+  const { lernbericht } = await import('../js/fortschritt.js');
+  const run = { wins: 5 };
+  merkeAntwort(run, 'mehrzahl', true, true);
+  merkeAntwort(run, 'mehrzahl', true, true);
+  merkeAntwort(run, 'artikel', false);
+  merkeAntwort(run, 'artikel', true, false);
+  merkeAntwort(run, 'rechtschreibung', true, true);
+  const b = lernbericht(run);
+  assert.deepEqual(b.sitzt.map((r) => r.regel), ['mehrzahl', 'rechtschreibung']);
+  assert.deepEqual(b.ueben.map((r) => r.regel), ['artikel']);
+  assert.match(b.ueben[0].tipp, /das letzte Wort den Artikel/);
+  const text = JSON.stringify(b);
+  assert.ok(!/%|Note/.test(text), 'keine Prozentzahlen und keine Noten');
+});
