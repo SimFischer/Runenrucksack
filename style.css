@@ -1022,3 +1022,7 @@ body {
 .ask-btn { min-height: 72px; padding: 12px 20px; }
 @media (max-height: 760px) { .title-img { max-height: 120px; } .start-card .tagline { margin-bottom: 12px; } }
 .f-portrait .f-img { height: 96px; }
+.tut-fenwick img { width: auto; height: 88px; }
+#tut-bubble.compact .tut-fenwick img { width: auto; height: 60px; }
+/* Fliegende Münzen und Sterne nur während der Animation sichtbar */
+.coin-fly, .merge-fly, .merge-star { opacity: 0; }

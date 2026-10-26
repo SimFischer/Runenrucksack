@@ -2,7 +2,7 @@
 
 Ein Fantasy-Backpack-Battler fürs iPad (Querformat) als Web-App, in dem Grammatik das Regelwerk der Kombos ist. Das vollständige Spielkonzept steht in [konzept.md](konzept.md).
 
-**Stand: Etappe 3 – Pfad 1 vollständig, mit Tutorial, Sternstufen und Verben mit Subjekt**
+**Stand: Etappe 3 – Pfad 1 vollständig, mit Tutorial, Sternstufen, Verben mit Subjekt und Bildern**
 
 Spielen: <https://simfischer.github.io/Runenrucksack/> – auf dem iPad in Safari öffnen, **Teilen → Zum Home-Bildschirm**, dann startet es wie eine App im Vollbild und läuft auch offline.
 
@@ -100,6 +100,38 @@ Alle Inhalte stehen in JSON-Dateien. Jede Datei hat oben ein Feld `_hinweis`, da
 
 Die Tests (siehe unten) melden, wenn eine Aufgabe nicht genau eine richtige Lösung hat.
 
+## Bilder
+
+Alle Bilder liegen in `assets/`. Die Originale (große PNGs) stehen in `assets/roh/` und werden nur von den Werkzeugen gelesen – sie kommen nicht in den Service Worker. Das Spiel lädt kleine WebP-Bilder:
+
+| Ordner/Datei | Inhalt |
+| --- | --- |
+| `assets/items/` | ein Bild pro Item (1×1: 256 px, 1×2: 256×512 px, 2×2: 512 px), Name = Item-id |
+| `assets/gegner/` | die vier Orks (512 px) |
+| `assets/figur-*.webp`, `assets/boss-*.webp` | Figuren und Bosse, 512 px hoch |
+| `assets/hintergrund-*.webp`, `assets/titelbild.webp` | Gebiets-Hintergründe und Titelbild, 1536 px breit |
+| `assets/zuordnung.json` | welches Bild zu welcher id gehört (wird von den Werkzeugen geschrieben) |
+| `assets/vorschau.html` | Übersicht aller Items mit Bild zum Prüfen (im Browser öffnen, z. B. http://localhost:8080/assets/vorschau.html) |
+
+Fehlt zu einem Item ein Bild, zeigt das Spiel automatisch das Emoji aus `items.json`. Komposita (z. B. Feuerschwert) zeigen das Bild ihres Trägers mit dem Kraft-Leuchten darüber, gesteigerte Runen das Bild ihrer Grundrune. Sternstufen und Kraft-Effekte werden im Code darübergelegt.
+
+### Neue Bilder hinzufügen
+
+1. **Sprite-Sheet mit mehreren Items** (transparenter Hintergrund, Objekte in Reihen): Datei nach `assets/roh/` legen und in `tools/zerschneide.mjs` unter `SHEETS` eintragen – Reihen von oben nach unten, in jeder Reihe die Item-ids von links nach rechts. Dann:
+
+   ```bash
+   node tools/zerschneide.mjs
+   ```
+
+   Danach `assets/vorschau.html` öffnen und prüfen, ob jedes Item das richtige Bild hat. Das Werkzeug schneidet an den leersten Linien zwischen den Objekten; liegen Objekte sehr dicht beieinander, hilft ein etwas größerer Abstand im Sheet.
+2. **Einzelbild** (Figur, Boss, Hintergrund): Datei nach `assets/roh/` legen, in `tools/bilder.mjs` unter `BILDER` eintragen (`figuren`/`bosse` werden 512 px hoch, `hintergruende` 1536 px breit) und `node tools/bilder.mjs` ausführen. Figuren und Gegner werden über ihre id gefunden (Figur = id aus `heroes.json`, Boss/Gegner = id aus `enemies.json`, Hintergrund = Gebiets-id aus `regions.json`).
+3. **App-Symbol:** `assets/roh/app-symbol.png` ersetzen und `node tools/bilder.mjs` ausführen – das erzeugt `icons/icon-192.png`, `icons/icon-512.png` und `icons/apple-touch-icon.png`.
+4. Neue Bilddateien in `sw.js` in die Liste `FILES` eintragen und `CACHE` um eins erhöhen, damit sie auch offline da sind.
+
+Beide Werkzeuge rechnen mit einem unsichtbar gestarteten Chrome oder Edge (keine zusätzlichen Pakete nötig). Wird kein Browser gefunden, den Pfad in der Umgebungsvariable `CHROME` angeben.
+
+Die Schriftrollen „rufen“ (Horn) und „reiten“ (Hufeisen) sind schon zugeschnitten und für spätere Verben vorgemerkt (`assets/items/verb-rufen.webp`, `verb-reiten.webp`). Für die Figuren Faelith, Theron und Ysolde liegen die Bilder bereit, sie werden mit den Figuren selbst eingebaut.
+
 ## Lokal testen
 
 Mit Node.js im Projektordner:
@@ -163,7 +195,9 @@ Aktuelle Balance (200 Läufe, einfache Kaufstrategie, Aufgaben zu 75 % richtig):
 | `js/sim.js` | Simulation ganzer Läufe für die Balance |
 | `sw.js`, `manifest.webmanifest`, `icons/` | PWA (offline, Home-Bildschirm) |
 | `tools/serve.mjs` | lokaler Testserver |
-| `tools/make-icons.mjs` | erzeugt die App-Symbole neu |
+| `tools/zerschneide.mjs` | zerlegt Sprite-Sheets in Einzelbilder (WebP), schreibt Zuordnung und Vorschau |
+| `tools/bilder.mjs` | verkleinert Figuren, Bosse, Hintergründe, Titelbild; erzeugt die App-Symbole |
+| `tools/chrome.mjs`, `tools/vorschau.mjs` | Hilfen für die Bild-Werkzeuge |
 | `tools/tutorial-browsertest.mjs` | spielt das Tutorial im Browser per Touch durch |
 
 Kein Server, keine Accounts, keine externen Dienste. Der laufende Lauf wird nur im Browser gemerkt.
