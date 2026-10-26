@@ -727,3 +727,18 @@ h2 .hint { font-size: 12px; font-weight: 400; color: var(--ink-soft); }
 .item.cursed .label { color: #6b2a8a; }
 .mark-fluch { position: absolute; right: 3px; bottom: 14px; font-family: var(--emoji); font-size: 16px; pointer-events: none; }
 .lvl { font-size: .4em; vertical-align: top; color: var(--gold-dark); font-family: var(--font); font-weight: 900; }
+.armor-word {
+  font: inherit;
+  font-family: "Courier New", monospace;
+  font-weight: 700;
+  color: var(--red);
+  background: #fff6e2;
+  border: 2px dashed var(--red);
+  border-radius: 8px;
+  padding: 4px 10px;
+  min-height: 40px;
+  cursor: pointer;
+  animation: fuse 1.6s ease-in-out infinite;
+}
+.f-armor .ok { color: var(--green); }
+.bad-word { font-family: "Courier New", monospace; color: var(--red); font-size: 1.2em; }

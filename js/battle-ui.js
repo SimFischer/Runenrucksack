@@ -1,13 +1,14 @@
 // Nacht: Kampfanzeige mit Lebensbalken, Abklingzeiten und Schadenszahlen.
-import { CFG, makeEnemy, pickEnemy, rectGrid } from './logic.js';
+import { CFG, makeEnemy, pickEnemy, rectGrid, pickOne, shuffle } from './logic.js';
 import { Battle, makeFighter, runToEnd } from './battle.js';
 import { analyze } from './grammar.js';
 import { G, itemsIn, gridOf, region, hero, playerCtx } from './state.js';
 import { evaluateBag } from './mods.js';
-import { $, fmt, buildGrid, drawItems } from './ui.js';
+import { $, fmt, buildGrid, drawItems, openModal, closeModal } from './ui.js';
 
 let battle = null, enemy = null, speed = 1, rafId = 0, lastFrame = 0, itemEls = {}, onDone = null;
-let bcell = 100, selfHit = 0;
+let bcell = 100, selfHit = 0, armor = null;
+export const ARMOR_BONUS = 0.15; // richtig verbessert: Gegner startet mit 15 % weniger Leben
 
 function enemyPool(day) {
   const base = G.ITEMS.filter((d) => d.art !== 'siegel' && d.art !== 'rune' && d.art !== 'tasche');
@@ -27,6 +28,7 @@ export function startNight(done) {
   const reg = region();
   const foeDef = pickEnemy(run.day, G.REGIONS, G.ENEMIES);
   enemy = makeEnemy(run.day, foeDef, enemyPool(run.day), G.DEFS);
+  armor = foeDef.fehler?.length ? { ...pickOne(foeDef.fehler), status: 'offen' } : null;
 
   const ctx = playerCtx();
   const bag = itemsIn('bag');
@@ -45,7 +47,8 @@ export function startNight(done) {
   $('battle-title').textContent = `🌙 ${reg.name} · Nacht ${run.day}${enemy.boss ? ' · Anführer!' : ''}`;
   const h = hero();
   buildFighter('player', `${h?.emoji || ''}<span class="f-bag">🎒</span>`, h?.name || 'Dein Rucksack', h ? `mit dem Runenrucksack · ${h.volk}` : `Tag ${run.day}`, bag, playerGrid, evaluateBag(bag, G.DEFS, ctx));
-  buildFighter('enemy', enemy.emoji, enemy.name, enemy.boss ? 'Anführer der Orks' : 'Wirrwarr-Ork', enemy.items, enemyGrid, analyze(enemy.items, G.DEFS));
+  buildFighter('enemy', enemy.emoji, enemy.name, armorHtml(), enemy.items, enemyGrid, analyze(enemy.items, G.DEFS));
+  bindArmor();
   updateBattleUi();
   setSpeed(speed);
   $('btn-start-battle').hidden = false;
@@ -82,6 +85,7 @@ function setSpeed(s) {
 
 function beginBattle() {
   $('btn-start-battle').hidden = true;
+  if (armor?.status === 'offen') { armor.status = 'vorbei'; refreshArmor(); }
   if (selfHit) floater($('fighter-player'), `😈 -${selfHit} Fluch`, 'gift');
   lastFrame = performance.now();
   rafId = requestAnimationFrame(frame);
@@ -175,4 +179,63 @@ function showEvent(ev) {
     cls = ev.kind;
   }
   if (text) floater(box, text, cls);
+}
+
+// ---------- Fehler auf der Ork-Rüstung ----------
+
+function armorHtml() {
+  const who = enemy.boss ? 'Anführer der Orks' : 'Wirrwarr-Ork';
+  if (!armor) return who;
+  if (armor.status === 'richtig') return `Rüstung: <s>${armor.falsch}</s> → <b class="ok">${armor.richtig}</b> · geschwächt!`;
+  if (armor.status === 'falsch' || armor.status === 'vorbei') return `Auf der Rüstung steht: <b>${armor.falsch}</b>`;
+  return `Auf der Rüstung steht: <button class="armor-word" id="armor-word">${armor.falsch} 🔍</button>`;
+}
+
+function refreshArmor() {
+  const el = $('fighter-enemy').querySelector('.f-armor');
+  if (el) el.innerHTML = armorHtml();
+  bindArmor();
+}
+
+function bindArmor() {
+  const btn = $('armor-word');
+  if (btn) btn.onclick = openArmor;
+}
+
+// Ein Versuch pro Kampf: richtig → Gegner startet mit 15 % weniger Leben.
+function openArmor() {
+  const run = G.run;
+  const options = shuffle(armor.optionen);
+  const card = openModal(`
+    <div class="big-emoji">${enemy.emoji}</div>
+    <p class="enc-hint">Auf der Rüstung steht ein falsches Wort: <b class="bad-word">${armor.falsch}</b></p>
+    <h2>Wie schreibt man es richtig?</h2>
+    <div class="row wrap">${options.map((o, k) => `<button class="btn opt-btn" data-k="${k}">${o}</button>`).join('')}</div>
+    <p class="cost">Nur ein Versuch! Richtig verbessert: Der Ork startet mit 15 % weniger Leben.</p>
+    <div class="row"><button class="btn small" data-no>Lieber nicht</button></div>`);
+  card.querySelectorAll('[data-k]').forEach((b) => {
+    b.onclick = () => {
+      const ok = options[+b.dataset.k] === armor.richtig;
+      armor.status = ok ? 'richtig' : 'falsch';
+      run.lernen[ok ? 'richtig' : 'falsch']++;
+      if (ok) {
+        const f = battle.sides.enemy;
+        f.hp = Math.round(f.maxHp * (1 - ARMOR_BONUS));
+        updateBattleUi();
+        floater($('fighter-enemy'), `-${Math.round(f.maxHp * ARMOR_BONUS)} Rüstung kaputt!`, 'schaden');
+      }
+      const res = openModal(ok ? `
+        <div class="big-emoji">💥</div>
+        <h2>Richtig: ${armor.richtig}</h2>
+        <p>Die Rüstung bekommt einen Riss! ${enemy.name} startet mit 15 % weniger Leben.</p>
+        <div class="row"><button class="btn primary big" data-ok>Weiter</button></div>` : `
+        <div class="big-emoji">🛡️</div>
+        <h2>Leider nicht</h2>
+        <p class="feedback">Richtig wäre: <b>${armor.richtig}</b>. ${armor.erklaerung}</p>
+        <p class="muted">Der Ork bleibt so stark wie vorher.</p>
+        <div class="row"><button class="btn primary" data-ok>Weiter</button></div>`);
+      res.querySelector('[data-ok]').onclick = () => { closeModal(); refreshArmor(); };
+    };
+  });
+  card.querySelector('[data-no]').onclick = closeModal;
 }

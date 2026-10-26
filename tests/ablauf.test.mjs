@@ -66,3 +66,16 @@ test('Startfiguren: Start-Items und Boni', async () => {
   assert.ok(Math.abs(e.get(1).def.abklingzeit - DEFS.stuermen.abklingzeit * 0.8) < 0.06);
   assert.equal(e.get(2).def.abklingzeit, DEFS.speer.abklingzeit, 'Eadrun beschleunigt nur Verben');
 });
+
+test('Ork-Rüstungen: 3–5 Fehler, je genau eine richtige Schreibung', () => {
+  for (const e of ENEMIES) {
+    assert.ok(e.fehler.length >= 3 && e.fehler.length <= 5, e.id);
+    for (const f of e.fehler) {
+      assert.equal(f.optionen.length, 3, `${e.id}: ${f.falsch}`);
+      assert.equal(new Set(f.optionen).size, 3);
+      assert.equal(f.optionen.filter((o) => o === f.richtig).length, 1);
+      assert.ok(f.optionen.includes(f.falsch) && f.falsch !== f.richtig);
+      assert.ok(f.erklaerung);
+    }
+  }
+});
