@@ -62,9 +62,9 @@ function act(step, run) {
       return null;
     }
     case 'verschmelzen': {
-      const k = findItem(run, 'feuer'), t = findItem(run, 'schwert');
-      run.items = run.items.filter((p) => p !== k);
-      t.id = a.ergebnis;
+      // Der Kristall liegt links neben dem Schwert: Das Spiel fragt sofort nach dem Artikel.
+      const log = verbindeAlles(run, DEFS, RECIPES, [{ uid: findItem(run, 'feuer').uid }]);
+      assert.deepEqual(log.map((l) => [l.typ, l.id]), [['kompositum', a.ergebnis]]);
       return null;
     }
     case 'siegel': buyTo(run, a.siegel, 'bag', targetCell(run, DEFS, `neben:${a.ziel}`)); return null;

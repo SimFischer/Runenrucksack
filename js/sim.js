@@ -4,7 +4,7 @@ import {
   CFG, newRun, finishBattle, rollShop, pickEnemy, makeEnemy, findSpot, bagGrid, STORE_GRID,
   growBag, attachTasche, enemyPool, shopPool, pickEncounters, pickOne, sellValue, seededRng, ARMOR_BONUS,
 } from './logic.js';
-import { buildCompounds, buildRuneLevels, findFusions } from './grammar.js';
+import { buildCompounds, buildRuneLevels } from './grammar.js';
 import { partnerOf, placeNew, verbindeAlles } from './sterne.js';
 import { playerContext, evaluateBag } from './mods.js';
 import { Battle, makeFighter, runToEnd } from './battle.js';
@@ -60,7 +60,9 @@ function shop(run, data, rng, skill) {
         }
         run.gold -= o.d.preis;
         run.shop[o.i] = null;
-        run.items.push({ uid: run.nextUid++, id: o.d.id, area: 'bag', ...spot });
+        const p = { uid: run.nextUid++, id: o.d.id, area: 'bag', ...spot };
+        run.items.push(p);
+        verbinde(run, data, rng, skill, p); // liegt es zufällig neben einem Träger? → Kompositum
         bought = true;
         break;
       }
@@ -101,14 +103,6 @@ function morning(run, data, rng, skill) {
       if (b.typ === 'kobold') {
         const e = pickOne(data.exercises.kobold, rng);
         verbinde(run, data, rng, skill, placeNew(run, defs, e.item, null, ok ? {} : { fluch: e.teile.join('') }));
-      }
-    }
-    if (step === 'verschmelzen') {
-      const bag = run.items.filter((p) => p.area === 'bag');
-      for (const f of findFusions(bag, defs, data.recipes)) {
-        if (rng() > skill) run.gold = Math.max(0, run.gold - 1);
-        run.items = run.items.filter((p) => p.uid !== f.kraft.uid);
-        f.traeger.id = f.id;
       }
     }
   }

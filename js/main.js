@@ -33,7 +33,7 @@ async function boot() {
   $('btn-first').onclick = startTutorial;
   $('btn-known').onclick = showStart;
   $('btn-help').onclick = () => showHelp();
-  initTutorial({ render, showGame, showStart, showHeroes, runFusions, continueSaved, hasSavedRun: () => !!loadRun() });
+  initTutorial({ render, showGame, showStart, showHeroes, continueSaved, hasSavedRun: () => !!loadRun() });
   showAsk();
   $('btn-reroll').onclick = onReroll;
   $('btn-fight').onclick = onFight;
@@ -132,8 +132,7 @@ function continueFlow() {
   else if (step === 'schicksal') showFate(next);
   else if (step === 'unterklasse') chooseSubclass(next);
   else if (step === 'begegnung') runEncounter(next, render);
-  else if (step === 'verschmelzen') runFusions(next);
-  else next();
+  else next(); // z. B. „verschmelzen“ aus älteren Spielständen – Komposita entstehen jetzt sofort
 }
 
 function applyTheme() {
@@ -365,7 +364,8 @@ function renderInfo() {
   const base = defOf(selected);
   const inBag = selected.src === 'bag';
   const ana = inBag ? bagInfo.get(selected.uid) : null;
-  const def = ana ? ana.def : starDef(base, selected.uid ? placedOf(selected.uid).stern || 1 : 1);
+  const pl = selected.uid ? placedOf(selected.uid) : null;
+  const def = ana ? ana.def : starDef(base, pl?.stern || 1, pl?.kraftStern || 1);
   const s = sizeOf(base, 0);
   const rar = G.RAR[base.seltenheit] || {};
 
@@ -389,7 +389,7 @@ function renderInfo() {
   for (const [key, label, f] of STAT_ROWS) {
     if (key === 'abklingzeit' && !def.abklingzeit) continue;
     if (!def[key]) continue;
-    const diff = def[key] - ((ana?.base || starDef(base, selected.uid ? placedOf(selected.uid).stern || 1 : 1))[key] || 0);
+    const diff = def[key] - ((ana?.base || starDef(base, pl?.stern || 1, pl?.kraftStern || 1))[key] || 0);
     const extra = Math.abs(diff) > 1e-9 ? ` <span class="${diff > 0 === (key !== 'abklingzeit') ? 'plus' : 'minus'}">(${diff > 0 ? '+' : '−'}${fmt(Math.round(Math.abs(diff) * 10) / 10)})</span>` : '';
     ul.insertAdjacentHTML('beforeend', `<li><span>${label}</span><b>${f(def[key])}${extra}</b></li>`);
   }
@@ -496,17 +496,19 @@ function grammarNotes(base, ana, ref) {
   if (base.art === 'kompositum') {
     const k = G.DEFS[base.teile.kraft], t = G.DEFS[base.teile.traeger];
     out.push({ html: `${k.name} + ${t.name} = ${base.name}. Das letzte Wort bestimmt den Artikel: ${fullName(t)} → ${fullName(base)}.` });
+    const ks = ref.uid ? placedOf(ref.uid)?.kraftStern || 1 : 1;
+    if (ks > 1) out.push({ cls: 'ok', html: `Aus einem ${'★'.repeat(ks)}-Kristall: Die Kraft wirkt ${fmt(STERN_FAKTOR[ks])}-fach.` });
   }
   if (base.art === 'kraft') {
     const fus = ref.src === 'bag' && findFusions(bag, G.DEFS, G.RECIPES).find((f) => f.kraft.uid === ref.uid);
     const wrong = ref.src === 'bag' && !fus && wrongOrderNeighbor(placedOf(ref.uid), bag, G.DEFS, G.RECIPES);
     if (fus) {
-      out.push({ cls: 'ok', html: `✓ Verschmilzt zu Beginn des nächsten Tages: ${base.name} + ${G.DEFS[fus.traeger.id].name} = <b>${G.DEFS[fus.id].name}</b>` });
+      out.push({ cls: 'ok', html: `✓ Liegt richtig: ${base.name} + ${G.DEFS[fus.traeger.id].name} = <b>${G.DEFS[fus.id].name}</b>. Zieh den Kristall noch einmal hierher, dann verbinden sich beide.` });
     } else if (wrong) {
       const t = G.DEFS[wrong.id];
       out.push({ cls: 'bad', html: `✗ Liegt rechts neben oder unter ${dativ(t)}. So entstünde „${t.name}${base.name.toLowerCase()}“. Das Bestimmungswort steht vorne: Lege ${fullName(base)} links neben oder über das Item.` });
     } else {
-      out.push({ html: `Lege ${fullName(base)} direkt links neben oder über einen Träger (Schwert, Bogen, Schild …). Zu Beginn des nächsten Tages verschmelzen beide zum Kompositum.` });
+      out.push({ html: `Lege ${fullName(base)} direkt links neben oder über einen Träger (Schwert, Bogen, Schild …). Dann entsteht sofort das Kompositum.` });
     }
   }
   if (base.art === 'siegel') {
@@ -597,18 +599,16 @@ function renderSummary(box) {
 
   const reg = region();
   const boss = G.ENEMIES.find((e) => e.id === reg.boss);
-  const fusions = findFusions(itemsIn('bag'), G.DEFS, G.RECIPES);
   box.innerHTML = `
     <h2>Dein Rucksack</h2>
     ${ctx.hero ? `<p class="gram">${ctx.hero.emoji} <b>${ctx.hero.name}</b>: ${ctx.hero.staerke}</p>` : ''}
     ${ctx.unterklasse ? `<p class="gram">${ctx.unterklasse.emoji} <b>${ctx.unterklasse.name}</b>: ${ctx.unterklasse.text}</p>` : ''}
     ${ctx.fate ? `<p class="gram">${ctx.fate.emoji} <b>Schicksalsrune</b>: ${ctx.fate.text}</p>` : ''}
     <ul class="stats">${rows.map(([a, b]) => `<li><span>${a}</span><b>${b}</b></li>`).join('')}</ul>
-    ${fusions.length ? `<p class="gram ok">✓ Morgen verschmelzen: ${fusions.map((f) => G.DEFS[f.id].name).join(', ')}</p>` : ''}
     ${run.day === reg.tage[1] ? `<p class="gram bad"><b>Heute Nacht wartet der Anführer: ${boss.emoji} ${boss.name}!</b></p>` : `<p class="muted">${boss.emoji} ${boss.name} wartet am ${reg.tage[1]}. Tag.</p>`}
     <h3>So geht's</h3>
     <p class="muted">Ziehe Items aus dem Laden in den Rucksack. Tippe ein Item an für Infos, tippe nochmal zum Drehen. Beim Ziehen dreht ein zweiter Finger das Item.</p>
-    <p class="muted">🔥 Kraft links neben oder über einen Träger legen → verschmilzt morgen. ${genusChip('der')} ${genusChip('die')} ${genusChip('das')} Siegel neben ein passendes Nomen. ➤ Runen-Pfeil auf ein passendes Nomen richten.</p>
+    <p class="muted">⭐ Zwei gleiche → sofort stärker. 🔥 Kraft links neben oder über einen Träger legen → sofort ein Kompositum. ${genusChip('der')} ${genusChip('die')} ${genusChip('das')} Siegel neben ein passendes Nomen. ➤ Runen-Pfeil auf ein passendes Nomen richten.</p>
     <p class="muted">${run.day < CFG.lastDay ? `Morgen gibt es ${income(run.day + 1) + (run.goldBonus || 0)} 🪙. ` : 'Heute ist der letzte Tag deiner Reise! '}Mit 🔓 reservierst du ein Item im Laden.</p>`;
 }
 
@@ -684,6 +684,7 @@ function moveAuto(uid, area) {
   Object.assign(p, { area, ...spot });
   if (isRune(G.DEFS[p.id])) p.rot = 0;
   selected = { src: area, uid };
+  pruefe({ uid });
   render();
 }
 
@@ -693,6 +694,7 @@ function rotateInPlace(uid) {
   if (!canRotate(def)) return;
   const rot = nextRot(def, p.rot || 0);
   if (isRune(def)) { p.rot = rot; render(); emit('drehen', { id: p.id }); return; }
+  pruefe({ uid }); // gedreht kann ein Kristall jetzt richtig an einem Träger liegen
   const grid = gridOf(p.area);
   const others = itemsIn(p.area, uid);
   for (const [dx, dy] of [[0, 0], [-1, 0], [0, -1], [-1, -1], [1, 0], [0, 1]]) {
@@ -752,12 +754,6 @@ function confirmNew() {
       <button class="btn" data-act="close">Abbrechen</button>
       <button class="btn danger" data-act="yes">Neuer Lauf</button>
     </div>`, { yes: showHeroes });
-}
-
-// ---------- Verschmelzen (zu Beginn des Tages) ----------
-
-function runFusions(done) {
-  showFusion(findFusions(itemsIn('bag'), G.DEFS, G.RECIPES), 0, done);
 }
 
 // ---------- Verbinden: zwei gleiche ergeben sofort die nächste Stufe ----------
@@ -823,11 +819,21 @@ function quiz(opts) {
   draw();
 }
 
-// Zwei gleiche gefunden: Frage stellen, bei richtiger Antwort sofort verbinden.
+// Zwei gleiche oder Kristall + Träger gefunden: Frage stellen, bei richtiger Antwort sofort verbinden.
 function askMerge(a) {
-  const run = G.run;
-  const d = G.DEFS[a.alt.id];
   const q = frageFuer(a, G.DEFS);
+  if (a.typ === 'kompositum') {
+    const kd = G.DEFS[a.kraft.id], td = G.DEFS[a.traeger.id], cd = G.DEFS[a.id];
+    quiz({
+      q,
+      anchor: itemNode(a.traeger.uid),
+      kopf: `<span class="quick-eq">${iconHtml(kd, 'ic small')}<b>+</b>${iconHtml(td, 'ic small')}<b>=</b><span class="glowing quick-goal" style="--glow:${cd.leuchten}">${iconHtml(td, 'ic small')}</span></span>`,
+      richtig: () => doMerge(a),
+      trotzdem: () => doMerge(a),
+    });
+    return;
+  }
+  const d = G.DEFS[a.alt.id];
   emit('tipp', { key: isRune(d) ? 'steigerung' : 'sterne' });
   if (!q) { doMerge(a); return; } // Superlativ → Krone: ohne neue Frage
   const ziel = '★'.repeat(sternVon(a.alt) + 1);
@@ -842,15 +848,17 @@ function askMerge(a) {
 
 function doMerge(a) {
   const run = G.run;
-  const from = [a.neu, a.alt].map((p) => itemNode(p.uid)?.getBoundingClientRect()).filter(Boolean);
+  const teile = a.typ === 'kompositum' ? [a.kraft, a.traeger] : [a.neu, a.alt];
+  const from = teile.map((p) => itemNode(p.uid)?.getBoundingClientRect()).filter(Boolean);
   closeQuick();
   const p = fuehreAus(run, a, G.DEFS);
   selected = run.tutorial ? null : { src: p.area, uid: p.uid };
   render();
   const nd = G.DEFS[p.id];
   mergeAnimation(from, itemNode(p.uid), nd.emoji);
-  toast(isRune(nd) ? `Rune gesteigert: ${nd.name}${nd.krone ? ' 👑' : ''}!` : `${'★'.repeat(p.stern)} ${nd.name}: jetzt viel stärker!`);
-  emit('verschmolzen', { id: p.id, stern: sternVon(p) });
+  if (a.typ === 'kompositum') toast(`${fullName(nd)} ist entstanden!`);
+  else toast(isRune(nd) ? `Rune gesteigert: ${nd.name}${nd.krone ? ' 👑' : ''}!` : `${'★'.repeat(p.stern)} ${nd.name}: jetzt viel stärker!`);
+  emit('verschmolzen', { id: p.id, stern: sternVon(p), typ: a.typ });
   // Kette: Gibt es zum neuen Item wieder ein gleiches? Erst nach der Animation weiter.
   pending.unshift({ uid: p.uid, paar: true });
   setTimeout(() => { merging = false; checkMerges(); }, 950);
@@ -878,72 +886,6 @@ function askVerb(p) {
     nein: run.tutorial ? null : () => store(false),
     neinText: 'So lassen (wirkt nur halb)',
   });
-}
-
-function showFusion(list, i, done) {
-  const run = G.run;
-  if (i >= list.length) { render(); done(); return; }
-  const f = list[i];
-  const k = placedOf(f.kraft.uid), t = placedOf(f.traeger.uid);
-  if (!k || !t || k.area !== 'bag' || t.area !== 'bag') { showFusion(list, i + 1, done); return; }
-  const kd = G.DEFS[k.id], td = G.DEFS[t.id], cd = G.DEFS[f.id];
-  let tries = 0;
-  let feedback = '';
-  const wrong = new Set();
-
-  const draw = () => {
-    const paid = tries > 0;
-    const broke = paid && run.gold < 1;
-    const card = openModal(`
-      <div class="fusion-eq">
-        <span class="fi">${iconHtml(kd)}<small>${kd.name}</small></span><span class="op">+</span>
-        <span class="fi">${iconHtml(td)}<small>${td.name}</small></span><span class="op">=</span>
-        <span class="fi glowing" style="--glow:${cd.leuchten}">${iconHtml(td)}<em>${kd.emoji}</em><small>?</small></span>
-      </div>
-      <h2 class="fusion-q"><span class="blank">___</span> ${cd.name}</h2>
-      <div class="row">${['der', 'die', 'das'].map((g) => `
-        <button class="btn genus-btn" data-g="${g}" style="--genus:${GENUS[g].farbe}" ${wrong.has(g) || broke ? 'disabled' : ''}>${g}</button>`).join('')}
-      </div>
-      <p class="cost">${run.tutorial ? (tries ? 'Probier es noch einmal!' : '') : paid ? `Jeder weitere Versuch kostet 1 🪙 · du hast ${run.gold} 🪙` : 'Erster Versuch kostenlos'}</p>
-      ${feedback ? `<p class="feedback">${feedback}</p>` : ''}
-      ${broke ? '<p class="feedback">Kein Gold für einen weiteren Versuch.</p>' : ''}
-      ${run.tutorial ? '' : '<div class="row"><button class="btn small" data-later>Heute nicht verschmelzen</button></div>'}`);
-    card.querySelectorAll('[data-g]').forEach((b) => { b.onclick = () => guess(b.dataset.g); });
-    const later = card.querySelector('[data-later]');
-    if (later) later.onclick = () => { closeModal(); showFusion(list, i + 1, done); };
-  };
-
-  const guess = (g) => {
-    if (tries > 0 && !run.tutorial) {
-      if (run.gold < 1) return;
-      run.gold -= 1;
-      bump('stat-gold');
-    }
-    tries++;
-    if (g === cd.artikel) {
-      run.lernen.richtig++;
-      run.items = run.items.filter((p) => p !== k);
-      t.id = cd.id;
-      const st = Math.max(k.stern || 1, t.stern || 1);
-      if (st > 1) t.stern = st;
-      selected = { src: 'bag', uid: t.uid };
-      render();
-      const card = openModal(`
-        <div class="big-emoji glowing" style="--glow:${cd.leuchten}">${iconHtml(td, 'ic big')}<em>${kd.emoji}</em></div>
-        <h2>${genusChip(cd.artikel)} ${cd.name}</h2>
-        <p>Richtig! ${tries > 1 ? '' : 'Gleich beim ersten Versuch. '}Das letzte Wort bestimmt den Artikel: ${fullName(td)} → ${fullName(cd)}.</p>
-        <div class="row"><button class="btn primary big" data-next>Weiter</button></div>`);
-      card.querySelector('[data-next]').onclick = () => { closeModal(); showFusion(list, i + 1, done); };
-      return;
-    }
-    run.lernen.falsch++;
-    wrong.add(g);
-    feedback = `Das letzte Wort bestimmt den Artikel: ${fullName(td)} → ${fullName(cd)}`;
-    save();
-    draw();
-  };
-
-  draw();
 }
 
 // ---------- Ziehen, Tippen, Drehen ----------
@@ -1139,6 +1081,7 @@ function drop(d) {
   if (d.ref.src === 'shop') { buy(d.ref.slot, t.area, spot); return; }
   Object.assign(placedOf(d.ref.uid), { area: t.area, ...spot });
   selected = { src: t.area, uid: d.ref.uid };
+  pruefe({ uid: d.ref.uid }); // Kristall neben Träger gelegt? → sofort Kompositum
   render();
 }
 

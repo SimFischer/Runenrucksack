@@ -102,7 +102,7 @@ export function checkStep(step, run, defs, recipes, ev = null) {
     case 'neben':
       ok = findFusions(bagItems(run), defs, recipes).some((f) => f.kraft.id === a.kraft && f.traeger.id === a.traeger);
       break;
-    case 'verschmelzen':
+    case 'verschmelzen': // das Kompositum entsteht sofort, sobald der Kristall richtig liegt
       ok = !!find(run, a.ergebnis, 'bag');
       break;
     case 'siegel': {

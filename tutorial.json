@@ -175,12 +175,12 @@
         "titel": "Kraft-Kristalle",
         "emoji": "🔥",
         "animation": "ziehen",
-        "text": "Leg einen Kristall links neben oder über einen Gegenstand. Am nächsten Morgen verschmelzen sie."
+        "text": "Leg einen Kristall links neben oder über einen Gegenstand. Sofort entsteht ein Kompositum."
       }
     },
     {
       "id": "verschmelzen",
-      "text": "Jetzt verschmelzen beide zum Feuerschwert! Im Wort steht „Schwert“ am Ende – darum bestimmt das Schwert den Artikel.",
+      "text": "Jetzt verbinden sich beide sofort zum Feuerschwert! Im Wort steht „Schwert“ am Ende – darum bestimmt das Schwert den Artikel.",
       "tipp": "Wie heißt es: der, die oder das Schwert?",
       "ziel": [
         "fenster"
@@ -189,12 +189,11 @@
         "typ": "verschmelzen",
         "ergebnis": "feuer+schwert"
       },
-      "hinweis": "Im Spiel passiert das sonst am nächsten Morgen.",
       "hilfe": {
         "titel": "Verschmelzen",
         "emoji": "✨",
         "animation": "pulsieren",
-        "text": "Feuer + Schwert = das Feuerschwert. Das letzte Wort bestimmt den Artikel."
+        "text": "Feuer + Schwert = das Feuerschwert – sofort, sobald der Kristall richtig liegt. Das letzte Wort bestimmt den Artikel."
       }
     },
     {

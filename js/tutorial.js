@@ -135,9 +135,7 @@ function next() {
   shown = !s.zeigenBei && !s.kampfPause;
   if (!s.kampfPause && !s.zeigenBei && s.aktion.typ !== 'abschluss') api.render();
 
-  if (s.aktion.typ === 'verschmelzen') {
-    api.runFusions(() => complete());
-  } else if (s.begegnung) {
+  if (s.begegnung) {
     runEncounter(() => { api.render(); emit('begegnungFertig'); }, api.render, s.begegnung);
   } else if (s.kampfPause) {
     // Kampf starten, nach einem Moment anhalten und erklären.
@@ -172,7 +170,7 @@ function handleEvent(ev) {
   const s = step();
   if (s.zeigenBei && ev.typ === s.zeigenBei) { shown = true; draw(); }
   if (ev.typ === 'render' && shown) layout();
-  if (['weiter', 'abschluss', 'verschmelzen'].includes(s.aktion.typ) || s.kampfPause) return;
+  if (['weiter', 'abschluss'].includes(s.aktion.typ) || s.kampfPause) return;
   const r = checkStep(s, G.run, G.DEFS, G.RECIPES, ev);
   if (r?.ok) { complete(); return; }
   if (r?.falsch && ev.typ === 'render') {

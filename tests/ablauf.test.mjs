@@ -109,7 +109,7 @@ test('Schicksalsrunen und Unterklassen wirken', async () => {
   const run = newRun(ITEMS, REGIONS);
   for (let d = 1; d < 6; d++) finishBattle(run, ITEMS, REGIONS, true, 'Ork');
   assert.equal(run.day, 6);
-  assert.deepEqual(run.queue, ['gebiet', 'unterklasse', 'begegnung', 'verschmelzen']);
+  assert.deepEqual(run.queue, ['gebiet', 'unterklasse', 'begegnung'], 'kein Verschmelzen am Morgen mehr');
 });
 
 test('Wortfeld-Taschen: +2 Felder, passende Items darin +20 %', async () => {

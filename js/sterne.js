@@ -1,9 +1,11 @@
-// Verbinden wie in Backpack Rush: Zwei gleiche Gegenstände (gleiche id, gleiche Sternstufe) werden SOFORT
-// zu einem der nächsten Stufe – beim Kaufen, beim Ablegen direkt auf ein gleiches Item und bei Belohnungen.
-// Das neue Item liegt dort, wo das schon vorhandene lag; gibt es dazu wieder ein gleiches, geht es weiter (Kette).
-// Vorher eine Grammatik-Frage: Nomen → Mehrzahl, Verben → Präteritum, Adjektiv-Runen → Steigerung.
+// Verbinden wie in Backpack Rush – alles passiert SOFORT:
+// - Zwei gleiche Gegenstände (gleiche id, gleiche Sternstufe) werden zu einem der nächsten Stufe – beim Kaufen,
+//   beim Ablegen direkt auf ein gleiches Item und bei Belohnungen. Das neue Item liegt dort, wo das schon
+//   vorhandene lag; gibt es dazu wieder ein gleiches, geht es weiter (Kette).
+// - Ein Kraft-Kristall direkt links neben oder über einem Träger wird mit ihm zum Kompositum.
+// Vorher eine Grammatik-Frage: Kompositum → Artikel, Nomen → Mehrzahl, Verben → Präteritum, Runen → Steigerung.
 import { MAX_STERN, sternOf, bagGrid, STORE_GRID, findSpot, shuffle } from './logic.js';
-import { isRune, runeBase, nextLevelId, pluralOf } from './grammar.js';
+import { isRune, runeBase, nextLevelId, pluralOf, findFusions } from './grammar.js';
 
 export { pluralOf };
 
@@ -76,14 +78,28 @@ export function mergePair(run, neu, alt, defs) {
   run.items = run.items.filter((p) => p.uid !== neu.uid && p.uid !== alt.uid);
   const p = { uid: run.nextUid++, id: isRune(d) ? nextLevelId(d) : alt.id, area: alt.area, x: alt.x, y: alt.y, rot: alt.rot || 0 };
   if (!isRune(d)) p.stern = sternOf(alt) + 1;
+  const ks = Math.max(alt.kraftStern || 1, neu.kraftStern || 1); // Komposita: der stärkere Kristall bleibt
+  if (ks > 1) p.kraftStern = ks;
   const fluch = alt.fluch || neu.fluch; // ein Fluch verschwindet nicht durch Verbinden
   if (fluch) p.fluch = fluch;
   run.items.push(p);
   return p;
 }
 
+// Kristall + Träger → Kompositum. Es behält Platz und Sternstufe des Trägers; ein höherstufiger Kristall
+// gibt eine stärkere Kraftwirkung (kraftStern).
+export function applyFusion(run, a) {
+  run.items = run.items.filter((p) => p.uid !== a.kraft.uid);
+  const t = a.traeger;
+  t.id = a.id;
+  const ks = sternOf(a.kraft);
+  if (ks > 1) t.kraftStern = Math.max(ks, t.kraftStern || 1);
+  return t;
+}
+
 // Die nächste Verbindung für eine Prüfung { uid, paar, mit }:
 // paar = nach einem gleichen Item suchen (bei neuen Items), mit = genau dieses Item (Ablegen auf ein gleiches).
+// Danach: Liegt das Item als Kristall links neben / über einem Träger (oder umgekehrt)? → Kompositum.
 export function findeVerbindung(run, defs, recipes, check) {
   const p = run.items.find((q) => q.uid === check.uid);
   if (!p) return null;
@@ -93,11 +109,16 @@ export function findeVerbindung(run, defs, recipes, check) {
       : partnerOf(run.items, defs, p);
     if (alt) return { typ: 'paar', neu: p, alt };
   }
+  if (p.area === 'bag' && recipes) {
+    const f = findFusions(run.items.filter((q) => q.area === 'bag'), defs, recipes)
+      .find((x) => x.kraft.uid === p.uid || x.traeger.uid === p.uid);
+    if (f) return { typ: 'kompositum', kraft: f.kraft, traeger: f.traeger, id: f.id };
+  }
   return null;
 }
 
 export function fuehreAus(run, a, defs) {
-  return mergePair(run, a.neu, a.alt, defs);
+  return a.typ === 'kompositum' ? applyFusion(run, a) : mergePair(run, a.neu, a.alt, defs);
 }
 
 const hasNewUmlaut = (sg, pl) => [...'äöüÄÖÜ'].some((u) => pl.includes(u) && !sg.includes(u));
@@ -106,6 +127,18 @@ const blank = '<span class="blank">___</span>';
 // Die Frage vor dem Verbinden: { art, wort, titel, prompt, options, correct, explain, kurz } –
 // oder null, wenn keine Frage nötig ist (Superlativ → Krone).
 export function frageFuer(a, defs, rng = Math.random) {
+  if (a.typ === 'kompositum') {
+    const kd = defs[a.kraft.id], td = defs[a.traeger.id], cd = defs[a.id];
+    return {
+      art: 'artikel', wort: cd.name, genus: true,
+      titel: `${kd.name} + ${td.name}`,
+      prompt: `${blank} ${cd.name}`,
+      options: ['der', 'die', 'das'],
+      correct: cd.artikel,
+      explain: `Das letzte Wort bestimmt den Artikel: ${td.artikel} ${td.name} → ${cd.artikel} ${cd.name}.`,
+      kurz: `${cd.artikel} ${cd.name} ✓`,
+    };
+  }
   const d = defs[a.alt.id];
   if (isRune(d)) {
     const base = defs[runeBase(d)], to = defs[nextLevelId(d)], st = base.steigerung;
@@ -161,12 +194,15 @@ export function verbindeAlles(run, defs, recipes, checks, antwort = () => 'richt
     const a = findeVerbindung(run, defs, recipes, c);
     if (!a) continue;
     if (antwort(a, frageFuer(a, defs)) !== 'richtig') {
-      if (a.neu.area === 'neu' && !placeWaiting(run, defs, a.neu)) run.items = run.items.filter((p) => p !== a.neu);
+      if (a.typ === 'paar') {
+        if (a.neu.area === 'neu' && !placeWaiting(run, defs, a.neu)) run.items = run.items.filter((p) => p !== a.neu);
+        else queue.unshift({ uid: a.neu.uid }); // nicht verbunden – vielleicht liegt es neben einem Träger
+      }
       continue;
     }
     const p = fuehreAus(run, a, defs);
     log.push({ typ: a.typ, id: p.id, stern: sternOf(p), uid: p.uid });
-    queue.unshift({ uid: p.uid, paar: true }); // Kette: gibt es wieder ein gleiches?
+    queue.unshift({ uid: p.uid, paar: true }); // Kette: gibt es wieder ein gleiches (oder einen Träger)?
   }
   return log;
 }

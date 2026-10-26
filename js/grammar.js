@@ -1,6 +1,6 @@
 // Grammatik als Spielregel: Komposita, Artikel-Siegel, Adjektiv-Runen.
 // Grundsatz: Eine grammatisch falsche Kombination ist nie stärker als eine richtige –
-// falsch gelegte Siegel und Runen wirken gar nicht, falsche Artikel verschmelzen nicht.
+// falsch gelegte Siegel und Runen wirken gar nicht, mit falschem Artikel entsteht kein Kompositum.
 import { sizeOf, STERN_FAKTOR } from './logic.js';
 
 export const GENUS = {
@@ -39,7 +39,15 @@ export function compoundId(kraftId, traegerId) {
 const roundUp = (key, v) => (DECIMAL_KEYS.has(key) ? Math.ceil(v * 10 - 1e-9) / 10 : Math.ceil(v - 1e-9));
 
 // Werte eines Gegenstands mit Sternstufe (★★ 2,2-fach, ★★★ 5-fach, ★★★★ 11-fach).
-export function starDef(def, stern = 1) {
+// kraftStern: Ein Kompositum aus einem höherstufigen Kristall hat einen stärkeren Kraft-Anteil.
+export function starDef(def, stern = 1, kraftStern = 1) {
+  if (kraftStern > 1 && def.kraftWerte) {
+    const kf = STERN_FAKTOR[kraftStern];
+    const k = { ...def, kraftStern };
+    for (const [key, v] of Object.entries(def.kraftWerte)) k[key] = roundUp(key, (k[key] || 0) + v * (kf - 1));
+    if (def.aura) k.aura = Object.fromEntries(Object.entries(def.aura).map(([key, v]) => [key, Math.round(v * kf)]));
+    def = k;
+  }
   if (!stern || stern === 1) return def;
   const f = STERN_FAKTOR[stern];
   const out = { ...def, stern, preis: Math.round(def.preis * f) };
@@ -83,6 +91,9 @@ export function buildCompounds(defs, recipes) {
         for (const key of ['tempo', 'glueck']) if (kd[key]) def.aura[key] = kd[key];
       }
       for (const [key, v] of Object.entries(kraft.wirkung)) def[key] = roundUp(key, (def[key] || 0) + v);
+      // Was der Kristall beisteuert (wächst mit seiner Sternstufe, siehe starDef)
+      def.kraftWerte = {};
+      for (const key of EFFECT_KEYS) if ((def[key] || 0) > (td[key] || 0)) def.kraftWerte[key] = def[key] - (td[key] || 0);
       out.push(def);
     }
   }
@@ -274,7 +285,7 @@ export function analyze(placed, defs, opts = {}) {
   const runeMult = opts.runeMult ?? 1;
   const map = cellMap(placed, defs);
   const info = new Map();
-  for (const p of placed) info.set(p.uid, { base: starDef(defs[p.id], p.stern), siegel: [], runen: [], ziele: [], ziel: null });
+  for (const p of placed) info.set(p.uid, { base: starDef(defs[p.id], p.stern, p.kraftStern), siegel: [], runen: [], ziele: [], ziel: null });
 
   for (const p of placed) {
     const d = defs[p.id];

@@ -243,7 +243,7 @@ export function finishBattle(run, items, regions, won, enemyName, rng = Math.ran
   if (isRegionStart(run.day, regions)) run.queue.push('gebiet');
   // Ankunft im zweiten Gebiet: Unterklasse wählen
   if (regions[1] && run.day === regions[1].tage[0]) run.queue.push('unterklasse');
-  run.queue.push('begegnung', 'verschmelzen');
+  run.queue.push('begegnung');
 }
 
 // ---------- Gegner ----------
