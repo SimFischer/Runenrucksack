@@ -82,9 +82,11 @@ const freeNextTo = async (sel) => {
 
 let ok = true;
 const seen = [];
+// Fenwicks Text abwarten (bis 4 s – beim ersten Besuch online lädt der Start länger)
 const expect = async (part) => {
   await sleep(500);
-  const t = await bubble();
+  let t = await bubble();
+  for (let i = 0; i < 35 && !t.includes(part); i++) { await sleep(100); t = await bubble(); }
   seen.push(t.slice(0, 40));
   if (!t.includes(part)) { ok = false; console.log(`✗ erwartet „${part}“, gesehen „${t}“`); } else console.log(`✓ ${part}`);
 };
@@ -109,6 +111,9 @@ await send('Runtime.enable');
 await send('Emulation.setDeviceMetricsOverride', { width: W, height: H, deviceScaleFactor: 1, mobile: true });
 await send('Emulation.setTouchEmulationEnabled', { enabled: true, maxTouchPoints: 5 });
 await send('Page.navigate', { url: URL_ }); await sleep(1500);
+// Spiel bereit? (Startknopf hat seinen Klick-Handler – online laden Daten und Bilder länger)
+const bereit = async () => { for (let i = 0; i < 100; i++) { if (await ev("typeof document.getElementById('btn-first')?.onclick === 'function'")) return; await sleep(100); } };
+await bereit();
 console.log(`Tutorial-Test bei ${W}×${H} auf ${URL_}`);
 
 try {
@@ -210,7 +215,7 @@ try {
   check(!run.tutorial && run.gold === 12 && run.shop.filter(Boolean).length >= 5, 'normaler Lauf ohne Tutorial-Reste');
 
   // Überspringen
-  await send('Page.reload'); await sleep(1500);
+  await send('Page.reload'); await sleep(1500); await bereit();
   check(await ev('document.getElementById("btn-known").classList.contains("primary")'), '„Ich kenne das schon“ ist jetzt hervorgehoben');
   await tap('#btn-first'); await tap('#tut-skip'); await tap('#tut-confirm [data-skip]');
   check(await ev('document.getElementById("tut-layer").hidden && !document.getElementById("start-menu").hidden'), 'Überspringen führt ins Startmenü');
