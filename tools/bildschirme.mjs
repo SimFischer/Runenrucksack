@@ -73,7 +73,9 @@ const PROFIL = { v: 1, xp: 420, buch: ['komp:feuer+axt', 'stufe:axt:2'], erfolge
 // Lauf starten (Figur Eadrun) bis zum Spielfeld
 const LAUF = `
   await __klick('#btn-known'); await __klick('#btn-new', 500);
-  const karte = [...document.querySelectorAll('.hero-card, .figur-karte')].find((k) => k.textContent.includes('Eadrun'));
+  // Figurenwahl abwarten (online laden die Bilder langsamer)
+  let karte = null;
+  for (let t = 0; t < 30 && !karte; t++) { karte = [...document.querySelectorAll('.hero-card, .figur-karte')].find((k) => k.textContent.includes('Eadrun')); if (!karte) await __s(100); }
   await __klick(karte, 500);
   for (let k = 0; k < 2; k++) {
     const los = [...document.querySelectorAll('button')].find((b) => b.offsetParent && /aufbrechen/i.test(b.textContent));
