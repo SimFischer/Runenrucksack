@@ -1,7 +1,8 @@
 // Bildschirmfotos und Layout-Prüfung in einem echten Browser (headless Chrome oder Edge).
 // Für jede Größe (iPad quer) werden die wichtigsten Bildschirme aufgerufen, fotografiert und geprüft:
 // - kein seitliches Scrollen (scrollWidth = innerWidth), auf Start, Figurenwahl, Spielfeld und Kampf auch kein senkrechtes;
-// - keine Emojis im sichtbaren Text (Ausnahme: Ersatz für fehlende Item-Bilder, Klasse .emoji-ersatz).
+// - keine Emojis im sichtbaren Text (Ausnahme: Ersatz für fehlende Item-Bilder, Klasse .emoji-ersatz);
+// - wo angegeben (frei): Diese Elemente überlappen sich nicht (getBoundingClientRect).
 //
 //   node tools/serve.mjs                                        (in einem zweiten Fenster)
 //   node tools/bildschirme.mjs [url] [ordner] [größen]
@@ -107,8 +108,19 @@ const BILDSCHIRME = [
   { name: 'figur-detail', profil: PROFIL, ohneScroll: true, schritte: `await __klick('#btn-known'); await __klick('#btn-new', 600);
       const k = [...document.querySelectorAll('.hero-card, .figur-karte')].find((x) => x.textContent.includes('Borga')); await __klick(k, 600);` },
   { name: 'spielfeld', profil: PROFIL, ohneScroll: true, schritte: LAUF },
-  { name: 'kampf', profil: PROFIL, ohneScroll: true, schritte: `${KAMPF(true)} await __s(300);` },
-  { name: 'kampf-laeuft', profil: PROFIL, ohneScroll: true, schritte: `${KAMPF(true)} await __klick('#btn-start-battle', 2600);` },
+  { name: 'kampf', profil: PROFIL, ohneScroll: true, frei: ['#btn-start-battle', '#armor-word', '#fighter-player .f-figur', '#fighter-enemy .f-figur', '#fighter-player .f-rucksack', '#fighter-enemy .f-rucksack', '#fighter-player .f-band', '#fighter-enemy .f-band', '#battle .vs'], schritte: `${KAMPF(true)} await __s(300);` },
+  { name: 'kampf-gross', profil: PROFIL, ohneScroll: true, frei: ['#btn-start-battle', '#armor-word', '#fighter-player .f-figur', '#fighter-enemy .f-figur', '#fighter-player .f-rucksack', '#fighter-enemy .f-rucksack', '#fighter-player .f-band', '#fighter-enemy .f-band', '#battle .vs'], schritte: `${LAUF}
+      // größter Rucksack: 5×4 und beide Taschen
+      const L = await import(new URL('js/logic.js', location.href).href);
+      while (L.growBag(__G.run)) {}
+      for (const t of ['gartentasche', 'satteltasche']) L.attachTasche(__G.run, __G.DEFS[t]);
+      __G.run.items = [
+        { uid: 960, id: 'feuer+schwert', area: 'bag', x: 0, y: 0, rot: 0, stern: 2 }, { uid: 961, id: 'schild', area: 'bag', x: 1, y: 0, rot: 0 },
+        { uid: 962, id: 'apfel', area: 'bag', x: 5, y: 0, rot: 0 }, { uid: 963, id: 'heiltrank', area: 'bag', x: 4, y: 3, rot: 0 },
+        { uid: 964, id: 'bogen', area: 'bag', x: 0, y: 2, rot: 1 }];
+      await __klick('#btn-fight', 800);
+      const ok = document.querySelector('#modal:not([hidden]) [data-ok]'); if (ok) { ok.click(); await __s(400); }` },
+  { name: 'kampf-laeuft', profil: PROFIL, ohneScroll: true, frei: ['#btn-start-battle', '#armor-word', '#fighter-player .f-figur', '#fighter-enemy .f-figur', '#fighter-player .f-rucksack', '#fighter-enemy .f-rucksack', '#fighter-player .f-band', '#fighter-enemy .f-band', '#battle .vs'], schritte: `${KAMPF(true)} await __klick('#btn-start-battle', 2600);` },
   { name: 'sieg', profil: PROFIL, ohneScroll: true, schritte: `${KAMPF(true)} await __klick('#btn-start-battle', 200); await __klick('#btn-skip', 3200);` },
   { name: 'niederlage', profil: PROFIL, ohneScroll: true, schritte: `${KAMPF(false)} await __klick('#btn-start-battle', 200); await __klick('#btn-skip', 3200);` },
   { name: 'buch', profil: PROFIL, ohneScroll: false, schritte: `await __klick('#btn-known'); await __klick('#btn-buch', 500);` },
@@ -138,7 +150,7 @@ const BILDSCHIRME = [
   { name: 'tutorial', profil: null, ohneScroll: true, schritte: `await __klick('#btn-first', 1200); const n = document.querySelector('#tut-next'); if (n && !n.hidden) { n.click(); await __s(900); }` },
 ];
 
-const PRUEFEN = (ohneScroll) => `
+const PRUEFEN = (ohneScroll, frei = []) => `
   const emojiRe = /\\p{Extended_Pictographic}/u;
   const emojis = [];
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
@@ -153,6 +165,16 @@ const PRUEFEN = (ohneScroll) => `
   return {
     breit: de.scrollWidth - innerWidth, hoch: ${ohneScroll} ? Math.max(de.scrollHeight, document.body.scrollHeight) - innerHeight : 0,
     emojis: [...new Set(emojis)].slice(0, 12),
+    ueberlappt: (() => {
+      const teile = ${JSON.stringify(frei)}.flatMap((sel) => [...document.querySelectorAll(sel)].filter((e) => e.offsetParent || e.getClientRects().length).map((e, k) => ({ name: sel + (k ? '#' + k : ''), r: e.getBoundingClientRect() })));
+      const out = [];
+      for (let a = 0; a < teile.length; a++) for (let b = a + 1; b < teile.length; b++) {
+        const p = teile[a].r, q = teile[b].r;
+        const x = Math.min(p.right, q.right) - Math.max(p.left, q.left), y = Math.min(p.bottom, q.bottom) - Math.max(p.top, q.top);
+        if (x > 2 && y > 2) out.push(teile[a].name + ' ∩ ' + teile[b].name);
+      }
+      return out;
+    })(),
   };`;
 
 const ergebnisse = [];
@@ -168,12 +190,12 @@ for (const [w, h] of GROESSEN) {
       await laden(b.profil);
       await ev(b.schritte + ' return 1;');
       await sleep(500);
-      r = await ev(PRUEFEN(b.ohneScroll));
+      r = await ev(PRUEFEN(b.ohneScroll, b.frei));
     } catch (e) { r = { fehler: String(e.message).slice(0, 200) }; }
-    const ok = !r.fehler && r.breit <= 0 && r.hoch <= 0 && !r.emojis.length;
+    const ok = !r.fehler && r.breit <= 0 && r.hoch <= 0 && !r.emojis.length && !r.ueberlappt?.length;
     if (!ok) fehler++;
     ergebnisse.push({ groesse: `${w}x${h}`, bildschirm: b.name, ...r, ok });
-    console.log(`${ok ? '✓' : '✗'} ${w}x${h} ${b.name}${r.fehler ? ' – ' + r.fehler : ''}${r.breit > 0 ? ` – ${r.breit}px zu breit` : ''}${r.hoch > 0 ? ` – ${r.hoch}px zu hoch` : ''}${r.emojis?.length ? ' – Emojis: ' + r.emojis.join(' | ') : ''}`);
+    console.log(`${ok ? '✓' : '✗'} ${w}x${h} ${b.name}${r.fehler ? ' – ' + r.fehler : ''}${r.breit > 0 ? ` – ${r.breit}px zu breit` : ''}${r.hoch > 0 ? ` – ${r.hoch}px zu hoch` : ''}${r.emojis?.length ? ' – Emojis: ' + r.emojis.join(' | ') : ''}${r.ueberlappt?.length ? ' – überlappt: ' + r.ueberlappt.join(', ') : ''}`);
     if (ORDNER) {
       const shot = await send('Page.captureScreenshot', { format: 'jpeg', quality: 72 });
       writeFileSync(join(ORDNER, `${b.name}-${w}x${h}.jpg`), Buffer.from(shot.result.data, 'base64'));

@@ -19,11 +19,19 @@ export const battleControl = {
   resume: () => { paused = false; },
 };
 
-// Feldgröße der Rucksäcke: Pro Seite stehen Figur und Rucksack nebeneinander.
+// Feste Bereiche der Kampfszene (siehe gestaltung.css): Mitte 150 px für VS und „Los!“, je Seite eine Spalte
+// für die Figur und eine für den Rucksack. Der Rucksack passt immer in seinen Bereich: Bei mehr Feldern
+// (bis 5×4 und Taschen) werden die Felder kleiner, statt dass der Rucksack wächst.
+export const KAMPF_MITTE = 150, KAMPF_OBEN = 150, LEDER = 26;
+export const figurBreite = (w) => Math.round(Math.min(260, Math.max(140, w * 0.16)));
+export function kampfZelle(w, h, cols, rows) {
+  const seite = (w - KAMPF_MITTE - 2 * 10 - 28) / 2;
+  const breit = seite - figurBreite(w) - 2 * LEDER - 12;
+  const hoch = h - 64 - KAMPF_OBEN - 2 * LEDER - 24;
+  return Math.max(22, Math.min(100, Math.floor(Math.min(breit / cols, hoch / rows))));
+}
 function cellSize(cols, rows) {
-  const w = window.innerWidth, h = window.innerHeight;
-  const perSide = (w - 150) / 2 - Math.min(230, w * 0.17) - 70;
-  return Math.max(36, Math.min(110, Math.floor(Math.min(perSide / cols, (h - 300) / rows))));
+  return kampfZelle(window.innerWidth, window.innerHeight, cols, rows);
 }
 
 // Startet die Nacht. done(won, enemyName) wird nach dem Ergebnisfenster aufgerufen.
@@ -54,7 +62,8 @@ export function startNight(done) {
 
   const playerGrid = gridOf('bag');
   const enemyGrid = rectGrid(CFG.bagCols, CFG.bagRows);
-  bcell = cellSize(Math.max(playerGrid.cols, 4), Math.max(playerGrid.rows, 3));
+  // beide Rucksäcke gleich groß: nach dem größeren
+  bcell = cellSize(Math.max(playerGrid.cols, enemyGrid.cols, 4), Math.max(playerGrid.rows, enemyGrid.rows, 3));
 
   $('battle-title').innerHTML = `${sym('nacht')} ${reg.name} · Nacht ${run.day}${enemy.boss ? ' · Anführer!' : ''}`;
   $('battle-gold').innerHTML = `${sym('gold')}${run.gold}`;
@@ -66,6 +75,8 @@ export function startNight(done) {
   updateBattleUi();
   setSpeed(speed);
   $('btn-start-battle').hidden = false;
+  $('btn-start-battle').innerHTML = `${sym('kampf')} Los!`;
+  document.documentElement.style.setProperty('--figur-b', figurBreite(window.innerWidth) + 'px');
   $('btn-start-battle').onclick = beginBattle;
   $('btn-skip').onclick = skipBattle;
   $('btn-skip').disabled = false;
@@ -82,8 +93,7 @@ function buildFighter(side, bildHtml, name, sub, placed, grid, info) {
     <div class="f-oben">
       <div class="f-band"><span class="f-name">${name}</span></div>
       <div class="hpbar"><div class="fill"></div><div class="text"></div></div>
-      <div class="f-status"></div>
-      <div class="f-armor">${sub}</div>
+      <div class="f-zeile"><div class="f-status"></div><div class="f-armor">${sub}</div></div>
     </div>
     <div class="f-figur">${bildHtml}</div>
     <div class="f-rucksack"><div class="grid"></div></div>`;
