@@ -72,14 +72,17 @@ Man trifft eine Figur am Wegesrand und wählt aus zwei bis drei Boni. Jede Begeg
 ### Tag: Laden und Rucksack
 
 - Gold pro Tag, steigend mit den Tagen; die Goldanzeige ist groß und zählt beim Ausgeben und Bekommen mit.
-- Laden mit 5 Items; neu würfeln kostet 1 Gold, Items lassen sich reservieren. Ein leuchtendes Abzeichen „1/2“ mit „= sofort ★★“ zeigt Items, von denen man schon eins besitzt; solche Items erscheinen etwas häufiger. Ein Ketten-Symbol zeigt Items, die mit etwas im Rucksack ein Kompositum ergeben („Mit deiner Axt wird daraus sofort: die Feueraxt“).
+- Laden mit 5 Items; Items lassen sich reservieren. **Neu würfeln:** die ersten 3 Würfe am Tag kosten 1 Gold, jeder weitere 2 Gold; der Knopf zeigt immer den aktuellen Preis. Ein leuchtendes Abzeichen „1/2“ mit „= sofort ★★“ zeigt Items, von denen man schon eins besitzt; solche Items erscheinen etwas häufiger. Ein Ketten-Symbol zeigt Items, die mit etwas im Rucksack ein Kompositum ergeben („Mit deiner Axt wird daraus sofort: die Feueraxt“).
+- **Händler-Vertrauen** (wie in Oaken Tower): 5 Stufen, jeder Lauf beginnt auf Stufe 1. Für 6, 9, 12 und 15 Gold steigt das Vertrauen, höchstens eine Stufe am Tag. Jede Stufe macht seltene, epische und legendäre Gegenstände häufiger (Stufe 4: legendäre schon früh möglich); der jetzige Laden bleibt, Neu-Würfeln und der nächste Tag nutzen die neue Stufe. Laternen am Stand zeigen die Stufe, eine Tafel erklärt die aktuelle und die nächste Stufe in Worten.
+- **Schmied:** Ein Gegenstand aus Rucksack oder Lager auf den Amboss gezogen wird für Gold eine Sternstufe stärker – ohne zweites Exemplar. Teuer (3 × Grundpreis × Zielstufe), einmal am Tag, höchstens bis ★★★; Siegel und Taschen nie. Vorher kommt die passende Aufgabe wie beim Verbinden; Abbrechen kostet nichts.
+- Ziel der drei Ausgaben: Gold bleibt bis zum Ende knapp und wertvoll, auch wenn der Rucksack ab etwa Tag 4 voll ist.
 - Items kaufen, verkaufen, verschieben, drehen. Alles Verbinden passiert sofort, wie in Backpack Rush: zwei gleiche Items werden zur nächsten Sternstufe, ein Kristall links neben oder über einem Träger wird zum Kompositum (siehe „Kombinieren“).
 
 ### Nacht: Kampf
 
 - Der Rucksack kämpft automatisch gegen einen Ork-Rucksack; zuschauen, Kombos feiern.
 - Vorher optional: einen Fehler auf der Gegnerrüstung korrigieren (ein Versuch), dann startet der Ork mit 15 % weniger Leben.
-- Ab Tag 3 bringen Orks auch Items mit ★★ mit, ab Tag 6 auch mit ★★★; der Boss an Tag 10 hat immer ein legendäres ★★★★-Item.
+- Ab Tag 3 bringen Orks auch Items mit ★★ mit, ab Tag 6 auch mit ★★★; der Boss an Tag 10 hat immer ein legendäres ★★★★-Item. Orks kaufen intern bei einem Händler, dem sie mit den Tagen mehr vertrauen (etwa so wie ein Kind im Schnitt).
 - Sieg = Trophäe, Niederlage = 1 Herz weniger.
 
 ### Ende eines Laufs
@@ -94,6 +97,7 @@ Jede Wortart ist eine Item-Sorte mit eigener Form und Rolle, und die Stern-Felde
 
 - Raster, anfangs etwa 4×3 Felder; Items lassen sich verschieben und drehen.
 - Daneben ein **Lager**: Items dort sind gesammelt, aber wirkungslos.
+- **Sternstufen** entstehen durch Verbinden zweier gleicher Items – oder teuer beim **Schmied** (bis ★★★, einmal am Tag). ★★★★ (legendär) gibt es nur durch Verbinden.
 - **Taschen** erweitern das Raster und sind Wortfelder: Die Waldtasche stärkt Wörter aus dem Wortfeld Wald, die Schmiedetasche Wörter rund ums Schmieden.
 
 ### Item-Sorten

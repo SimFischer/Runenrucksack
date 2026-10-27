@@ -53,7 +53,7 @@ Nach Änderungen: `node --test` prüft, dass jeder Schritt erreichbar ist und h�
 3. **Zehn Tage, zwei Gebiete:** Kleinwurzel (Tag 1–5, Boss: Ork-Plünderer) und Hrossmark (Tag 6–10, Boss: Wolfsreiter-Häuptling). Beim Gebietswechsel gibt es einen Übergangsbildschirm, in Hrossmark wählt man eine **Unterklasse**.
 4. **Jeder Tag:**
    - **Morgen:** Begegnung am Wegesrand (drei zur Wahl).
-   - **Tag:** Laden mit 5 Items, Neu würfeln für 1 Gold, Reservieren, Verkaufen, Verschieben, Drehen. Alles Verbinden passiert sofort: zwei gleiche werden zur nächsten Sternstufe, ein Kristall neben einem Träger zum Kompositum. Das Abzeichen „1/2“ mit „= sofort ★★“ zeigt Items, von denen man schon eins hat.
+   - **Tag:** Laden mit 5 Items, Neu würfeln (3 Würfe am Tag zu 1 Gold, danach 2 Gold), Reservieren, Verkaufen, Verschieben, Drehen. **Händler-Vertrauen** (Laternen am Laden, 5 Stufen, 6/9/12/15 Gold, eine Stufe pro Tag) macht seltenere Gegenstände häufiger. **Schmied** (Amboss am Laden): einen Gegenstand für 3 × Grundpreis × Zielstufe um eine Sternstufe aufwerten, einmal am Tag, bis ★★★, nach einer Aufgabe; Abbrechen kostet nichts. Alles Verbinden passiert sofort: zwei gleiche werden zur nächsten Sternstufe, ein Kristall neben einem Träger zum Kompositum. Das Abzeichen „1/2“ mit „= sofort ★★“ zeigt Items, von denen man schon eins hat.
    - **Nacht:** Automatischer Kampf. Vorher kann man den Fehler auf der Ork-Rüstung verbessern (ein Versuch, richtig: Ork startet mit 15 % weniger Leben).
 5. **Ende:** nach dem 10. Kampf („Reise geschafft“, mit Sternen nach Siegen) oder wenn alle 5 Herzen weg sind. Danach: Lernbericht, Erfahrung und Rang, neue Freischaltungen und Erfolge, der Heldencode (6 Zeichen) zum Abschreiben ins Heft.
 
@@ -123,6 +123,8 @@ Die Aufgaben entstehen aus `wortschatz.json` (508 Nomen, 137 Verben, 93 Adjektiv
 - **Prüfliste für Lehrkräfte:** `node tools/pruefliste.mjs` erzeugt `wortschatz-pruefliste.html` (sortierbar, mit Häkchen-Spalte, Bedeutungsgruppen und allen Sätzen, unsichere Einträge und Sätze markiert).
 
 ## Inhalte ändern (ohne Programmieren)
+
+**Werte für Gold und Laden** stehen zentral in `js/logic.js`: `income` (Gold pro Tag), `WUERFEL` (Würfelpreise), `HAENDLER` (Kosten, Gewichte und Texte der Vertrauens-Stufen), `SCHMIED` (Faktor, höchste Zielstufe), `GEGNER_HAENDLER_PRO_TAG` (Händler-Stufe der Gegner). `node --test tests/balance.test.mjs` zeigt danach pro Tag Siegquote, Gold am Tagesende, Händler-Stufe, Schmied-Nutzung und Würfe.
 
 Alle Inhalte stehen in JSON-Dateien. Jede Datei hat oben ein Feld `_hinweis`, das ihre Felder erklärt. Nach dem Ändern `CACHE` in `sw.js` um eins erhöhen, damit installierte Apps die neue Version laden.
 
