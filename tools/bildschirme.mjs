@@ -72,8 +72,11 @@ const LAUF = `
   await __klick('#btn-known'); await __klick('#btn-new', 500);
   const karte = [...document.querySelectorAll('.hero-card, .figur-karte')].find((k) => k.textContent.includes('Eadrun'));
   await __klick(karte, 500);
-  const los = [...document.querySelectorAll('button')].find((b) => b.offsetParent && /aufbrechen/i.test(b.textContent));
-  if (los) { los.click(); await __s(700); }
+  for (let k = 0; k < 2; k++) {
+    const los = [...document.querySelectorAll('button')].find((b) => b.offsetParent && /aufbrechen/i.test(b.textContent));
+    if (los) { los.click(); await __s(700); }
+  }
+  const offen = document.querySelector('#aufgabe [data-nein]'); if (offen) { offen.click(); await __s(400); }
   const go = [...document.querySelectorAll('button')].find((b) => b.offsetParent && /Los geht/.test(b.textContent));
   if (go) { go.click(); await __s(600); }
   const G = __G;

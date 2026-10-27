@@ -203,3 +203,50 @@ h1, h2, h3, .titel { font-family: var(--titel); font-weight: 700; letter-spacing
   background: radial-gradient(circle, rgba(255, 220, 120, .65), rgba(255, 180, 60, .15) 70%); box-shadow: 0 0 18px var(--gold), inset 0 0 8px #fff3c4; }
 .start-rang small { color: #f6e4bb; opacity: 1; }
 .start-rang b { font-family: var(--titel); color: var(--gold-hell); }
+
+/* ---------- Figurenwahl ---------- */
+#heroes { padding: 0; }
+#heroes .heroes-wrap { position: relative; flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center;
+  padding: max(14px, env(safe-area-inset-top)) 20px max(14px, env(safe-area-inset-bottom)); gap: 10px; max-width: none; }
+.figuren-titel { font-size: clamp(36px, 5vw, 56px); margin: 0; }
+.figur-reihe { flex: 1; min-height: 0; width: 100%; display: flex; gap: clamp(8px, 1.4vw, 18px); justify-content: center; align-items: stretch; padding-bottom: 6px; }
+.figur-karte {
+  flex: 1 1 0; max-width: 240px; min-width: 0; display: flex; flex-direction: column; align-items: center; justify-content: flex-end;
+  padding: 10px 8px 14px; gap: 4px; cursor: pointer; color: var(--pergament);
+  background: linear-gradient(180deg, rgba(34, 21, 13, .15), rgba(34, 21, 13, .82) 70%);
+  border: 3px solid rgba(232, 178, 58, .55); border-radius: 18px; box-shadow: 0 6px 0 rgba(0, 0, 0, .4);
+  transition: transform .15s, border-color .15s;
+}
+.figur-karte:active { transform: translateY(3px); }
+.figur-karte.gewaehlt { border-color: var(--gold-hell); box-shadow: 0 0 0 3px var(--gold), 0 0 26px rgba(255, 200, 80, .6), 0 6px 0 rgba(0, 0, 0, .4); }
+.figur-bild { position: relative; flex: 1; min-height: 0; width: 100%; display: flex; align-items: flex-end; justify-content: center; }
+.figur-bild img { max-width: 100%; max-height: 100%; object-fit: contain; filter: drop-shadow(0 8px 10px rgba(0, 0, 0, .55)); }
+.figur-karte.gesperrt .figur-bild img, .figur-detail-bild.gesperrt img { filter: brightness(0) opacity(.6) drop-shadow(0 0 2px rgba(255, 220, 160, .35)); }
+.figur-schloss { position: absolute; top: 38%; left: 50%; transform: translate(-50%, -50%); }
+.figur-schloss .sym { height: 64px; }
+.figur-name { font-family: var(--titel); font-weight: 900; font-size: clamp(20px, 2.2vw, 28px); color: #ffe9b8; text-shadow: 0 2px 0 #2a1407, 0 0 6px #000; }
+.figur-rolle { font-size: 16px; font-weight: 700; color: #f1dcae; text-align: center; line-height: 1.25; text-shadow: 0 1px 2px #000; }
+.figur-karte.gesperrt .figur-rolle { font-size: 14px; font-weight: 400; }
+.figur-detail {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); z-index: 5;
+  width: min(900px, calc(100vw - 40px)); max-height: calc(var(--hoehe) - 40px);
+  display: flex; gap: 22px; align-items: center; animation: einblenden .25s ease-out;
+}
+.figur-detail-bild { flex: 0 0 34%; display: flex; justify-content: center; }
+.figur-detail-bild img { max-height: min(56vh, 420px); max-width: 100%; object-fit: contain; filter: drop-shadow(0 8px 10px rgba(0, 0, 0, .45)); }
+.figur-detail-text { flex: 1; display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
+.figur-detail-text h2 { font-size: 30px; margin: 0; }
+.figur-herkunft { margin: 0; color: var(--tinte-hell); font-weight: 700; }
+.figur-faehigkeit { margin: 0; font-size: 20px; line-height: 1.4; }
+.figur-start { display: flex; gap: 12px; flex-wrap: wrap; }
+.figur-start span { display: flex; flex-direction: column; align-items: center; gap: 2px; background: rgba(120, 80, 30, .12); border: 2px solid rgba(120, 80, 30, .35); border-radius: 12px; padding: 6px 10px; }
+.figur-start .figur-item { height: 64px; width: auto; }
+.figur-start small { font-weight: 700; font-size: 15px; }
+button, input, select, textarea { font-family: inherit; }
+.figur-bild img { height: 100%; width: auto; }
+.figur-karte.gesperrt .figur-bild img { filter: none; }
+.figur-karte.gesperrt .figur-bild > img { filter: brightness(0) opacity(.6) drop-shadow(0 0 2px rgba(255, 220, 160, .35)); }
+.figur-schloss .sym { filter: drop-shadow(0 2px 4px #000); }
+.figur-bild img { width: 100%; height: 100%; max-width: none; object-fit: contain; object-position: center bottom; }
+/* Tutorial überspringen: kleiner Link oben rechts, verdeckt keine Schließen-Knöpfe */
+#tut-skip { min-height: 38px; padding: 4px 12px 6px; font-size: 14px; top: max(4px, env(safe-area-inset-top)); right: 8px; }

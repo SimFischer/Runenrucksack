@@ -46,6 +46,11 @@ async function boot() {
   G.run = loadRun();
   $('btn-continue').onclick = continueSaved;
   $('btn-new').onclick = showHeroes;
+  $('heroes').addEventListener('click', (e) => {
+    if (e.target.closest('#figur-detail, .figur-karte')) return;
+    $('figur-detail').hidden = true;
+    document.querySelectorAll('.figur-karte.gewaehlt').forEach((k) => k.classList.remove('gewaehlt'));
+  });
   $('btn-tutorial').onclick = startTutorial;
   $('btn-first').onclick = startTutorial;
   $('btn-known').onclick = showStart;
@@ -158,25 +163,47 @@ function continueSaved() {
   continueFlow();
 }
 
-// Vor jedem Lauf: Figur wählen.
+// Vor jedem Lauf: Figur wählen. Karten zeigen nur Bild, Name und Rolle; Antippen öffnet die Detailtafel.
+// Gesperrte Figuren sind dunkle Silhouetten mit Schloss und einer Zeile, wie man sie freischaltet.
 function showHeroes() {
   const box = $('hero-cards');
   box.innerHTML = '';
+  $('figur-detail').hidden = true;
   for (const h of G.HEROES) {
     const frei = figurFrei(G.PROFIL, h);
     const card = document.createElement('button');
-    card.className = 'hero-card' + (frei ? '' : ' gesperrt');
-    card.style.setProperty('--hero', h.farbe);
+    card.className = 'figur-karte' + (frei ? '' : ' gesperrt');
+    card.dataset.held = h.id;
     card.innerHTML = `
-      <div class="hero-emoji">${figurBild(h.id) ? `<img src="${figurBild(h.id)}" alt="">` : ''}${frei ? '' : `<span class="sam-schloss">${sym('schloss')}</span>`}</div>
-      <div class="hero-name">${h.name}</div>
-      <div class="hero-volk">${h.volk}</div>
-      <p class="hero-staerke">${frei ? h.staerke : bedingungText(h.freischaltung, fortschrittCtx())}</p>
-      ${frei ? `<div class="hero-start">Start mit: ${h.start.map((s) => `<span>${iconHtml(G.DEFS[s.id])} ${fullName(G.DEFS[s.id])}</span>`).join('')}</div>` : ''}`;
-    card.onclick = () => (frei ? startNewRun(h) : toast(bedingungText(h.freischaltung, fortschrittCtx())));
+      <div class="figur-bild">${figurBild(h.id) ? `<img src="${figurBild(h.id)}" alt="">` : ''}${frei ? '' : `<span class="figur-schloss">${sym('schloss')}</span>`}</div>
+      <div class="figur-name">${frei ? h.kurz : '???'}</div>
+      <div class="figur-rolle">${frei ? h.rolle : bedingungText(h.freischaltung, fortschrittCtx())}</div>`;
+    card.onclick = (e) => { e.stopPropagation(); zeigeFigur(h, frei); };
     box.append(card);
   }
   showScreen('heroes');
+}
+
+// Breite Detailtafel über der Szene: großes Bild, Herkunft, Fähigkeit, Start-Gegenstände, Goldknopf.
+function zeigeFigur(h, frei) {
+  const tafel = $('figur-detail');
+  document.querySelectorAll('.figur-karte').forEach((k) => k.classList.toggle('gewaehlt', k.dataset.held === h.id));
+  tafel.innerHTML = frei ? `
+    <div class="figur-detail-bild">${figurBild(h.id) ? `<img src="${figurBild(h.id)}" alt="">` : ''}</div>
+    <div class="figur-detail-text">
+      <h2 class="titel">${h.name}</h2>
+      <p class="figur-herkunft">${h.volk}</p>
+      <p class="figur-faehigkeit">${h.faehigkeit || h.staerke}</p>
+      <div class="figur-start">${h.start.map((s) => `<span>${iconHtml(G.DEFS[s.id], 'figur-item')}<small>${fullName(G.DEFS[s.id])}</small></span>`).join('')}</div>
+      <button class="btn big primary" data-los>Mit ${h.kurz} aufbrechen</button>
+    </div>` : `
+    <div class="figur-detail-bild gesperrt">${figurBild(h.id) ? `<img src="${figurBild(h.id)}" alt="">` : ''}</div>
+    <div class="figur-detail-text">
+      <h2 class="titel">${sym('schloss')} ???</h2>
+      <p class="figur-faehigkeit">${bedingungText(h.freischaltung, fortschrittCtx())}</p>
+    </div>`;
+  tafel.hidden = false;
+  tafel.querySelector('[data-los]')?.addEventListener('click', () => startNewRun(h));
 }
 
 function startNewRun(h) {

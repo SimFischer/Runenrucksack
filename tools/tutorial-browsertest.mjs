@@ -153,7 +153,7 @@ try {
   check(await ev('localStorage.getItem("runenrucksack.lauf.v2") === null'), 'Tutorial-Lauf wurde nicht gespeichert');
   await tap('#tut-finale [data-go]');
   check(await ev('!document.getElementById("heroes").hidden && document.getElementById("tut-layer").hidden'), 'Figurenwahl ohne Tutorial-Overlay');
-  await tap('.hero-card');
+  await tap('.figur-karte'); await tap('#figur-detail [data-los]');
   const run = JSON.parse(await ev('localStorage.getItem("runenrucksack.lauf.v2")'));
   check(!run.tutorial && run.gold === 12 && run.shop.filter(Boolean).length >= 5, 'normaler Lauf ohne Tutorial-Reste');
 
