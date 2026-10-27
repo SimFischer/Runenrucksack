@@ -325,11 +325,14 @@ export function analyze(placed, defs, opts = {}) {
       if (!t || !isNoun(defs[t.id])) continue;
       const stern = t.stern || 1;
       const s = p.satz;
-      const passt = s && s.uid === t.uid && s.id === t.id && (s.stern || 1) === stern;
+      // Gefragt wird nur, wenn die Rolle auf einen anderen Gegenstand zeigt: Aufwerten, Kompositum und Verschieben
+      // behalten den Gegenstand (gleiche uid) und damit die Antwort.
+      const passt = s && s.uid === t.uid;
       vi.verb = {
         status: passt ? (s.ok ? 'ok' : 'falsch') : 'offen',
         subjekt: { uid: t.uid, id: t.id, stern, def: defs[t.id] },
         ...satzFor(d, defs[t.id], stern, defs),
+        ...(passt && s.text ? { satz: s.text } : {}),
       };
     }
   }

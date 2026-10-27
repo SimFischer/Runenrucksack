@@ -27,8 +27,11 @@ test('Jede mögliche Kombination steht im Buch, jede id genau einmal', () => {
   const fa = BUCH.byId.get('komp:feuer+axt');
   assert.equal(fa.artikel, 'die');
   assert.match(fa.hinweis, /Grundwort Axt bestimmt den Artikel → die Feueraxt/);
-  assert.equal(BUCH.byId.get('satz:schlagen:axt').name, 'Die Axt schlägt.');
-  assert.match(BUCH.byId.get('satz:schlagen:axt').wirkung, /Die Äxte schlagen/);
+  // Natürliche Sätze: Eine Person handelt, der Gegenstand ist das Werkzeug
+  assert.match(BUCH.byId.get('satz:schlagen:axt').name, /^Eadrun schlägt mit der Axt /);
+  assert.match(BUCH.byId.get('satz:schlagen:axt').wirkung, /Wir schlagen mit den Äxten /);
+  const mitWs = baueBuch(DEFS, ITEMS, RECIPES, json('wortschatz.json'));
+  assert.equal(mitWs.byId.get('satz:schlagen:axt').name, 'Eadrun schlägt mit der Axt kräftig zu.');
 });
 
 test('Entdeckungen aus dem Lauf: Komposita, Stufen (auch die darunter), Steigerungen, Sätze, Schätze', () => {

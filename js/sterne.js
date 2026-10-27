@@ -82,6 +82,11 @@ export function mergePair(run, neu, alt, defs) {
   if (ks > 1) p.kraftStern = ks;
   const fluch = alt.fluch || neu.fluch; // ein Fluch verschwindet nicht durch Verbinden
   if (fluch) p.fluch = fluch;
+  // Verb-Rollen: Eine aufgewertete Rolle behält ihren Satz; zeigte eine Rolle auf eines der beiden Teile,
+  // zeigt ihr Satz jetzt auf das neue Item – so kommt nach dem Aufwerten keine neue Frage.
+  const satz = alt.satz || neu.satz;
+  if (satz) p.satz = satz;
+  for (const q of run.items) if (q.satz && (q.satz.uid === neu.uid || q.satz.uid === alt.uid)) q.satz = { ...q.satz, uid: p.uid };
   run.items.push(p);
   return p;
 }

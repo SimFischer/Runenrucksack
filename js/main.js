@@ -18,8 +18,9 @@ import {
   openQuick, closeQuick, sternVon, klangAn,
 } from './ui.js';
 import { startNight } from './battle-ui.js';
-import { frageImSpiel } from './aufgaben/spiel.js';
-import { stufenBereich } from './aufgaben/wahl.js';
+import { frageImSpiel, wortschatz, einstellungen } from './aufgaben/spiel.js';
+import { stufenBereich, stufeFuer, aufgabenStand } from './aufgaben/wahl.js';
+import { verbSatz, verbSatzInhalt, PERSONEN_FOLGE, kurzName } from './aufgaben/verbsatz.js';
 import { runEncounter } from './encounters.js';
 import { initTutorial, startTutorial, tutorialDone, showHelp, tipsOn, setTips } from './tutorial.js';
 import { entdeckungenIn } from './buch.js';
@@ -586,6 +587,14 @@ function artLabel(d) {
 const dativ = (d) => fullName(d).replace(/^der /, 'dem ').replace(/^die /, 'der ').replace(/^das /, 'dem ');
 
 // Erklärungen zu Genus, Siegeln, Runen und Komposita für das Info-Feld.
+// Der Satz einer Verb-Rolle zum Gegenstand, wie er jetzt ist (gemerkte Person und Vorlage).
+function rollenSatz(base, ana, ref) {
+  const v = ana?.verb;
+  const s = ref?.uid ? placedOf(ref.uid)?.satz : null;
+  if (!v?.subjekt || !s?.person) return v?.satz;
+  return verbSatz({ verbDef: base, subjDef: v.subjekt.def, stern: v.subjekt.stern, defs: G.DEFS, ws: wortschatz(), person: s.person, figur: s.figur, vorlage: s.vorlage }).satz;
+}
+
 function grammarNotes(base, ana, ref) {
   const out = [];
   const where = ref.src === 'bag' ? '' : ' (wirkt nur im Rucksack)';
@@ -596,9 +605,9 @@ function grammarNotes(base, ana, ref) {
   }
   if (isVerb(base) && base.formen) {
     const v = ana?.verb;
-    out.push({ html: `Verben sagen, was passiert. Dreh den Pfeil der Rolle auf ein Nomen – das ist das Subjekt. Formen: er ${base.formen.er}, sie ${base.formen.sie}, gestern ${base.formen.praeteritum}.` });
-    if (v?.status === 'ok') out.push({ cls: 'ok', html: `✓ <b>„${v.satz}“</b> Wenn die Rolle wirkt, ${v.mehrzahl ? 'schlagen' : 'schlägt'} ${v.subjektText.charAt(0).toLowerCase() + v.subjektText.slice(1)} mit.${v.bonus ? ` ${v.bonus}!` : ''}` });
-    else if (v?.status === 'falsch') out.push({ cls: 'bad', html: `✗ Die Form passte nicht – richtig wäre „${v.satz}“. Die Rolle wirkt nur halb. Leg sie neu an, um es nochmal zu versuchen.` });
+    out.push({ html: `Verben sagen, was passiert. Dreh den Pfeil der Rolle auf einen Gegenstand – damit handelt deine Figur.` });
+    if (v?.status === 'ok') out.push({ cls: 'ok', html: `✓ <b>„${rollenSatz(base, ana, ref)}“</b> Die Rolle wirkt voll.${v.bonus ? ` ${v.bonus}!` : ''}` });
+    else if (v?.status === 'falsch') out.push({ cls: 'bad', html: `✗ Richtig wäre: „${rollenSatz(base, ana, ref)}“. Die Rolle wirkt nur halb – zeig mit ihr auf einen anderen Gegenstand für einen neuen Versuch.` });
     else if (v?.status === 'offen') out.push({ cls: 'bad', html: 'Gleich fragt das Spiel nach der richtigen Form.' });
     else if (ana) out.push({ cls: 'bad', html: '✗ Der Pfeil zeigt auf kein Nomen. Ohne Subjekt wirkt die Rolle nur halb. Tippe zweimal, um sie zu drehen.' });
   }
@@ -1045,29 +1054,44 @@ function doMerge(a, glanz = false) {
   setTimeout(() => { merging = false; checkMerges(); }, gross ? 1900 : 1250);
 }
 
-// „Das Feuerschwert ___ (schlagen)“ – die Antwort gilt, solange Rolle und Subjekt so liegen.
+// „Eadrun ___ mit dem Eisspeer auf die Orks zu.“ – gefragt wird nur, wenn die Rolle zum ersten Mal auf diesen
+// Gegenstand zeigt; die Antwort bleibt beim Aufwerten, beim Kompositum und beim Verschieben erhalten.
 function askVerb(p) {
   const run = G.run;
   const d = G.DEFS[p.id];
   const v = bagInfo.get(p.uid).verb;
   emit('tipp', { key: 'verben' });
+  // Die Personen wechseln der Reihe nach (ich, du, die Figur, wir, ihr, zwei Figuren); im Tutorial fest „du“.
+  const stand = aufgabenStand(run);
+  const k = stand.verbPerson || 0;
+  if (!run.tutorial) stand.verbPerson = k + 1;
+  const wahl = {
+    person: run.tutorial ? 'du' : PERSONEN_FOLGE[k % PERSONEN_FOLGE.length], figur: kurzName(hero()?.name),
+    vorlage: run.tutorial ? 0 : Math.floor(Math.random() * 3),
+  };
+  const inhalt = verbSatzInhalt({
+    verbDef: d, subjDef: v.subjekt.def, stern: v.subjekt.stern, defs: G.DEFS, ws: wortschatz(), ...wahl,
+    stufe: run.tutorial ? 1 : stufeFuer(G.PROFIL, einstellungen(), 'personalformen', [1, 3]),
+  });
   const store = (ok) => {
-    p.satz = { uid: v.subjekt.uid, id: v.subjekt.id, stern: v.subjekt.stern, ok };
+    // Person und Vorlage gemerkt: Der Satz passt sich später dem Gegenstand an (★★ → „mit den Speeren“, Eisspeer)
+    p.satz = { uid: v.subjekt.uid, id: v.subjekt.id, stern: v.subjekt.stern, ok, text: inhalt.satzVoll, ...wahl };
     closeQuick();
     merging = false;
     render();
     emit('satz', { ok, verb: p.id, subjekt: v.subjekt.id });
-    if (ok) { toast(`„${v.satz}“ – jetzt wirkt die Rolle voll!`); laufStand(run).saetze++; }
+    if (ok) { toast(`„${inhalt.satzVoll}“ – jetzt wirkt die Rolle voll!`); laufStand(run).saetze++; }
   };
-  quiz({
-    regel: 'personalform',
-    q: { titel: 'Wie heißt der Satz?', prompt: `${v.subjektText} <span class="blank">___</span>. <small>(${d.name})</small>`, options: shuffle([v.richtig, ...v.falsch]), correct: v.richtig, explain: v.regel },
-    anchor: itemNode(p.uid),
-    kopf: `<span class="quick-eq">${iconHtml(d, 'ic small')}<b>➤</b>${iconHtml(v.subjekt.def, 'ic small')}</span>`,
-    richtig: () => store(true),
-    nein: run.tutorial ? null : () => store(false),
-    neinText: 'So lassen (wirkt nur halb)',
-  });
+  const kopf = `<span class="quick-eq">${iconHtml(d, 'ic small')}<b>➤</b>${iconHtml(v.subjekt.def, 'ic small')}</span>`;
+  if (run.tutorial) {
+    quiz({
+      regel: 'personalform',
+      q: { titel: 'Welche Form passt?', prompt: inhalt.satz.replace('___', '<span class="blank">___</span>'), options: inhalt.optionen, correct: inhalt.richtig, explain: inhalt.merke },
+      anchor: itemNode(p.uid), kopf, richtig: () => store(true), nein: null,
+    });
+    return;
+  }
+  frageImSpiel({ inhalt, anker: itemNode(p.uid), kopf, nein: 'So lassen (wirkt nur halb)' }).then((r) => store(!!r.richtig));
 }
 
 // ---------- Ziehen, Tippen, Drehen ----------

@@ -61,7 +61,7 @@ export async function loadData() {
   G.THEMEN = themen;
   G.LEHRKRAFT = lehrkraft;
   if (bilder) Object.assign(G.BILDER, bilder);
-  G.BUCH = baueBuch(G.DEFS, G.ITEMS, G.RECIPES);
+  G.BUCH = baueBuch(G.DEFS, G.ITEMS, G.RECIPES, G.WORTSCHATZ);
   G.PROFIL = loadProfil();
 }
 

@@ -127,7 +127,7 @@ try {
   for (let i = 0; i < 6 && !(await ev('!!document.getElementById("quick")')); i++) await tap('#grid-bag [data-tut="item-schlagen"]');
   await expect('welche Form');
   const optsV = await ev(`[...document.querySelectorAll('#quick [data-k]')].map((x) => x.textContent)`);
-  await tap(`#quick [data-k="${optsV.indexOf('schlägt')}"]`); await expect('schlägt dein Feuerschwert');
+  await tap(`#quick [data-k="${optsV.indexOf('schlägst')}"]`); await expect('schlägst du mit deinem Feuerschwert');
   check(await ev(`!!document.querySelector('#grid-bag .rune-lines line.verb')`), 'Leuchtlinie von der Rolle zum Feuerschwert');
   await tap('#tut-next'); await expect('zweiten Kampf');
   await tap('#btn-fight'); await expect('Rüstung des Orks');

@@ -482,7 +482,7 @@
     },
     {
       "id": "verb-frage",
-      "text": "Wer schlägt? Das Feuerschwert – welche Form passt?",
+      "text": "Du schlägst mit deinem Feuerschwert zu – welche Form passt zu „du“?",
       "tipp": "Das Feuerschwert … (eins: er, sie, es)",
       "ziel": [
         "fenster"
@@ -495,7 +495,7 @@
     },
     {
       "id": "verb-erklaerung",
-      "text": "Jetzt schlägt dein Feuerschwert jedes Mal mit, wenn die Rolle wirkt. Ohne Subjekt wirkt eine Rolle nur halb.",
+      "text": "Jetzt schlägst du mit deinem Feuerschwert zu, jedes Mal wenn die Rolle wirkt. Ohne Gegenstand wirkt eine Rolle nur halb.",
       "ziel": [
         "rucksack"
       ],

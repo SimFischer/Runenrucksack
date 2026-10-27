@@ -60,13 +60,37 @@ test('Ohne Subjekt oder mit falscher Form wirkt die Rolle nur halb', () => {
   }
 });
 
-test('Antwort gilt nur, solange Rolle und Subjekt so liegen', () => {
+test('Die Antwort gilt für den Gegenstand: Aufwerten, Kompositum und Verschieben fragen nicht neu', () => {
   const items = setup('schlagen', 'speer', true);
   assert.equal(analyze(items, DEFS).get(2).verb.status, 'ok');
-  items[0].stern = 2; // Subjekt ist jetzt ★★ → neue Frage (Mehrzahl)
+  items[0].stern = 2; // aufgewertet
+  assert.equal(analyze(items, DEFS).get(2).verb.status, 'ok');
+  items[0].id = 'eis+speer'; // Speer → Eisspeer
+  assert.equal(analyze(items, DEFS).get(2).verb.status, 'ok');
+  // Rolle und Gegenstand zusammen verschoben
+  items[0].y = 1; items[1].y = 2;
+  assert.equal(analyze(items, DEFS).get(2).verb.status, 'ok');
+  // Ein anderer Gegenstand → neue Aufgabe
+  items[0] = { uid: 3, id: 'axt', x: 0, y: 1, rot: 0 };
   assert.equal(analyze(items, DEFS).get(2).verb.status, 'offen');
-  items[0] = { uid: 3, id: 'axt', x: 0, y: 0, rot: 0 };
-  assert.equal(analyze(items, DEFS).get(2).verb.status, 'offen');
+});
+
+test('Aufwerten durch Verbinden: Rolle und Gegenstand behalten ihren Satz', async () => {
+  const { mergePair } = await import('../js/sterne.js');
+  const run = { nextUid: 10, items: [
+    { uid: 1, id: 'speer', area: 'bag', x: 0, y: 0, rot: 0 },
+    { uid: 2, id: 'stuermen', area: 'bag', x: 0, y: 1, rot: 0, satz: { uid: 1, id: 'speer', stern: 1, ok: true, text: 'Eadrun stürmt mit dem Speer los.' } },
+    { uid: 3, id: 'speer', area: 'store', x: 0, y: 0, rot: 0 },
+  ] };
+  const p = mergePair(run, run.items[2], run.items[0], DEFS); // zweiter Speer kommt dazu → ★★
+  const rolle = run.items.find((q) => q.uid === 2);
+  assert.equal(rolle.satz.uid, p.uid, 'Satz zeigt auf den neuen ★★-Speer');
+  assert.equal(analyze(run.items.filter((q) => q.area === 'bag'), DEFS).get(2).verb.status, 'ok');
+  // Zwei Rollen verbinden: Die neue Rolle behält den Satz
+  run.items.push({ uid: 20, id: 'stuermen', area: 'store', x: 1, y: 0, rot: 0 });
+  const r2 = mergePair(run, run.items.find((q) => q.uid === 20), rolle, DEFS);
+  assert.equal(r2.satz.uid, p.uid);
+  assert.equal(analyze(run.items.filter((q) => q.area === 'bag'), DEFS).get(r2.uid).verb.status, 'ok');
 });
 
 test('Passendes Subjekt: brennen gibt Feuer-Komposita +Brand, stechen stärkt Speere', () => {

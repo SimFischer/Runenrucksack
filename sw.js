@@ -32,6 +32,7 @@ const FILES = [
   'js/aufgaben/themen.js',
   'js/aufgaben/wahl.js',
   'js/aufgaben/wortschatz.js',
+  'js/aufgaben/verbsatz.js',
   'js/aufgaben/formate/auswahl.js',
   'js/aufgaben/formate/basis.js',
   'js/aufgaben/formate/baukasten.js',

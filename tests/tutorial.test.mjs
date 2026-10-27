@@ -147,7 +147,7 @@ test('Tutorial komplett durchspielen: jeder Schritt ist erreichbar', () => {
   // Zweiter Tag: ★★-Dolch, Satz mit Subjekt
   assert.ok(run.items.some((p) => p.id === 'dolch' && p.stern === 2), '★★-Dolch entstanden');
   const rolle = run.items.find((p) => p.id === 'schlagen');
-  assert.equal(analyze(bag(run), DEFS).get(rolle.uid).verb.satz, 'Das Feuerschwert schlägt.');
+  assert.equal(analyze(bag(run), DEFS).get(rolle.uid).verb.status, 'ok');
   // Am Ende: scharfes Feuerschwert mit Siegel
   const fs = findItem(run, 'feuer+schwert');
   const i = analyze(bag(run), DEFS).get(fs.uid);

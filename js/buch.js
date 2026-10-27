@@ -2,6 +2,7 @@
 // Jede Kombination steht von Anfang an im Buch (unentdeckt als Silhouette mit „???“).
 import { STERN_FAKTOR, MAX_STERN } from './logic.js';
 import { isRune, pluralOf } from './grammar.js';
+import { verbSatz } from './aufgaben/verbsatz.js';
 
 export const SEITEN = [
   { id: 'komposita', titel: 'Komposita', emoji: '🔥', text: 'Kraft + Träger = ein neues Wort. Das letzte Wort bestimmt den Artikel.' },
@@ -22,7 +23,8 @@ export const kurzWirkung = (d) => WIRKUNG.filter(([k]) => d[k]).slice(0, 3).map(
 const stufbar = (d) => d.art !== 'siegel' && d.art !== 'tasche' && !isRune(d) && d.art !== 'kompositum' && !d.stufe;
 
 // Baut das ganze Buch. defs: alle Definitionen (mit Komposita und Runenstufen), items: items.json, recipes: recipes.json.
-export function baueBuch(defs, items, recipes) {
+// ws (wortschatz.json, optional): natürliche Sätze für die Seite „Sätze“ aus den Vorlagen der Verben.
+export function baueBuch(defs, items, recipes, ws = null) {
   const eintraege = [];
   const add = (seite, e) => eintraege.push({ seite, ...e });
   const k = recipes.komposita;
@@ -70,9 +72,9 @@ export function baueBuch(defs, items, recipes) {
       const pl = pluralOf(td, defs);
       add('saetze', {
         id: `satz:${v.id}:${t}`, def: v, subjekt: td, gruppe: v.id,
-        name: `${cap(td.artikel)} ${td.name} ${v.formen.er}.`, artikel: null,
-        wirkung: `Mehrzahl: Die ${pl.richtig} ${v.formen.sie}.`,
-        hinweis: `Bei einem endet das Verb meist auf -t: ${v.formen.er}. Bei mehreren bleibt die Grundform: ${v.formen.sie}.`,
+        name: verbSatz({ verbDef: v, subjDef: td, stern: 1, defs, ws, person: 'er', figur: 'Eadrun' }).satz, artikel: null,
+        wirkung: pl ? `Mehrzahl: ${verbSatz({ verbDef: v, subjDef: td, stern: 2, defs, ws, person: 'wir' }).satz}` : '',
+        hinweis: `Die Person bestimmt die Form: ich ${verbSatz({ verbDef: v, subjDef: td, defs, ws, person: 'ich' }).form}, du ${verbSatz({ verbDef: v, subjDef: td, defs, ws, person: 'du' }).form}, sie ${v.formen.er}, wir ${v.formen.sie}.`,
       });
     }
   }
@@ -105,7 +107,7 @@ export function entdeckungenIn(run, defs, buch) {
     if (d.art === 'verb' && p.satz?.ok) {
       const subj = byUid.get(p.satz.uid);
       const sd = subj && defs[subj.id];
-      if (sd && subj.id === p.satz.id) has(`satz:${d.id}:${sd.teile?.traeger || sd.id}`);
+      if (sd) has(`satz:${d.id}:${sd.teile?.traeger || sd.id}`);
     }
     has(`schatz:${d.id}`);
   }
