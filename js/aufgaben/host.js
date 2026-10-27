@@ -3,6 +3,7 @@
 // kostet jeder 1 Gold (im Tutorial nicht). Ergebnis als Promise: { richtig, ersterVersuch, versuche, abgebrochen, trotzdem }.
 import { FORMATE } from './formate/index.js';
 
+let offen = null; // Abbruch des gerade offenen Fensters
 const sterne = (s) => '★'.repeat(s) + `<i>${'☆'.repeat(3 - s)}</i>`;
 
 // opts: { anker, kopf, titel, stufe, zahle() → bool, gold() → Zahl, tutorial, nein (Text) , trotzdem (bool), onRegel(id) }
@@ -11,7 +12,7 @@ export function stelleAufgabe(a, opts = {}) {
   return new Promise((fertig) => {
     let versuche = 0, vorher = null, pleite = false;
     const gross = format.gross(a) || !opts.anker; // ohne Item als Anker: in der Mitte
-    document.getElementById('aufgabe')?.remove();
+    offen?.(); // ein noch offenes Fenster nicht hängen lassen: gilt als abgebrochen
     const ebene = document.createElement('div');
     ebene.id = 'aufgabe';
     ebene.className = gross ? 'af-gross' : 'af-klein';
@@ -22,7 +23,9 @@ export function stelleAufgabe(a, opts = {}) {
     document.body.append(ebene);
     const ankerRect = opts.anker?.getBoundingClientRect?.() || null;
 
-    const schliessen = (ergebnis) => { ebene.remove(); fertig(ergebnis); };
+    const schliessen = (ergebnis) => { if (offen === abbrechen) offen = null; ebene.remove(); fertig(ergebnis); };
+    const abbrechen = () => schliessen({ abgebrochen: true, versuche });
+    offen = abbrechen;
 
     const zeichne = () => {
       const extra = versuche > 0 && !opts.tutorial;
