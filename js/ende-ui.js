@@ -2,7 +2,7 @@
 import { CFG } from './logic.js';
 import { G, region } from './state.js';
 import { laufStand, lernbericht } from './fortschritt.js';
-import { modal, klang, iconHtml } from './ui.js';
+import { modal, iconHtml } from './ui.js';
 import { figurBild } from './state.js';
 import { codeKasten, kopierenAn, aktuellerHeldencode } from './code-ui.js';
 import { themenBericht } from './aufgaben/wahl.js';
@@ -93,6 +93,5 @@ export function rangFeier(r) {
     box.append(s);
   }
   document.body.append(box);
-  klang(4);
   box.querySelector('button').onclick = () => box.remove();
 }

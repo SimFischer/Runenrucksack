@@ -12,7 +12,7 @@ const IDLE_MS = 8000;
 let api = null;            // Einstiegspunkte aus main.js
 let steps = [], idx = -1, active = false, shown = false;
 let idleTimer = 0, layoutTimer = 0, extraTip = '', warnText = '';
-let fenwickImg = null, voice = null;
+let fenwickImg = null;
 const el = {};
 
 export const tutorialDone = () => getPref('tutorial') === 'fertig' || !!G.PROFIL?.tutorial;
@@ -37,19 +37,17 @@ export function initTutorial(mainApi) {
         <p class="tut-tip" id="tut-tip" hidden></p>
         <div class="tut-foot">
           <span class="tut-dots" id="tut-dots"></span>
-          <button class="tut-speak" id="tut-speak" aria-label="Vorlesen" hidden>🔊</button>
           <button class="btn primary" id="tut-next" hidden>Weiter</button>
         </div>
       </div>
     </div>
     <button class="btn small" id="tut-skip">Tutorial überspringen ✕</button>`;
   document.body.append(layer);
-  for (const id of ['tut-layer', 'tut-shade', 'tut-holes', 'tut-rings', 'tut-hand', 'tut-bubble', 'tut-fenwick', 'tut-text', 'tut-tip', 'tut-dots', 'tut-speak', 'tut-next', 'tut-skip']) {
+  for (const id of ['tut-layer', 'tut-shade', 'tut-holes', 'tut-rings', 'tut-hand', 'tut-bubble', 'tut-fenwick', 'tut-text', 'tut-tip', 'tut-dots', 'tut-next', 'tut-skip']) {
     el[id] = document.getElementById(id);
   }
   el['tut-next'].onclick = () => complete();
   el['tut-skip'].onclick = confirmSkip;
-  el['tut-speak'].onclick = speak;
 
   // Nur das Ziel ist bedienbar: alles andere wird abgefangen, bevor das Spiel es sieht.
   for (const type of ['pointerdown', 'click']) document.addEventListener(type, blocker, true);
@@ -61,12 +59,6 @@ export function initTutorial(mainApi) {
   const img = new Image();
   img.onload = () => { fenwickImg = img.src; if (active) drawFenwick(); };
   img.src = G.TUTORIAL.begleiter.bild;
-
-  // Deutsche Stimme zum Vorlesen, falls verfügbar.
-  const pickVoice = () => {
-    try { voice = speechSynthesis.getVoices().find((v) => v.lang?.toLowerCase().startsWith('de')) || null; } catch { voice = null; }
-  };
-  if ('speechSynthesis' in window) { pickVoice(); speechSynthesis.addEventListener?.('voiceschanged', pickVoice); }
 }
 
 function drawFenwick() {
@@ -94,7 +86,6 @@ function stop() {
   clearTimeout(idleTimer);
   clearInterval(layoutTimer);
   battleControl.resume();
-  try { speechSynthesis.cancel(); } catch { /* ohne Sprachausgabe */ }
   el['tut-layer'].hidden = true;
   el['tut-layer'].classList.remove('finale');
   document.getElementById('modal').classList.remove('tut-shift');
@@ -202,7 +193,6 @@ function draw() {
   el['tut-tip'].hidden = !tip;
   el['tut-tip'].classList.toggle('warn', !!warnText && tip === warnText);
   el['tut-next'].hidden = s.aktion.typ !== 'weiter';
-  el['tut-speak'].hidden = !voice;
   const nr = steps.indexOf(s);
   el['tut-dots'].innerHTML = `<span class="tut-bar"><i style="width:${Math.round(((nr + 1) / steps.length) * 100)}%"></i></span><small>${nr + 1}/${steps.length}</small>`;
   layout();
@@ -343,21 +333,6 @@ function resetIdle() {
     playHand();
     resetIdle();
   }, IDLE_MS);
-}
-
-// ---------- Vorlesen ----------
-
-function speak() {
-  try {
-    speechSynthesis.cancel();
-    const s = step();
-    const text = [s.text, el['tut-tip'].hidden ? '' : el['tut-tip'].textContent].filter(Boolean).join(' ');
-    const u = new SpeechSynthesisUtterance(text.replace(/[\u{1F300}-\u{1FAFF}☀-➿]/gu, ''));
-    u.voice = voice;
-    u.lang = voice?.lang || 'de-DE';
-    u.rate = 0.9;
-    speechSynthesis.speak(u);
-  } catch { /* ohne Sprachausgabe */ }
 }
 
 // ---------- Nur das Ziel ist bedienbar ----------

@@ -808,7 +808,6 @@ h2 .hint { font-size: 12px; font-weight: 400; color: var(--ink-soft); }
 .tut-dots i { width: 9px; height: 9px; border-radius: 50%; background: #d8c8a4; }
 .tut-dots i.past { background: var(--green); }
 .tut-dots i.now { background: var(--gold); box-shadow: 0 0 0 2px var(--gold-dark); }
-.tut-speak { font-family: var(--emoji); font-size: 22px; width: 48px; height: 48px; border-radius: 50%; border: 2px solid var(--line); background: #fff6e2; cursor: pointer; }
 #tut-next { min-width: 110px; min-height: 48px; }
 #tut-skip { position: fixed; right: 14px; top: 74px; opacity: .92; }
 #tut-hand {

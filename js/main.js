@@ -15,7 +15,7 @@ import {
 import { evaluateBag, GLANZ_BONUS } from './mods.js';
 import {
   $, fmt, fullName, genusChip, toast, bump, openModal, closeModal, modal, itemEl, buildGrid, drawItems, mergeAnimation, syncGold, iconHtml,
-  openQuick, closeQuick, sternVon, klangAn,
+  openQuick, closeQuick, sternVon,
 } from './ui.js';
 import { startNight } from './battle-ui.js';
 import { frageImSpiel, wortschatz, einstellungen } from './aufgaben/spiel.js';
@@ -864,7 +864,6 @@ function openMenu() {
       <button class="btn small" data-act="help">📖 So geht's</button>
       <button class="btn small" data-act="tutorial">🧙 Tutorial wiederholen</button>
       <button class="btn small" data-act="tips">💡 Erste-Mal-Tipps: ${tipsOn() ? 'an' : 'aus'}</button>
-      <button class="btn small" data-act="klang">${klangAn() ? '🔊' : '🔇'} Klang: ${klangAn() ? 'an' : 'aus'}</button>
       <button class="btn small" data-act="neustart">🗑️ Neu beginnen</button>
     </div>`, {
     new: () => confirmNew(),
@@ -877,7 +876,6 @@ function openMenu() {
     pause: () => zeigeCode({ reise: true, zurueck: (beenden) => { if (beenden) { save(); showStart(); } } }),
     neustart: () => neuBeginnen(() => { wendeDesignAn(); showAsk(); }),
     tips: () => { setTips(!tipsOn()); toast(`Erste-Mal-Tipps sind jetzt ${tipsOn() ? 'an' : 'aus'}.`); openMenu(); },
-    klang: () => { setPref('klang', klangAn() ? 'aus' : 'an'); toast(`Klang beim Verbinden ist jetzt ${klangAn() ? 'an' : 'aus'}.`); openMenu(); },
   });
 }
 

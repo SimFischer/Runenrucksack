@@ -126,7 +126,7 @@ Bedeutung und Wirkung fallen zusammen: Ein scharfes Schwert macht mehr Schaden, 
   - **als Kette:** Gibt es zum neuen Item wieder ein gleiches, geht es gleich weiter (★★ + vorhandenes ★★ → ★★★), jeweils mit eigener Animation nacheinander.
 - Gilt für Nomen, Träger, Kraft-Kristalle, Komposita, Verben und Adjektiv-Runen. Artikel-Siegel und Taschen verbinden sich nicht, zwei verschiedene Komposita (Feueraxt + Eisaxt) auch nicht.
 - Vorher eine Grammatik-Frage: Nomen, Träger, Komposita und Kristalle → **Mehrzahl** („zwei ___“: Äxte / Axts / Axten), Verben → **Präteritum** („Gestern ___ der Ritter“), Adjektiv-Runen → **Steigerung**. Kristall + Träger → **Artikel** des Kompositums.
-- Belohnung: Beide Teile fliegen zusammen, kurzer Lichtblitz, die Sterne erscheinen nacheinander, ein leiser Klang (im Menü abschaltbar), „+120 % Schaden“ steigt auf. Bei ★★★★ glänzt der ganze Rucksack.
+- Belohnung: Beide Teile fliegen zusammen, kurzer Lichtblitz, die Sterne erscheinen nacheinander, „+120 % Schaden“ steigt auf. Bei ★★★★ glänzt der ganze Rucksack.
 
 ### Zeitformen als Wirkung (ab Pfad 2)
 

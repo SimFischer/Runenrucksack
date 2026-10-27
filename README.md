@@ -10,7 +10,7 @@ Spielen: <https://simfischer.github.io/Runenrucksack/> – auf dem iPad in Safar
 
 Beim Öffnen fragt das Spiel: **„Ich bin zum ersten Mal hier“** (startet das Tutorial) oder **„Ich kenne das schon“** (Startmenü). Hat das Gerät das Tutorial schon einmal abgeschlossen, ist „Ich kenne das schon“ hervorgehoben – gefragt wird trotzdem, weil sich oft mehrere Kinder ein iPad teilen.
 
-Meister Fenwick 🧙 führt in 3–4 Minuten durch einen echten, aber festgelegten Lauf: Schwert kaufen, Infos ansehen, drehen, Lager, Feuer-Kristall neben das Schwert legen (das Feuerschwert entsteht sofort, mit Artikelwahl), das-Siegel, Rune „scharf“, Kampf gegen den Strohpuppen-Ork, Sieg und Herzen, eine leichte Begegnung. Am zweiten Tag: Fenwick schenkt einen Dolch, der zweite aus dem Laden macht sofort einen ★★-Dolch; eine Verb-Rolle mit Subjekt; ein Fehler auf der Ork-Rüstung. Alles außer dem Ziel ist abgedunkelt, eine Hand zeigt Tippen und Ziehen, nach 8 Sekunden ohne Aktion kommt ein Zusatz-Tipp, 🔊 liest vor (wenn das Gerät eine deutsche Stimme hat). Falsche Aktionen werden freundlich zurückgesetzt. Der Tutorial-Lauf wird nicht gespeichert und zählt nicht.
+Meister Fenwick 🧙 führt in 3–4 Minuten durch einen echten, aber festgelegten Lauf: Schwert kaufen, Infos ansehen, drehen, Lager, Feuer-Kristall neben das Schwert legen (das Feuerschwert entsteht sofort, mit Artikelwahl), das-Siegel, Rune „scharf“, Kampf gegen den Strohpuppen-Ork, Sieg und Herzen, eine leichte Begegnung. Am zweiten Tag: Fenwick schenkt einen Dolch, der zweite aus dem Laden macht sofort einen ★★-Dolch; eine Verb-Rolle mit Subjekt; ein Fehler auf der Ork-Rüstung. Alles außer dem Ziel ist abgedunkelt, eine Hand zeigt Tippen und Ziehen, nach 8 Sekunden ohne Aktion kommt ein Zusatz-Tipp. Falsche Aktionen werden freundlich zurückgesetzt. Der Tutorial-Lauf wird nicht gespeichert und zählt nicht.
 
 Jederzeit: **„Tutorial überspringen“** oben rechts. Im Menü: **„Tutorial wiederholen“**, **„So geht's“** (Übersicht zum Nachschlagen) und **„Erste-Mal-Tipps“** an/aus (Fenwick meldet sich einmal pro Lauf beim ersten Boss, Gebietswechsel, der ersten Steigerung und der Unterklasse).
 
@@ -106,7 +106,7 @@ Das Werkzeug hängt neue Einträge **nur hinten an**. Nie Einträge umsortieren,
 
 **Regel für alle Aufgaben:** Der erste Versuch ist kostenlos, jeder weitere kostet 1 Gold; nach jeder Antwort erscheint eine kurze Erklärung mit Merkhilfe. **Eine grammatisch falsche Kombination ist nie stärker als eine richtige** – die Tests prüfen das.
 
-**Verbinden ohne Bremse:** Kurze Aufgaben erscheinen als kleines Fenster direkt am Item, größere (Sortieren, Satz ordnen, Tastatur) in der Mitte. Mit „Nicht verbinden“ bleiben die Items getrennt. Im Menü lässt sich der Klang beim Verbinden ausschalten.
+**Verbinden ohne Bremse:** Kurze Aufgaben erscheinen als kleines Fenster direkt am Item, größere (Sortieren, Satz ordnen, Tastatur) in der Mitte. Mit „Nicht verbinden“ bleiben die Items getrennt.
 
 ## Aufgaben und Lernstand
 
@@ -242,10 +242,10 @@ Aktuelle Balance (200 Läufe, einfache Kaufstrategie, Aufgaben zu 75 % richtig):
 | `js/encounters.js` | Begegnungen am Morgen mit ihren Aufgaben |
 | `js/aufgaben/` | Aufgaben: Wortschatz-Hilfen (`wortschatz.js`), Themen-Generatoren (`themen.js`), Auswahl und Lernstand (`wahl.js`), Fenster (`host.js`), Anbindung ans Spiel (`spiel.js`), elf Formate in `formate/` |
 | `js/lehrkraft-ui.js` | Bereich „Für Lehrkräfte“ mit Klassen-Code |
-| `js/tutorial.js` | Tutorial: Spotlight, Sprechblase, Hand, Vorlesen, „So geht's“, Erste-Mal-Tipps |
+| `js/tutorial.js` | Tutorial: Spotlight, Sprechblase, Hand, „So geht's“, Erste-Mal-Tipps |
 | `js/tutorial-logic.js` | Tutorial ohne Darstellung: aktive Schritte, Prüfen, Zurücksetzen (testbar) |
 | `js/battle-ui.js` | Kampfanzeige und Fehler auf der Ork-Rüstung |
-| `js/ui.js` | Gemeinsame Bausteine: Fenster, Frage-Fenster am Item, Item-Kacheln, Raster, Verbinden-Animation und Klang |
+| `js/ui.js` | Gemeinsame Bausteine: Fenster, Frage-Fenster am Item, Item-Kacheln, Raster, Verbinden-Animation |
 | `js/state.js` | Geladene Inhalte und Speichern im Browser |
 | `js/logic.js` | Regeln: Raster, Laden, Gold, Gebiete, Lauf, Gegner, Begegnungen |
 | `js/grammar.js` | Grammatik-Regeln: Komposita, Siegel, Runen, Steigerung, Verben mit Subjekt, Mehrzahl |

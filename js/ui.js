@@ -372,7 +372,7 @@ function drawRuneLines(gridEl, grid, placed, size, info) {
 }
 
 // Verbinden-Animation: Beide Teile fliegen zusammen, kurzer Lichtblitz, die Sterne erscheinen nacheinander,
-// ein kurzer Klang, und der Gewinn („+120 % Schaden“) steigt auf. opts: { icon, sterne, gewinn, gross }
+// und der Gewinn („+120 % Schaden“) steigt auf. opts: { icon, sterne, gewinn, gross }
 // gross (★★★★ oder Krone): Glanz über den ganzen Rucksack.
 export function mergeAnimation(fromRects, toEl, opts = {}) {
   if (!toEl) return;
@@ -399,11 +399,10 @@ export function mergeAnimation(fromRects, toEl, opts = {}) {
     setTimeout(() => f.remove(), 540);
   }
   setTimeout(() => {
-    // 2. Lichtblitz und Klang
+    // 2. Lichtblitz
     toEl.classList.add('merged');
     const flash = fly('', 'merge-flash' + (opts.gross ? ' gross' : ''), cx, cy);
     setTimeout(() => flash.remove(), 700);
-    klang(opts.sterne || 2);
     for (let i = 0; i < (opts.gross ? 18 : 8); i++) {
       const s = fly(i % 2 ? '★' : '✨', 'merge-star', 0, 0);
       const w = (i / (opts.gross ? 18 : 8)) * Math.PI * 2, d = opts.gross ? 150 : 80;
@@ -437,27 +436,3 @@ export function mergeAnimation(fromRects, toEl, opts = {}) {
   }, 480);
 }
 
-// Kurzer, leiser Klang beim Verbinden (Web Audio, im Menü abschaltbar). Höhere Stufe = längere Tonfolge.
-let audio = null;
-export const klangAn = () => getPref('klang', 'an') !== 'aus';
-export function klang(stufe = 2) {
-  if (!klangAn()) return;
-  try {
-    audio ||= new (window.AudioContext || window.webkitAudioContext)();
-    if (audio.state === 'suspended') audio.resume();
-    const toene = stufe >= 4 ? [523, 659, 784, 1047, 1319, 1568] : stufe === 3 ? [523, 659, 784, 1047] : [587, 784, 988];
-    const t0 = audio.currentTime + 0.02;
-    toene.forEach((f, i) => {
-      const o = audio.createOscillator(), g = audio.createGain();
-      o.type = 'triangle';
-      o.frequency.value = f;
-      const s = t0 + i * 0.08;
-      g.gain.setValueAtTime(0.0001, s);
-      g.gain.exponentialRampToValueAtTime(0.06, s + 0.02);
-      g.gain.exponentialRampToValueAtTime(0.0001, s + 0.32);
-      o.connect(g).connect(audio.destination);
-      o.start(s);
-      o.stop(s + 0.35);
-    });
-  } catch { /* ohne Ton */ }
-}
