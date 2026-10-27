@@ -250,3 +250,62 @@ button, input, select, textarea { font-family: inherit; }
 .figur-bild img { width: 100%; height: 100%; max-width: none; object-fit: contain; object-position: center bottom; }
 /* Tutorial überspringen: kleiner Link oben rechts, verdeckt keine Schließen-Knöpfe */
 #tut-skip { min-height: 38px; padding: 4px 12px 6px; font-size: 14px; top: max(4px, env(safe-area-inset-top)); right: 8px; }
+
+/* ---------- Spielfeld: Gebietshintergrund bleibt sichtbar, Materialien statt Kästen ---------- */
+#game .board { gap: 10px; }
+#game .panel { background: none; border: none; box-shadow: none; padding: 0; color: var(--pergament); }
+#game .panel > h2, .shop-head h2 {
+  font-family: var(--titel); font-weight: 900; font-size: 19px; color: #ffe9b8; margin: 0;
+  text-shadow: 0 2px 0 #2a1407, 0 0 6px rgba(0, 0, 0, .8);
+}
+#game .panel > h2 .hint { color: #f0dcb0; font-family: var(--font); text-shadow: 0 1px 2px #000; }
+/* Rucksack aus Leder, Lager als offene Truhe (9-teilige Rahmen aus den Bildern) */
+#game .bag-panel { border: 34px solid transparent; border-image: url('assets/ui/rucksack-flaeche.webp') 130 fill / 34px stretch; padding: 0; position: relative; }
+#game .store-panel { border: 30px solid transparent; border-image: url('assets/ui/lager-truhe.webp') 112 fill / 30px stretch; padding: 0; position: relative; }
+#game .bag-panel > h2, #game .store-panel > h2 { position: absolute; top: -30px; left: 0; right: 0; justify-content: center; z-index: 2; }
+#game .store-panel > h2 { top: -27px; }
+#game .grid { background: rgba(30, 14, 5, .28); border: 2px solid rgba(255, 214, 150, .25); border-radius: 6px; }
+#game .grid .cell { border: 1px dashed rgba(255, 220, 160, .22); background: rgba(255, 230, 190, .04); box-shadow: none; }
+#game .grid.store { background: rgba(20, 10, 4, .22); border-style: solid; }
+#game .grid.store .item { filter: saturate(.75); }
+/* Laden: Händlerstand, Angebote auf der Theke, Preise auf Holzschildern */
+#game .shop-panel {
+  background: url('assets/ui/haendlerstand.webp') center 72% / cover no-repeat;
+  border-radius: 14px; overflow: hidden; padding: 8px 12px 10px;
+  box-shadow: inset 0 0 0 3px rgba(40, 20, 8, .7), 0 6px 14px rgba(0, 0, 0, .45);
+}
+.shop-head { padding: 0 2px; }
+.shop-head .btn { min-height: 48px; }
+.shop-gold { display: inline-flex; align-items: center; gap: 4px; font-family: var(--titel); font-weight: 900; font-size: 20px; color: var(--gold-hell);
+  background: rgba(20, 11, 5, .7); border: 2px solid rgba(232, 178, 58, .6); border-radius: 999px; padding: 2px 12px 2px 6px; }
+.shop-gold .sym { height: 28px; }
+#game .slot { border: none; background: none; justify-content: flex-end; padding: 2px 2px 6px; color: var(--pergament); }
+#game .slot .holder { filter: drop-shadow(0 6px 4px rgba(0, 0, 0, .45)); }
+#game .slot .price-tag {
+  display: inline-flex; align-items: center; gap: 3px; font-family: var(--titel); font-weight: 900; font-size: 17px; color: #ffe9b8;
+  background: linear-gradient(180deg, #8a5a34, #5a3820); border: 2px solid #2a170b; border-radius: 6px; padding: 1px 10px 2px 8px;
+  box-shadow: 0 3px 0 rgba(0, 0, 0, .4); text-shadow: 0 1px 0 #000;
+}
+#game .slot .price-tag.cant { color: #ff9c8a; }
+#game .slot .price-tag small { font-family: var(--font); font-size: 13px; }
+#game .slot .lock { opacity: 1; background: rgba(20, 11, 5, .55); border-radius: 50%; width: 40px; height: 40px; top: 4px; right: 4px; }
+#game .slot .lock.on { background: var(--gold); border-color: #6d4a10; }
+#game .slot.empty { color: #f0dcb0; text-shadow: 0 1px 2px #000; }
+/* Info als Pergamenttafel */
+#game .info-panel { color: var(--tinte); border: 22px solid transparent; border-image: url('assets/ui/tafel-rahmen.webp') 64 fill / 22px stretch; padding: 2px 4px; }
+#game .info-panel h2 { color: var(--tinte); text-shadow: none; font-size: 18px; }
+#game .info-panel .gram { background: rgba(120, 80, 30, .1); }
+.stats li { align-items: center; }
+.stats li span:first-child { display: inline-flex; align-items: center; gap: 4px; }
+.stats .sym { height: 24px; }
+/* Gegenstände: Name gut lesbar */
+.item .label { font-family: var(--font); font-weight: 700; }
+/* Kopfleiste auf kleineren iPads: kompakter, Gebietsname nur mit genug Platz */
+@media (max-width: 1100px) {
+  .topbar { gap: 6px; padding: 6px 8px; }
+  .stat { font-size: 16px; padding: 2px 9px 2px 5px; }
+  .stat-gebiet { display: none; }
+  #stat-hearts .sym { height: 22px; }
+  .topbar .btn.icon { width: 50px; min-width: 50px; height: 50px; }
+  .topbar .fight { padding: 6px 14px 9px; font-size: 16px; }
+}

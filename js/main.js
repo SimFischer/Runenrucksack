@@ -366,7 +366,7 @@ function renderTop() {
   $('stat-hero').innerHTML = `${hero() && figurBild(hero().id) ? `<img class="stat-bild" src="${figurBild(hero().id)}" alt="">` : ''}${hero()?.kurz || ''}`;
   $('stat-hero').title = [c.unterklasse?.name, c.fate?.name].filter(Boolean).join(' · ');
   $('stat-hero').hidden = !hero();
-  $('stat-day').innerHTML = `${sym('karte')}${reg.name} <span class="stat-tag">${sym('tag')}${run.day}/${CFG.lastDay}</span>`;
+  $('stat-day').innerHTML = `${sym('karte')}<span class="stat-gebiet">${reg.name}</span> <span class="stat-tag">${sym('tag')}${run.day}/${CFG.lastDay}</span>`;
   $('stat-hearts').innerHTML = sym('herz').repeat(Math.max(0, run.hearts)) + sym('herz', 'leer').repeat(CFG.hearts - Math.max(0, run.hearts));
   $('stat-wins').innerHTML = `${sym('pokal')}${run.wins}`;
   syncGold();

@@ -89,6 +89,8 @@ const LAUF = `
   ];
   G.run.gold = 14;
   const lock = document.querySelector('.lock'); if (lock) { lock.click(); await __s(150); lock.click(); await __s(300); }
+  await __s(400); for (const n of document.querySelectorAll('#aufgabe [data-nein]')) { n.click(); await __s(300); }
+  document.getElementById('tip-bubble')?.remove();
 `;
 
 // Kampf bis zum Ende: Spieler stark oder schwach machen, dann „Überspringen“
