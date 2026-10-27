@@ -622,6 +622,393 @@
         425,
         491
       ]
+    },
+    "ui/symbole/gold.webp": {
+      "sheet": "ui/ui-symbole.png",
+      "ausschnitt": [
+        42,
+        45,
+        259,
+        261
+      ]
+    },
+    "ui/symbole/herz.webp": {
+      "sheet": "ui/ui-symbole.png",
+      "ausschnitt": [
+        343,
+        61,
+        270,
+        231
+      ]
+    },
+    "ui/symbole/herz-zerbrochen.webp": {
+      "sheet": "ui/ui-symbole.png",
+      "ausschnitt": [
+        642,
+        61,
+        278,
+        231
+      ]
+    },
+    "ui/symbole/pokal.webp": {
+      "sheet": "ui/ui-symbole.png",
+      "ausschnitt": [
+        944,
+        47,
+        299,
+        262
+      ]
+    },
+    "ui/symbole/tag.webp": {
+      "sheet": "ui/ui-symbole.png",
+      "ausschnitt": [
+        27,
+        319,
+        286,
+        292
+      ]
+    },
+    "ui/symbole/nacht.webp": {
+      "sheet": "ui/ui-symbole.png",
+      "ausschnitt": [
+        358,
+        343,
+        241,
+        252
+      ]
+    },
+    "ui/symbole/sanduhr.webp": {
+      "sheet": "ui/ui-symbole.png",
+      "ausschnitt": [
+        680,
+        316,
+        201,
+        295
+      ]
+    },
+    "ui/symbole/schloss.webp": {
+      "sheet": "ui/ui-symbole.png",
+      "ausschnitt": [
+        979,
+        315,
+        230,
+        297
+      ]
+    },
+    "ui/symbole/stern.webp": {
+      "sheet": "ui/ui-symbole.png",
+      "ausschnitt": [
+        27,
+        631,
+        278,
+        264
+      ]
+    },
+    "ui/symbole/buch.webp": {
+      "sheet": "ui/ui-symbole.png",
+      "ausschnitt": [
+        317,
+        629,
+        308,
+        284
+      ]
+    },
+    "ui/symbole/truhe.webp": {
+      "sheet": "ui/ui-symbole.png",
+      "ausschnitt": [
+        645,
+        631,
+        293,
+        287
+      ]
+    },
+    "ui/symbole/karte.webp": {
+      "sheet": "ui/ui-symbole.png",
+      "ausschnitt": [
+        944,
+        633,
+        291,
+        275
+      ]
+    },
+    "ui/symbole/menue.webp": {
+      "sheet": "ui/ui-symbole.png",
+      "ausschnitt": [
+        28,
+        924,
+        291,
+        295
+      ]
+    },
+    "ui/symbole/wuerfel.webp": {
+      "sheet": "ui/ui-symbole.png",
+      "ausschnitt": [
+        351,
+        934,
+        229,
+        259
+      ]
+    },
+    "ui/symbole/kampf.webp": {
+      "sheet": "ui/ui-symbole.png",
+      "ausschnitt": [
+        619,
+        927,
+        314,
+        275
+      ]
+    },
+    "ui/symbole/eule.webp": {
+      "sheet": "ui/ui-symbole.png",
+      "ausschnitt": [
+        956,
+        920,
+        278,
+        302
+      ]
+    },
+    "ui/zustand/brand.webp": {
+      "sheet": "ui/zustand-symbole.png",
+      "ausschnitt": [
+        17,
+        11,
+        415,
+        407
+      ]
+    },
+    "ui/zustand/gift.webp": {
+      "sheet": "ui/zustand-symbole.png",
+      "ausschnitt": [
+        458,
+        11,
+        415,
+        407
+      ]
+    },
+    "ui/zustand/kaelte.webp": {
+      "sheet": "ui/zustand-symbole.png",
+      "ausschnitt": [
+        902,
+        11,
+        416,
+        407
+      ]
+    },
+    "ui/zustand/betaeubung.webp": {
+      "sheet": "ui/zustand-symbole.png",
+      "ausschnitt": [
+        1342,
+        11,
+        416,
+        408
+      ]
+    },
+    "ui/zustand/block.webp": {
+      "sheet": "ui/zustand-symbole.png",
+      "ausschnitt": [
+        17,
+        448,
+        415,
+        417
+      ]
+    },
+    "ui/zustand/heilung.webp": {
+      "sheet": "ui/zustand-symbole.png",
+      "ausschnitt": [
+        458,
+        448,
+        416,
+        417
+      ]
+    },
+    "ui/zustand/tempo.webp": {
+      "sheet": "ui/zustand-symbole.png",
+      "ausschnitt": [
+        901,
+        448,
+        417,
+        417
+      ]
+    },
+    "ui/zustand/glueck.webp": {
+      "sheet": "ui/zustand-symbole.png",
+      "ausschnitt": [
+        1342,
+        448,
+        420,
+        417
+      ]
+    },
+    "ui/banner/sieg.webp": {
+      "sheet": "ui/banner.png",
+      "ausschnitt": [
+        12,
+        44,
+        846,
+        591
+      ]
+    },
+    "ui/banner/niederlage.webp": {
+      "sheet": "ui/banner.png",
+      "ausschnitt": [
+        886,
+        21,
+        636,
+        655
+      ]
+    },
+    "ui/banner/namensband.webp": {
+      "sheet": "ui/banner.png",
+      "ausschnitt": [
+        14,
+        728,
+        803,
+        191
+      ]
+    },
+    "ui/banner/holzschild.webp": {
+      "sheet": "ui/banner.png",
+      "ausschnitt": [
+        858,
+        710,
+        655,
+        257
+      ]
+    },
+    "ui/effekte/treffer.webp": {
+      "sheet": "ui/effekte.png",
+      "ausschnitt": [
+        30,
+        30,
+        370,
+        369
+      ]
+    },
+    "ui/effekte/pfeil.webp": {
+      "sheet": "ui/effekte.png",
+      "ausschnitt": [
+        457,
+        153,
+        416,
+        148
+      ]
+    },
+    "ui/effekte/eis.webp": {
+      "sheet": "ui/effekte.png",
+      "ausschnitt": [
+        925,
+        39,
+        364,
+        358
+      ]
+    },
+    "ui/effekte/feuer.webp": {
+      "sheet": "ui/effekte.png",
+      "ausschnitt": [
+        1337,
+        86,
+        409,
+        263
+      ]
+    },
+    "ui/effekte/giftwolke.webp": {
+      "sheet": "ui/effekte.png",
+      "ausschnitt": [
+        41,
+        454,
+        388,
+        398
+      ]
+    },
+    "ui/effekte/blitz.webp": {
+      "sheet": "ui/effekte.png",
+      "ausschnitt": [
+        474,
+        448,
+        376,
+        413
+      ]
+    },
+    "ui/effekte/heilung.webp": {
+      "sheet": "ui/effekte.png",
+      "ausschnitt": [
+        986,
+        453,
+        271,
+        409
+      ]
+    },
+    "ui/effekte/schildblitz.webp": {
+      "sheet": "ui/effekte.png",
+      "ausschnitt": [
+        1380,
+        454,
+        334,
+        404
+      ]
+    },
+    "ui/besiegt/spaeher.webp": {
+      "sheet": "ui/orks-besiegt.png",
+      "ausschnitt": [
+        50,
+        63,
+        565,
+        536
+      ]
+    },
+    "ui/besiegt/schildork.webp": {
+      "sheet": "ui/orks-besiegt.png",
+      "ausschnitt": [
+        661,
+        70,
+        586,
+        593
+      ]
+    },
+    "ui/besiegt/schamane.webp": {
+      "sheet": "ui/orks-besiegt.png",
+      "ausschnitt": [
+        18,
+        662,
+        607,
+        561
+      ]
+    },
+    "ui/besiegt/wolfsreiter.webp": {
+      "sheet": "ui/orks-besiegt.png",
+      "ausschnitt": [
+        635,
+        660,
+        608,
+        577
+      ]
+    },
+    "ui/fenwick/erklaert.webp": {
+      "sheet": "ui/fenwick-posen.png",
+      "ausschnitt": [
+        41,
+        31,
+        663,
+        681
+      ]
+    },
+    "ui/fenwick/tipp.webp": {
+      "sheet": "ui/fenwick-posen.png",
+      "ausschnitt": [
+        777,
+        42,
+        613,
+        673
+      ]
+    },
+    "ui/fenwick/jubelt.webp": {
+      "sheet": "ui/fenwick-posen.png",
+      "ausschnitt": [
+        1393,
+        0,
+        766,
+        722
+      ]
     }
   },
   "figuren": {
@@ -640,5 +1027,68 @@
     "kleinwurzel": "hintergrund-kleinwurzel.webp",
     "hrossmark": "hintergrund-hrossmark.webp",
     "titelbild": "titelbild.webp"
+  },
+  "ui": {
+    "flaechen": {
+      "tafel-rahmen": "ui/tafel-rahmen.webp",
+      "rucksack-flaeche": "ui/rucksack-flaeche.webp",
+      "lager-truhe": "ui/lager-truhe.webp",
+      "haendlerstand": "ui/haendlerstand.webp"
+    },
+    "symbole": {
+      "gold": "ui/symbole/gold.webp",
+      "herz": "ui/symbole/herz.webp",
+      "herz-zerbrochen": "ui/symbole/herz-zerbrochen.webp",
+      "pokal": "ui/symbole/pokal.webp",
+      "tag": "ui/symbole/tag.webp",
+      "nacht": "ui/symbole/nacht.webp",
+      "sanduhr": "ui/symbole/sanduhr.webp",
+      "schloss": "ui/symbole/schloss.webp",
+      "stern": "ui/symbole/stern.webp",
+      "buch": "ui/symbole/buch.webp",
+      "truhe": "ui/symbole/truhe.webp",
+      "karte": "ui/symbole/karte.webp",
+      "menue": "ui/symbole/menue.webp",
+      "wuerfel": "ui/symbole/wuerfel.webp",
+      "kampf": "ui/symbole/kampf.webp",
+      "eule": "ui/symbole/eule.webp"
+    },
+    "zustand": {
+      "brand": "ui/zustand/brand.webp",
+      "gift": "ui/zustand/gift.webp",
+      "kaelte": "ui/zustand/kaelte.webp",
+      "betaeubung": "ui/zustand/betaeubung.webp",
+      "block": "ui/zustand/block.webp",
+      "heilung": "ui/zustand/heilung.webp",
+      "tempo": "ui/zustand/tempo.webp",
+      "glueck": "ui/zustand/glueck.webp"
+    },
+    "banner": {
+      "sieg": "ui/banner/sieg.webp",
+      "niederlage": "ui/banner/niederlage.webp",
+      "namensband": "ui/banner/namensband.webp",
+      "holzschild": "ui/banner/holzschild.webp"
+    },
+    "effekte": {
+      "treffer": "ui/effekte/treffer.webp",
+      "pfeil": "ui/effekte/pfeil.webp",
+      "eis": "ui/effekte/eis.webp",
+      "feuer": "ui/effekte/feuer.webp",
+      "giftwolke": "ui/effekte/giftwolke.webp",
+      "blitz": "ui/effekte/blitz.webp",
+      "heilung": "ui/effekte/heilung.webp",
+      "schildblitz": "ui/effekte/schildblitz.webp"
+    },
+    "besiegt": {
+      "spaeher": "ui/besiegt/spaeher.webp",
+      "schildork": "ui/besiegt/schildork.webp",
+      "schamane": "ui/besiegt/schamane.webp",
+      "wolfsreiter": "ui/besiegt/wolfsreiter.webp"
+    },
+    "fenwick": {
+      "erklaert": "ui/fenwick/erklaert.webp",
+      "tipp": "ui/fenwick/tipp.webp",
+      "jubelt": "ui/fenwick/jubelt.webp"
+    }
   }
 }
