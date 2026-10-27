@@ -1,11 +1,18 @@
 // Prüfliste für Lehrkräfte: alle Wörter aus wortschatz.json als sortierbare Tabellen mit Häkchen-Spalte.
-// Einträge mit „unsicher“ sind gelb markiert. Die Häkchen merkt sich der Browser.
+// Einträge mit „unsicher“ sind gelb markiert, ebenso unsichere Sätze (⚠). Die Häkchen merkt sich der Browser.
 //
 //   node tools/pruefliste.mjs      → wortschatz-pruefliste.html (im Browser öffnen)
 import { readFileSync, writeFileSync } from 'node:fs';
+import { rahmenSatz } from '../js/aufgaben/saetze.js';
 
 const ws = JSON.parse(readFileSync('wortschatz.json', 'utf8'));
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;');
+// Sätze eines Eintrags, unsichere mit ⚠ davor; dazu der Hinweis für die Zeile
+const saetze = (liste, e) => liste.map((s) => (e.satzUnsicher?.includes(s) ? '⚠ ' + s : s)).join(' / ');
+const hinweis = (e, extra = '') => [extra, e.satzUnsicher ? `Satz unsicher (⚠)` : ''].filter(Boolean).join(' · ');
+// Verben: jeder Rahmen im Präsens, der erste auch im Präteritum und Perfekt, dazu der Satz mit dem Verb als Nomen
+const verbSaetze = (v) => [...v.rahmen.map((r) => rahmenSatz(v, r).satz), rahmenSatz(v, v.rahmen[0], 'praeteritum').satz,
+  ...(v.hilfsverb === 'beide' ? [] : [rahmenSatz(v, v.rahmen[0], 'perfekt').satz]), ...(v.nominal ? [v.nominal] : [])];
 
 function tabelle(id, titel, kopf, zeilen) {
   return `<h2 id="${id}">${titel} <small>(${zeilen.length})</small></h2>
@@ -15,15 +22,16 @@ ${zeilen.map(({ key, zellen, unsicher }) => `<tr class="${unsicher ? 'unsicher' 
 }
 
 const teile = [
-  tabelle('nomen', 'Nomen', ['Artikel', 'Wort', 'Mehrzahl', 'Muster', 'Silben', 'Wortfeld', 'Stufe', 'Rechtschreibung', 'Ableitung / Grundwort'],
-    ws.nomen.map((n) => ({ key: n.wort, unsicher: n.unsicher || (n.mehrdeutig ? 'mehrdeutig – nie für Artikel/Mehrzahl' : ''),
-      zellen: [n.artikel, n.wort, n.plural, n.pluralmuster, n.silben.join('-'), ws.wortfelder[n.wortfeld]?.name || n.wortfeld, n.schwierigkeit, n.phaenomene.join(', '), n.ableitung || n.grundwort || ''] }))),
-  tabelle('verben', 'Verben', ['Infinitiv', 'ich', 'du', 'er/sie/es', 'wir', 'ihr', 'sie', 'Präteritum', 'Perfekt', 'unregelmäßig', 'Stufe', 'Satz-Ergänzung'],
-    ws.verben.map((v) => ({ key: v.infinitiv, unsicher: v.unsicher,
-      zellen: [v.infinitiv, ...Object.values(v.praesens), v.praeteritum, `${{ haben: 'hat', sein: 'ist', beide: 'hat/ist' }[v.hilfsverb]} ${v.partizip}`, v.unregelmaessig ? 'ja' : 'nein', v.schwierigkeit, v.ergaenzung] }))),
-  tabelle('adjektive', 'Adjektive', ['Positiv', 'Komparativ', 'Superlativ', 'Gegenteil', 'unregelmäßig', 'Umlaut', 'Stufe'],
-    ws.adjektive.map((a) => ({ key: a.positiv, unsicher: a.unsicher,
-      zellen: [a.positiv, a.komparativ, a.superlativ, a.gegenteil, a.unregelmaessig ? 'ja' : 'nein', a.umlaut ? 'ja' : 'nein', a.schwierigkeit] }))),
+  tabelle('nomen', 'Nomen', ['Artikel', 'Wort', 'Mehrzahl', 'Muster', 'Silben', 'Wortfeld', 'Bedeutungsgruppe', 'Stufe', 'Rechtschreibung', 'Ableitung / Grundwort', 'Sätze (zuletzt Mehrzahl)'],
+    ws.nomen.map((n) => ({ key: n.wort, unsicher: hinweis(n, n.unsicher || (n.mehrdeutig ? 'mehrdeutig – nie für Artikel/Mehrzahl' : '')),
+      zellen: [n.artikel, n.wort, n.plural, n.pluralmuster, n.silben.join('-'), ws.wortfelder[n.wortfeld]?.name || n.wortfeld, n.gruppe, n.schwierigkeit, n.phaenomene.join(', '), n.ableitung || n.grundwort || '',
+        saetze([...n.saetze, n.mehrzahlSatz], n)] }))),
+  tabelle('verben', 'Verben', ['Infinitiv', 'ich', 'du', 'er/sie/es', 'wir', 'ihr', 'sie', 'Präteritum', 'Perfekt', 'unregelmäßig', 'Stufe', 'Sätze'],
+    ws.verben.map((v) => ({ key: v.infinitiv, unsicher: hinweis(v, v.unsicher),
+      zellen: [v.infinitiv, ...Object.values(v.praesens), v.praeteritum, `${{ haben: 'hat', sein: 'ist', beide: 'hat/ist' }[v.hilfsverb]} ${v.partizip}`, v.unregelmaessig ? 'ja' : 'nein', v.schwierigkeit, saetze(verbSaetze(v), v)] }))),
+  tabelle('adjektive', 'Adjektive', ['Positiv', 'Komparativ', 'Superlativ', 'Gegenteil', 'unregelmäßig', 'Umlaut', 'Stufe', 'Sätze'],
+    ws.adjektive.map((a) => ({ key: a.positiv, unsicher: hinweis(a, a.unsicher),
+      zellen: [a.positiv, a.komparativ, a.superlativ, a.gegenteil, a.unregelmaessig ? 'ja' : 'nein', a.umlaut ? 'ja' : 'nein', a.schwierigkeit, saetze(Object.values(a.saetze), a)] }))),
   tabelle('komposita', 'Komposita', ['Bestimmungswort', 'Fuge', 'Grundwort', 'Kompositum', 'Artikel'],
     ws.komposita.map((k) => ({ key: k.wort, zellen: [k.bestimmungswort, k.fuge || '–', k.grundwort, k.wort, k.artikel] }))),
   tabelle('familien', 'Wortfamilien', ['Wörter', 'Falle (gehört nicht dazu)'],

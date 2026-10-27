@@ -8,7 +8,6 @@ import { falscheFormen } from './wortschatz.js';
 export const PERSONEN_FOLGE = ['er', 'ich', 'wir', 'du', 'sie', 'ihr'];
 const PRONOMEN = { ich: 'Ich', du: 'Du', wir: 'Wir', ihr: 'Ihr' };
 const DATIV_ARTIKEL = { der: 'dem', das: 'dem', die: 'der' };
-const ERSATZ_VORLAGE = '{S} ___ mit {D} los.';
 
 // Kurzer Name der Figur: „Borga Eisenfaust“ → „Borga“
 export const kurzName = (name) => String(name || 'Eadrun').split(' ')[0];
@@ -31,7 +30,7 @@ export function mitDativ(def, stern, defs) {
 }
 
 export const verbVon = (ws, verbDef) => ws?.verben?.find((v) => v.infinitiv === verbDef.name) || null;
-export const vorlagenFuer = (ws, verbDef) => verbVon(ws, verbDef)?.vorlagen || [ERSATZ_VORLAGE];
+export const vorlagenFuer = (ws, verbDef) => verbVon(ws, verbDef)?.vorlagen || [];
 
 // Personalform aus dem Wortschatz; ohne Eintrag nur er/sie aus items.json.
 function form(ws, verbDef, person) {
@@ -43,9 +42,14 @@ function form(ws, verbDef, person) {
 // Ein Satz: { luecke: „Eadrun ___ mit dem Eisspeer los.“, form: „stürmt“, satz: „Eadrun stürmt mit dem Eisspeer los.“ }
 export function verbSatz({ verbDef, subjDef, stern = 1, defs, ws, person = 'er', figur = 'Eadrun', vorlage = 0 }) {
   const vorlagen = vorlagenFuer(ws, verbDef);
+  const f = form(ws, verbDef, person);
+  // Ohne Wortschatz (Simulation, einzelne Tests) gibt es keinen Satz – nur Person, Form und Gegenstand
+  if (!vorlagen.length) {
+    const kurz = `${subjektFuer(person, figur)}: ___ (mit ${mitDativ(subjDef, stern, defs)})`;
+    return { luecke: kurz, form: f, satz: kurz.replace('___', f), person };
+  }
   const v = vorlagen[vorlage % vorlagen.length];
   const luecke = v.replace('{S}', subjektFuer(person, figur)).replace('{D}', mitDativ(subjDef, stern, defs));
-  const f = form(ws, verbDef, person);
   return { luecke, form: f, satz: luecke.replace('___', f), person };
 }
 

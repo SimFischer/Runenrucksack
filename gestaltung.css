@@ -489,3 +489,7 @@ button, input, select, textarea { font-family: inherit; }
 .af-linie { stroke: var(--gold-hell); stroke-width: 2.5; stroke-dasharray: 6 5; filter: drop-shadow(0 0 3px #000); }
 .af-punkt { fill: var(--gold-hell); stroke: #2a1407; stroke-width: 1.5; }
 @keyframes af-ring { 50% { stroke-opacity: .55; } }
+
+/* Lückensatz: Die Lücke ist so groß wie die Schrift und bricht nie vom Wort danach weg */
+.luecke-paar { white-space: nowrap; }
+.af-satz .blank, .quick-q .blank { font-size: inherit; line-height: inherit; vertical-align: baseline; }

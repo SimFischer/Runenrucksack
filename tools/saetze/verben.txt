@@ -1,0 +1,141 @@
+# Satzrahmen zu den Verben: Infinitiv|Satz mit dem Verb als Nomen (oder -)|Rahmen|Rahmen|Rahmen
+# Rahmen: person:Rest (ich, du, wir, ihr) oder person:Subjekt:Rest (er, sie). Daraus entstehen Sätze im Präsens,
+# Präteritum und Perfekt: „Ich schwimme im kalten See.“ – „Ich schwamm …“ – „Ich bin im kalten See geschwommen.“
+# Ein „?“ vor dem Rahmen: noch unsicher.
+sein|-|er:Fenwick:oft im Wald|ich:sehr müde|wir:gute Freunde
+haben|-|er:Borga:einen schweren Hammer|du:einen guten Plan|sie:Die Zwerge:viel Gold
+werden|-|er:Das Fohlen:schnell groß|ich:am Abend müde|wir:vor dem Turnier ganz still
+gehen|Beim Gehen knirscht der Schnee unter den Stiefeln.|er:Fenwick:nach Hause|ich:mit Oma zum Markt|wir:über die Brücke
+kommen|Im Gasthaus hört das Kommen und Gehen nie auf.|er:Der Bote:zur Burg|du:zu spät zum Fest|sie:Die Gäste:in den Saal
+laufen|Beim Laufen über die Wiese verliert Eadrun ihre Mütze.|er:Das Fohlen:über die Wiese|ich:schnell zum Stall|ihr:um den Teich
+fahren|Beim Fahren mit der Kutsche wird Borga schlecht.|er:Der Bauer:mit der Kutsche zum Markt|wir:mit dem Boot über den See|du:mit dem Fahrrad zur Schule
+schlagen|Beim Schlagen auf den Amboss sprühen Funken.|er:Borga:mit dem Hammer auf das Eisen|ich:die Trommel|sie:Die Wellen:gegen die Felsen
+tragen|Beim Tragen der Kiste hilft mir Borga.|er:Der Esel:einen schweren Sack|du:den Korb|wir:die Truhe in den Keller
+fallen|Beim Fallen hält sich Eadrun am Ast fest.|er:Der Apfel:vom Baum|ich:in den Bach|sie:Die Blätter:auf den Weg
+fangen|Beim Fangen der Hühner rennt Borga über den Hof.|er:Der Fuchs:eine Maus|ich:den Ball|wir:im Bach einen Fisch
+halten|Beim Halten der Fackel zittert der Knappe.|er:Der Knappe:die Fackel|du:die Zügel fest|ihr:die Leiter
+schlafen|Beim Schlafen schnarcht Borga laut.|er:Der Igel:unter dem Laub|ich:im Zelt|sie:Die Kinder:tief und fest
+waschen|Beim Waschen spritzt das Wasser.|er:Eadrun:das Pferd|ich:meine Hände|wir:die Teller
+wachsen|Beim Wachsen braucht die Rose viel Sonne.|er:Die Rose:am Zaun|ich:jedes Jahr ein Stück|sie:Die Kürbisse:im Garten
+geben|-|er:Eadrun:dem Pferd Hafer|du:mir den Becher|wir:der Wirtin das Geld
+nehmen|-|er:Der Ritter:den Schlüssel|ich:einen Apfel aus dem Korb|ihr:die Fackeln
+sehen|-|er:Die Eule:im Dunkeln gut|ich:einen Drachen am Himmel|wir:die Sterne
+lesen|Beim Lesen vergisst Fenwick die Zeit.|er:Fenwick:ein dickes Buch|du:den Brief|sie:Die Kinder:ein Märchen
+essen|Beim Essen redet man nicht mit vollem Mund.|er:Borga:einen Apfel|ich:eine Suppe|wir:Kuchen mit Sahne
+helfen|-|er:Der Zwerg:dem Ritter|du:der Oma|wir:den Bauern bei der Ernte
+sprechen|Beim Sprechen wackelt die Eule mit dem Kopf.|er:Fenwick:mit der Eule|ich:ganz leise|ihr:mit dem Zwerg
+treffen|-|er:Eadrun:einen Zwerg|wir:unsere Freunde am Brunnen|du:genau die Mitte
+werfen|Beim Werfen zielt Theron genau.|er:Theron:den Ball|ich:einen Stein in den Teich|sie:Die Kinder:Schneebälle
+vergessen|-|er:Fenwick:oft seinen Hut|ich:den Schlüssel|ihr:nie einen Geburtstag
+stechen|-|er:Die Mücke:mich in den Arm|ich:mit der Gabel in die Kartoffel|sie:Die Dornen:in die Finger
+brechen|-|er:Der Ast:unter dem Schnee|ich:das Brot in zwei Stücke|ihr:das Siegel
+finden|-|er:Der Hund:den Knochen|ich:eine Münze im Gras|wir:einen Schatz in der Höhle
+singen|Beim Singen klatscht Ysolde in die Hände.|er:Der Vogel:ein Lied|ich:im Chor|sie:Die Kinder:am Feuer
+trinken|Beim Trinken kleckert der Kobold.|er:Das Pferd:an der Tränke|ich:einen Saft|wir:warmen Tee
+springen|Beim Springen über den Zaun fällt Eadrun fast hin.|er:Der Frosch:in den Teich|du:über den Zaun|sie:Die Kinder:über die Pfützen
+schwimmen|Beim Schwimmen im Teich wird Faelith ganz nass.|er:Die Ente:im Teich|ich:im kalten See|wir:durch den Fluss
+beginnen|-|er:Die Reise:am Morgen|wir:mit dem Spiel|du:ein neues Buch
+gewinnen|-|er:Der Ritter:das Turnier|ich:das Rennen|ihr:den Kampf gegen die Orks
+schreiben|Beim Schreiben macht Fenwick einen Klecks.|er:Fenwick:einen Brief|ich:in mein Heft|sie:Die Kinder:eine Geschichte
+bleiben|-|er:Der Ritter:in der Burg|ich:bei meinem Pferd|wir:im Gasthaus
+steigen|Beim Steigen auf den Turm keucht der Wächter.|er:Der Wächter:auf den Turm|ich:auf das Pferd|wir:über die Mauer
+reiten|Beim Reiten durch das Tal singt Eadrun.|er:Eadrun:durch das Tal|ich:auf einem Pony|sie:Die Ritter:zur Burg
+greifen|-|er:Der Ritter:nach dem Schwert|du:nach dem Seil|wir:in den Korb
+pfeifen|Beim Pfeifen spitzt Theron die Lippen.|er:Der Hirte:ein Lied|ich:nach meinem Hund|ihr:laut im Wald
+schneiden|Beim Schneiden der Zwiebeln weint die Köchin.|er:Die Köchin:das Brot|ich:ein paar Rosen|wir:die Hecke
+fliegen|Beim Fliegen breitet der Drache die Flügel aus.|er:Der Drache:über den Berg|ich:im Traum über die Wolken|sie:Die Vögel:nach Süden
+ziehen|-|er:Das Pferd:den Wagen|ich:am Seil|wir:den Eimer aus dem Brunnen
+schießen|Beim Schießen trifft Theron die Mitte.|er:Theron:einen Pfeil|ich:den Ball ins Tor|ihr:auf die Zielscheibe
+verlieren|-|er:Der Ritter:seinen Helm|ich:oft meine Mütze|wir:das Spiel
+frieren|-|er:Der Wächter:im Schnee|ich:an den Füßen|sie:Die Kinder:ohne Jacke
+riechen|-|er:Der Hund:den Braten|ich:an der Rose|ihr:den Kuchen
+rufen|-|er:Die Hirtin:nach dem Pferd|ich:laut um Hilfe|wir:nach Fenwick
+liegen|Beim Liegen im Gras zählt Eadrun die Wolken.|er:Der Hund:vor dem Kamin|ich:im Gras|sie:Die Äpfel:im Korb
+sitzen|Beim Sitzen am Feuer erzählt Fenwick Geschichten.|er:Die Katze:auf dem Dach|ich:am Feuer|wir:auf der Bank
+stehen|-|er:Der Wächter:vor dem Tor|du:auf der Leiter|sie:Die Pferde:im Stall
+tun|-|er:Der Kobold:nichts|ich:dir nichts|ihr:viel für das Dorf
+wissen|-|er:Fenwick:den Weg|ich:die Antwort|wir:ein Geheimnis
+denken|Beim Denken kratzt sich Borga am Kopf.|er:Borga:an die Reise|ich:oft an meine Oma|ihr:an den Schlüssel
+bringen|-|er:Der Bote:einen Brief|ich:dir einen Korb mit Äpfeln|wir:das Pferd in den Stall
+kennen|-|er:Fenwick:den Weg|ich:jedes Tier im Wald|wir:den Zwerg
+rennen|Beim Rennen verliert der Kobold einen Schuh.|er:Der Hund:zum Stall|ich:schnell nach Hause|sie:Die Kinder:über den Hof
+brennen|-|er:Das Feuer:im Kamin|ich:vor Neugier|sie:Die Fackeln:an der Wand
+nennen|-|er:Fenwick:den Namen|ich:mein Pferd Blitz|wir:den Drachen Funkel
+bitten|-|er:Der Zwerg:um Hilfe|ich:dich um einen Gefallen|ihr:den König um Rat
+graben|Beim Graben findet Borga eine Münze.|er:Der Dachs:ein Loch|ich:im Beet|wir:nach dem Schatz
+sterben|-|er:Die Blume:ohne Wasser|ich:fast vor Lachen|sie:Die Pflanzen:im Frost
+blasen|Beim Blasen ins Horn wird Theron rot.|er:Der Wächter:ins Horn|ich:in die heiße Suppe|sie:Die Kinder:in die Trompeten
+stoßen|-|er:Der Ritter:gegen die Tür|ich:mit dem Fuß gegen einen Stein|sie:Die Ziegen:mit den Hörnern
+schieben|Beim Schieben hilft Borga.|er:Der Bauer:den Wagen|ich:die Kiste in die Ecke|wir:den Karren den Berg hinauf
+heben|Beim Heben der Truhe stöhnt der Knappe.|er:Der Riese:den Stein|ich:die Kiste|ihr:den Baumstamm
+lügen|-|er:Der Kobold:oft|ich:nie|ihr:nicht
+leihen|-|er:Fenwick:mir ein Buch|du:mir deinen Stift|wir:dem Nachbarn eine Leiter
+machen|-|er:Borga:eine Pause|ich:meine Hausaufgaben|wir:ein Feuer
+spielen|Beim Spielen im Garten wird es nie langweilig.|er:Der Hund:mit dem Ball|ich:im Garten|sie:Die Kinder:Verstecken
+lernen|Beim Lernen hilft Fenwick den Kindern.|er:Der Lehrling:viel von Borga|ich:neue Wörter|wir:ein Lied
+kaufen|Beim Kaufen zählt Eadrun die Münzen.|er:Die Wirtin:frisches Brot|ich:einen Apfel auf dem Markt|ihr:neue Stiefel
+sagen|-|er:Der Ritter:die Wahrheit|ich:dir ein Geheimnis|wir:Danke
+fragen|Beim Fragen hebt Eadrun die Hand.|er:Der Wanderer:nach dem Weg|ich:Fenwick um Rat|ihr:die Lehrerin
+lachen|Beim Lachen hält sich Borga den Bauch.|er:Der König:laut|ich:über den Kobold|wir:über den Witz
+weinen|-|er:Das Baby:leise|ich:vor Freude|sie:Die Kinder:beim Abschied
+hören|-|er:Der Hund:ein Geräusch|ich:ein Horn im Wald|wir:die Glocke
+suchen|Beim Suchen hilft der Hund.|er:Borga:den Schlüssel|ich:meine Socke|ihr:den Weg
+holen|-|er:Der Knappe:Wasser vom Brunnen|ich:Holz für den Ofen|wir:die Pferde von der Weide
+bauen|Beim Bauen der Hütte hilft das ganze Dorf.|er:Der Vogel:ein Nest|ich:eine Hütte|wir:eine Burg aus Sand
+malen|Beim Malen wird Ysolde ganz still.|er:Ysolde:ein Bild|ich:einen Drachen|ihr:die Wände bunt
+tanzen|Beim Tanzen tritt Borga dem Zwerg auf den Fuß.|er:Der König:mit der Königin|ich:beim Fest|sie:Die Gäste:im Saal
+reisen|Beim Reisen sieht Eadrun viele Länder.|er:Fenwick:nach Hrossmark|wir:mit dem Schiff|du:gern
+wandern|Beim Wandern durch den Wald singen wir.|er:Der Hirte:über die Hügel|ich:mit Opa durch den Wald|ihr:zum See
+klettern|Beim Klettern auf den Baum zerreißt Eadrun ihre Hose.|er:Das Eichhörnchen:auf den Baum|ich:über den Felsen|wir:auf die Mauer
+sammeln|Beim Sammeln der Beeren füllt sich der Korb.|er:Das Eichhörnchen:Nüsse|ich:Muscheln am Strand|wir:Beeren im Wald
+wohnen|-|er:Der König:in der Burg|ich:in einem kleinen Dorf|sie:Die Zwerge:in den Bergen
+kochen|Beim Kochen duftet das ganze Haus.|er:Die Wirtin:eine Suppe|ich:Tee|wir:Kartoffeln
+putzen|Beim Putzen findet der Knappe eine alte Münze.|er:Der Knappe:den Helm|ich:meine Zähne|ihr:den Stall
+zeigen|-|er:Fenwick:den Weg|ich:dir mein Pferd|wir:den Gästen die Burg
+legen|-|er:Das Huhn:ein Ei|ich:den Stein auf den Tisch|wir:Holz auf das Feuer
+stellen|-|er:Die Wirtin:die Kanne auf den Tisch|ich:die Stiefel vor die Tür|ihr:die Stühle in eine Reihe
+wecken|-|er:Der Hahn:das ganze Dorf|ich:meinen Bruder|wir:den Ritter
+packen|Beim Packen vergisst Eadrun ihre Mütze.|er:Eadrun:den Rucksack|ich:meine Tasche|wir:die Säcke
+kämpfen|Beim Kämpfen gegen die Orks bleibt Borga mutig.|er:Der Ritter:gegen den Ork|ich:für mein Dorf|wir:gegen den Drachen
+leben|-|er:Der Fuchs:im Wald|ich:in einem Dorf|sie:Die Fische:im Teich
+lieben|-|er:Eadrun:ihr Pferd|ich:Kirschkuchen|wir:den Sommer
+hoffen|-|er:Der Bauer:auf Regen|ich:auf Sonne|wir:auf den Sieg
+glauben|-|er:Der Ritter:an den Sieg|ich:dir|ihr:an Feen
+brauchen|-|er:Der Bergsteiger:ein Seil|ich:einen Stift|wir:Hilfe
+danken|-|er:Der Wanderer:der Wirtin|ich:dir|wir:dem Zwerg für die Hilfe
+drehen|-|er:Der Wächter:den Schlüssel im Schloss|ich:mich im Kreis|wir:das Rad
+fühlen|-|er:Der Wächter:die Kälte|ich:das weiche Fell|du:den Wind
+füllen|-|er:Die Wirtin:den Krug|ich:die Gießkanne|wir:die Säcke mit Mehl
+führen|-|er:Die Hirtin:das Pferd in den Stall|ich:dich durch den Wald|ihr:die Gäste in den Saal
+jagen|Beim Jagen ist der Falke sehr schnell.|er:Die Katze:die Maus|du:den Kobold aus dem Garten|sie:Die Wölfe:im Winter
+klopfen|-|er:Der Bote:an die Tür|ich:an das Fenster|ihr:den Staub aus dem Teppich
+pflanzen|Beim Pflanzen der Rosen trägt Oma Handschuhe.|er:Der Gärtner:eine Rose|ich:Bohnen im Beet|wir:einen Apfelbaum
+retten|-|er:Der Ritter:den Prinzen|ich:die Katze vom Baum|wir:das Dorf vor dem Drachen
+arbeiten|Beim Arbeiten summt Borga ein Lied.|er:Borga:in der Schmiede|ich:im Garten|sie:Die Bauern:auf dem Feld
+warten|-|er:Der Bote:am Brunnen|ich:auf meine Freundin|wir:auf den Bus
+antworten|-|er:Die Eule:mit einem Ruf|ich:der Lehrerin|ihr:auf die Frage
+baden|Beim Baden im Teich quaken die Frösche.|er:Der Hund:im Teich|ich:im warmen Wasser|wir:im See
+reden|-|er:Der Zwerg:ohne Pause|ich:mit meiner Oma|ihr:zu laut
+atmen|-|er:Der Drache:schwer|ich:die frische Luft|wir:ganz ruhig
+öffnen|-|er:Der Zwerg:die Truhe|ich:das Fenster|ihr:das Tor
+rechnen|Beim Rechnen zählt der Kobold an den Fingern.|er:Der Händler:schnell|ich:im Kopf|wir:mit großen Zahlen
+zählen|-|er:Der Händler:die Münzen|ich:bis hundert|wir:die Schafe
+schützen|-|er:Der Schild:den Ritter|ich:mein Gesicht vor dem Wind|wir:das Dorf
+schmieden|Beim Schmieden schwitzt Borga sehr.|er:Borga:ein Schwert|ich:ein Hufeisen|sie:Die Zwerge:Ringe aus Gold
+schmücken|-|er:Die Königin:den Saal|ich:den Weihnachtsbaum|wir:die Halle mit Blumen
+besuchen|-|er:Der Prinz:die Königin|ich:meine Oma|wir:den Markt
+bezahlen|-|er:Der Ritter:den Händler|ich:mit drei Münzen|ihr:das Essen
+erzählen|Beim Erzählen am Feuer leuchten Fenwicks Augen.|er:Fenwick:ein Märchen|ich:dir eine Geschichte|wir:von unserer Reise
+verkaufen|-|er:Der Händler:Äpfel|ich:mein altes Fahrrad|wir:Kuchen auf dem Markt
+erklären|-|er:Fenwick:den Plan|ich:dir das Spiel|ihr:den Weg zur Burg
+probieren|-|er:Der Koch:die Suppe|ich:den Kuchen|wir:ein neues Spiel
+marschieren|-|er:Der Ritter:zur Burg|wir:durch das Tor|sie:Die Orks:über die Brücke
+landen|-|er:Der Drache:auf der Wiese|ich:mit dem Boot auf der Insel|sie:Die Vögel:auf dem Dach
+folgen|-|er:Der Jäger:der Spur|ich:dir|wir:dem Bach
+stolpern|-|er:Der Kobold:über einen Stein|ich:über meine Schnürsenkel|ihr:im Dunkeln
+zaubern|Beim Zaubern sprühen bunte Funken.|er:Fenwick:einen Sturm|ich:einen Hasen aus dem Hut|ihr:Blumen aus dem Hut
+leuchten|-|er:Der Mond:hell am Himmel|er:Die Laterne:im Dunkeln|sie:Die Sterne:in der Nacht
+heizen|-|er:Der Schmied:den Ofen|ich:mein Zimmer|wir:im Winter mit Holz
+fischen|Beim Fischen muss man still sein.|er:Der Bär:im Fluss|ich:mit Opa im Bach|wir:am Teich
+heilen|-|er:Die Ärztin:die Wunde|ich:dein Knie mit einem Zauber|sie:Die Heiltränke:schnell
+stürmen|-|er:Der Ritter:auf die Burg|ich:auf den Hof|sie:Die Orks:auf die Burg

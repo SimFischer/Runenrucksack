@@ -1,0 +1,275 @@
+# Sätze zu den Nomen (Teil 2: natur, burg, zauber, essen, alltag) – Aufbau wie nomen-1.txt
+Wolke|wn|Die Wolke sieht aus wie ein Schaf.|Am Himmel zieht eine dunkle Wolke.|Heute ziehen viele Wolken über das Tal.
+Blitz|wn|Der Blitz erhellt den Himmel.|Ein Blitz schlägt in den Baum ein.|Beim Gewitter zucken helle Blitze.
+Donner|wn|Der Donner grollt über den Bergen.|Nach dem Blitz kommt der Donner.|?Die lauten Donner hallen durch das Tal.
+Sturm|wn|Der Sturm biegt die Bäume.|In der Nacht tobt ein Sturm.|Im Herbst gibt es viele Stürme.
+Wind|wn|Der Wind weht kalt.|Ein Wind bläst die Blätter weg.|Auf dem Meer wehen starke Winde.
+Sonne|wn|Die Sonne scheint warm.|Die Katze liegt in der Sonne.|?Im Weltall gibt es viele Sonnen.
+Mond|wn|Der Mond leuchtet hell.|Der Wolf heult den Mond an.|Manche Planeten haben mehrere Monde.
+Stern|wn|Der Stern funkelt am Himmel.|Fenwick zeigt auf einen hellen Stern.|In der Nacht leuchten viele Sterne.
+Himmel|wn|Der Himmel ist blau.|Ein Drache fliegt am Himmel.|?Die Himmel über dem Meer sind oft grau.
+Flocke|wn|Die Flocke schmilzt auf meiner Hand.|Auf meiner Nase landet eine Flocke.|Im Winter fallen dicke Flocken.
+Nebel|wn|Der Nebel liegt über dem Tal.|Im Nebel sieht man kaum etwas.|?Im Herbst ziehen dichte Nebel über das Moor.
+Tag|ze|Der Tag beginnt mit Sonnenschein.|Am Tag arbeitet Borga in der Schmiede.|Die Reise dauert drei Tage.
+Nacht|ze|Die Nacht ist dunkel und still.|In der Nacht ruft die Eule.|Im Winter sind die Nächte lang.
+Morgen|ze|Der Morgen ist kühl.|Am Morgen kräht der Hahn.|An kalten Morgen liegt Reif auf der Wiese.
+Abend|ze|Der Abend ist mild.|Am Abend erzählt Fenwick Geschichten.|Im Sommer sind die Abende lang.
+Woche|ze|Die Woche hat sieben Tage.|Nächste Woche reisen wir zur Burg.|Die Ferien dauern sechs Wochen.
+Monat|ze|Der Monat Mai ist warm.|Das Fest ist in einem Monat.|Ein Jahr hat zwölf Monate.
+Jahr|ze|Das Jahr hat vier Jahreszeiten.|Mein Bruder ist ein Jahr älter als ich.|Die Schildkröte ist schon achtzig Jahre alt.
+Sommer|ze|Der Sommer ist heiß.|Im Sommer baden wir im See.|Die Sommer in Hrossmark sind kurz.
+Winter|ze|Der Winter ist kalt.|Im Winter fällt viel Schnee.|Die Winter in den Bergen sind lang.
+Frühling|ze|Der Frühling bringt die ersten Blumen.|Im Frühling kommen die Vögel zurück.|?Oma hat schon achtzig Frühlinge erlebt.
+Regenschirm|ge|Der Regenschirm ist rot.|Ich nehme einen Regenschirm mit.|Im Flur stehen zwei Regenschirme.
+Schirm|ge|Der Schirm schützt vor dem Regen.|Oma spannt ihren Schirm auf.|Auf dem Markt stehen bunte Schirme.
+Pfütze|wn|Die Pfütze ist tief.|Das Kind springt in eine Pfütze.|Nach dem Regen gibt es viele Pfützen.
+Fall|ab|Der Fall ist für Fenwick ein Rätsel.|Der Wächter löst einen schwierigen Fall.|Der Wächter hat schon viele Fälle gelöst.
+Wasserfall|wn|Der Wasserfall rauscht laut.|Hinter dem Wasserfall liegt eine Höhle.|Im Gebirge gibt es viele Wasserfälle.
+Wasser|wn|Das Wasser im Bach ist klar.|Das Pferd trinkt Wasser.|?Nach dem Regen steigen die Wasser des Flusses.
+Welle|wn|Die Welle schlägt an den Strand.|Das Boot schaukelt auf einer Welle.|Im Sturm sind die Wellen hoch.
+Meer|wn|Das Meer ist tief und blau.|Das Schiff segelt über das Meer.|Auf der Karte sind drei Meere.
+Insel|or|Die Insel liegt mitten im Meer.|Auf einer Insel lebt ein alter Pirat.|Im See liegen zwei kleine Inseln.
+Strand|or|Der Strand ist voller Muscheln.|Wir bauen eine Burg am Strand.|Die Insel hat weiße Strände.
+Muschel|ge|Die Muschel glänzt in der Sonne.|Am Strand finde ich eine Muschel.|Die Kinder sammeln bunte Muscheln.
+Fisch|ti|Der Fisch schwimmt im Teich.|Der Bär fängt einen Fisch.|Im Bach schwimmen viele Fische.
+Boot|ge|Das Boot schaukelt auf dem See.|Wir rudern mit einem Boot über den Fluss.|Am Ufer liegen drei Boote.
+Schiff|ge|Das Schiff hat große Segel.|Der Pirat steuert ein Schiff.|Im Hafen liegen viele Schiffe.
+Licht|wn|Das Licht der Kerze flackert.|Im Turm brennt noch Licht.|In der Stadt leuchten viele Lichter.
+Ernte|ab|Die Ernte ist dieses Jahr gut.|Im Herbst hilft das ganze Dorf bei der Ernte.|Nach zwei guten Ernten ist der Bauer froh.
+Felsen|wn|Der Felsen ragt aus dem Meer.|Die Ziege steht auf einem Felsen.|Am Ufer liegen große Felsen.
+Schiffsglocke|ge|Die Schiffsglocke läutet.|Der Kapitän schlägt die Schiffsglocke.|Im Hafen läuten viele Schiffsglocken.
+Burg|or|Die Burg steht auf einem Hügel.|Der König wohnt in einer Burg.|Im Land gibt es viele alte Burgen.
+Schloss|or|Das Schloss hat hundert Zimmer.|Die Prinzessin wohnt in einem Schloss.|Am Rhein stehen viele Schlösser.
+Turm|or|Der Turm ist sehr hoch.|Der Wächter steht auf dem Turm.|Die Burg hat vier Türme.
+Mauer|ge|Die Mauer ist dick und alt.|Der Kobold klettert über die Mauer.|Die Stadt hat hohe Mauern.
+Graben|or|Der Graben um die Burg ist voll Wasser.|Das Pferd springt über den Graben.|Am Feld verlaufen tiefe Gräben.
+Zugbrücke|ge|Die Zugbrücke geht nach oben.|Der Wächter senkt die Zugbrücke.|Manche Burgen haben zwei Zugbrücken.
+Ritter|pe|Der Ritter reitet zum Turnier.|Am Tor wartet ein Ritter.|Die Ritter sitzen an einem runden Tisch.
+Ritterin|pe|Die Ritterin trägt eine glänzende Rüstung.|Eadrun möchte eine Ritterin werden.|Die Ritterinnen reiten zum Turnier.
+König|pe|Der König trägt eine Krone.|Im Schloss wohnt ein alter König.|Die Könige treffen sich zum Fest.
+Königin|pe|Die Königin sitzt auf dem Thron.|Der Bote bringt der Königin einen Brief.|Die Königinnen der Nachbarländer kommen zu Besuch.
+Prinz|pe|Der Prinz reitet aus.|Im Turm wartet ein Prinz.|Die Prinzen üben mit dem Schwert.
+Prinzessin|pe|Die Prinzessin liest ein Buch.|Im Schloss lebt eine kluge Prinzessin.|Die Prinzessinnen tanzen beim Fest.
+Thron|ge|Der Thron ist aus Gold.|Der König sitzt auf dem Thron.|Im Saal stehen zwei Throne.
+Fahne|ge|Die Fahne weht im Wind.|Auf dem Turm flattert eine Fahne.|Beim Fest hängen bunte Fahnen.
+Banner|ge|Das Banner zeigt einen Drachen.|Der Knappe trägt das Banner.|In der Halle hängen alte Banner.
+Wappen|ge|Das Wappen zeigt einen Löwen.|Auf dem Schild ist ein Wappen.|An der Wand hängen viele Wappen.
+Halle|or|Die Halle ist voller Gäste.|Das Fest findet in der Halle statt.|Die Burg hat zwei große Hallen.
+Kerker|or|Der Kerker ist dunkel und feucht.|Der Räuber sitzt im Kerker.|Unter der Burg liegen tiefe Kerker.
+Wächter|pe|Der Wächter steht am Tor.|Auf dem Turm wacht ein Wächter.|Die Wächter rufen Alarm.
+Wache|pe|Die Wache lässt niemanden durch.|Vor dem Tor steht eine Wache.|Am Tor wechseln die Wachen.
+Knappe|pe|Der Knappe putzt die Rüstung.|Theron ist ein fleißiger Knappe.|Die Knappen üben mit Holzschwertern.
+Turnier|ab|Das Turnier beginnt am Morgen.|Der Ritter gewinnt das Turnier.|Im Sommer gibt es viele Turniere.
+Held|pe|Der Held rettet das Dorf.|Im Märchen kommt ein Held vor.|Die Helden kehren nach Hause zurück.
+Heldin|pe|Die Heldin besiegt den Drachen.|Eadrun ist eine echte Heldin.|Die Heldinnen feiern ihren Sieg.
+Drache|ti|Der Drache speit Feuer.|Über dem Berg fliegt ein Drache.|Die Drachen schlafen auf ihrem Gold.
+Riese|pe|Der Riese ist so groß wie ein Turm.|Im Gebirge wohnt ein Riese.|Die Riesen werfen mit Felsen.
+Zwerg|pe|Der Zwerg hat einen langen Bart.|Im Berg lebt ein Zwerg.|Die Zwerge graben nach Gold.
+Fee|pe|Die Fee hat zarte Flügel.|Im Garten tanzt eine Fee.|Die Feen leuchten im Mondlicht.
+Kobold|pe|Der Kobold versteckt die Schlüssel.|Im Keller wohnt ein frecher Kobold.|Die Kobolde spielen Streiche.
+Fest|ab|Das Fest dauert bis Mitternacht.|Im Sommer feiert das Dorf ein Fest.|Im Jahr gibt es viele Feste.
+Becher|ge|Der Becher ist aus Holz.|Der Zwerg trinkt aus einem Becher.|Auf dem Tisch stehen zehn Becher.
+Krug|ge|Der Krug ist voll Wasser.|Die Wirtin bringt einen Krug Saft.|Im Regal stehen große Krüge.
+Bote|pe|Der Bote bringt eine Nachricht.|Am Tor wartet ein Bote.|Die Boten reiten in alle Richtungen.
+Brief|ge|Der Brief kommt vom König.|Eadrun schreibt einen Brief an Oma.|Der Bote bringt drei Briefe.
+Rolle|ge|Die Rolle ist aus Pergament.|Fenwick öffnet eine alte Rolle.|Im Regal liegen viele Rollen.
+Fackel|ge|Die Fackel brennt hell.|Der Wächter hält eine Fackel.|An den Wänden brennen Fackeln.
+Glocke|ge|Die Glocke läutet zum Fest.|Im Turm hängt eine große Glocke.|Am Sonntag läuten alle Glocken.
+Gast|pe|Der Gast bekommt das beste Zimmer.|Heute kommt ein Gast zum Essen.|Die Gäste tanzen im Saal.
+Mantel|ge|Der Mantel ist warm.|Fenwick trägt einen blauen Mantel.|An der Garderobe hängen viele Mäntel.
+Kleid|ge|Das Kleid ist aus Seide.|Die Prinzessin trägt ein rotes Kleid.|Im Schrank hängen schöne Kleider.
+Krone|ge|Die Krone ist aus Gold.|Der König trägt eine Krone.|In der Schatzkammer liegen drei Kronen.
+Königskrone|ge|Die Königskrone funkelt im Licht.|Der Drache stiehlt die Königskrone.|In der Schatzkammer liegen alte Königskronen.
+Heldenschwert|ge|Das Heldenschwert hängt über dem Thron.|Der Ritter zieht das Heldenschwert aus dem Stein.|In der Halle hängen zwei Heldenschwerter.
+Kampf|ab|Der Kampf gegen die Orks ist hart.|Nach dem Kampf ruhen sich alle aus.|Eadrun hat schon viele Kämpfe gewonnen.
+Sieg|ab|Der Sieg gehört Eadrun.|Nach dem Sieg feiert das Dorf.|Die Ritter feiern ihre Siege.
+Feind|pe|Der Feind steht vor dem Tor.|Der Ork ist ein gefährlicher Feind.|Die Feinde ziehen sich zurück.
+Reihe|ab|Die Reihe vor dem Tor ist lang.|Wir stellen uns in einer Reihe auf.|Im Saal stehen drei Reihen Stühle.
+Zwergenmütze|ge|Die Zwergenmütze ist rot und spitz.|Der Zwerg verliert seine Zwergenmütze.|Am Haken hängen sieben Zwergenmützen.
+Kämpfer|pe|Der Kämpfer hebt seinen Schild.|Theron ist ein mutiger Kämpfer.|Die Kämpfer stellen sich vor dem Tor auf.
+Kämpferin|pe|Die Kämpferin schwingt ihr Schwert.|Eadrun ist eine flinke Kämpferin.|Die Kämpferinnen üben auf dem Hof.
+Gefährte|pe|Der Gefährte hilft Eadrun.|Fenwick ist ein treuer Gefährte.|Die Gefährten ziehen gemeinsam los.
+Zauber|ab|Der Zauber wirkt nur bei Vollmond.|Fenwick spricht einen Zauber.|Fenwick kennt viele Zauber.
+Zauberer|pe|Der Zauberer schwingt seinen Stab.|Fenwick ist ein alter Zauberer.|Die Zauberer treffen sich im Turm.
+Hexe|pe|Die Hexe rührt im Kessel.|Im Wald wohnt eine freundliche Hexe.|Die Hexen fliegen auf Besen.
+Stab|ge|Der Stab leuchtet blau.|Fenwick stützt sich auf seinen Stab.|In der Ecke lehnen drei Stäbe.
+Trank|ge|Der Trank schmeckt bitter.|Fenwick braut einen Trank.|Auf dem Regal stehen bunte Tränke.
+Flasche|ge|Die Flasche ist leer.|Fenwick füllt den Trank in eine Flasche.|Im Keller stehen viele Flaschen.
+Buch|ge|Das Buch ist dick und alt.|Fenwick liest ein Buch.|In der Bibliothek stehen tausend Bücher.
+Seite|ge|Die Seite ist zerrissen.|Fenwick blättert eine Seite um.|Das Buch hat hundert Seiten.
+Schrift|ge|Die Schrift ist schwer zu lesen.|Auf dem Stein steht eine alte Schrift.|Fenwick kann viele Schriften lesen.
+Buchstabe|ab|Der Buchstabe A steht am Anfang.|Jeder Buchstabe hat einen Klang.|Das Wort hat fünf Buchstaben.
+Satz|ab|Der Satz endet mit einem Punkt.|Schreibe einen Satz in dein Heft.|Die Geschichte hat zehn Sätze.
+Rune|ge|Die Rune leuchtet auf dem Stein.|Fenwick ritzt eine Rune in das Holz.|Auf dem Tor stehen alte Runen.
+Karte|ge|Die Karte zeigt den Weg zum Schatz.|Theron faltet die Karte auseinander.|Im Spiel hat jeder fünf Karten.
+Rätsel|ab|Das Rätsel ist schwer.|Die Eule stellt ein Rätsel.|Fenwick löst gern Rätsel.
+Tinte|ge|Die Tinte ist schwarz.|Fenwick taucht die Feder in die Tinte.|Im Laden gibt es bunte Tinten.
+Stift|ge|Der Stift ist rot.|Ich schreibe mit einem Stift.|In meinem Mäppchen liegen zehn Stifte.
+Heft|ge|Das Heft ist blau.|Ich schreibe den Code in mein Heft.|Auf dem Pult liegen viele Hefte.
+Tafel|ge|Die Tafel hängt vorne im Klassenzimmer.|Die Lehrerin schreibt an die Tafel.|In der Schule gibt es viele Tafeln.
+Spruch|ab|Der Spruch steht über der Tür.|Fenwick murmelt einen Spruch.|Die Hexe kennt viele Sprüche.
+Kugel|ge|Die Kugel ist aus Glas.|Die Hexe schaut in eine Kugel.|Am Baum hängen bunte Kugeln.
+Kristall|ge|Der Kristall leuchtet im Dunkeln.|Der Zwerg findet einen Kristall.|In der Höhle glitzern viele Kristalle.
+Umhang|ge|Der Umhang ist dunkelblau.|Fenwick trägt einen langen Umhang.|An den Haken hängen zwei Umhänge.
+Kessel|ge|Der Kessel brodelt.|Die Hexe rührt im Kessel.|In der Küche hängen drei Kessel.
+Laterne|ge|Die Laterne leuchtet im Nebel.|Der Wächter trägt eine Laterne.|Am Weg stehen alte Laternen.
+Geheimnis|ab|Das Geheimnis bleibt unter uns.|Fenwick verrät ein Geheimnis.|Der Wald hat viele Geheimnisse.
+Kraft|ab|Die Kraft des Riesen ist gewaltig.|Borga hat viel Kraft.|Der Trank gibt neue Kräfte.
+Muster|ab|Das Muster auf dem Teppich ist bunt.|Oma strickt ein Muster.|Auf den Tellern sind blaue Muster.
+Kreis|ab|Der Kreis ist rund.|Die Kinder sitzen in einem Kreis.|Fenwick malt drei Kreise auf den Boden.
+Bibliothek|or|Die Bibliothek ist riesig.|Fenwick sitzt in der Bibliothek.|Die Stadt hat zwei Bibliotheken.
+Pult|ge|Das Pult steht am Fenster.|Fenwick legt das Buch auf das Pult.|Im Klassenzimmer stehen zwanzig Pulte.
+Tagebuch|ge|Das Tagebuch hat ein Schloss.|Eadrun schreibt in ihr Tagebuch.|Im Regal liegen alte Tagebücher.
+Kinderbuch|ge|Das Kinderbuch hat viele Bilder.|Oma liest mir ein Kinderbuch vor.|In der Bücherei gibt es viele Kinderbücher.
+Bilderbuch|ge|Das Bilderbuch ist bunt.|Das Baby schaut ein Bilderbuch an.|Im Kindergarten stehen viele Bilderbücher.
+Liebesbrief|ge|Der Liebesbrief duftet nach Rosen.|Der Prinz schreibt einen Liebesbrief.|In der Truhe liegen alte Liebesbriefe.
+Geschichtsbuch|ge|Das Geschichtsbuch erzählt von alten Königen.|Fenwick liest im Geschichtsbuch.|Auf dem Pult liegen zwei Geschichtsbücher.
+Geschichte|ab|Die Geschichte ist spannend.|Fenwick erzählt eine Geschichte.|Am Feuer hören wir Geschichten.
+Märchen|ab|Das Märchen beginnt mit „Es war einmal“.|Oma erzählt ein Märchen.|Ich kenne viele Märchen.
+Puppe|ge|Die Puppe hat blonde Haare.|Das Kind spielt mit einer Puppe.|Im Regal sitzen drei Puppen.
+Schleier|ge|Der Schleier ist dünn wie Nebel.|Die Fee trägt einen Schleier.|Die Tänzerinnen tragen bunte Schleier.
+Liederbuch|ge|Das Liederbuch liegt auf dem Klavier.|Ysolde singt aus dem Liederbuch.|Der Chor hat neue Liederbücher.
+Brot|es|Das Brot ist frisch und warm.|Die Wirtin schneidet das Brot.|Der Bäcker backt jeden Tag hundert Brote.
+Apfel|es|Der Apfel ist rot und süß.|Eadrun gibt dem Pferd einen Apfel.|Im Korb liegen fünf Äpfel.
+Birne|es|Die Birne ist saftig.|Oma pflückt eine Birne vom Baum.|Auf dem Teller liegen drei Birnen.
+Pflaume|es|Die Pflaume ist reif.|Ich esse eine Pflaume.|Oma backt einen Kuchen mit Pflaumen.
+Kirsche|es|Die Kirsche ist dunkelrot.|Auf der Torte liegt eine Kirsche.|Im Sommer pflücken wir Kirschen.
+Erdbeere|es|Die Erdbeere ist süß.|Ich tauche eine Erdbeere in Schokolade.|Im Beet wachsen rote Erdbeeren.
+Kartoffel|es|Die Kartoffel ist noch heiß.|Borga isst eine Kartoffel mit Butter.|Der Bauer erntet viele Kartoffeln.
+Kürbis|es|Der Kürbis ist orange und rund.|Im Herbst schnitzen wir einen Kürbis.|Am Zaun wachsen dicke Kürbisse.
+Zwiebel|es|Die Zwiebel macht Tränen.|Die Köchin schneidet eine Zwiebel.|Im Korb liegen fünf Zwiebeln.
+Bohne|es|Die Bohne ist lang und grün.|Ich pflanze eine Bohne ins Beet.|Zum Essen gibt es grüne Bohnen.
+Erbse|es|Die Erbse ist klein und rund.|Die Prinzessin spürt eine Erbse unter der Matratze.|In der Schote stecken sechs Erbsen.
+Nuss|es|Die Nuss ist hart.|Das Eichhörnchen versteckt eine Nuss.|Im Herbst sammeln wir Nüsse.
+Kuchen|es|Der Kuchen duftet nach Zimt.|Oma backt einen Kuchen.|Beim Fest gibt es viele Kuchen.
+Torte|es|Die Torte hat drei Stockwerke.|Zum Geburtstag gibt es eine Torte.|Der Bäcker verkauft bunte Torten.
+Keks|es|Der Keks ist knusprig.|Ich esse einen Keks.|Oma backt Kekse für das Fest.
+Suppe|es|Die Suppe ist heiß.|Die Wirtin kocht eine Suppe.|Im Gasthaus gibt es drei Suppen.
+Wurst|es|Die Wurst ist lecker.|Der Hund klaut eine Wurst.|Auf dem Grill liegen zehn Würste.
+Ei|es|Das Ei ist hart gekocht.|Das Huhn legt ein Ei.|Im Nest liegen drei Eier.
+Saft|es|Der Saft ist süß.|Ich trinke einen Saft.|Im Laden gibt es viele Säfte.
+Glas|ge|Das Glas ist voll Wasser.|Die Wirtin bringt ein Glas Milch.|Auf dem Tisch stehen vier Gläser.
+Schüssel|ge|Die Schüssel ist voll Salat.|Oma rührt den Teig in einer Schüssel.|Auf dem Tisch stehen drei Schüsseln.
+Pfanne|ge|Die Pfanne ist heiß.|Die Köchin brät ein Ei in der Pfanne.|Am Haken hängen zwei Pfannen.
+Koch|pe|Der Koch rührt in der Suppe.|Im Gasthaus arbeitet ein Koch.|Die Köche bereiten das Fest vor.
+Köchin|pe|Die Köchin probiert die Suppe.|In der Burg arbeitet eine Köchin.|Die Köchinnen backen Brot.
+Bäcker|pe|Der Bäcker steht früh auf.|Im Dorf gibt es einen Bäcker.|Die Bäcker backen Brezeln.
+Bäckerei|or|Die Bäckerei duftet nach Brot.|Ich kaufe Brötchen in der Bäckerei.|In der Stadt gibt es drei Bäckereien.
+Teig|es|Der Teig muss ruhen.|Oma knetet den Teig.|Der Bäcker macht zwei verschiedene Teige.
+Brezel|es|Die Brezel ist salzig.|Ich kaufe eine Brezel.|Auf dem Markt gibt es frische Brezeln.
+Brötchen|es|Das Brötchen ist knusprig.|Ich esse ein Brötchen mit Honig.|Der Bäcker backt viele Brötchen.
+Gurke|es|Die Gurke ist grün und lang.|Die Köchin schneidet eine Gurke.|Im Garten wachsen viele Gurken.
+Tomate|es|Die Tomate ist rot.|Ich esse eine Tomate.|An der Pflanze hängen viele Tomaten.
+Salat|es|Der Salat ist frisch.|Die Schnecke frisst den Salat.|Im Beet wachsen zwei Salate.
+Zitrone|es|Die Zitrone ist sauer.|Oma presst eine Zitrone aus.|Im Korb liegen drei Zitronen.
+Banane|es|Die Banane ist gelb.|Der Affe schält eine Banane.|Im Korb liegen sechs Bananen.
+Traube|es|Die Traube ist süß.|Ich esse eine Traube.|Am Weinstock hängen viele Trauben.
+Mahlzeit|ab|Die Mahlzeit ist fertig.|Das Frühstück ist die erste Mahlzeit am Tag.|Wir essen drei Mahlzeiten am Tag.
+Zeit|ze|Die Zeit vergeht schnell.|Fenwick hat keine Zeit.|?Es kommen wieder bessere Zeiten.
+Fass|ge|Das Fass ist voll Wasser.|Der Wirt rollt ein Fass in den Keller.|Im Keller stehen viele Fässer.
+Wirt|pe|Der Wirt begrüßt die Gäste.|Im Gasthaus arbeitet ein freundlicher Wirt.|Die Wirte im Dorf kennen sich.
+Wirtin|pe|Die Wirtin bringt die Suppe.|Im Gasthaus arbeitet eine Wirtin.|Die Wirtinnen kochen für das Fest.
+Gasthaus|or|Das Gasthaus heißt „Zum goldenen Krug“.|Wir übernachten in einem Gasthaus.|In der Stadt gibt es viele Gasthäuser.
+Speise|es|Die Speise ist köstlich.|Der Koch bereitet eine Speise zu.|Auf dem Fest gibt es viele Speisen.
+Speisekarte|ge|Die Speisekarte ist lang.|Die Wirtin bringt die Speisekarte.|Auf den Tischen liegen Speisekarten.
+Gemüse|es|Das Gemüse ist frisch.|Oma kauft Gemüse auf dem Markt.|?Der Bauer verkauft verschiedene Gemüse.
+Kirschkuchen|es|Der Kirschkuchen ist noch warm.|Oma backt einen Kirschkuchen.|Beim Fest gibt es drei Kirschkuchen.
+Apfelbaum|pf|Der Apfelbaum blüht im Mai.|Im Garten steht ein Apfelbaum.|Auf der Wiese wachsen alte Apfelbäume.
+Brotkorb|ge|Der Brotkorb ist leer.|Die Wirtin stellt einen Brotkorb auf den Tisch.|Auf jedem Tisch stehen Brotkörbe.
+Wasserglas|ge|Das Wasserglas ist voll.|Ich stelle ein Wasserglas auf den Tisch.|Im Schrank stehen sechs Wassergläser.
+Eierkuchen|es|Der Eierkuchen ist goldbraun.|Oma backt einen Eierkuchen.|Zum Frühstück gibt es drei Eierkuchen.
+Gans|ti|Die Gans schnattert laut.|Auf dem Hof watschelt eine Gans.|Die Gänse fliegen nach Süden.
+Huhn|ti|Das Huhn gackert.|Im Stall sitzt ein Huhn auf seinen Eiern.|Auf dem Hof laufen zehn Hühner.
+Hahn|ti|Der Hahn kräht am Morgen.|Auf dem Misthaufen steht ein Hahn.|Die Hähne streiten sich.
+Schule|or|Die Schule beginnt um acht Uhr.|Ich gehe gern in die Schule.|In der Stadt gibt es drei Schulen.
+Lehrer|pe|Der Lehrer erklärt die Aufgabe.|Unser Lehrer heißt Herr Berg.|Die Lehrer treffen sich im Lehrerzimmer.
+Lehrerin|pe|Die Lehrerin liest eine Geschichte vor.|Meine Lehrerin ist sehr nett.|Die Lehrerinnen planen einen Ausflug.
+Kind|pe|Das Kind spielt im Sand.|Auf der Schaukel sitzt ein Kind.|Die Kinder laufen auf den Hof.
+Freund|pe|Der Freund von Eadrun heißt Theron.|Ich treffe meinen Freund am Brunnen.|Meine Freunde kommen zum Geburtstag.
+Freundin|pe|Die Freundin von Ysolde singt im Chor.|Ich spiele mit meiner Freundin.|Eadrun hat viele Freundinnen.
+Vater|pe|Der Vater liest die Zeitung.|Mein Vater kocht heute.|Die Väter bauen eine Bühne für das Fest.
+Bruder|pe|Der Bruder von Theron ist noch klein.|Mein Bruder spielt Fußball.|Ich habe zwei Brüder.
+Schwester|pe|Die Schwester von Eadrun reitet auch.|Meine Schwester malt gern.|Ysolde hat drei Schwestern.
+Oma|pe|Die Oma backt Kekse.|Meine Oma wohnt am Meer.|Beim Fest sitzen die Omas zusammen.
+Opa|pe|Der Opa repariert das Fahrrad.|Mein Opa erzählt Witze.|Die Opas spielen Karten.
+Baby|pe|Das Baby schläft.|Im Kinderwagen liegt ein Baby.|Im Dorf gibt es drei Babys.
+Auto|ge|Das Auto ist rot.|Papa wäscht das Auto.|Vor dem Haus parken zwei Autos.
+Kino|or|Das Kino ist voll.|Am Sonntag gehen wir ins Kino.|Die Stadt hat zwei Kinos.
+Foto|ge|Das Foto zeigt meine Familie.|Ich mache ein Foto vom Pferd.|Im Album kleben viele Fotos.
+Hobby|ab|Das Hobby von Ysolde ist Singen.|Reiten ist ein schönes Hobby.|Theron hat viele Hobbys.
+Ball|ge|Der Ball rollt in den Teich.|Der Hund fängt den Ball.|Im Korb liegen fünf Bälle.
+Spiel|ab|Das Spiel macht viel Spaß.|Wir spielen ein Spiel im Garten.|Im Schrank liegen viele Spiele.
+Lied|ab|Das Lied ist fröhlich.|Ysolde singt ein Lied.|Am Feuer singen wir alte Lieder.
+Stadt|or|Die Stadt hat eine hohe Mauer.|Am Fluss liegt eine große Stadt.|Im Land gibt es viele Städte.
+Dorf|or|Das Dorf liegt im Tal.|Eadrun wohnt in einem kleinen Dorf.|Am Fluss liegen drei Dörfer.
+Straße|or|Die Straße ist nass.|Ich wohne in einer ruhigen Straße.|In der Stadt gibt es viele Straßen.
+Weg|or|Der Weg führt zum Schloss.|Fenwick kennt den Weg.|Durch den Wald führen viele Wege.
+Platz|or|Der Platz vor der Kirche ist voll.|Am Platz steht ein Brunnen.|Die Stadt hat drei große Plätze.
+Kirche|or|Die Kirche hat einen hohen Turm.|Im Dorf steht eine alte Kirche.|In der Stadt gibt es zwei Kirchen.
+Markt|or|Der Markt ist bunt und laut.|Oma kauft Äpfel auf dem Markt.|In der Stadt gibt es zwei Märkte.
+Geld|ge|Das Geld liegt im Beutel.|Ich spare Geld für ein Fahrrad.|?Der König verwaltet die Gelder des Landes.
+Tasche|ge|Die Tasche ist schwer.|Ich packe eine Tasche.|Am Haken hängen zwei Taschen.
+Rucksack|ge|Der Rucksack ist voller Schätze.|Eadrun packt ihren Rucksack.|Die Wanderer tragen schwere Rucksäcke.
+Sack|ge|Der Sack ist voll Mehl.|Der Esel trägt einen Sack.|In der Mühle stehen viele Säcke.
+Hand|ge|Die Hand ist kalt.|Gib mir deine Hand.|Ich wasche mir die Hände.
+Fuß|ge|Der Fuß tut weh.|Ich stoße mir den Fuß.|Nach der Wanderung tun mir die Füße weh.
+Kopf|ge|Der Kopf tut mir weh.|Borga kratzt sich am Kopf.|Die Kinder stecken die Köpfe zusammen.
+Auge|ge|Das Auge der Eule ist groß.|Fenwick kneift ein Auge zu.|Die Katze hat grüne Augen.
+Ohr|ge|Das Ohr des Hasen ist lang.|Fenwick flüstert mir etwas ins Ohr.|Der Esel hat lange Ohren.
+Nase|ge|Die Nase ist rot vor Kälte.|Auf meiner Nase sitzt eine Fliege.|Die Hunde haben feine Nasen.
+Mund|ge|Der Mund ist voller Kuchen.|Der Kobold hält sich den Mund zu.|Die Kinder öffnen ihre Münder weit.
+Zahn|ge|Der Zahn wackelt.|Mir fällt ein Zahn aus.|Der Wolf hat spitze Zähne.
+Haar|ge|Das Haar ist lang und blond.|In der Suppe ist ein Haar.|Eadrun flicht ihre Haare.
+Arm|ge|Der Arm tut weh.|Borga hebt den Hammer mit einem Arm.|Der Riese hat starke Arme.
+Bein|ge|Das Bein ist gebrochen.|Der Stuhl hat ein kurzes Bein.|Die Spinne hat acht Beine.
+Finger|ge|Der Finger blutet.|Der Ring passt an meinen Finger.|Eine Hand hat fünf Finger.
+Herz|ge|Das Herz schlägt schnell.|Eadrun hat ein großes Herz.|Beim Rennen klopfen alle Herzen.
+Bauch|ge|Der Bauch ist voll.|Mir tut der Bauch weh.|Die Zwerge haben runde Bäuche.
+Rücken|ge|Der Rücken tut weh.|Der Esel trägt den Sack auf dem Rücken.|Die Wanderer haben müde Rücken.
+Hals|ge|Der Hals kratzt.|Die Giraffe hat einen langen Hals.|Die Schwäne strecken ihre Hälse.
+Jacke|ge|Die Jacke ist warm.|Ich ziehe meine Jacke an.|Am Haken hängen drei Jacken.
+Hose|ge|Die Hose ist zu kurz.|Eadrun zerreißt ihre Hose.|Im Schrank liegen zwei Hosen.
+Rock|ge|Der Rock ist bunt.|Die Tänzerin trägt einen langen Rock.|Im Laden hängen viele Röcke.
+Mütze|ge|Die Mütze ist aus Wolle.|Im Winter trage ich eine Mütze.|Die Kinder tragen bunte Mützen.
+Socke|ge|Die Socke hat ein Loch.|Der Hund klaut eine Socke.|Ich ziehe warme Socken an.
+Fahrrad|ge|Das Fahrrad ist neu.|Ich fahre mit dem Fahrrad zur Schule.|Vor der Schule stehen viele Fahrräder.
+Bus|ge|Der Bus kommt zu spät.|Wir warten auf den Bus.|Am Bahnhof halten viele Busse.
+Zug|ge|Der Zug fährt pünktlich ab.|Wir steigen in den Zug.|Am Bahnhof stehen drei Züge.
+Zahl|ab|Die Zahl Sieben bringt Glück.|Der Händler schreibt eine Zahl auf.|Wir rechnen mit großen Zahlen.
+Stunde|ze|Die Stunde ist schnell vorbei.|Der Ritt dauert eine Stunde.|Der Tag hat vierundzwanzig Stunden.
+Minute|ze|Die Minute vergeht langsam.|Warte bitte eine Minute.|Eine Stunde hat sechzig Minuten.
+Pause|ze|Die Pause beginnt um zehn Uhr.|Borga macht eine Pause.|Wir haben zwei Pausen am Tag.
+Klasse|pe|Die Klasse macht einen Ausflug.|Ich gehe in die fünfte Klasse.|Unsere Schule hat zwanzig Klassen.
+Schüler|pe|Der Schüler meldet sich.|In der ersten Reihe sitzt ein neuer Schüler.|Die Schüler laufen auf den Hof.
+Schülerin|pe|Die Schülerin liest vor.|Eine Schülerin hebt die Hand.|Die Schülerinnen spielen Fußball.
+Bild|ge|Das Bild hängt schief.|Ysolde malt ein Bild.|In der Halle hängen viele Bilder.
+Geschenk|ge|Das Geschenk ist gut verpackt.|Ich bekomme ein Geschenk.|Unter dem Baum liegen viele Geschenke.
+Geburtstag|ze|Der Geburtstag ist im Mai.|Heute feiert Oma Geburtstag.|Im Mai haben wir drei Geburtstage in der Familie.
+Hund|ti|Der Hund bellt laut.|Theron hat einen treuen Hund.|Die Hunde spielen im Hof.
+Arbeit|ab|Die Arbeit in der Schmiede ist hart.|Nach der Arbeit ruht sich Borga aus.|Die Kinder zeigen ihre Arbeiten.
+Arzt|pe|Der Arzt hört das Herz ab.|Ich gehe zum Arzt.|In der Stadt gibt es viele Ärzte.
+Ärztin|pe|Die Ärztin verbindet die Wunde.|Meine Tante ist Ärztin.|Die Ärztinnen helfen den Kranken.
+Name|ab|Der Name des Pferdes ist Blitz.|Mein Name steht auf dem Heft.|Der Lehrer liest die Namen vor.
+Frage|ab|Die Frage ist schwer.|Eadrun stellt eine Frage.|Die Kinder haben viele Fragen.
+Antwort|ab|Die Antwort ist richtig.|Fenwick weiß eine Antwort.|Die Eule gibt kluge Antworten.
+Gesicht|ge|Das Gesicht ist voller Sommersprossen.|Ich wasche mein Gesicht.|Auf dem Bild sieht man fröhliche Gesichter.
+Kamm|ge|Der Kamm liegt am Waschbecken.|Ich kämme mich mit einem Kamm.|Im Laden gibt es bunte Kämme.
+Seife|ge|Die Seife riecht nach Rosen.|Ich wasche mir die Hände mit Seife.|Im Bad liegen zwei Seifen.
+Tuch|ge|Das Tuch ist aus Seide.|Oma bindet ein Tuch um den Kopf.|Auf dem Markt hängen bunte Tücher.
+Handtuch|ge|Das Handtuch ist nass.|Ich trockne mich mit einem Handtuch ab.|Im Bad hängen drei Handtücher.
+Zeugnis|ab|Das Zeugnis ist gut.|Am Ende des Jahres bekomme ich ein Zeugnis.|Die Lehrerin verteilt die Zeugnisse.
+Busfahrer|pe|Der Busfahrer grüßt freundlich.|Mein Onkel ist Busfahrer.|Die Busfahrer machen eine Pause.
+Fahrer|pe|Der Fahrer hält die Kutsche an.|Ein Fahrer bringt die Gäste zur Burg.|Die Fahrer warten vor dem Schloss.
+Fahrerin|pe|Die Fahrerin lenkt den Wagen.|Ich frage die Fahrerin nach dem Weg.|Die Fahrerinnen starten zum Rennen.
+Fähre|ge|Die Fähre bringt uns auf die Insel.|Wir fahren mit der Fähre.|Am Hafen legen zwei Fähren an.
+Gegend|or|Die Gegend ist bergig.|In dieser Gegend gibt es viele Schafe.|Eadrun kennt viele Gegenden.
+Arbeitstisch|ge|Der Arbeitstisch ist voller Werkzeug.|Borga legt den Hammer auf den Arbeitstisch.|In der Werkstatt stehen zwei Arbeitstische.
+Weihnachtsbaum|pf|Der Weihnachtsbaum glitzert.|Wir schmücken einen Weihnachtsbaum.|Auf dem Markt stehen viele Weihnachtsbäume.
+Straßenlaterne|ge|Die Straßenlaterne flackert.|Unter einer Straßenlaterne wartet der Bote.|In der Stadt leuchten viele Straßenlaternen.
+Augenarzt|pe|Der Augenarzt prüft meine Augen.|Ich gehe zum Augenarzt.|In der Stadt gibt es zwei Augenärzte.
+Gebäude|or|Das Gebäude ist sehr hoch.|Die Schule ist ein altes Gebäude.|In der Stadt stehen viele Gebäude.
+Läufer|pe|Der Läufer ist als Erster im Ziel.|Ein Läufer bringt die Nachricht.|Die Läufer starten zum Rennen.
+Verkäufer|pe|Der Verkäufer zeigt mir die Stiefel.|Am Stand steht ein Verkäufer.|Die Verkäufer rufen laut über den Markt.
+Verkäuferin|pe|Die Verkäuferin packt das Brot ein.|Ich bezahle bei der Verkäuferin.|Die Verkäuferinnen öffnen den Laden.
+Sänger|pe|Der Sänger singt ein Lied.|Ysolde hört einem Sänger zu.|Die Sänger stehen auf der Bühne.
+Sängerin|pe|Die Sängerin hat eine schöne Stimme.|Ysolde möchte Sängerin werden.|Die Sängerinnen proben im Saal.

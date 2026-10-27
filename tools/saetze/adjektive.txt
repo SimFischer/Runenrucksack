@@ -1,0 +1,95 @@
+# Sätze zu den Adjektiven: Positiv|Satz Grundform|Satz Komparativ|Satz Superlativ – das Adjektiv steht nie vor einem
+# Nomen (sonst bräuchte es eine Endung). Ein „?“ vor dem Satz: noch unsicher.
+schnell|Das Pferd ist schnell.|Der Falke fliegt schneller als die Eule.|Von allen Tieren läuft der Gepard am schnellsten.
+langsam|Die Schnecke kriecht langsam.|Die Schildkröte ist langsamer als der Hase.|Von allen Tieren ist die Schnecke am langsamsten.
+klein|Die Maus ist klein.|Der Zwerg ist kleiner als der Ritter.|Von allen Tieren ist der Floh am kleinsten.
+schön|Die Rose ist schön.|Im Frühling ist der Garten schöner als im Winter.|Im Mai blühen die Rosen am schönsten.
+hässlich|Der Troll findet seine neue Mütze hässlich.|Die alte Mütze ist noch hässlicher als die neue.|Von allen Masken ist die Ork-Maske am hässlichsten.
+hell|Die Kerze ist hell.|Die Sonne ist heller als der Mond.|Am Mittag scheint die Sonne am hellsten.
+dunkel|Der Keller ist dunkel.|Die Höhle ist dunkler als der Wald.|Um Mitternacht ist es am dunkelsten.
+leicht|Die Feder ist leicht.|Ein Blatt ist leichter als ein Stein.|Von allen Sachen im Rucksack ist die Feder am leichtesten.
+schwer|Der Amboss ist schwer.|Der Hammer ist schwerer als die Zange.|Von allen Truhen ist die Goldtruhe am schwersten.
+weich|Das Kissen ist weich.|Das Fell ist weicher als die Decke.|Von allen Betten ist das Moos am weichsten.
+laut|Der Donner ist laut.|Das Horn ist lauter als die Flöte.|Von allen Tieren brüllt der Drache am lautesten.
+leise|Die Maus ist leise.|Die Katze schleicht leiser als der Hund.|Von allen Vögeln fliegt die Eule am leisesten.
+tief|Der Brunnen ist tief.|Der See ist tiefer als der Teich.|In der Mitte ist das Meer am tiefsten.
+flach|Der Teller ist flach.|Der Bach ist flacher als der Fluss.|Am Ufer ist der Teich am flachsten.
+breit|Der Fluss ist breit.|Das Tor ist breiter als die Tür.|An der Mündung ist der Fluss am breitesten.
+eng|Der Gang ist eng.|Die Höhle ist enger als der Tunnel.|Am Ende ist der Pfad am engsten.
+weit|Der Weg ist weit.|Die Burg ist weiter weg als das Dorf.|Von allen Orten liegt Hrossmark am weitesten weg.
+spitz|Der Pfeil ist spitz.|Der Speer ist spitzer als der Stock.|Von allen Werkzeugen ist die Nadel am spitzesten.
+stumpf|Das Messer ist stumpf.|Die alte Axt ist stumpfer als die neue.|Von allen Klingen ist diese am stumpfsten.
+süß|Der Honig ist süß.|Die Kirsche ist süßer als die Zitrone.|Von allen Früchten schmeckt die Traube am süßesten.
+sauer|Die Zitrone ist sauer.|Der grüne Apfel ist saurer als der rote.|Von allen Früchten schmeckt die Zitrone am sauersten.
+frisch|Das Brot ist frisch.|Das Wasser aus der Quelle ist frischer als das Wasser im Eimer.|Am Morgen ist die Luft am frischesten.
+reich|Der König ist reich.|Der Drache ist reicher als der König.|Im ganzen Land ist der Drache am reichsten.
+fleißig|Die Biene ist fleißig.|Die Ameise ist fleißiger als die Grille.|Von allen Lehrlingen arbeitet Theron am fleißigsten.
+faul|Die Katze ist faul.|Der Kater ist fauler als der Hund.|Am Sonntag ist der Kobold am faulsten.
+lustig|Der Kobold ist lustig.|Der Gaukler ist lustiger als der König.|Fenwicks Geschichten sind am lustigsten.
+traurig|Der Hund ist traurig.|Beim Abschied ist Eadrun trauriger als Theron.|Am letzten Tag der Ferien bin ich am traurigsten.
+fröhlich|Die Kinder sind fröhlich.|Beim Fest ist Borga fröhlicher als sonst.|Von allen Gästen singt Ysolde am fröhlichsten.
+mutig|Die Ritterin ist mutig.|Eadrun ist mutiger als der Knappe.|Von allen Helden ist Eadrun am mutigsten.
+ängstlich|Das Reh ist ängstlich.|Der Hase ist ängstlicher als der Fuchs.|Beim Gewitter ist der kleine Hund am ängstlichsten.
+freundlich|Die Wirtin ist freundlich.|Die Eule ist freundlicher als der Rabe.|Von allen Händlern grüßt der Zwerg am freundlichsten.
+wild|Der Stier ist wild.|Der Hengst ist wilder als die Stute.|Im Sturm ist das Meer am wildesten.
+zahm|Das Pony ist zahm.|Das Kaninchen ist zahmer als der Hase.|Von allen Tieren ist der alte Esel am zahmsten.
+ruhig|Der See ist ruhig.|Am Abend ist das Dorf ruhiger als am Tag.|Um Mitternacht ist es am ruhigsten.
+sauber|Der Teller ist sauber.|Das Hemd ist sauberer als die Hose.|Nach dem Putzen ist der Helm am saubersten.
+schmutzig|Die Stiefel sind schmutzig.|Die Hose ist schmutziger als die Jacke.|Nach dem Regen ist der Weg am schmutzigsten.
+teuer|Die Krone ist teuer.|Gold ist teurer als Eisen.|Von allen Steinen ist der Rubin am teuersten.
+billig|Das Brot ist billig.|Der Apfel ist billiger als die Torte.|Auf dem Markt sind die Äpfel am billigsten.
+voll|Der Krug ist voll.|Der Korb ist voller als die Tasche.|Am Sonntag ist der Markt am vollsten.
+leer|Der Becher ist leer.|Die Truhe ist leerer als gestern.|Am Abend ist der Brotkorb am leersten.
+müde|Das Fohlen ist müde.|Nach dem Ritt ist Eadrun müder als Borga.|Am Abend bin ich am müdesten.
+glücklich|Die Kinder sind glücklich.|Nach dem Sieg ist Eadrun glücklicher als je zuvor.|Am Geburtstag ist Oma am glücklichsten.
+gefährlich|Der Drache ist gefährlich.|Der Wolf ist gefährlicher als der Fuchs.|Von allen Orks ist der Häuptling am gefährlichsten.
+harmlos|Die Spinne ist harmlos.|Der Igel ist harmloser als die Schlange.|Von allen Tieren ist der Marienkäfer am harmlosesten.
+klar|Das Wasser ist klar.|Die Quelle ist klarer als der Bach.|Nach dem Regen ist die Luft am klarsten.
+bunt|Der Schmetterling ist bunt.|Das Kleid ist bunter als der Mantel.|Im Herbst ist der Wald am buntesten.
+hungrig|Der Bär ist hungrig.|Nach dem Kampf ist Borga hungriger als sonst.|Am Abend sind die Kinder am hungrigsten.
+dick|Der Baum ist dick.|Die Eiche ist dicker als die Birke.|Von allen Bäumen ist die alte Eiche am dicksten.
+dünn|Der Zweig ist dünn.|Der Draht ist dünner als das Seil.|Von allen Fäden ist der Spinnenfaden am dünnsten.
+feucht|Das Gras ist feucht.|Der Keller ist feuchter als der Dachboden.|Am Morgen ist die Wiese am feuchtesten.
+trocken|Das Holz ist trocken.|Der Dachboden ist trockener als der Keller.|Im August ist der Boden am trockensten.
+edel|Der Rubin ist edel.|Gold ist edler als Eisen.|Von allen Pferden ist der weiße Hengst am edelsten.
+früh|Der Hahn kräht früh.|Der Bäcker steht früher auf als der Wirt.|Von allen Tieren singen die Vögel am frühesten.
+spät|Fenwick kommt spät.|Der Bote kommt später als der Ritter.|Der Kobold kommt immer am spätesten.
+fein|Der Sand ist fein.|Mehl ist feiner als Sand.|Von allen Netzen ist das Spinnennetz am feinsten.
+niedrig|Der Zaun ist niedrig.|Die Hecke ist niedriger als die Mauer.|Am Ufer ist das Wasser am niedrigsten.
+wenig|Fenwick isst wenig.|Eadrun isst weniger als Borga.|Von allen isst Fenwick am wenigsten.
+schlecht|Das Wetter ist schlecht.|Heute ist das Wetter schlechter als gestern.|Im November ist das Wetter am schlechtesten.
+ehrlich|Der Zwerg ist ehrlich.|Theron ist ehrlicher als der Kobold.|Von allen Händlern ist die Wirtin am ehrlichsten.
+höflich|Der Knappe ist höflich.|Die Eule ist höflicher als der Rabe.|Von allen Gästen grüßt der Prinz am höflichsten.
+still|Der Wald ist still.|Nachts ist das Dorf stiller als am Tag.|Im Winter ist der See am stillsten.
+heiß|Das Feuer ist heiß.|Die Schmiede ist heißer als die Küche.|Im August ist es am heißesten.
+kühl|Der Keller ist kühl.|Der Abend ist kühler als der Mittag.|Am Morgen ist es am kühlsten.
+sanft|Der Wind weht sanft.|Die Stute ist sanfter als der Hengst.|Von allen Pferden ist die alte Stute am sanftesten.
+fest|Der Knoten ist fest.|Der Stein ist fester als das Holz.|Von allen Zwergen zieht Borga den Knoten am festesten zu.
+locker|Die Schraube ist locker.|Der Zahn ist lockerer als gestern.|Von allen Nägeln sitzt der linke am lockersten.
+rund|Der Ball ist rund.|Der Apfel ist runder als die Birne.|Bei Vollmond ist der Mond am rundesten.
+eckig|Die Kiste ist eckig.|?Das neue Haus ist eckiger als die alte Hütte.|?Von allen Steinen ist der Würfelstein am eckigsten.
+durstig|Das Pferd ist durstig.|Nach dem Rennen ist das Pferd durstiger als vorher.|Im Sommer sind die Schafe am durstigsten.
+prächtig|Das Schloss ist prächtig.|Die Krone ist prächtiger als der Helm.|Beim Fest ist die Halle am prächtigsten geschmückt.
+kostbar|Der Ring ist kostbar.|Der Rubin ist kostbarer als der Stein.|Von allen Schätzen ist die Königskrone am kostbarsten.
+seltsam|Der Kobold ist seltsam.|Der Trank riecht seltsamer als gestern.|Von allen Gästen benimmt sich der Kobold am seltsamsten.
+alt|Der Baum ist alt.|Opa ist älter als Oma.|Von allen Bäumen ist die Eiche am ältesten.
+jung|Das Fohlen ist jung.|Theron ist jünger als Eadrun.|In unserer Familie ist das Baby am jüngsten.
+arm|Der Bettler ist arm.|Der Knecht ist ärmer als der Bauer.|Am Anfang des Märchens ist das Mädchen am ärmsten.
+hart|Der Stein ist hart.|Eisen ist härter als Holz.|Von allen Steinen ist der Diamant am härtesten.
+kalt|Der Schnee ist kalt.|Der Winter ist kälter als der Herbst.|Im Januar ist es am kältesten.
+warm|Der Ofen ist warm.|Der Sommer ist wärmer als der Frühling.|Im Juli ist es am wärmsten.
+klug|Die Eule ist klug.|Der Rabe ist klüger als die Krähe.|Von allen Zauberern ist Fenwick am klügsten.
+dumm|Der Plan ist dumm.|Der zweite Plan ist dümmer als der erste.|Von allen Plänen ist der Plan des Kobolds am dümmsten.
+krank|Das Kalb ist krank.|Heute ist der Hund kränker als gestern.|?Am dritten Tag ist der Hund am kränksten.
+kurz|Der Weg ist kurz.|Der Dolch ist kürzer als das Schwert.|Im Dezember sind die Tage am kürzesten.
+lang|Der Fluss ist lang.|Das Schwert ist länger als der Dolch.|Im Juni sind die Tage am längsten.
+scharf|Das Messer ist scharf.|Die neue Klinge ist schärfer als die alte.|Von allen Äxten ist Borgas Axt am schärfsten.
+schwach|Der Kobold ist schwach.|Der Zwerg ist schwächer als der Riese.|Am Ende des Kampfes ist der Ork am schwächsten.
+stark|Der Riese ist stark.|Borga ist stärker als der Knappe.|Von allen Tieren im Wald ist der Bär am stärksten.
+grob|Der Sand ist grob.|Der Kies ist gröber als der Sand.|Von allen Gästen benimmt sich der Ork am gröbsten.
+gut|Der Kuchen ist gut.|Heute schmeckt die Suppe besser als gestern.|Omas Kuchen schmeckt am besten.
+viel|Borga isst viel.|Borga isst mehr als Eadrun.|Von allen isst Borga am meisten.
+gern|Ich esse gern Äpfel.|Ich esse lieber Äpfel als Birnen.|Kirschkuchen esse ich am liebsten.
+hoch|Der Turm ist hoch.|Der Berg ist höher als der Hügel.|Von allen Bergen ist der Drachenberg am höchsten.
+nah|Der Brunnen ist nah.|Das Dorf ist näher als die Burg.|Von allen Häusern liegt der Stall am nächsten.
+groß|Der Riese ist groß.|Das Pferd ist größer als das Pony.|Von allen Tieren ist der Drache am größten.

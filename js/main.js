@@ -990,7 +990,7 @@ function quiz(opts) {
 // Im Tutorial bleibt die feste Frage zum Item-Wort.
 function askMerge(a, c) {
   const run = G.run;
-  const q = frageFuer(a, G.DEFS);
+  const q = frageFuer(a, G.DEFS, Math.random, wortschatz());
   if (a.typ === 'paar') emit('tipp', { key: isRune(G.DEFS[a.alt.id]) ? 'steigerung' : 'sterne' });
   if (!q) { doMerge(a); return; } // Superlativ → Krone: ohne neue Frage
   let kopf;

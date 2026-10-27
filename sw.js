@@ -90,6 +90,7 @@ const FILES = [
   'js/lehrkraft-ui.js',
   'js/symbole.js',
   'js/aufgaben/host.js',
+  'js/aufgaben/saetze.js',
   'js/aufgaben/spiel.js',
   'js/aufgaben/themen.js',
   'js/aufgaben/wahl.js',

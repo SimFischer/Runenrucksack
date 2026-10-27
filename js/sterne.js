@@ -6,6 +6,7 @@
 // Vorher eine Grammatik-Frage: Kompositum → Artikel, Nomen → Mehrzahl, Verben → Präteritum, Runen → Steigerung.
 import { MAX_STERN, sternOf, bagGrid, STORE_GRID, findSpot, shuffle } from './logic.js';
 import { isRune, runeBase, nextLevelId, pluralOf, findFusions } from './grammar.js';
+import { rahmenSatz } from './aufgaben/saetze.js';
 
 export { pluralOf };
 
@@ -130,8 +131,8 @@ const hasNewUmlaut = (sg, pl) => [...'äöüÄÖÜ'].some((u) => pl.includes(u) 
 const blank = '<span class="blank">___</span>';
 
 // Die Frage vor dem Verbinden: { art, wort, titel, prompt, options, correct, explain, kurz } –
-// oder null, wenn keine Frage nötig ist (Superlativ → Krone).
-export function frageFuer(a, defs, rng = Math.random) {
+// oder null, wenn keine Frage nötig ist (Superlativ → Krone). ws (Wortschatz): Verben bekommen ihren eigenen Satz.
+export function frageFuer(a, defs, rng = Math.random, ws = null) {
   if (a.typ === 'kompositum') {
     const kd = defs[a.kraft.id], td = defs[a.traeger.id], cd = defs[a.id];
     return {
@@ -161,14 +162,17 @@ export function frageFuer(a, defs, rng = Math.random) {
   }
   if (d.art === 'verb') {
     const f = d.formen;
+    // Ein Satz des Verbs mit er/sie/es im Präteritum – ohne Wortschatz nur die Form
+    const v = ws?.verben?.find((x) => x.infinitiv === d.name);
+    const r = v?.rahmen?.find((x) => x.person === 'er');
     return {
       art: 'praeteritum', wort: d.name, ref: d.id,
       titel: 'Präteritum (so erzählt man, was gestern war)',
-      prompt: `Gestern ${blank} der Ritter. <small>(${d.name})</small>`,
+      prompt: r ? `${rahmenSatz(v, r, 'praeteritum').luecke.replace('___', blank)} <small>(${d.name})</small>` : `${d.name} → er ${blank}`,
       options: shuffle([f.praeteritum, ...f.falschPraeteritum], rng),
       correct: f.praeteritum,
       explain: `${d.name} → er ${f.praeteritum}. Im Präteritum erzählt man, was schon passiert ist.`,
-      kurz: `gestern ${f.praeteritum} ✓`,
+      kurz: `er ${f.praeteritum} ✓`,
     };
   }
   const pl = pluralOf(d, defs);

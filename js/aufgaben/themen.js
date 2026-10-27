@@ -1,9 +1,11 @@
 // Aufgaben-Inhalte je Thema und Stufe (ohne Darstellung, testbar). Das Wort kommt zufällig aus dem Wortschatz,
-// bevorzugt aus dem Wortfeld des aktuellen Gebiets. Ergebnis: ein Inhalt für ein Format (siehe js/aufgaben/formate/)
+// bevorzugt aus dem Wortfeld des aktuellen Gebiets. Sätze stammen immer vom Wort selbst (saetze.js) – keine
+// Schablonen, in die beliebige Wörter eingesetzt werden; gibt es keinen passenden Satz, kommt die Aufgabe ohne Satz. Ergebnis: ein Inhalt für ein Format (siehe js/aufgaben/formate/)
 // mit frage, merke (Erklärung mit Merkhilfe), regel (id der Regelkarte) und wort (Schlüssel gegen Wiederholungen).
 import {
   falschePlurale, falschePraeterita, falscheFormen, falscheSteigerung, sichererSchreibfehler, schreibfehler, merkhilfe, alleFormen, gross,
 } from './wortschatz.js';
+import { mitLuecke, rahmenSatz, praeteritum, hilfsverbForm, artikelSatz, woerter, kern, zaehle } from './saetze.js';
 
 // ---------- Zufall ----------
 export const zufall = (liste, rng) => liste[Math.floor(rng() * liste.length)];
@@ -32,11 +34,8 @@ function waehle(liste, schluessel, ctx) {
 }
 
 // ---------- Hilfen ----------
-const PERSONEN = { ich: 'Ich', du: 'Du', er: 'Eadrun', wir: 'Wir', ihr: 'Ihr', sie: 'Die Orks' };
 const PRON = { ich: 'ich', du: 'du', er: 'er/sie/es', wir: 'wir', ihr: 'ihr', sie: 'sie' };
 const ART_GROSS = { der: 'Der', die: 'Die', das: 'Das' };
-const EIN_AKK = { der: 'einen', die: 'eine', das: 'ein' };
-const DEM = { der: 'dem', die: 'der', das: 'dem' };
 const optionen = (richtig, falsch, rng, n = 4) => mische([richtig, ...nimm(falsch.filter((f) => f !== richtig), n - 1, rng)], rng);
 const satzText = (s) => s.glieder.map((g) => g.woerter.map((w) => w.wort).join(' ')).join(' ') + '.';
 const wortListe = (s) => s.glieder.flatMap((g) => g.woerter);
@@ -49,11 +48,13 @@ const MEHRZAHL_PASST = { // welche Regeln zu einem Muster passen (für „Regel 
   'Umlaut+e': ['mehrzahl-umlaut', 'mehrzahl-e'], 'Umlaut+er': ['mehrzahl-umlaut', 'mehrzahl-er'], 'Umlaut': ['mehrzahl-umlaut', 'mehrzahl-gleich'],
 };
 const MEHRZAHL_STUFE = { 1: ['-e', '-n', '-en'], 2: ['Umlaut+e', '-er', 'Umlaut+er', 'Umlaut'], 3: ['unverändert', '-s', '-nen', '-se', 'Umlaut+en'] };
-const MEHRZAHL_SATZ = {
-  haus: 'Im Haus von Fenwick gibt es zwei ___.', pferd: 'Eadrun sieht auf der Weide zwei ___.', schmiede: 'Borga schmiedet zwei neue ___.',
-  wald: 'Im Dornwald entdeckt Faelith zwei ___.', natur: 'Unterwegs zählt Eadrun zwei ___.', burg: 'In der Burg gibt es zwei ___.',
-  zauber: 'In Fenwicks Truhe liegen zwei ___.', essen: 'Die Wirtin bringt zwei ___.', alltag: 'Auf dem Markt gibt es zwei ___.',
-};
+// Das Wort im Satz hervorheben (nur das erste Vorkommen, Satzzeichen bleiben außerhalb)
+function markiere(satz, wort, cls = '') {
+  const t = woerter(satz);
+  const i = t.findIndex((x) => kern(x) === wort);
+  t[i] = t[i].replace(wort, `<b${cls ? ` class="${cls}"` : ''}>${wort}</b>`);
+  return t.join(' ');
+}
 
 // Eigene Ableitungen (zur Laufzeit gecacht)
 let FORMEN = null, WS = null;
@@ -105,9 +106,8 @@ const THEMEN = {
     if (format === 'sortieren') return artikelSortieren(quelle, ctx, 'artikel-lernen', (n) => `Lerne Nomen mit Artikel: ${n.artikel} ${n.wort}.`);
     const n = ctx.itemNomen && ctx.rng() < 0.2 ? ctx.itemNomen : waehle(quelle, (x) => 'n:' + x.wort, ctx);
     const basis = { wort: 'n:' + n.wort, regel: 'artikel-lernen', richtig: n.artikel, merke: `Es heißt ${n.artikel} ${n.wort}. Lerne Nomen immer mit Artikel.` };
-    if (format === 'luecke') {
-      return { ...basis, format, frage: 'Welcher Artikel passt?', satz: `___ ${n.wort} liegt im Rucksack.`, optionen: ['Der', 'Die', 'Das'], richtig: ART_GROSS[n.artikel], genus: true };
-    }
+    const s = format === 'luecke' && artikelSatz(n);
+    if (s) return { ...basis, format, frage: 'Welcher Artikel passt?', satz: '___' + s.slice(n.artikel.length), optionen: ['Der', 'Die', 'Das'], richtig: ART_GROSS[n.artikel], genus: true };
     return { ...basis, format: 'auswahl', frage: 'Welcher Artikel passt?', text: `<span class="blank">___</span> ${n.wort}`, optionen: ['der', 'die', 'das'], genus: true };
   },
 
@@ -140,7 +140,8 @@ const THEMEN = {
     if (format === 'buchstaben') return { ...basis, format, frage: `Mehrzahl von „${n.artikel} ${n.wort}“: Ergänze die fehlenden Buchstaben.`, ...luecken(n.plural, n.wort, rng), vorsatz: 'die' };
     if (format === 'eintippen') return { ...basis, format, frage: `Schreibe die Mehrzahl: ${n.artikel} ${n.wort} → die …`, loesung: n.plural };
     const falsch = falschePlurale(n, formen);
-    if (format === 'luecke') return { ...basis, format, frage: 'Welche Form passt?', satz: MEHRZAHL_SATZ[n.wortfeld] || MEHRZAHL_SATZ.alltag, optionen: optionen(n.plural, falsch, rng), richtig: n.plural };
+    const satz = format === 'luecke' && n.mehrzahlSatz && mitLuecke(n.mehrzahlSatz, n.plural);
+    if (satz) return { ...basis, format, frage: 'Welche Form passt?', satz, optionen: optionen(n.plural, falsch, rng), richtig: n.plural };
     return { ...basis, format: 'auswahl', frage: 'Wie heißt die Mehrzahl?', text: `${n.artikel} ${n.wort} → die <span class="blank">___</span>`, optionen: optionen(n.plural, falsch, rng), richtig: n.plural };
   },
 
@@ -184,20 +185,25 @@ const THEMEN = {
         optionen: optionen(NAME[w.wortart], andere, rng), richtig: NAME[w.wortart], wort: 's:' + satzText(s), regel: REGEL[w.wortart], merke: `„${w.wort}“ ist hier ein ${NAME[w.wortart]}. ${ws.regelText(REGEL[w.wortart])}` };
     }
     // Stufe 3: dasselbe Wort als Nomen oder Verb
-    const vs = ws.verben.filter((v) => v.infinitiv.length <= 9 && !['sein', 'haben', 'werden', 'tun', 'wissen', 'sterben', 'lügen'].includes(v.infinitiv));
-    const satz = (v, alsNomen) => (alsNomen ? zufall([`Beim ${gross(v.infinitiv)} hilft Fenwick.`, `Das ${gross(v.infinitiv)} macht Spaß.`], rng) : `Wir ${v.infinitiv} ${v.ergaenzung}.`);
+    const vs = ws.verben.filter((v) => v.nominal);
+    // { satz, wort }: als Nomen der Satz mit dem Verb als Nomen, sonst ein Satz des Verbs im Präsens
+    const satz = (v, alsNomen) => {
+      if (alsNomen) return { satz: v.nominal, wort: gross(v.infinitiv) };
+      const s = rahmenSatz(v, zufall(v.rahmen, rng));
+      return { satz: s.satz, wort: s.form };
+    };
     if (format === 'sortieren') {
       const vv = nimm(vs, 4, rng);
       return { format, frage: 'Ist das markierte Wort ein Nomen oder ein Verb?', kisten: [{ id: 'nomen', name: 'Nomen' }, { id: 'verb', name: 'Verb' }],
-        karten: vv.map((v, k) => { const n = k % 2 === 0; const t = satz(v, n); const wort = n ? gross(v.infinitiv) : v.infinitiv; return { text: t.replace(new RegExp(`\\b${wort}\\b`), `<b>${wort}</b>`), kiste: n ? 'nomen' : 'verb' }; }),
+        karten: vv.map((v, k) => { const n = k % 2 === 0; const s = satz(v, n); return { text: markiere(s.satz, s.wort), kiste: n ? 'nomen' : 'verb' }; }),
         wort: 'v:' + vv[0].infinitiv, regel: 'wortart-funktion', merke: ws.regelText('wortart-funktion') };
     }
     const v = waehle(vs, (x) => 'v:' + x.infinitiv, ctx);
     const n = rng() < 0.5;
-    const wort = n ? gross(v.infinitiv) : v.infinitiv;
-    return { format: 'auswahl', frage: 'Welche Wortart ist das markierte Wort?', text: satz(v, n).replace(new RegExp(`\\b${wort}\\b`), `<b class="markiert">${wort}</b>`),
+    const s = satz(v, n);
+    return { format: 'auswahl', frage: 'Welche Wortart ist das markierte Wort?', text: markiere(s.satz, s.wort, 'markiert'),
       optionen: mische(['Nomen', 'Verb', 'Adjektiv'], rng), richtig: n ? 'Nomen' : 'Verb', wort: 'v:' + v.infinitiv, regel: 'wortart-funktion',
-      merke: n ? `„Beim“ oder „das“ steht davor – „${wort}“ ist hier ein Nomen.` : `„${wort}“ sagt, was wir tun – hier ein Verb.` };
+      merke: n ? `Man kann „das“ davorsetzen – „${s.wort}“ ist hier ein Nomen.` : `„${s.wort}“ sagt, was jemand tut – hier ein Verb.` };
   },
 
   grossklein(stufe, format, ctx) {
@@ -223,13 +229,16 @@ const THEMEN = {
         woerter: woerter.map((w) => w.wort.toLowerCase()), ziele: woerter.map((w, i) => (i === 0 || w.wortart === 'nomen' ? i : -1)).filter((i) => i >= 0),
         wort: 's:' + satzText(s), regel: 'gross-satzanfang', merke: `${ws.regelText('gross-satzanfang')} Nomen schreibt man auch groß: ${satzText(s)}` };
     }
-    const vs = ws.verben.filter((v) => v.schwierigkeit <= 2 && !['sein', 'haben', 'werden'].includes(v.infinitiv));
+    const vs = ws.verben.filter((v) => v.schwierigkeit <= 2 && v.nominal);
     if (format === 'luecke') {
       const v = waehle(vs, (x) => 'v:' + x.infinitiv, ctx);
-      const n = rng() < 0.6;
-      return { format, frage: 'Groß oder klein?', satz: n ? `Beim ___ hilft Fenwick.` : `Die Kinder ___ ${v.ergaenzung}.`, optionen: [gross(v.infinitiv), v.infinitiv],
-        richtig: n ? gross(v.infinitiv) : v.praesens.sie, wort: 'v:' + v.infinitiv, regel: 'gross-nominalisierung', merke: ws.regelText('gross-nominalisierung'),
-        ...(n ? {} : { optionen: [gross(v.praesens.sie), v.praesens.sie] }) };
+      const basis = { format, frage: 'Groß oder klein?', wort: 'v:' + v.infinitiv, regel: 'gross-nominalisierung', merke: ws.regelText('gross-nominalisierung') };
+      if (rng() < 0.6) {
+        const g = gross(v.infinitiv);
+        return { ...basis, satz: mitLuecke(v.nominal, g), optionen: [g, v.infinitiv], richtig: g };
+      }
+      const s = rahmenSatz(v, zufall(v.rahmen, rng));
+      return { ...basis, satz: s.luecke, optionen: [gross(s.form), s.form], richtig: s.form };
     }
     const vv = nimm(vs, 4, rng);
     return { format: 'sortieren', frage: 'Groß oder klein? Achte auf das Wort davor.', kisten: [{ id: 'gross', name: 'groß' }, { id: 'klein', name: 'klein' }],
@@ -251,7 +260,9 @@ const THEMEN = {
         merke: `${v.infinitiv}: ich ${v.praesens.ich}, du ${v.praesens.du}, er ${v.praesens.er}, wir ${v.praesens.wir}.` };
     }
     const v = waehle(quelle, (x) => 'v:' + x.infinitiv, ctx);
-    const p = stufe === 2 ? zufall(['du', 'er'], rng) : zufall(['ich', 'du', 'er', 'wir', 'ihr', 'sie'], rng);
+    // Stufe 2: nur du und er/sie/es (dort wechselt der Vokal) – jedes Verb hat einen Rahmen mit er/sie/es
+    const r = zufall(v.rahmen.filter((x) => stufe !== 2 || ['du', 'er'].includes(x.person)), rng);
+    const p = r.person;
     const richtig = v.praesens[p];
     const merke = `${ws.regelText(regel)} Hier: ${PRON[p]} ${richtig}.`;
     const basis = { wort: 'v:' + v.infinitiv, regel, merke };
@@ -259,7 +270,7 @@ const THEMEN = {
     if (format === 'eintippen') return { ...basis, format, frage: `Schreibe die Form: ${PRON[p]} … (${v.infinitiv})`, loesung: richtig };
     const falsch = falscheFormen(v, p);
     if (format === 'auswahl') return { ...basis, format, frage: `Welche Form passt? (${v.infinitiv})`, text: `${PRON[p]} <span class="blank">___</span>`, optionen: optionen(richtig, falsch, rng), richtig };
-    return { ...basis, format: 'luecke', frage: `Welche Form passt? (${v.infinitiv})`, satz: `${PERSONEN[p]} ___ ${v.ergaenzung}.`, optionen: optionen(richtig, falsch, rng), richtig };
+    return { ...basis, format: 'luecke', frage: `Welche Form passt? (${v.infinitiv})`, satz: rahmenSatz(v, r).luecke, optionen: optionen(richtig, falsch, rng), richtig };
   },
 
   zeitformen(stufe, format, ctx) {
@@ -267,16 +278,19 @@ const THEMEN = {
     if (stufe === 3) {
       const quelle = ws.verben.filter((v) => v.hilfsverb !== 'beide' && !['sein', 'werden', 'sterben'].includes(v.infinitiv));
       const v = waehle(quelle, (x) => 'v:' + x.infinitiv, ctx);
-      const hv = v.hilfsverb === 'sein' ? 'ist' : 'hat';
+      const r = zufall(v.rahmen, rng);
       if (format === 'auswahl') {
         const zeit = zufall(['Präsens', 'Präteritum', 'Perfekt'], rng);
-        const satz = { Präsens: `Borga ${v.praesens.er} ${v.ergaenzung}.`, Präteritum: `Borga ${v.praeteritum} ${v.ergaenzung}.`, Perfekt: `Borga ${hv} ${v.ergaenzung} ${v.partizip}.` }[zeit];
-        if (v.praesens.er === v.praeteritum) return THEMEN.zeitformen(3, 'luecke', ctx);
+        const satz = rahmenSatz(v, r, { Präsens: 'praesens', Präteritum: 'praeteritum', Perfekt: 'perfekt' }[zeit]).satz;
+        if (v.praesens[r.person] === praeteritum(v, r.person)) return THEMEN.zeitformen(3, 'luecke', ctx);
         return { format, frage: 'In welcher Zeitform steht der Satz?', text: satz, optionen: ['Präsens', 'Präteritum', 'Perfekt'], richtig: zeit, wort: 'v:' + v.infinitiv,
           regel: 'zeit-erkennen', merke: ws.regelText('zeit-erkennen') };
       }
-      return { format: 'luecke', frage: 'haben oder sein?', satz: `Borga ___ ${v.ergaenzung} ${v.partizip}.`, optionen: mische(['hat', 'ist', 'haben', 'sind'], rng), richtig: hv,
-        wort: 'v:' + v.infinitiv, regel: 'zeit-perfekt', merke: `${ws.regelText('zeit-perfekt')} Hier: Borga ${hv} ${v.ergaenzung} ${v.partizip}.` };
+      const s = rahmenSatz(v, r, 'perfekt');
+      const andere = ['wir', 'ihr', 'sie'].includes(r.person) ? 'er' : 'wir';
+      const formen = [...new Set(['haben', 'sein'].flatMap((h) => [hilfsverbForm(h, r.person), hilfsverbForm(h, andere)]))];
+      return { format: 'luecke', frage: 'haben oder sein?', satz: s.luecke, optionen: mische(formen, rng), richtig: s.form,
+        wort: 'v:' + v.infinitiv, regel: 'zeit-perfekt', merke: `${ws.regelText('zeit-perfekt')} Hier: ${s.satz}` };
     }
     const quelle = ws.verben.filter((v) => (stufe === 1 ? !v.unregelmaessig : v.unregelmaessig) && v.infinitiv !== 'sterben');
     const regel = stufe === 1 ? 'zeit-te' : 'zeit-stark';
@@ -295,7 +309,10 @@ const THEMEN = {
     const merke = `${ws.regelText(regel)} Hier: ${v.infinitiv} – er ${v.praeteritum}.`;
     const basis = { wort: 'v:' + v.infinitiv, regel, merke };
     if (format === 'buchstaben') return { ...basis, format, frage: `Präteritum von „${v.infinitiv}“: Ergänze die fehlenden Buchstaben.`, ...luecken(v.praeteritum, v.infinitiv, rng), vorsatz: 'gestern er' };
-    return { ...basis, format: 'luecke', frage: `Präteritum von „${v.infinitiv}“`, satz: `Gestern ___ Borga ${v.ergaenzung}.`, optionen: optionen(v.praeteritum, falschePraeterita(v), rng), richtig: v.praeteritum };
+    const r = zufall(v.rahmen.filter((x) => ['ich', 'er', 'wir', 'sie'].includes(x.person)), rng);
+    const s = rahmenSatz(v, r, 'praeteritum');
+    const falsch = [...new Set(falschePraeterita(v).map((f) => praeteritum({ praeteritum: f }, r.person)))];
+    return { ...basis, format: 'luecke', frage: `Präteritum von „${v.infinitiv}“`, satz: s.luecke, optionen: optionen(s.form, falsch, rng), richtig: s.form };
   },
 
   steigerung(stufe, format, ctx) {
@@ -320,7 +337,7 @@ const THEMEN = {
     const basis = { wort: 'a:' + a.positiv, regel, merke };
     if (format === 'buchstaben') return { ...basis, format, frage: `${art === 'komparativ' ? 'Komparativ' : 'Superlativ'} von „${a.positiv}“: Ergänze.`, ...luecken(richtig.replace('am ', ''), a.positiv, rng), vorsatz: art === 'superlativ' ? 'am' : '' };
     if (format === 'eintippen') return { ...basis, format, frage: `Schreibe den Komparativ: ${a.positiv} → …`, loesung: a.komparativ };
-    return { ...basis, format: 'luecke', frage: `Steigere „${a.positiv}“.`, satz: steigerungsSatz(a, art), optionen: optionen(richtig, falscheSteigerung(a, art), rng), richtig };
+    return { ...basis, format: 'luecke', frage: `Steigere „${a.positiv}“.`, satz: a.saetze[art].replace(richtig, '___'), optionen: optionen(richtig, falscheSteigerung(a, art), rng), richtig };
   },
 
   verlaengerung: (s, f, c) => rechtschreibung(['auslaut-d', 'auslaut-b', 'auslaut-g'], 'verlaengern', s, f, c),
@@ -427,23 +444,6 @@ function tasten(noetig, rng) {
   return mische([...set], rng);
 }
 
-function steigerungsSatz(a, art) {
-  const k = art === 'komparativ';
-  const sonder = {
-    viel: k ? 'Borga isst ___ als Eadrun.' : 'Von allen isst Borga ___.',
-    wenig: k ? 'Eadrun isst ___ als Borga.' : 'Von allen isst Fenwick ___.',
-    gern: k ? 'Borga isst Äpfel ___ als Birnen.' : 'Borga isst Kuchen ___.',
-  }[a.positiv];
-  if (sonder) return sonder;
-  return {
-    wesen: k ? 'Der Bär ist ___ als der Fuchs.' : 'Der Drache ist ___ von allen.',
-    ding: k ? 'Das Schwert ist ___ als der Dolch.' : 'Diese Truhe ist ___ von allen.',
-    wetter: k ? 'Heute ist es ___ als gestern.' : 'Um Mitternacht ist es ___.',
-    zeit: k ? 'Heute kommt Eadrun ___ als gestern.' : 'Von allen kommt Fenwick ___.',
-    essen: k ? 'Die Suppe ist ___ als der Brei.' : 'Dieser Kuchen ist ___ von allen.',
-  }[a.bezug] || (k ? 'Das ist ___ als vorher.' : 'Das ist ___ von allen.');
-}
-
 // Rechtschreib-Themen: Wörter mit dem Phänomen; Stufe 1 Auswahl/Sortieren, Stufe 2 Buchstaben/Fehler, Stufe 3 Eintippen/Fehler.
 function rechtschreibung(phs, regel, stufe, format, ctx) {
   const { ws, rng } = ctx;
@@ -478,21 +478,15 @@ function verlaengerungSortieren(ctx, formen) {
     wort: 'n:' + d[0].wort, regel: 'verlaengern', merke: `Verlängere: ${d[0].wort} – ${d[0].plural}, ${t[0].wort} – ${t[0].plural}.` };
 }
 
-// Satz mit genau einem falsch geschriebenen Wort (auch für die Ork-Rüstung).
+// Ein Satz des Worts mit genau diesem einen falsch geschriebenen Wort (auch für die Ork-Rüstung).
 export function fehlerSatz(n, falsch, rng) {
-  const EIN = { der: 'ein', die: 'eine', das: 'ein' };
-  const vorlagen = [
-    [`Der Ork stiehlt ${EIN_AKK[n.artikel]}`, ''],
-    [`Hinter ${DEM[n.artikel]}`, 'wartet ein Ork'],
-    [`Der Ork legt ${EIN_AKK[n.artikel]}`, 'in den Sack'],
-    [`${gross(EIN[n.artikel])}`, 'liegt neben dem Ork'],
-  ];
-  if (n.wortfeld === 'schmiede') vorlagen.push([`Der Ork schwingt ${{ der: 'seinen', die: 'seine', das: 'sein' }[n.artikel]}`, 'wild']);
-  const [vorne, hinten] = zufall(vorlagen, rng);
-  const a = vorne.split(' ');
-  const woerter = [...a, falsch, ...(hinten ? hinten.split(' ') : [])];
-  const i = a.length;
-  return { woerter, ziele: [i], korrektur: { [i]: n.wort }, optionen: mische([n.wort, falsch], rng), satzEnde: '.' };
+  const satz = zufall(n.saetze.filter((s) => zaehle(s, n.wort) === 1), rng);
+  const w = woerter(satz);
+  const ende = w.at(-1).match(/[.!?]$/)?.[0] || '';
+  if (ende) w[w.length - 1] = w.at(-1).slice(0, -1);
+  const i = w.findIndex((t) => kern(t) === n.wort);
+  w[i] = w[i].replace(n.wort, falsch);
+  return { woerter: w, ziele: [i], korrektur: { [i]: n.wort }, optionen: mische([n.wort, falsch], rng), satzEnde: ende };
 }
 
 // ---------- Öffentlich ----------

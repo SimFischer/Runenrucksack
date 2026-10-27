@@ -12,7 +12,7 @@ const RECIPES = json('recipes.json');
 const DEFS = Object.fromEntries(ITEMS.map((d) => [d.id, d]));
 for (const d of buildCompounds(DEFS, RECIPES)) DEFS[d.id] = d;
 for (const d of buildRuneLevels(DEFS)) DEFS[d.id] = d;
-const BUCH = baueBuch(DEFS, ITEMS, RECIPES);
+const BUCH = baueBuch(DEFS, ITEMS, RECIPES, json('wortschatz.json'));
 
 test('Jede mögliche Kombination steht im Buch, jede id genau einmal', () => {
   const k = RECIPES.komposita;

@@ -1,0 +1,237 @@
+# Sätze zu den Nomen (Teil 1: haus, pferd, schmiede, wald)
+# Wort|Gruppe|Satz 1|Satz 2|Mehrzahl-Satz – Gruppe: ge Gegenstand, es Essen, ti Tier, pe Person, or Ort, pf Pflanze,
+# wn Wetter und Natur, ze Zeit, ab Gefühl und Abstraktes. Ein „?“ vor dem Satz: noch unsicher (in der Prüfliste markiert).
+Garten|or|Der Garten hinter dem Haus ist voller Blumen.|Im Garten wachsen Bohnen und Erbsen.|Die Gärten im Dorf sind im Sommer bunt.
+Haus|or|Das Haus von Fenwick hat ein schiefes Dach.|Oma wohnt in einem kleinen Haus am Bach.|Im Dorf stehen viele alte Häuser.
+Tür|ge|Die Tür quietscht laut.|Der Bote klopft an die Tür.|Die Burg hat zwei schwere Türen.
+Fenster|ge|Das Fenster steht offen.|Die Katze schaut aus dem Fenster.|Die Fenster im Turm sind schmal.
+Tisch|ge|Der Tisch in der Küche ist aus Holz.|Die Wirtin stellt die Suppe auf den Tisch.|Im Gasthaus stehen zehn Tische.
+Stuhl|ge|Der Stuhl wackelt ein bisschen.|Opa sitzt auf seinem Stuhl am Fenster.|Um den Tisch stehen vier Stühle.
+Bett|ge|Das Bett im Gasthaus ist weich.|Am Abend gehe ich müde ins Bett.|Im Schlafsaal stehen viele Betten.
+Lampe|ge|Die Lampe über dem Tisch ist hell.|Fenwick zündet die Lampe an.|In der Halle hängen drei Lampen.
+Schrank|ge|Der Schrank ist voller Kleider.|Die Teller stehen im Schrank.|In der Küche gibt es zwei Schränke.
+Küche|or|Die Küche duftet nach Kuchen.|Die Wirtin kocht in der Küche eine Suppe.|Die Burg hat zwei große Küchen.
+Dach|ge|Das Dach ist mit Stroh gedeckt.|Die Katze sitzt auf dem Dach.|Nach dem Sturm sind viele Dächer kaputt.
+Wand|ge|Die Wand in der Halle ist aus Stein.|An der Wand hängt ein Bild.|Die Wände der Hütte sind aus Holz.
+Boden|ge|Der Boden in der Küche ist nass.|Die Münze rollt über den Boden.|In der Burg sind alle Böden aus Stein.
+Treppe|ge|Die Treppe zum Turm ist sehr steil.|Der Wächter läuft die Treppe hinauf.|Im Schloss gibt es viele Treppen.
+Keller|or|Der Keller ist dunkel und kühl.|Die Äpfel lagern im Keller.|Die Häuser im Dorf haben tiefe Keller.
+Ofen|ge|Der Ofen in der Bäckerei ist heiß.|Der Bäcker schiebt das Brot in den Ofen.|In der Schmiede brennen zwei Öfen.
+Topf|ge|Der Topf mit der Suppe dampft.|Die Köchin rührt im Topf.|Auf dem Herd stehen drei Töpfe.
+Kanne|ge|Die Kanne ist voll mit Tee.|Die Wirtin stellt eine Kanne auf den Tisch.|Auf dem Regal stehen bunte Kannen.
+Löffel|ge|Der Löffel liegt neben dem Teller.|Ich esse die Suppe mit einem Löffel.|In der Schublade liegen viele Löffel.
+Gabel|ge|Die Gabel hat vier Zinken.|Borga isst die Kartoffel mit der Gabel.|Auf dem Tisch liegen sechs Gabeln.
+Messer|ge|Das Messer ist sehr scharf.|Der Koch schneidet das Brot mit einem Messer.|In der Küche hängen viele Messer.
+Teller|ge|Der Teller ist leer.|Die Wirtin bringt einen Teller mit Kuchen.|Nach dem Fest spülen wir alle Teller.
+Tasse|ge|Die Tasse ist heiß.|Oma trinkt eine Tasse Tee.|Auf dem Tisch stehen vier Tassen.
+Eimer|ge|Der Eimer ist voll Wasser.|Der Knappe holt einen Eimer vom Brunnen.|Im Stall stehen zwei Eimer.
+Besen|ge|Der Besen steht in der Ecke.|Die Hexe fliegt auf ihrem Besen.|Im Schuppen hängen drei Besen.
+Blume|pf|Die Blume duftet süß.|Eadrun pflückt eine Blume für Oma.|Im Beet blühen viele Blumen.
+Strauch|pf|Der Strauch trägt rote Beeren.|Hinter dem Strauch versteckt sich ein Hase.|Am Weg wachsen dichte Sträucher.
+Rose|pf|Die Rose hat spitze Dornen.|Der Gärtner pflanzt eine Rose.|Im Garten der Königin blühen viele Rosen.
+Beet|or|Das Beet ist voller Unkraut.|Oma gießt das Beet.|Hinter dem Haus liegen drei Beete.
+Zaun|ge|Der Zaun um den Garten ist neu.|Das Pferd springt über den Zaun.|Im Dorf gibt es viele Zäune aus Holz.
+Schaufel|ge|Die Schaufel steht im Schuppen.|Borga gräbt mit der Schaufel ein Loch.|Die Zwerge tragen ihre Schaufeln zum Berg.
+Rechen|ge|Der Rechen liegt auf der Wiese.|Ich sammle das Laub mit dem Rechen.|Im Schuppen hängen zwei Rechen.
+Gießkanne|ge|Die Gießkanne ist leer.|Oma füllt die Gießkanne am Brunnen.|Im Garten stehen zwei grüne Gießkannen.
+Gärtner|pe|Der Gärtner schneidet die Hecke.|Im Schlossgarten arbeitet ein Gärtner.|Die Gärtner pflanzen neue Rosen.
+Gras|pf|Das Gras auf der Wiese ist nass.|Die Kuh frisst Gras.|Am Teich wachsen hohe Gräser.
+Hof|or|Der Hof ist voller Hühner.|Die Kinder spielen auf dem Hof.|Im Tal liegen viele kleine Höfe.
+Scheune|or|Die Scheune ist voll Heu.|Der Bauer bringt das Heu in die Scheune.|Am Dorfrand stehen zwei alte Scheunen.
+Brunnen|or|Der Brunnen steht mitten im Dorf.|Der Knappe holt Wasser aus dem Brunnen.|In der Stadt gibt es drei Brunnen.
+Kamin|ge|Der Kamin wärmt die ganze Stube.|Im Kamin knistert das Feuer.|Das Schloss hat viele Kamine.
+Teppich|ge|Der Teppich ist weich und bunt.|Der Hund schläft auf dem Teppich.|Im Saal liegen kostbare Teppiche.
+Kissen|ge|Das Kissen ist weich.|Ich lege meinen Kopf auf das Kissen.|Auf dem Sofa liegen viele Kissen.
+Decke|ge|Die Decke ist warm.|Im Winter kuschle ich mich in eine Decke.|Im Schrank liegen drei Decken.
+Spiegel|ge|Der Spiegel hängt an der Wand.|Die Königin schaut in den Spiegel.|Im Schloss hängen goldene Spiegel.
+Uhr|ge|Die Uhr tickt laut.|Der Turm hat eine große Uhr.|Im Laden hängen viele Uhren.
+Zimmer|or|Das Zimmer ist klein und gemütlich.|Ich räume mein Zimmer auf.|Das Gasthaus hat zehn Zimmer.
+Kiste|ge|Die Kiste ist schwer.|Borga packt das Werkzeug in eine Kiste.|Im Keller stehen viele Kisten.
+Korb|ge|Der Korb ist voller Äpfel.|Oma trägt einen Korb zum Markt.|Auf dem Markt stehen Körbe mit Obst.
+Hecke|pf|Die Hecke ist hoch und dicht.|Der Gärtner schneidet die Hecke.|Zwischen den Gärten wachsen Hecken.
+Schlüssel|ge|Der Schlüssel passt in das Schloss.|Fenwick sucht seinen Schlüssel.|Am Gürtel des Wächters hängen viele Schlüssel.
+Katze|ti|Die Katze schläft in der Sonne.|Auf dem Dach sitzt eine Katze.|Im Stall wohnen drei Katzen.
+Maus|ti|Die Maus knabbert am Käse.|Die Katze jagt eine Maus.|Im Keller wohnen viele Mäuse.
+Gartenzaun|ge|Der Gartenzaun ist grün gestrichen.|Die Katze balanciert auf dem Gartenzaun.|Im Dorf sind alle Gartenzäune aus Holz.
+Blumenbeet|or|Das Blumenbeet blüht bunt.|Oma gießt das Blumenbeet.|Vor dem Schloss liegen große Blumenbeete.
+Stube|or|Die Stube ist warm und gemütlich.|Am Abend sitzen wir in der Stube.|Das Gasthaus hat zwei Stuben.
+Kammer|or|Die Kammer unter dem Dach ist klein.|Fenwick versteckt seine Tränke in einer Kammer.|Die Burg hat viele kleine Kammern.
+Herd|ge|Der Herd in der Küche ist heiß.|Die Suppe kocht auf dem Herd.|In der Burgküche stehen zwei Herde.
+Sofa|ge|Das Sofa ist weich.|Opa schläft auf dem Sofa.|Im Laden stehen drei bunte Sofas.
+Kerze|ge|Die Kerze flackert.|Fenwick liest beim Licht einer Kerze.|Auf dem Kuchen brennen zehn Kerzen.
+Hütte|or|Die Hütte steht am Waldrand.|Der Jäger wohnt in einer Hütte.|Am See stehen drei kleine Hütten.
+Loch|ge|Das Loch im Zaun ist groß.|Der Hase verschwindet in einem Loch.|Meine Socke hat zwei Löcher.
+Falle|ge|Die Falle schnappt zu.|Der Kobold tappt in die Falle.|Der Jäger stellt Fallen auf.
+Leine|ge|Die Leine ist lang.|Der Hund läuft an der Leine.|Im Schuppen hängen zwei Leinen.
+Hundehütte|or|Die Hundehütte steht im Hof.|Der Hund schläft in seiner Hundehütte.|Im Dorf gibt es viele bunte Hundehütten.
+Taschenlampe|ge|Die Taschenlampe leuchtet hell.|In der Höhle brauchen wir eine Taschenlampe.|Die Kinder haben zwei Taschenlampen dabei.
+Sonnenblume|pf|Die Sonnenblume ist größer als ich.|Im Garten blüht eine Sonnenblume.|Am Zaun wachsen viele Sonnenblumen.
+Mausefalle|ge|Die Mausefalle steht im Keller.|Der Kobold tritt in eine Mausefalle.|Im Keller stehen zwei Mausefallen.
+Hundeleine|ge|Die Hundeleine hängt an der Tür.|Opa nimmt die Hundeleine vom Haken.|Im Laden hängen bunte Hundeleinen.
+Pferd|ti|Das Pferd grast auf der Weide.|Eadrun reitet auf einem braunen Pferd.|Im Stall stehen sechs Pferde.
+Sattel|ge|Der Sattel ist aus Leder.|Eadrun legt dem Pferd den Sattel auf.|An der Wand hängen viele Sättel.
+Zügel|ge|Der Zügel ist aus Leder.|Eadrun hält den Zügel fest.|Die Reiterin nimmt die Zügel in die Hand.
+Hufeisen|ge|Das Hufeisen bringt Glück.|Der Hufschmied nagelt ein Hufeisen an den Huf.|Ein Pferd braucht vier Hufeisen.
+Huf|ge|Der Huf des Pferdes ist hart.|Das Fohlen scharrt mit dem Huf.|Ein Pferd hat vier Hufe.
+Stall|or|Der Stall riecht nach Heu.|Die Pferde schlafen im Stall.|Auf dem Hof gibt es zwei Ställe.
+Fohlen|ti|Das Fohlen hüpft über die Wiese.|Die Stute hat ein Fohlen bekommen.|Auf der Koppel spielen drei Fohlen.
+Stute|ti|Die Stute ist sehr sanft.|Eadrun reitet auf einer weißen Stute.|Auf der Weide grasen fünf Stuten.
+Hengst|ti|Der Hengst ist wild und stark.|Der Ritter reitet einen schwarzen Hengst.|Die Hengste galoppieren über die Wiese.
+Reiter|pe|Der Reiter trägt einen Helm.|Am Tor wartet ein Reiter.|Die Reiter kommen zur Burg.
+Reiterin|pe|Die Reiterin springt über den Graben.|Eadrun ist eine gute Reiterin.|Beim Rennen starten zehn Reiterinnen.
+Mähne|ge|Die Mähne des Pferdes ist lang.|Eadrun flicht dem Pferd die Mähne.|Die Fohlen haben kurze Mähnen.
+Schweif|ge|Der Schweif des Pferdes ist schwarz.|Das Pferd verscheucht die Fliegen mit dem Schweif.|Die Pferde haben lange Schweife.
+Weide|or|Die Weide ist grün und groß.|Die Kühe grasen auf der Weide.|Hinter dem Hof liegen zwei Weiden.
+Koppel|or|Die Koppel hat einen hohen Zaun.|Das Fohlen spielt auf der Koppel.|Neben dem Stall liegen zwei Koppeln.
+Bürste|ge|Die Bürste ist weich.|Eadrun striegelt das Pferd mit einer Bürste.|Im Stall liegen drei Bürsten.
+Seil|ge|Das Seil ist lang und stark.|Der Knappe zieht am Seil.|Die Zwerge brauchen zwei Seile.
+Peitsche|ge|Die Peitsche knallt laut.|Der Kutscher hält eine Peitsche in der Hand.|Am Haken hängen zwei Peitschen.
+Rennen|ab|Das Rennen beginnt am Mittag.|Eadrun gewinnt das Rennen.|Im Sommer gibt es viele Rennen.
+Rad|ge|Das Rad der Kutsche ist kaputt.|Der Bauer repariert ein Rad.|Ein Wagen hat vier Räder.
+Kutsche|ge|Die Kutsche fährt zur Burg.|Die Königin steigt in die Kutsche.|Vor dem Schloss warten zwei Kutschen.
+Lanze|ge|Die Lanze ist lang und spitz.|Der Ritter hält eine Lanze.|Beim Turnier brechen viele Lanzen.
+Wiese|or|Die Wiese ist voller Blumen.|Das Fohlen läuft über die Wiese.|Rund um das Dorf liegen grüne Wiesen.
+Pfad|or|Der Pfad führt in den Wald.|Wir folgen einem schmalen Pfad.|Durch den Wald führen viele Pfade.
+Brücke|or|Die Brücke führt über den Fluss.|Der Troll wohnt unter einer Brücke.|Über den Fluss führen drei Brücken.
+Feld|or|Das Feld ist voller Weizen.|Der Bauer arbeitet auf dem Feld.|Hinter dem Dorf liegen viele Felder.
+Herde|ti|Die Herde zieht über die Wiese.|Die Hirtin passt auf die Herde auf.|Im Tal grasen zwei Herden.
+Zelt|ge|Das Zelt steht am See.|Wir schlafen in einem Zelt.|Auf der Wiese stehen viele Zelte.
+Lager|or|Das Lager liegt am Fluss.|Am Abend erreichen wir das Lager.|Die Orks haben zwei Lager im Wald.
+Horn|ge|Das Horn klingt laut über das Tal.|Der Wächter bläst in das Horn.|Die Ziege hat zwei spitze Hörner.
+Esel|ti|Der Esel trägt zwei Säcke.|Der Händler kommt mit einem Esel.|Auf der Weide stehen drei Esel.
+Ziege|ti|Die Ziege klettert auf den Felsen.|Die Hirtin melkt eine Ziege.|Am Berg leben viele Ziegen.
+Schaf|ti|Das Schaf hat dicke Wolle.|Der Hirte sucht ein verlorenes Schaf.|Auf der Wiese grasen viele Schafe.
+Kuh|ti|Die Kuh gibt Milch.|Auf der Weide steht eine braune Kuh.|Der Bauer hat zehn Kühe.
+Kalb|ti|Das Kalb steht neben seiner Mutter.|Im Stall schläft ein Kalb.|Im Frühling kommen viele Kälber zur Welt.
+Stier|ti|Der Stier ist stark und wild.|Auf der Koppel steht ein schwarzer Stier.|Die Stiere scharren mit den Hufen.
+Hirte|pe|Der Hirte passt auf die Schafe auf.|Am Feuer sitzt ein alter Hirte.|Die Hirten ziehen mit ihren Herden in die Berge.
+Hirtin|pe|Die Hirtin ruft nach ihren Ziegen.|Am Hügel wartet eine Hirtin.|Die Hirtinnen singen am Abend.
+Pferdestall|or|Der Pferdestall ist frisch gestrichen.|Eadrun bringt das Fohlen in den Pferdestall.|Auf dem Gut stehen zwei Pferdeställe.
+Hufschmied|pe|Der Hufschmied beschlägt das Pferd.|Im Dorf arbeitet ein Hufschmied.|Die Hufschmiede haben viel zu tun.
+Karotte|es|Die Karotte ist knackig.|Eadrun gibt dem Pferd eine Karotte.|Im Beet wachsen viele Karotten.
+Hügel|or|Der Hügel ist steil.|Auf dem Hügel steht eine Mühle.|Hinter dem Dorf liegen grüne Hügel.
+Ritt|ab|Der Ritt durch das Tal dauert lange.|Nach einem langen Ritt ist Eadrun müde.|Eadrun macht jede Woche zwei lange Ritte.
+Reise|ab|Die Reise nach Hrossmark ist lang.|Fenwick packt für eine Reise.|Fenwick hat schon viele Reisen gemacht.
+Tränke|ge|Die Tränke ist voll Wasser.|Die Pferde trinken an der Tränke.|Auf der Weide stehen zwei Tränken.
+Tal|or|Das Tal ist grün und still.|Ein Bach fließt durch das Tal.|Zwischen den Bergen liegen tiefe Täler.
+Hirtenstab|ge|Der Hirtenstab ist aus Holz.|Die Hirtin stützt sich auf ihren Hirtenstab.|An der Hütte lehnen zwei Hirtenstäbe.
+Schäfer|pe|Der Schäfer zählt seine Schafe.|Am Hügel wohnt ein Schäfer.|Die Schäfer treiben die Herde ins Tal.
+Schäferin|pe|Die Schäferin ruft ihren Hund.|Auf der Wiese sitzt eine Schäferin.|Die Schäferinnen scheren die Schafe.
+Schmied|pe|Der Schmied schlägt auf das Eisen.|Im Dorf arbeitet ein Schmied.|Die Schmiede der Zwerge sind berühmt.
+Schmiede|or|Die Schmiede ist heiß und laut.|Borga arbeitet in der Schmiede.|In der Zwergenstadt gibt es viele Schmieden.
+Hammer|ge|Der Hammer ist schwer.|Borga schlägt mit dem Hammer auf das Eisen.|An der Wand hängen drei Hämmer.
+Amboss|ge|Der Amboss ist aus Eisen.|Borga legt das glühende Eisen auf den Amboss.|In der großen Schmiede stehen zwei Ambosse.
+Eisen|ge|Das Eisen glüht rot.|Borga schmiedet ein Schwert aus Eisen.|?Die Eisen glühen im Feuer.
+Zange|ge|Die Zange hält das heiße Eisen.|Borga greift nach der Zange.|An der Wand hängen viele Zangen.
+Feile|ge|Die Feile ist rau.|Borga glättet die Klinge mit einer Feile.|Im Werkzeugkasten liegen zwei Feilen.
+Säge|ge|Die Säge ist scharf.|Der Zimmermann schneidet das Brett mit der Säge.|Im Schuppen hängen zwei Sägen.
+Nagel|ge|Der Nagel ist krumm.|Ich schlage einen Nagel in die Wand.|In der Kiste liegen viele Nägel.
+Schraube|ge|Die Schraube ist locker.|Borga dreht eine Schraube fest.|In der Dose liegen kleine Schrauben.
+Schwert|ge|Das Schwert glänzt in der Sonne.|Der Ritter zieht sein Schwert.|In der Waffenkammer hängen viele Schwerter.
+Axt|ge|Die Axt ist scharf.|Der Holzfäller hackt mit der Axt Holz.|Die Zwerge tragen schwere Äxte.
+Dolch|ge|Der Dolch steckt im Gürtel.|Der Räuber zieht einen Dolch.|Auf dem Tisch liegen zwei Dolche.
+Helm|ge|Der Helm schützt den Kopf.|Der Ritter setzt seinen Helm auf.|Die Wachen tragen glänzende Helme.
+Rüstung|ge|Die Rüstung ist schwer.|Der Ritter putzt seine Rüstung.|In der Halle stehen alte Rüstungen.
+Hemd|ge|Das Hemd ist frisch gewaschen.|Theron zieht ein sauberes Hemd an.|Auf der Leine hängen drei Hemden.
+Kettenhemd|ge|Das Kettenhemd klirrt bei jedem Schritt.|Der Ritter trägt ein Kettenhemd.|Die Zwerge schmieden neue Kettenhemden.
+Kette|ge|Die Kette ist aus Gold.|Die Königin trägt eine Kette.|Am Tor hängen schwere Ketten.
+Ring|ge|Der Ring glänzt am Finger der Königin.|Der Zwerg schmiedet einen Ring.|In der Truhe liegen goldene Ringe.
+Feuer|wn|Das Feuer knistert im Kamin.|Wir sitzen am Feuer und singen.|Im Lager brennen viele kleine Feuer.
+Funke|wn|Der Funke springt aus dem Feuer.|Beim Schmieden fliegt ein Funke durch die Luft.|Am Amboss sprühen helle Funken.
+Werkzeug|ge|Das Werkzeug liegt auf der Bank.|Borga braucht gutes Werkzeug.|In der Schmiede hängen viele Werkzeuge.
+Griff|ge|Der Griff des Schwertes ist aus Leder.|Ich halte die Tasse am Griff.|Die Schwerter haben goldene Griffe.
+Klinge|ge|Die Klinge ist scharf.|Borga schleift die Klinge.|In der Schmiede glänzen neue Klingen.
+Spitze|ge|Die Spitze des Speers ist scharf.|Der Pfeil hat eine eiserne Spitze.|Die Speere haben scharfe Spitzen.
+Pfeil|ge|Der Pfeil trifft die Mitte.|Theron legt einen Pfeil auf den Bogen.|Im Köcher stecken zehn Pfeile.
+Köcher|ge|Der Köcher hängt auf dem Rücken.|Theron steckt den Pfeil in den Köcher.|Die Jäger tragen volle Köcher.
+Keule|ge|Die Keule ist schwer.|Der Riese schwingt eine Keule.|Die Orks tragen dicke Keulen.
+Spieß|ge|Der Spieß ist lang und spitz.|Die Wache hält einen Spieß.|Die Wachen tragen lange Spieße.
+Schnalle|ge|Die Schnalle am Gürtel glänzt.|Ich mache die Schnalle zu.|Die Stiefel haben silberne Schnallen.
+Gürtel|ge|Der Gürtel ist aus Leder.|Borga hängt den Hammer an den Gürtel.|Im Laden hängen bunte Gürtel.
+Stiefel|ge|Der Stiefel ist voller Matsch.|Eadrun zieht einen Stiefel aus.|Vor der Tür stehen nasse Stiefel.
+Schuh|ge|Der Schuh ist zu klein.|Ich binde meinen Schuh zu.|Im Flur stehen viele Schuhe.
+Handschuh|ge|Der Handschuh ist warm.|Borga trägt einen dicken Handschuh.|Im Winter brauche ich Handschuhe.
+Metall|ge|Das Metall glänzt in der Sonne.|Der Schild ist aus Metall.|Die Zwerge kennen viele Metalle.
+Draht|ge|Der Draht ist dünn und biegsam.|Borga biegt den Draht zu einem Ring.|Am Zaun hängen alte Drähte.
+Blech|ge|Das Blech ist dünn.|Der Kuchen backt auf einem Blech.|In der Schmiede liegen glänzende Bleche.
+Lehrling|pe|Der Lehrling hilft in der Schmiede.|Borga hat einen neuen Lehrling.|Die Lehrlinge fegen die Werkstatt.
+Meister|pe|Der Meister zeigt dem Lehrling einen Trick.|Fenwick ist ein Meister der Zauberei.|Die Meister treffen sich in der Halle.
+Meisterin|pe|Die Meisterin prüft das Schwert.|Die Schmiede hat eine strenge Meisterin.|Die Meisterinnen zeigen ihre Kunst.
+Knoten|ge|Der Knoten hält fest.|Der Hirte macht einen Knoten in das Seil.|Das Seil hat drei Knoten.
+Truhe|ge|Die Truhe ist voller Gold.|Der Zwerg öffnet die Truhe.|Im Keller stehen alte Truhen.
+Schatz|ge|Der Schatz liegt tief in der Höhle.|Die Zwerge suchen einen Schatz.|Der Drache bewacht viele Schätze.
+Münze|ge|Die Münze ist aus Gold.|Ich finde eine Münze im Gras.|Im Beutel klimpern zehn Münzen.
+Rubin|ge|Der Rubin leuchtet rot.|Die Krone hat einen großen Rubin.|In der Truhe funkeln drei Rubine.
+Edelstein|ge|Der Edelstein funkelt.|Der Zwerg findet einen Edelstein im Berg.|In der Krone stecken viele Edelsteine.
+Stein|ge|Der Stein ist rund und glatt.|Ich werfe einen Stein in den Teich.|Am Bach liegen viele Steine.
+Speer|ge|Der Speer ist lang.|Die Wache hält einen Speer.|An der Wand lehnen vier Speere.
+Waffe|ge|Die Waffe des Ritters ist ein Schwert.|Jeder Ritter braucht eine Waffe.|In der Waffenkammer liegen viele Waffen.
+Panzer|ge|Der Panzer der Schildkröte ist hart.|Der Ritter trägt einen Panzer aus Eisen.|Die Käfer haben glänzende Panzer.
+Holz|ge|Das Holz brennt gut.|Borga holt Holz für den Ofen.|Der Tischler kennt viele Hölzer.
+Wald|or|Der Wald ist dunkel und still.|Faelith wohnt tief im Wald.|In Hrossmark gibt es große Wälder.
+Baum|pf|Der Baum ist sehr alt.|Das Eichhörnchen klettert auf einen Baum.|Am Weg stehen hohe Bäume.
+Blatt|pf|Das Blatt fällt vom Baum.|Die Raupe frisst ein Blatt.|Im Herbst werden die Blätter bunt.
+Ast|pf|Der Ast bricht unter dem Schnee.|Die Eule sitzt auf einem Ast.|Der Sturm reißt viele Äste ab.
+Zweig|pf|Der Zweig ist dünn.|Der Vogel trägt einen Zweig zu seinem Nest.|Wir sammeln trockene Zweige für das Feuer.
+Wurzel|pf|Die Wurzel des Baumes ist dick.|Eadrun stolpert über eine Wurzel.|Der alte Baum hat lange Wurzeln.
+Stamm|pf|Der Stamm der Eiche ist dick.|Der Specht klopft an den Stamm.|Die Holzfäller stapeln die Stämme.
+Rinde|pf|Die Rinde ist rau.|Der Hirsch reibt sein Geweih an der Rinde.|Birken haben weiße Rinden.
+Pilz|pf|Der Pilz wächst unter der Tanne.|Fenwick findet einen roten Pilz.|Im Herbst sammeln wir Pilze.
+Moos|pf|Das Moos ist weich und grün.|Der Igel schläft auf dem Moos.|Im Wald wachsen viele Moose.
+Fuchs|ti|Der Fuchs schleicht um den Hühnerstall.|Im Wald lebt ein schlauer Fuchs.|Die Füchse spielen vor ihrem Bau.
+Wolf|ti|Der Wolf heult den Mond an.|Im Winter hört man einen Wolf heulen.|Die Wölfe leben im Rudel.
+Bär|ti|Der Bär nascht am Honig.|In der Höhle schläft ein Bär.|Die Bären fangen Fische im Fluss.
+Hirsch|ti|Der Hirsch hat ein großes Geweih.|Auf der Lichtung steht ein Hirsch.|Im Herbst röhren die Hirsche.
+Reh|ti|Das Reh ist scheu.|Am Waldrand grast ein Reh.|Auf der Wiese stehen drei Rehe.
+Hase|ti|Der Hase hoppelt über das Feld.|Hinter dem Busch sitzt ein Hase.|Die Hasen haben lange Ohren.
+Kaninchen|ti|Das Kaninchen mümmelt eine Karotte.|Im Stall wohnt ein Kaninchen.|Die Kaninchen graben Gänge in die Wiese.
+Eule|ti|Die Eule ruft in der Nacht.|Auf dem Turm sitzt eine Eule.|Die Eulen jagen in der Dunkelheit.
+Vogel|ti|Der Vogel singt im Baum.|Auf dem Dach sitzt ein Vogel.|Im Herbst fliegen viele Vögel nach Süden.
+Nest|ge|Das Nest ist aus Zweigen gebaut.|Im Baum ist ein Nest mit drei Eiern.|Im Frühling bauen die Vögel Nester.
+Spinne|ti|Die Spinne webt ein Netz.|In der Ecke sitzt eine Spinne.|Im Keller wohnen viele Spinnen.
+Käfer|ti|Der Käfer krabbelt über das Blatt.|Auf meiner Hand sitzt ein Käfer.|Unter dem Stein wohnen viele Käfer.
+Ameise|ti|Die Ameise trägt ein Blatt.|Auf dem Weg krabbelt eine Ameise.|Die Ameisen bauen einen großen Hügel.
+Biene|ti|Die Biene sammelt Nektar.|Auf der Blume sitzt eine Biene.|Im Garten summen viele Bienen.
+Schlange|ti|Die Schlange zischt.|Unter dem Stein liegt eine Schlange.|In der Höhle leben zwei Schlangen.
+Frosch|ti|Der Frosch quakt im Teich.|Auf dem Seerosenblatt sitzt ein Frosch.|Am Abend quaken die Frösche.
+Kröte|ti|Die Kröte ist braun und warzig.|Im Garten lebt eine Kröte.|Im Frühling wandern die Kröten zum Teich.
+Igel|ti|Der Igel rollt sich zusammen.|Unter dem Laub schläft ein Igel.|Im Herbst suchen die Igel einen Platz für den Winter.
+Eichhörnchen|ti|Das Eichhörnchen versteckt eine Nuss.|Auf der Eiche sitzt ein Eichhörnchen.|Die Eichhörnchen springen von Ast zu Ast.
+Specht|ti|Der Specht klopft an den Baum.|Im Wald hört man einen Specht.|Die Spechte bauen Höhlen in die Bäume.
+Rabe|ti|Der Rabe krächzt laut.|Auf dem Turm sitzt ein Rabe.|Die Raben sind sehr klug.
+Feder|ge|Die Feder ist weich und leicht.|Fenwick schreibt mit einer Feder.|Der Vogel verliert ein paar Federn.
+Bach|wn|Der Bach plätschert durch das Tal.|Wir springen über einen Bach.|Im Gebirge gibt es viele kleine Bäche.
+Teich|wn|Der Teich ist voller Frösche.|Die Enten schwimmen auf dem Teich.|Im Park gibt es zwei Teiche.
+Höhle|or|Die Höhle ist dunkel und kalt.|Der Drache schläft in einer Höhle.|Im Berg gibt es viele Höhlen.
+Berg|wn|Der Berg ist sehr hoch.|Die Zwerge wohnen in einem Berg.|Hinter dem Tal liegen hohe Berge.
+Fluss|wn|Der Fluss ist breit und tief.|Ein Boot fährt auf dem Fluss.|Durch das Land fließen zwei große Flüsse.
+Quelle|wn|Die Quelle ist klar und kalt.|Faelith trinkt Wasser aus der Quelle.|Im Gebirge gibt es viele Quellen.
+Beere|es|Die Beere ist süß.|Eadrun pflückt eine rote Beere.|Im Wald wachsen viele Beeren.
+Eichel|pf|Die Eichel fällt von der Eiche.|Das Eichhörnchen vergräbt eine Eichel.|Unter der Eiche liegen viele Eicheln.
+Zapfen|pf|Der Zapfen hängt an der Tanne.|Das Eichhörnchen knabbert an einem Zapfen.|Im Herbst fallen viele Zapfen.
+Fichte|pf|Die Fichte ist immer grün.|Am Waldrand steht eine hohe Fichte.|Im Gebirge wachsen viele Fichten.
+Eiche|pf|Die Eiche ist hundert Jahre alt.|Im Hof steht eine große Eiche.|Am Weg stehen alte Eichen.
+Tanne|pf|Die Tanne hat weiche Nadeln.|Im Winter schmücken wir eine Tanne.|Auf dem Berg wachsen viele Tannen.
+Buche|pf|Die Buche hat eine glatte Rinde.|Im Wald steht eine alte Buche.|Im Herbst werden die Buchen gelb.
+Jäger|pe|Der Jäger folgt der Spur.|Im Wald trifft Theron einen Jäger.|Die Jäger sitzen am Feuer.
+Fährte|ge|Die Fährte führt zum Bach.|Der Hund findet eine Fährte.|Im Schnee sieht man viele Fährten.
+Spur|ge|Die Spur führt in den Wald.|Im Schnee entdecken wir eine Spur.|Auf dem Weg sind frische Spuren.
+Pfote|ge|Die Pfote des Hundes ist schmutzig.|Die Katze leckt ihre Pfote.|Der Hund hat vier weiche Pfoten.
+Kralle|ge|Die Kralle der Eule ist spitz.|Die Katze zeigt eine Kralle.|Der Bär hat lange Krallen.
+Schnabel|ge|Der Schnabel des Spechts ist hart.|Die Amsel hat einen gelben Schnabel.|Die jungen Vögel sperren die Schnäbel auf.
+Fell|ge|Das Fell des Bären ist dick.|Die Katze putzt ihr Fell.|Im Winter bekommen die Tiere dicke Felle.
+Floh|ti|Der Floh springt sehr hoch.|Der Hund hat einen Floh.|Der Hund kratzt sich, weil er Flöhe hat.
+Mücke|ti|Die Mücke summt um meinen Kopf.|Mich hat eine Mücke gestochen.|Am Teich gibt es viele Mücken.
+Fliege|ti|Die Fliege sitzt auf dem Kuchen.|Das Pferd verscheucht eine Fliege.|Im Stall summen viele Fliegen.
+Wurm|ti|Der Wurm kriecht aus der Erde.|Die Amsel zieht einen Wurm aus dem Boden.|Nach dem Regen kommen die Würmer heraus.
+Lichtung|or|Die Lichtung liegt mitten im Wald.|Auf der Lichtung grasen Rehe.|Im Wald gibt es viele kleine Lichtungen.
+Falke|ti|Der Falke kreist über dem Feld.|Hoch am Himmel fliegt ein Falke.|Die Falken haben scharfe Augen.
+Schnecke|ti|Die Schnecke kriecht langsam.|Auf dem Salat sitzt eine Schnecke.|Nach dem Regen sind viele Schnecken unterwegs.
+Dachs|ti|Der Dachs gräbt einen Bau.|Im Wald lebt ein Dachs.|Die Dachse kommen nachts aus ihrem Bau.
+Ratte|ti|Die Ratte huscht durch den Keller.|Im Kerker wohnt eine Ratte.|Im Hafen gibt es viele Ratten.
+Bärenhöhle|or|Die Bärenhöhle ist tief und dunkel.|Der Wanderer findet eine Bärenhöhle.|Im Gebirge gibt es mehrere Bärenhöhlen.
+Hasenstall|or|Der Hasenstall steht im Garten.|Das Kaninchen schläft im Hasenstall.|Auf dem Hof stehen zwei Hasenställe.
+Bärenfell|ge|Das Bärenfell liegt vor dem Kamin.|Der Riese trägt ein Bärenfell.|In der Halle hängen zwei Bärenfelle.
+Räuber|pe|Der Räuber versteckt sich im Wald.|Ein Räuber stiehlt den Beutel.|Die Räuber teilen ihre Beute.
+Säugetier|ti|Das Säugetier trinkt als Baby Milch.|Der Wal ist ein Säugetier.|Hunde und Katzen sind Säugetiere.
+Tier|ti|Das Tier versteckt sich im Gebüsch.|Der Fuchs ist ein schlaues Tier.|Im Wald leben viele Tiere.
