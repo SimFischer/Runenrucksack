@@ -364,3 +364,39 @@ button, input, select, textarea { font-family: inherit; }
 .f-figur { margin-right: -36px; z-index: 0; }
 #fighter-enemy .f-figur { margin-right: 0; margin-left: -36px; }
 .f-rucksack { z-index: 1; position: relative; }
+
+/* ---------- Sieg und Niederlage ---------- */
+#kampf-ergebnis {
+  position: absolute; inset: 0; z-index: 20; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px;
+  background: radial-gradient(ellipse 55% 50% at 50% 45%, rgba(20, 10, 4, .55), transparent 75%); animation: einblenden .4s ease-out;
+}
+#kampf-ergebnis.niederlage { background: radial-gradient(ellipse 60% 55% at 50% 45%, rgba(10, 8, 14, .7), rgba(10, 8, 14, .25) 80%); }
+.erg-banner { position: relative; width: min(620px, 70vw); animation: ausrollen .7s cubic-bezier(.2, .9, .3, 1.2) both; transform-origin: center; }
+.erg-banner img { width: 100%; display: block; filter: drop-shadow(0 12px 18px rgba(0, 0, 0, .6)); }
+.niederlage .erg-banner { width: min(380px, 44vw); }
+.erg-titel { position: absolute; left: 0; right: 0; top: 47%; text-align: center; font-family: var(--titel); font-weight: 900; font-size: clamp(40px, 6vw, 68px); color: #fff3d6;
+  -webkit-text-stroke: 2px #4a0f08; paint-order: stroke fill; text-shadow: 0 4px 10px rgba(0, 0, 0, .6); }
+.niederlage .erg-titel { top: 38%; font-size: clamp(30px, 4vw, 44px); -webkit-text-stroke-color: #1c2230; }
+@keyframes ausrollen { from { transform: scaleX(.05) scaleY(.6); opacity: 0; } 60% { opacity: 1; } to { transform: none; opacity: 1; } }
+.erg-satz { margin: 0; font-size: 22px; font-weight: 700; color: #fff3d6; text-shadow: 0 2px 6px #000, 0 0 2px #000; text-align: center; max-width: 80vw; }
+.erg-werte { display: flex; gap: 14px; animation: einblenden .5s .4s both; }
+.erg-wert { display: inline-flex; align-items: center; gap: 6px; font-family: var(--titel); font-weight: 900; font-size: 26px; color: var(--gold-hell);
+  background: rgba(20, 11, 5, .75); border: 2px solid rgba(232, 178, 58, .6); border-radius: 999px; padding: 4px 16px 4px 8px; }
+.erg-wert .sym { height: 40px; }
+.erg-herzen { gap: 2px; }
+.erg-herz.leer { filter: grayscale(1) brightness(.5); }
+.erg-herz.bricht { filter: none; }
+.erg-herz.zerbrochen { animation: zerbrechen .7s ease-out forwards; }
+@keyframes zerbrechen { 0% { transform: scale(1); } 30% { transform: scale(1.4) rotate(-8deg); } 60% { transform: scale(1.1) rotate(6deg); filter: grayscale(.3); } 100% { transform: scale(1); filter: grayscale(1) brightness(.5); } }
+#kampf-ergebnis .btn { animation: einblenden .4s .6s both; min-width: 200px; }
+.erg-muenze { position: fixed; left: 0; top: 0; width: 40px; height: 40px; margin: -20px 0 0 -20px; z-index: 260; pointer-events: none; filter: drop-shadow(0 2px 3px rgba(0, 0, 0, .6)); }
+.f-figur.faellt img { animation: umkippen .6s ease-in forwards; transform-origin: bottom center; }
+@keyframes umkippen { to { transform: scaleX(-1) rotate(-80deg); opacity: .4; } }
+#fighter-enemy .f-figur.besiegt img { transform: none; animation: einblenden .4s; max-width: min(360px, 30vw); }
+.f-figur.liegt img { transform: scaleX(-1) rotate(-80deg) translateX(30%); filter: grayscale(.4) drop-shadow(0 10px 8px rgba(0, 0, 0, .6)); }
+.ende-banner { position: relative; width: min(520px, 80%); margin: -6px auto 4px; }
+.ende-banner img { width: 100%; display: block; }
+.ende-banner span { position: absolute; left: 0; right: 0; top: 46%; text-align: center; font-family: var(--titel); font-weight: 900; font-size: 34px; color: #fff3d6; -webkit-text-stroke: 1.5px #4a0f08; paint-order: stroke fill; }
+.ende-banner.niederlage { width: min(260px, 50%); }
+.ende-banner.niederlage span { top: 36%; font-size: 24px; -webkit-text-stroke-color: #1c2230; }
+#battle:has(#kampf-ergebnis) .versus { visibility: hidden; }

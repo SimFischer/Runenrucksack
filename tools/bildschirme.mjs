@@ -95,7 +95,7 @@ const LAUF = `
 
 // Kampf bis zum Ende: Spieler stark oder schwach machen, dann „Überspringen“
 const KAMPF = (sieg) => `${LAUF}
-  ${sieg ? '' : "__G.run.items = __G.run.items.filter((p) => p.id === 'apfel');"}
+  ${sieg ? '' : "__G.run.items = [{ uid: 900, id: 'apfel', area: 'bag', x: 0, y: 0, rot: 0 }];"}
   await __klick('#btn-fight', 800);
   const ok = document.querySelector('#modal:not([hidden]) [data-ok]'); if (ok) { ok.click(); await __s(400); }
 `;

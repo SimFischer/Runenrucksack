@@ -18,7 +18,7 @@ import {
   $, fmt, fullName, genusChip, toast, bump, openModal, closeModal, modal, itemEl, buildGrid, drawItems, mergeAnimation, syncGold, iconHtml,
   openQuick, closeQuick, sternVon, abzeichenHtml,
 } from './ui.js';
-import { startNight } from './battle-ui.js';
+import { startNight, zeigeKampfErgebnis } from './battle-ui.js';
 import { frageImSpiel, wortschatz, einstellungen } from './aufgaben/spiel.js';
 import { stufenBereich, stufeFuer, aufgabenStand } from './aufgaben/wahl.js';
 import { verbSatz, verbSatzInhalt, PERSONEN_FOLGE, kurzName } from './aufgaben/verbsatz.js';
@@ -1337,18 +1337,7 @@ function battleOver(won, enemyName) {
   }
   save();
   const heartsLeft = Math.max(0, run.hearts);
-  modal(won ? `
-      <div class="big-emoji">${sym('pokal', 'gross')}</div>
-      <h2>Sieg!</h2>
-      <p>Du hast gegen ${enemyName} gewonnen.</p>
-      <p>Siege: <b>${run.wins}</b> · Herzen: <b>${sym('herz').repeat(heartsLeft)}${sym('herz', 'leer').repeat(CFG.hearts - heartsLeft)}</b></p>
-      <div class="row"><button class="btn primary big" data-act="next">Weiter</button></div>` : `
-      <div class="big-emoji">${sym('herzZerbrochen', 'gross')}</div>
-      <h2>Niederlage</h2>
-      <p>${enemyName} war heute stärker. Du verlierst ein Herz.</p>
-      <p>Herzen: <b>${sym('herz').repeat(heartsLeft)}${sym('herz', 'leer').repeat(CFG.hearts - heartsLeft)}</b></p>
-      <div class="row"><button class="btn primary big" data-act="next">Weiter</button></div>`,
-  { next: afterBattle });
+  zeigeKampfErgebnis({ won, wins: run.wins, hearts: heartsLeft, maxHearts: CFG.hearts, gold: run.gold, weiter: afterBattle });
   emit('kampfEnde', { won });
 }
 

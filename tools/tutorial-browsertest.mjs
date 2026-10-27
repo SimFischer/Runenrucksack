@@ -107,7 +107,7 @@ try {
   await tap('#tut-next');
   for (let i = 0; i < 60 && (await ev('document.getElementById("modal").hidden')); i++) await sleep(500);
   await expect('Trophäe');
-  await tap('#modal [data-act="next"]'); await expect('Am Morgen');
+  await tap('#kampf-ergebnis [data-weiter]'); await expect('Am Morgen');
   await tap('#modal [data-go]'); await tap('#modal [data-i="2"]'); await tap('#modal [data-next]'); await tap('#modal [data-ok]');
 
   // Der zweite Tag
@@ -137,7 +137,7 @@ try {
   await tap('#tut-next');
   for (let i = 0; i < 60 && (await ev('document.getElementById("modal").hidden')); i++) await sleep(500);
   await expect('zweiten Tag geschafft');
-  await tap('#modal [data-act="next"]');
+  await tap('#kampf-ergebnis [data-weiter]');
   // Buch der Wörter und Heldencode
   await expect('Buch der Wörter');
   await tap('#btn-buch-spiel'); await expect('Feuerschwert steht schon drin');

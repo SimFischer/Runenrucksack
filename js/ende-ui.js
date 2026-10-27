@@ -6,7 +6,7 @@ import { modal, iconHtml } from './ui.js';
 import { figurBild } from './state.js';
 import { codeKasten, kopierenAn, aktuellerHeldencode } from './code-ui.js';
 import { themenBericht } from './aufgaben/wahl.js';
-import { sym } from './symbole.js';
+import { sym, bild } from './symbole.js';
 
 const rangBalken = (r) => {
   const pct = r.naechster ? Math.round(((G.PROFIL.xp - r.ab) / (r.naechster.ab - r.ab)) * 100) : 100;
@@ -22,11 +22,9 @@ export function zeigeLaufende(run, abschluss, aktionen) {
   const a = abschluss;
   const p = laufStand(run);
   const kopf = won ? `
-      <div class="big-emoji">${sym('pokal', 'gross')}</div>
-      <h2>Reise geschafft!</h2>
+      <div class="ende-banner"><img src="${bild('banner', 'sieg')}" alt=""><span>Reise geschafft!</span></div>
       <p>Du hast Kleinwurzel und Hrossmark durchquert: <b>${run.wins} von ${CFG.lastDay}</b> Kämpfen gewonnen. <span class="stars-inline">${stars}</span></p>` : `
-      <div class="big-emoji">${sym('herzZerbrochen', 'gross')}</div>
-      <h2>Lauf verloren</h2>
+      <div class="ende-banner niederlage"><img src="${bild('banner', 'niederlage')}" alt=""><span>Lauf zu Ende</span></div>
       <p>Alle Herzen sind weg – an Tag ${run.day} in ${region().name}. Du hast <b>${run.wins}</b> Kämpfe gewonnen.</p>`;
   const xp = a ? `
       <div class="xp-box">

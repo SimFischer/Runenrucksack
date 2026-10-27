@@ -7,7 +7,7 @@ import { evaluateBag } from './mods.js';
 import { merkeAntwort, laufStand } from './fortschritt.js';
 import { frageImSpiel } from './aufgaben/spiel.js';
 import { $, fmt, buildGrid, drawItems, openModal, closeModal } from './ui.js';
-import { sym, bild } from './symbole.js';
+import { sym, bild, symbolPfad } from './symbole.js';
 
 let battle = null, enemy = null, speed = 1, rafId = 0, lastFrame = 0, itemEls = {}, onDone = null;
 let bcell = 100, selfHit = 0, armor = null, paused = false;
@@ -57,6 +57,7 @@ export function startNight(done) {
   bcell = cellSize(Math.max(playerGrid.cols, 4), Math.max(playerGrid.rows, 3));
 
   $('battle-title').innerHTML = `${sym('nacht')} ${reg.name} · Nacht ${run.day}${enemy.boss ? ' · Anführer!' : ''}`;
+  $('battle-gold').innerHTML = `${sym('gold')}${run.gold}`;
   const h = hero();
   const hb = h && figurBild(h.id), gb = gegnerBild(enemy.id);
   buildFighter('player', hb ? `<img class="f-img" src="${hb}" alt="">` : '', h?.kurz || 'Dein Rucksack', '', bag, playerGrid, evaluateBag(bag, G.DEFS, ctx));
@@ -320,4 +321,68 @@ function openArmor() {
     };
   });
   card.querySelector('[data-no]').onclick = closeModal;
+}
+
+// ---------- Sieg und Niederlage als Inszenierung ----------
+// Sieg: Der Ork kippt um und liegt besiegt da, das Siegesbanner rollt über die Szene, Münzen fliegen zur Goldanzeige.
+// Niederlage: Niederlagenbanner, ein Herz zerbricht, ein ermutigender Satz. opts: { won, wins, hearts, maxHearts, gold, weiter }
+export function zeigeKampfErgebnis(opts) {
+  document.getElementById('kampf-ergebnis')?.remove();
+  document.getElementById('tip-bubble')?.remove(); // offene Tipps verdecken sonst „Weiter“
+  const box = document.createElement('div');
+  box.id = 'kampf-ergebnis';
+  box.className = opts.won ? 'sieg' : 'niederlage';
+  box.dataset.tut = 'fenster';
+  const herzen = Array.from({ length: opts.maxHearts }, (_, i) => `<img class="sym erg-herz${i < opts.hearts ? '' : ' leer'}${!opts.won && i === opts.hearts ? ' bricht' : ''}" src="${symbolPfad(i < opts.hearts ? 'herz' : 'herzZerbrochen')}" alt="">`).join('');
+  box.innerHTML = `
+    <div class="erg-banner">
+      <img src="${bild('banner', opts.won ? 'sieg' : 'niederlage')}" alt="">
+      <span class="erg-titel">${opts.won ? 'Sieg!' : 'Niederlage'}</span>
+    </div>
+    <p class="erg-satz">${opts.won ? `${enemy.name} liegt am Boden.` : 'Kopf hoch – morgen packst du deinen Rucksack noch klüger!'}</p>
+    <div class="erg-werte">
+      <span class="erg-wert">${sym('pokal')}<b>${opts.wins}</b></span>
+      <span class="erg-wert erg-herzen">${herzen}</span>
+    </div>
+    <button class="btn big primary" data-weiter>Weiter</button>`;
+  $('battle').append(box);
+  box.querySelector('[data-weiter]').onclick = () => { box.remove(); opts.weiter(); };
+  if (opts.won) orkFaellt();
+  else {
+    // das zuletzt verlorene Herz zerbricht
+    const h = box.querySelector('.erg-herz.bricht');
+    if (h) setTimeout(() => h.classList.add('zerbrochen'), 900);
+  }
+  if (opts.won) setTimeout(() => muenzenFliegen(box), 900);
+}
+
+function orkFaellt() {
+  const fig = $('fighter-enemy').querySelector('.f-figur');
+  const img = fig?.querySelector('img');
+  if (!img) return;
+  fig.classList.add('faellt');
+  const besiegt = G.BILDER.ui?.besiegt?.[enemy.id];
+  setTimeout(() => {
+    fig.classList.remove('faellt');
+    if (besiegt) { img.src = 'assets/' + besiegt; fig.classList.add('besiegt'); } else fig.classList.add('liegt');
+  }, 600);
+}
+
+// Münzen fliegen zur Goldanzeige oben
+function muenzenFliegen(box) {
+  const ziel = $('battle-gold');
+  if (!ziel || !document.body.animate) return;
+  const z = ziel.getBoundingClientRect(), a = box.querySelector('.erg-banner').getBoundingClientRect();
+  for (let i = 0; i < 7; i++) {
+    const c = document.createElement('img');
+    c.className = 'erg-muenze';
+    c.src = symbolPfad('gold');
+    document.body.append(c);
+    const x0 = a.left + a.width * (0.3 + Math.random() * 0.4), y0 = a.top + a.height * 0.5;
+    c.animate([
+      { transform: `translate(${x0}px, ${y0}px) scale(.4)`, opacity: 0 },
+      { transform: `translate(${x0 + (Math.random() - 0.5) * 120}px, ${y0 - 80}px) scale(1)`, opacity: 1, offset: .35 },
+      { transform: `translate(${z.left + z.width / 2}px, ${z.top + z.height / 2}px) scale(.6)`, opacity: .9 },
+    ], { duration: 900, delay: i * 90, easing: 'ease-in', fill: 'forwards' }).onfinish = () => { c.remove(); ziel.classList.remove('bump'); void ziel.offsetWidth; ziel.classList.add('bump'); };
+  }
 }
