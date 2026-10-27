@@ -470,3 +470,13 @@ button, input, select, textarea { font-family: inherit; }
 #battle .f-status { flex-wrap: nowrap; min-height: 0; overflow: hidden; }
 .armor-word.btn { min-height: 44px; padding: 4px 12px 7px; white-space: nowrap; }
 @media (max-width: 1100px) { .armor-word.btn { font-size: 13px; padding: 4px 9px 6px; } #battle .chip { font-size: 14px; padding: 1px 6px 1px 2px; } #battle .chip .sym { height: 22px; } }
+
+/* ---------- Lerninhalte: immer Leseschrift (Andika) in normaler Groß- und Kleinschreibung ----------
+   Antwortknöpfe, Lückensätze, Aufgabentexte, Item-Namen, Buch der Wörter, Regelkarten und Heldencode.
+   Die Titelschrift (nur Großbuchstaben) bleibt Überschriften, Namensbändern und Knöpfen ohne Lerninhalt. */
+:is(#aufgabe, #quick, #info, .code-kasten, .buch-neu) :not(h2, h2 *, .sym),
+.buch-card :not(h2, h2 *, .sym),
+.lern, .lern *, .opt-btn, .genus-btn, .enc-q, .enc-hint, .bad-word {
+  font-family: var(--font); text-transform: none; font-variant: normal; font-variant-caps: normal;
+}
+.code-kasten .code-text { letter-spacing: .08em; }

@@ -319,7 +319,7 @@ function openArmor() {
       armorErgebnis(ok);
       const res = openModal(ok ? `
         <div class="big-emoji">${sym('stern', 'gross')}</div>
-        <h2>Richtig: ${armor.richtig}</h2>
+        <h2 class="lern">Richtig: ${armor.richtig}</h2>
         <p>Die Rüstung bekommt einen Riss! ${enemy.name} startet mit 15 % weniger Leben.</p>
         <div class="row"><button class="btn primary big" data-ok>Weiter</button></div>` : `
         <div class="big-emoji">${sym('block', 'gross')}</div>

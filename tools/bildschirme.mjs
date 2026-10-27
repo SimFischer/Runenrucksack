@@ -2,7 +2,9 @@
 // Für jede Größe (iPad quer) werden die wichtigsten Bildschirme aufgerufen, fotografiert und geprüft:
 // - kein seitliches Scrollen (scrollWidth = innerWidth), auf Start, Figurenwahl, Spielfeld und Kampf auch kein senkrechtes;
 // - keine Emojis im sichtbaren Text (Ausnahme: Ersatz für fehlende Item-Bilder, Klasse .emoji-ersatz);
-// - wo angegeben (frei): Diese Elemente überlappen sich nicht (getBoundingClientRect).
+// - wo angegeben (frei): Diese Elemente überlappen sich nicht (getBoundingClientRect);
+// - Lerninhalte (Aufgaben, Quiz, Item-Infos, Buch, Regelkarten, Heldencode) stehen nie in der Titelschrift,
+//   in Großbuchstaben (text-transform) oder in Kapitälchen.
 //
 //   node tools/serve.mjs                                        (in einem zweiten Fenster)
 //   node tools/bildschirme.mjs [url] [ordner] [größen]
@@ -147,6 +149,12 @@ const BILDSCHIRME = [
   { name: 'aufgabe', profil: PROFIL, ohneScroll: false, schritte: `${LAUF}
       const { frageImSpiel } = await import(new URL('js/aufgaben/spiel.js', location.href).href);
       frageImSpiel({ format: 'sortieren', nein: 'Aufgeben' }); await __s(700);` },
+  { name: 'aufgabe-luecke', profil: PROFIL, ohneScroll: false, schritte: `${LAUF}
+      const { frageImSpiel } = await import(new URL('js/aufgaben/spiel.js', location.href).href);
+      frageImSpiel({ format: 'luecke', nein: 'Aufgeben' }); await __s(700);` },
+  { name: 'aufgabe-auswahl', profil: PROFIL, ohneScroll: false, schritte: `${LAUF}
+      const { frageImSpiel } = await import(new URL('js/aufgaben/spiel.js', location.href).href);
+      frageImSpiel({ format: 'auswahl', nein: 'Aufgeben' }); await __s(700);` },
   { name: 'tutorial', profil: null, ohneScroll: true, schritte: `await __klick('#btn-first', 1200); const n = document.querySelector('#tut-next'); if (n && !n.hidden) { n.click(); await __s(900); }` },
 ];
 
@@ -165,6 +173,18 @@ const PRUEFEN = (ohneScroll, frei = []) => `
   return {
     breit: de.scrollWidth - innerWidth, hoch: ${ohneScroll} ? Math.max(de.scrollHeight, document.body.scrollHeight) - innerHeight : 0,
     emojis: [...new Set(emojis)].slice(0, 12),
+    titelschrift: (() => {
+      const LERN = '#aufgabe *, #quick *, #info *, .code-kasten *, .buch-neu *, .buch-card *, .lern, .lern *, .opt-btn, .genus-btn, .enc-q, .enc-hint, .bad-word';
+      const out = [];
+      for (const e of document.querySelectorAll(LERN)) {
+        if (e.closest('h2:not(.lern, .enc-q)')) continue; // Überschriften ohne Lerninhalt dürfen die Titelschrift tragen
+        const text = [...e.childNodes].filter((n) => n.nodeType === 3).map((n) => n.textContent).join('').trim();
+        if (!text || !e.getClientRects().length) continue;
+        const c = getComputedStyle(e);
+        if (/cinzel/i.test(c.fontFamily) || c.textTransform !== 'none' || c.fontVariantCaps !== 'normal') out.push(text.slice(0, 30));
+      }
+      return [...new Set(out)].slice(0, 10);
+    })(),
     ueberlappt: (() => {
       const teile = ${JSON.stringify(frei)}.flatMap((sel) => [...document.querySelectorAll(sel)].filter((e) => e.offsetParent || e.getClientRects().length).map((e, k) => ({ name: sel + (k ? '#' + k : ''), r: e.getBoundingClientRect() })));
       const out = [];
@@ -192,10 +212,10 @@ for (const [w, h] of GROESSEN) {
       await sleep(500);
       r = await ev(PRUEFEN(b.ohneScroll, b.frei));
     } catch (e) { r = { fehler: String(e.message).slice(0, 200) }; }
-    const ok = !r.fehler && r.breit <= 0 && r.hoch <= 0 && !r.emojis.length && !r.ueberlappt?.length;
+    const ok = !r.fehler && r.breit <= 0 && r.hoch <= 0 && !r.emojis.length && !r.ueberlappt?.length && !r.titelschrift?.length;
     if (!ok) fehler++;
     ergebnisse.push({ groesse: `${w}x${h}`, bildschirm: b.name, ...r, ok });
-    console.log(`${ok ? '✓' : '✗'} ${w}x${h} ${b.name}${r.fehler ? ' – ' + r.fehler : ''}${r.breit > 0 ? ` – ${r.breit}px zu breit` : ''}${r.hoch > 0 ? ` – ${r.hoch}px zu hoch` : ''}${r.emojis?.length ? ' – Emojis: ' + r.emojis.join(' | ') : ''}${r.ueberlappt?.length ? ' – überlappt: ' + r.ueberlappt.join(', ') : ''}`);
+    console.log(`${ok ? '✓' : '✗'} ${w}x${h} ${b.name}${r.fehler ? ' – ' + r.fehler : ''}${r.breit > 0 ? ` – ${r.breit}px zu breit` : ''}${r.hoch > 0 ? ` – ${r.hoch}px zu hoch` : ''}${r.emojis?.length ? ' – Emojis: ' + r.emojis.join(' | ') : ''}${r.ueberlappt?.length ? ' – überlappt: ' + r.ueberlappt.join(', ') : ''}${r.titelschrift?.length ? ' – Titelschrift/Großbuchstaben: ' + r.titelschrift.join(' | ') : ''}`);
     if (ORDNER) {
       const shot = await send('Page.captureScreenshot', { format: 'jpeg', quality: 72 });
       writeFileSync(join(ORDNER, `${b.name}-${w}x${h}.jpg`), Buffer.from(shot.result.data, 'base64'));
