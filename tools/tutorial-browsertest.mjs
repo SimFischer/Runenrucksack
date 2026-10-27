@@ -78,6 +78,21 @@ const expect = async (part) => {
   if (!t.includes(part)) { ok = false; console.log(`✗ erwartet „${part}“, gesehen „${t}“`); } else console.log(`✓ ${part}`);
 };
 const check = (cond, text) => { if (!cond) ok = false; console.log(`${cond ? '✓' : '✗'} ${text}`); };
+// Offene Frage: Fenster nicht über dem Rucksack, Fenwicks Sprechblase verdeckt weder Fenster noch beteiligte Items.
+const ueberdeckung = () => ev(`(() => {
+  const r = (e) => e && e.getBoundingClientRect();
+  const schnitt = (p, q) => p && q && Math.min(p.right, q.right) - Math.max(p.left, q.left) > 2 && Math.min(p.bottom, q.bottom) - Math.max(p.top, q.top) > 2;
+  const ebene = document.querySelector('#quick, #aufgabe');
+  const karte = r(ebene?.querySelector('.quick-card, .af-fenster')), bag = r(document.getElementById('grid-bag'));
+  const blase = document.getElementById('tut-bubble').hidden ? null : r(document.getElementById('tut-bubble'));
+  const out = [];
+  if (!karte) out.push('kein Fenster');
+  if (schnitt(karte, bag)) out.push('Fenster über dem Rucksack');
+  if (schnitt(blase, karte)) out.push('Sprechblase über dem Fenster');
+  if ((ebene?.zielRects || []).some((z) => schnitt(blase, z))) out.push('Sprechblase über einem Item');
+  if (!ebene?.querySelector('.af-linien line')) out.push('keine Linie zum Item');
+  return out.join(', ');
+})()`);
 
 await send('Runtime.enable');
 await send('Emulation.setDeviceMetricsOverride', { width: W, height: H, deviceScaleFactor: 1, mobile: true });
@@ -126,6 +141,8 @@ try {
     for (let y = 0; y < 3; y++) for (let x = 0; x < 4; x++) { const px = g.left + 3 + (x + .5) * c, py = g.top + 3 + (y + .5) * c;
       if (!document.elementsFromPoint(px, py).some((e) => e.classList?.contains('item'))) return [px, py]; } return null; })()`);
   await drag('[data-tut="laden-dolch"]', frei[0], frei[1]); await expect('Mehrzahl');
+  await sleep(400);
+  { const u = await ueberdeckung(); check(!u, 'Mehrzahl-Frage neben dem Rucksack, nichts verdeckt' + (u ? ': ' + u : '')); }
   // Abbrechen: Der Dolch liegt wieder im Laden, das Tutorial geht beim Sammeln weiter
   await tap('#quick [data-no]'); await sleep(600);
   check(await ev(`!!document.querySelector('[data-tut="laden-dolch"]') && !document.getElementById('quick')`), 'Abbrechen beim Verbinden: Dolch wieder im Laden');
@@ -138,6 +155,8 @@ try {
   await tap('#tut-next'); await expect('Verben');
   for (let i = 0; i < 6 && !(await ev('!!document.getElementById("quick")')); i++) await tap('#grid-bag [data-tut="item-schlagen"]');
   check(await ev(`document.querySelector('#quick')?.textContent.includes('Feuerschwert')`), 'Frage gilt dem Feuerschwert (nicht dem Dolch)');
+  await sleep(400);
+  { const u = await ueberdeckung(); check(!u, 'Verb-Frage neben dem Rucksack, nichts verdeckt' + (u ? ': ' + u : '')); }
   await foto('tutorial-verb-frage');
   // Abbrechen darf das Tutorial nicht blockieren: Hinweis, dann noch einmal drehen
   await tap('#quick [data-no]'); await sleep(500);

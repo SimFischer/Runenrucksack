@@ -236,16 +236,24 @@ function layout() {
   const pad = 8;
   el['tut-holes'].innerHTML = rects.map((r) => `<rect x="${r.left - pad}" y="${r.top - pad}" width="${r.width + 2 * pad}" height="${r.height + 2 * pad}" rx="14" fill="black"/>`).join('');
   el['tut-rings'].innerHTML = rects.map((r) => `<rect class="tut-ring" x="${r.left - pad}" y="${r.top - pad}" width="${r.width + 2 * pad}" height="${r.height + 2 * pad}" rx="14"/>`).join('');
-  if (shown) placeBubble(rects);
+  if (shown) placeBubble(rects, hindernisse());
 }
 
-function placeBubble(rects) {
+// Offenes Aufgaben-Fenster und die Items, um die es geht: Die Sprechblase darf sie nicht verdecken.
+function hindernisse() {
+  const ebene = document.querySelector('#quick, #aufgabe');
+  if (!ebene) return [];
+  const karte = ebene.querySelector('.quick-card, .af-fenster');
+  return [...(karte ? [karte.getBoundingClientRect()] : []), ...(ebene.zielRects || [])];
+}
+
+function placeBubble(rects, hind = []) {
   const b = el['tut-bubble'];
   // Erst in normaler Größe versuchen, dann kompakt; reicht der Platz neben einem Fenster nicht,
   // rückt das Fenster zur Seite – die Sprechblase soll nie etwas Wichtiges verdecken.
   for (const compact of [false, true]) {
     b.classList.toggle('compact', compact);
-    if (tryPlace(b, rects, false)) return;
+    if (tryPlace(b, rects, false, hind)) return;
   }
   const modal = document.getElementById('modal');
   if (rects.length && !modal.hidden && !modal.classList.contains('tut-shift')) {
@@ -253,22 +261,22 @@ function placeBubble(rects) {
     requestAnimationFrame(layout);
     return;
   }
-  tryPlace(b, rects, true);
+  tryPlace(b, rects, true, hind);
 }
 
-// Setzt die Sprechblase neben die Ziele. Ohne Platz: false (oder mit force in die beste Ecke).
-
-function tryPlace(b, rects, force) {
+// Setzt die Sprechblase neben die Ziele, ohne Ziele und Hindernisse (Aufgaben-Fenster, beteiligte Items)
+// zu verdecken. Ohne Platz: false (oder mit force dorthin, wo sie am wenigsten verdeckt).
+function tryPlace(b, rects, force, hind = []) {
   const W = window.innerWidth, H = window.innerHeight, m = 12;
   b.style.left = '0px';
   b.style.top = '0px';
   const bw = b.offsetWidth, bh = b.offsetHeight;
-  if (!rects.length) {
+  if (!rects.length && !hind.length) {
     b.style.left = `${(W - bw) / 2}px`;
     b.style.top = `${(H - bh) / 2}px`;
     return true;
   }
-  const u = rects.reduce((a, r) => ({
+  const u = (rects.length ? rects : hind).reduce((a, r) => ({
     left: Math.min(a.left, r.left), top: Math.min(a.top, r.top), right: Math.max(a.right, r.right), bottom: Math.max(a.bottom, r.bottom),
   }), { left: Infinity, top: Infinity, right: -Infinity, bottom: -Infinity });
   const clampX = (x) => Math.max(m, Math.min(W - bw - m, x));
@@ -280,15 +288,14 @@ function tryPlace(b, rects, force) {
     { x: cx, y: u.bottom + 20, fits: H - u.bottom - 20 - m >= bh },
     { x: cx, y: u.top - 20 - bh, fits: u.top - 20 - m - 50 >= bh },
   ];
-  let best = options.find((o) => o.fits);
+  // Ecken als weitere Plätze; alles, was ein Ziel oder Hindernis verdeckt, scheidet aus
+  options.push(...[[m, H - bh - m], [W - bw - m, H - bh - m], [m, 60], [W - bw - m, 60]].map(([x, y]) => ({ x, y, fits: true })));
+  const alle = [...rects, ...hind];
+  const overlap = ({ x, y }) => alle.reduce((sum, r) => sum + Math.max(0, Math.min(clampX(x) + bw, r.right) - Math.max(clampX(x), r.left)) * Math.max(0, Math.min(clampY(y) + bh, r.bottom) - Math.max(clampY(y), r.top)), 0);
+  let best = options.find((o) => o.fits && overlap(o) === 0);
   if (!best && !force) return false;
-  if (!best) {
-    // Kein Platz neben den Zielen: die Ecke wählen, die am wenigsten Ziele verdeckt.
-    const corners = [[m, H - bh - m], [W - bw - m, H - bh - m], [m, 60], [W - bw - m, 60]];
-    const overlap = ([x, y]) => rects.reduce((sum, r) => sum + Math.max(0, Math.min(x + bw, r.right) - Math.max(x, r.left)) * Math.max(0, Math.min(y + bh, r.bottom) - Math.max(y, r.top)), 0);
-    const [x, y] = corners.sort((a, c) => overlap(a) - overlap(c))[0];
-    best = { x, y };
-  }
+  // Kein freier Platz: dorthin, wo die Sprechblase am wenigsten verdeckt
+  if (!best) best = [...options].sort((a, c) => overlap(a) - overlap(c))[0];
   b.style.left = `${clampX(best.x)}px`;
   b.style.top = `${clampY(best.y)}px`;
   return true;

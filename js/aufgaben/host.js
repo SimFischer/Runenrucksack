@@ -3,11 +3,14 @@
 // kostet jeder 1 Gold (im Tutorial nicht). Ergebnis als Promise: { richtig, ersterVersuch, versuche, abgebrochen, trotzdem }.
 import { FORMATE } from './formate/index.js';
 import { sym } from '../symbole.js';
+import { nebenRucksack } from '../ui.js';
 
 let offen = null; // Abbruch des gerade offenen Fensters
 const sterne = (s) => '★'.repeat(s) + `<i>${'☆'.repeat(3 - s)}</i>`;
 
-// opts: { anker, kopf, titel, stufe, zahle() → bool, gold() → Zahl, tutorial, nein (Text) , trotzdem (bool), onRegel(id) }
+// Mit Anker-Item im Spielfeld liegt das Fenster neben dem Rucksack (über Lager und Infobereich);
+// die beteiligten Items (opts.beteiligt, sonst der Anker) leuchten und sind mit dem Fenster verbunden.
+// opts: { anker, beteiligt, kopf, titel, stufe, zahle() → bool, gold() → Zahl, tutorial, nein (Text) , trotzdem (bool), onRegel(id) }
 export function stelleAufgabe(a, opts = {}) {
   const format = FORMATE[a.format];
   return new Promise((fertig) => {
@@ -47,6 +50,11 @@ export function stelleAufgabe(a, opts = {}) {
     };
 
     const platziere = () => {
+      ebene.classList.add('af-neben');
+      if (opts.anker && nebenRucksack(ebene, karte, opts.beteiligt || [opts.anker])) return;
+      ebene.classList.remove('af-neben');
+      karte.classList.remove('neben');
+      karte.style.maxWidth = karte.style.maxHeight = '';
       if (gross || !ankerRect) { karte.style.left = ''; karte.style.top = ''; karte.classList.remove('unten'); return; }
       const m = 8, cw = karte.offsetWidth, ch = karte.offsetHeight;
       let left = ankerRect.left + ankerRect.width / 2 - cw / 2, top = ankerRect.top - ch - 14, unten = false;

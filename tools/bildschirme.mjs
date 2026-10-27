@@ -149,6 +149,14 @@ const BILDSCHIRME = [
   { name: 'aufgabe', profil: PROFIL, ohneScroll: false, schritte: `${LAUF}
       const { frageImSpiel } = await import(new URL('js/aufgaben/spiel.js', location.href).href);
       frageImSpiel({ format: 'sortieren', nein: 'Aufgeben' }); await __s(700);` },
+  { name: 'aufgabe-neben', profil: PROFIL, ohneScroll: true, frei: ['#aufgabe .af-fenster', '#grid-bag'], schritte: `${LAUF}
+      const { frageImSpiel } = await import(new URL('js/aufgaben/spiel.js', location.href).href);
+      const items = [...document.querySelectorAll('#grid-bag .item')];
+      frageImSpiel({ art: 'nomen', anker: items[0], beteiligt: items.slice(0, 2), nein: 'Nicht verbinden' }); await __s(700);` },
+  { name: 'aufgabe-gross-neben', profil: PROFIL, ohneScroll: true, frei: ['#aufgabe .af-fenster', '#grid-bag'], schritte: `${LAUF}
+      const { frageImSpiel } = await import(new URL('js/aufgaben/spiel.js', location.href).href);
+      const items = [...document.querySelectorAll('#grid-bag .item')];
+      frageImSpiel({ format: 'sortieren', anker: items[0], nein: 'Nicht verbinden' }); await __s(700);` },
   { name: 'aufgabe-luecke', profil: PROFIL, ohneScroll: false, schritte: `${LAUF}
       const { frageImSpiel } = await import(new URL('js/aufgaben/spiel.js', location.href).href);
       frageImSpiel({ format: 'luecke', nein: 'Aufgeben' }); await __s(700);` },

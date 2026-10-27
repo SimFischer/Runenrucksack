@@ -945,7 +945,7 @@ function checkMerges() {
 }
 
 // Kleines Frage-Fenster direkt am Item: große Antwortknöpfe, ein Tipp genügt. Erster Versuch frei,
-// jeder weitere kostet 1 Gold (im Tutorial nicht). opts: { q, anchor, kopf, richtig(ersterVersuch), trotzdem, nein, neinText }
+// jeder weitere kostet 1 Gold (im Tutorial nicht). opts: { q, anchor, beteiligt, kopf, richtig(ersterVersuch), trotzdem, nein, neinText }
 function quiz(opts) {
   const run = G.run, q = opts.q;
   let tries = 0, feedback = '';
@@ -961,7 +961,7 @@ function quiz(opts) {
       ${feedback ? `<p class="quick-fb">${feedback}</p>` : ''}
       <div class="quick-foot"><span class="cost">${cost}</span>
         ${broke && opts.trotzdem ? '<button class="btn small primary" data-anyway>Trotzdem verbinden</button>' : ''}
-        ${opts.nein ? `<button class="btn small quick-no" data-no>${opts.neinText || 'Nicht verbinden'}</button>` : ''}</div>`, opts.anchor);
+        ${opts.nein ? `<button class="btn small quick-no" data-no>${opts.neinText || 'Nicht verbinden'}</button>` : ''}</div>`, opts.anchor, opts.beteiligt);
     card.querySelectorAll('[data-k]').forEach((b) => { b.onclick = () => guess(+b.dataset.k); });
     card.querySelector('[data-anyway]')?.addEventListener('click', () => opts.trotzdem());
     card.querySelector('[data-no]')?.addEventListener('click', () => opts.nein());
@@ -1002,17 +1002,18 @@ function askMerge(a, c) {
     kopf = `<span class="quick-eq">${iconHtml(d, 'ic small')}<b>+</b>${iconHtml(d, 'ic small')}<b>=</b><em class="goal-stars">${'★'.repeat(sternVon(a.alt) + 1)}</em></span>`;
   }
   const anchor = itemNode(a.typ === 'kompositum' ? a.traeger.uid : a.alt.uid);
+  const beteiligt = (a.typ === 'kompositum' ? [a.kraft, a.traeger] : [a.alt, a.neu]).map((p) => p && itemNode(p.uid));
   if (run.tutorial) {
     // Abbrechen: Der neue Gegenstand geht zurück in den Laden, der Schritt beginnt neu.
     const neu = a.typ === 'kompositum' ? a.kraft : a.neu;
-    quiz({ q, regel: q.art, anchor, kopf, richtig: () => doMerge(a), trotzdem: () => doMerge(a), neinText: 'Abbrechen',
+    quiz({ q, regel: q.art, anchor, beteiligt, kopf, richtig: () => doMerge(a), trotzdem: () => doMerge(a), neinText: 'Abbrechen',
       nein: () => { closeQuick(); zurueckInLaden(run, neu, G.DEFS); merging = false; render(); tutorialAbgebrochen('Kein Problem – der Gegenstand liegt wieder im Laden. Probier es noch einmal.'); } });
     return;
   }
   const d = G.DEFS[a.typ === 'kompositum' ? a.traeger.id : a.alt.id];
   const art = a.typ === 'kompositum' ? 'kompositum' : isRune(d) ? 'rune' : d.art === 'verb' ? 'verb' : 'nomen';
   const ziel = a.typ === 'kompositum' ? 2 : sternVon(a.alt) + 1;
-  const frage = () => frageImSpiel({ art, bereich: stufenBereich(ziel), anker: anchor, kopf, itemWort: art === 'nomen' ? d.name : null, nein: 'Nicht verbinden', trotzdem: true });
+  const frage = () => frageImSpiel({ art, bereich: stufenBereich(ziel), anker: anchor, beteiligt, kopf, itemWort: art === 'nomen' ? d.name : null, nein: 'Nicht verbinden', trotzdem: true });
   (async () => {
     let r = await frage();
     // ★★★★: Stufe 3 – oder zwei Aufgaben, wenn die Stufe 3 (noch) nicht erlaubt ist
@@ -1115,17 +1116,18 @@ function askVerb(p) {
     if (ok) { toast(`„${inhalt.satzVoll}“ – jetzt wirkt die Rolle voll!`); laufStand(run).saetze++; }
   };
   const kopf = `<span class="quick-eq">${iconHtml(d, 'ic small')}<b>➤</b>${iconHtml(v.subjekt.def, 'ic small')}</span>`;
+  const beteiligt = [itemNode(p.uid), itemNode(v.subjekt.uid)];
   if (run.tutorial) {
     quiz({
       regel: 'personalform',
       q: { titel: 'Welche Form passt?', prompt: inhalt.satz.replace('___', '<span class="blank">___</span>'), options: inhalt.optionen, correct: inhalt.richtig, explain: inhalt.merke },
-      anchor: itemNode(p.uid), kopf, richtig: () => store(true), neinText: 'Abbrechen',
+      anchor: itemNode(p.uid), beteiligt, kopf, richtig: () => store(true), neinText: 'Abbrechen',
       // Abbrechen: Die Rolle dreht sich eins weiter, dann einfach wieder auf das Ziel drehen.
       nein: () => { closeQuick(); p.rot = ((p.rot || 0) + 1) % 4; merging = false; render(); tutorialAbgebrochen('Kein Problem – dreh die Rolle noch einmal auf dein Feuerschwert.'); },
     });
     return;
   }
-  frageImSpiel({ inhalt, anker: itemNode(p.uid), kopf, nein: 'So lassen (wirkt nur halb)' }).then((r) => store(!!r.richtig));
+  frageImSpiel({ inhalt, anker: itemNode(p.uid), beteiligt, kopf, nein: 'So lassen (wirkt nur halb)' }).then((r) => store(!!r.richtig));
 }
 
 // ---------- Ziehen, Tippen, Drehen ----------

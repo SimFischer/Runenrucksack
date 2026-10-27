@@ -28,7 +28,7 @@ const REGEL_GRUPPE = {
 };
 
 // Eine Aufgabe auswählen (oder einen fertigen Inhalt nehmen) und stellen.
-// opts: { art | kandidaten, bereich, format, inhalt, anker, nein, trotzdem, einVersuch, itemWort, titel }
+// opts: { art | kandidaten, bereich, format, inhalt, anker, beteiligt, nein, trotzdem, einVersuch, itemWort, titel }
 export async function frageImSpiel(opts) {
   const run = G.run;
   const rng = Math.random;
@@ -42,6 +42,7 @@ export async function frageImSpiel(opts) {
   emit('tipp', { key: 'stufen' });
   const ergebnis = await stelleAufgabe(aufgabe, {
     anker: opts.anker,
+    beteiligt: opts.beteiligt,
     titel: t?.name || '',
     kopf: opts.kopf,
     tutorial: run.tutorial,

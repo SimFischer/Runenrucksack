@@ -129,7 +129,8 @@ export function modal(html, handlers = {}, cls = '') {
 
 // Kleines Frage-Fenster direkt über einem Item (nicht bildschirmfüllend). Eine durchsichtige Fläche
 // dahinter hält das Spiel an, bis die Frage beantwortet ist. Gibt das Fenster zurück.
-export function openQuick(html, anchor) {
+// beteiligt: Items, um die es in der Frage geht (leuchten, Linie zum Fenster); ohne Angabe das Anker-Item.
+export function openQuick(html, anchor, beteiligt = null) {
   let layer = $('quick');
   const rect = anchor?.getBoundingClientRect?.() || layer?.anchorRect || null;
   if (!layer) {
@@ -139,13 +140,64 @@ export function openQuick(html, anchor) {
     document.body.append(layer);
   }
   layer.anchorRect = rect;
-  const card = layer.firstChild;
+  const card = layer.querySelector('.quick-card');
   card.innerHTML = html;
-  placeQuick(card, rect);
+  if (nebenRucksack(layer, card, beteiligt || [anchor])) card.classList.add('no-tip');
+  else placeQuick(card, rect);
   return card;
 }
 
 export const closeQuick = () => $('quick')?.remove();
+
+// ---------- Aufgaben-Fenster neben dem Rucksack ----------
+// Fenster mit einer Frage zu Items liegen rechts neben dem Rucksack (über Lager und Infobereich), nie über
+// den Rucksack-Feldern. Die beteiligten Items bekommen einen leuchtenden Rahmen und eine dünne Linie zum
+// Fenster. Ohne sichtbares Spielfeld oder bei zu wenig Platz: false (das Fenster bleibt, wo es war).
+export function nebenRucksack(layer, card, beteiligt = []) {
+  const bag = document.querySelector('#game:not([hidden]) .bag-panel');
+  const els = beteiligt.filter((e) => e?.isConnected);
+  layer.querySelector('.af-linien')?.remove();
+  layer.zielRects = [];
+  if (!bag || !els.length) return false;
+  const b = bag.getBoundingClientRect();
+  const m = 8, oben = (document.querySelector('#game .topbar')?.getBoundingClientRect().bottom || 0) + m;
+  const links = b.right + 12, breite = innerWidth - links - m, hoehe = innerHeight - oben - m;
+  if (breite < 300) return false;
+  card.classList.add('neben');
+  card.style.maxWidth = breite + 'px';
+  card.style.maxHeight = hoehe + 'px';
+  card.style.left = links + 'px';
+  card.style.top = oben + 'px';
+  const cw = card.offsetWidth, ch = Math.min(card.offsetHeight, hoehe);
+  const ziele = els.map((e) => e.getBoundingClientRect());
+  const left = links + (breite - cw) / 2;
+  // Höhe: auf Höhe der Items – oder oben/unten, wenn das Fenster sonst ein Item im Lager verdeckt
+  const mitte = ziele.reduce((s, r) => s + r.top + r.height / 2, 0) / ziele.length;
+  const klemme = (t) => Math.max(oben, Math.min(innerHeight - m - ch, t));
+  const deckt = (t) => ziele.reduce((s, r) => s + Math.max(0, Math.min(left + cw, r.right) - Math.max(left, r.left)) * Math.max(0, Math.min(t + ch, r.bottom) - Math.max(t, r.top)), 0);
+  const top = [mitte - ch / 2, oben, innerHeight - m - ch].map(klemme).reduce((best, t) => (deckt(t) < deckt(best) ? t : best));
+  card.style.left = left + 'px';
+  card.style.top = top + 'px';
+  layer.zielRects = ziele;
+  verbinde(layer, { left, top, right: left + cw, bottom: top + ch }, ziele);
+  return true;
+}
+
+// Leuchtrahmen um die Items und je eine Linie vom Item-Rand zum nächsten Punkt am Fensterrand.
+function verbinde(layer, c, ziele) {
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('class', 'af-linien');
+  const klemme = (v, a, z) => Math.max(a, Math.min(z, v));
+  svg.innerHTML = ziele.map((r) => {
+    const cx = r.left + r.width / 2, cy = r.top + r.height / 2;
+    const x2 = klemme(cx, c.left, c.right), y2 = klemme(cy, c.top, c.bottom);
+    const x1 = klemme(x2, r.left, r.right), y1 = klemme(y2, r.top, r.bottom);
+    return `<rect class="af-ring" x="${r.left - 5}" y="${r.top - 5}" width="${r.width + 10}" height="${r.height + 10}" rx="12"/>`
+      + `<line class="af-linie" x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}"/><circle class="af-punkt" cx="${x1}" cy="${y1}" r="4"/>`;
+  }).join('');
+  layer.prepend(svg);
+}
 
 // Über dem Item, sonst darunter; immer ganz im Bild.
 function placeQuick(card, r) {
