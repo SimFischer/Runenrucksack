@@ -7,7 +7,9 @@ import { buildCompounds, buildRuneLevels } from '../js/grammar.js';
 import { baueBuch } from '../js/buch.js';
 import { neuesProfil } from '../js/fortschritt.js';
 import { newRun, growBag, attachTasche } from '../js/logic.js';
-import { ALPHABET, registryAus, heldencode, reisecode, leseCode, CodeFehler, fehlerText, saeubern, STAT_KEYS } from '../js/code.js';
+import {
+  ALPHABET, registryAus, heldencode, reisecode, leseCode, CodeFehler, fehlerText, saeubern, STAT_KEYS, klassenCode, leseKlassenCode, istKlassenCode,
+} from '../js/code.js';
 import { aktuelleIds } from '../tools/registry.mjs';
 
 const json = (f) => JSON.parse(readFileSync(new URL('../' + f, import.meta.url)));
@@ -193,6 +195,26 @@ test('Lernstand, Regelkarten und Klasse: nur angehängt, wenn vorhanden', () => 
   assert.equal(r.klasse.themen.ie, 0, 'ausgeschaltet bleibt aus');
   assert.equal(r.klasse.themen.mehrzahl, 2, 'nicht eingestellt: Standard 1–2');
   assert.equal(Object.keys(r.klasse.themen).length, json('themen.json').themen.length);
+});
+
+test('Klassen-Code: THEMEN-…, kurz, exakt dieselben Einstellungen, Tippfehler erkannt', (t) => {
+  const THEMEN = json('themen.json').themen;
+  const einst = { themen: Object.fromEntries(THEMEN.map((x, i) => [x.id, i % 4])) };
+  const code = klassenCode(einst, REG);
+  t.diagnostic(`Klassen-Code: ${code}`);
+  assert.match(code, /^THEMEN-[23456789A-HJKMNP-Z-]+$/);
+  assert.ok(saeubern(code).length <= 6 + 10, 'kurz genug zum Abtippen');
+  assert.ok(istKlassenCode(code.toLowerCase().replace(/-/g, ' ')));
+  assert.ok(!istKlassenCode(GOLDEN));
+  assert.deepEqual(leseKlassenCode(code, REG), einst);
+  // Standard: alle Themen bis Stufe 2
+  assert.ok(Object.values(leseKlassenCode(klassenCode({ themen: {} }, REG), REG).themen).every((m) => m === 2));
+  // Ein Tippfehler wird erkannt
+  const roh = saeubern(code), i = roh.length - 3;
+  assert.throws(() => leseKlassenCode(roh.slice(0, i) + (roh[i] === 'A' ? 'B' : 'A') + roh.slice(i + 1), REG), CodeFehler);
+  // Neue Themen (hinten in registry.json) sind bei einem alten Klassen-Code aus
+  const mehr = registryAus({ eintraege: [...REGJSON.eintraege, 'thema:neu'] });
+  assert.equal(leseKlassenCode(code, mehr).themen.neu, 0);
 });
 
 test('Dichte Listen werden als Bitfeld gespeichert (voller Fortschritt bleibt abschreibbar)', () => {

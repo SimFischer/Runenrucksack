@@ -24,6 +24,7 @@ export const G = {
   REGISTRY: null,   // registry.json: feste Nummern für Helden- und Reisecodes
   WORTSCHATZ: null, // wortschatz.json: Wörter für die Aufgaben
   THEMEN: null,     // themen.json: Themen und Stufen der Aufgaben
+  LEHRKRAFT: null,  // lehrkraft.json: Code für den Bereich „Für Lehrkräfte“
   BILDER: { items: {}, gegner: {}, figuren: {}, bosse: {}, hintergruende: {} }, // assets/zuordnung.json
   BUCH: null,       // Buch der Wörter (aus items.json und recipes.json erzeugt)
   PROFIL: null,     // dauerhafter Fortschritt (js/fortschritt.js)
@@ -34,9 +35,9 @@ const SAVE_KEY = 'runenrucksack.lauf.v2';
 
 export async function loadData() {
   const get = (f) => fetch(f).then((r) => r.json());
-  const [itemData, enemyData, recipes, regions, heroes, encounters, exercises, tutorial, ach, registry, wortschatz, themen, bilder] = await Promise.all([
+  const [itemData, enemyData, recipes, regions, heroes, encounters, exercises, tutorial, ach, registry, wortschatz, themen, lehrkraft, bilder] = await Promise.all([
     get('items.json'), get('enemies.json'), get('recipes.json'), get('regions.json'), get('heroes.json'),
-    get('encounters.json'), get('exercises.json'), get('tutorial.json'), get('achievements.json'), get('registry.json'), get('wortschatz.json'), get('themen.json'),
+    get('encounters.json'), get('exercises.json'), get('tutorial.json'), get('achievements.json'), get('registry.json'), get('wortschatz.json'), get('themen.json'), get('lehrkraft.json').catch(() => ({})),
     get('assets/zuordnung.json').catch(() => null),
   ]);
   G.ITEMS = itemData.items;
@@ -58,6 +59,7 @@ export async function loadData() {
   G.REGISTRY = registry;
   G.WORTSCHATZ = wortschatz;
   G.THEMEN = themen;
+  G.LEHRKRAFT = lehrkraft;
   if (bilder) Object.assign(G.BILDER, bilder);
   G.BUCH = baueBuch(G.DEFS, G.ITEMS, G.RECIPES);
   G.PROFIL = loadProfil();

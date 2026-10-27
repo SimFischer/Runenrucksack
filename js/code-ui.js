@@ -1,7 +1,7 @@
 // Heldencode und Reisecode: anzeigen (groß, mit QR-Code und „Kopieren“), eingeben (auch per Kamera), neu beginnen.
 // Der QR-Code entsteht lokal (js/vendor/qrcode.js), das Einscannen nutzt js/vendor/jsQR.js – keine externen Dienste.
 import { G, saveProfil, setPref, save, emit } from './state.js';
-import { heldencode, reisecode, leseCode, fehlerText, registryAus, saeubern } from './code.js';
+import { heldencode, reisecode, leseCode, fehlerText, registryAus, saeubern, istKlassenCode, leseKlassenCode } from './code.js';
 import { neuesProfil, rangVon } from './fortschritt.js';
 import { toast } from './ui.js';
 
@@ -71,11 +71,11 @@ export function zeigeCode({ reise = false, zurueck = null } = {}) {
   emit('codeZeigen');
 }
 
-// Startmenü: Code eingeben (Bindestriche optional, Großbuchstaben automatisch). Erkennt Helden- und Reisecode.
+// Startmenü: Code eingeben (Bindestriche optional, Großbuchstaben automatisch). Erkennt Helden-, Reise- und Klassen-Code.
 export function zeigeEingabe({ geladen, zurueck = null }) {
   const box = ebene('code-layer', `
     <h2>🔑 Heldencode eingeben</h2>
-    <p>Tippe deinen Helden- oder Reisecode ein. Die Bindestriche kannst du weglassen.</p>
+    <p>Tippe deinen Helden- oder Reisecode ein – oder den Klassen-Code von deiner Lehrkraft. Die Bindestriche kannst du weglassen.</p>
     <input class="code-input" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" placeholder="z. B. RWV6D-8AWXP-…">
     <p class="code-meldung" hidden></p>
     <div class="code-kamera" hidden><video playsinline muted></video><p class="muted">Halte den QR-Code vor die Kamera.</p></div>
@@ -96,6 +96,11 @@ export function zeigeEingabe({ geladen, zurueck = null }) {
   });
   const lesen = () => {
     try {
+      if (istKlassenCode(input.value)) {
+        const einst = leseKlassenCode(input.value, reg());
+        klasseBestaetigen(einst, () => schliessen());
+        return;
+      }
       const r = leseCode(input.value, reg(), codeDaten());
       bestaetigen(r, () => { schliessen(); geladen(r); });
     } catch (e) {
@@ -114,6 +119,24 @@ export function zeigeEingabe({ geladen, zurueck = null }) {
     });
   });
   setTimeout(() => input.focus(), 50);
+}
+
+// Klassen-Code: zeigen, welche Themen drin sind, dann ins Profil (und damit in den Heldencode).
+function klasseBestaetigen(einst, ok) {
+  const an = G.THEMEN.themen.filter((t) => einst.themen[t.id] > 0);
+  const box = ebene('code-frage', `
+    <h2>🍎 Klassen-Code erkannt</h2>
+    <p>Deine Lehrkraft hat diese Themen ausgewählt:</p>
+    <p class="code-info lk-themen">${an.map((t) => `<span>${t.emoji} ${t.name} <b>${'★'.repeat(einst.themen[t.id])}</b></span>`).join('')}</p>
+    <div class="row"><button class="btn primary big" data-ja>Übernehmen</button><button class="btn" data-nein>Abbrechen</button></div>`);
+  box.querySelector('[data-ja]').onclick = () => {
+    G.PROFIL.klasse = einst;
+    saveProfil();
+    box.remove();
+    toast('Klassen-Code gespeichert – er steht jetzt auch in deinem Heldencode.');
+    ok();
+  };
+  box.querySelector('[data-nein]').onclick = () => box.remove();
 }
 
 // Vor dem Laden zeigen, was im Code steckt.

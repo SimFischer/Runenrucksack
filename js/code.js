@@ -416,6 +416,26 @@ export function reisecode(profil, run, reg, data) {
   return bytesZuText(w.b);
 }
 
+// ---------- Klassen-Code der Lehrkraft (THEMEN-…): je Thema die Höchststufe 0–3 (0 = aus) ----------
+
+export const KLASSEN_PREFIX = 'THEMEN';
+export const istKlassenCode = (text) => saeubern(text).startsWith(KLASSEN_PREFIX);
+
+export function klassenCode(einst, reg) {
+  const w = new Schreiber();
+  packe(w, reg.teil('thema:').map((t) => einst.themen?.[t] ?? STANDARD_STUFE), 2);
+  return `${KLASSEN_PREFIX}-${bytesZuText(w.b)}`;
+}
+
+// Themen, die neuer sind als der Code, bleiben aus – die Lehrkraft hat sie nicht gesehen.
+export function leseKlassenCode(text, reg) {
+  const roh = saeubern(text);
+  if (!roh.startsWith(KLASSEN_PREFIX)) throw new CodeFehler('kaputt');
+  const r = new Leser(textZuBytes(roh.slice(KLASSEN_PREFIX.length)));
+  const werte = entpacke(r, 2);
+  return { themen: Object.fromEntries(reg.teil('thema:').map((t, k) => [t, werte[k] ?? 0])) };
+}
+
 // Liest einen Code; erkennt selbst, ob Helden- oder Reisecode. Ergebnis: { typ, profil, run? }
 // Wirft CodeFehler (fehlerText() macht daraus eine freundliche Meldung).
 export function leseCode(text, reg, data) {

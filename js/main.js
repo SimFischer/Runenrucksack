@@ -30,6 +30,7 @@ import { zeigeSammlung, wendeDesignAn, fortschrittCtx } from './sammlung-ui.js';
 import { zeigeBuch, meldeNeu, meldeErfolg } from './buch-ui.js';
 import { zeigeLaufende } from './ende-ui.js';
 import { zeigeCode, zeigeEingabe, uebernehmen, neuBeginnen } from './code-ui.js';
+import { zeigeLehrkraft } from './lehrkraft-ui.js';
 
 let selected = null;   // { src: 'bag'|'store'|'shop', uid?, slot? }
 let drag = null;
@@ -50,6 +51,7 @@ async function boot() {
   $('btn-buch').onclick = () => zeigeBuch();
   $('btn-sammlung').onclick = () => zeigeSammlung();
   $('btn-code-ein').onclick = () => zeigeEingabe({ geladen: codeGeladen, zurueck: showStart });
+  $('btn-lehrkraft').onclick = () => zeigeLehrkraft();
   $('btn-neu-beginnen').onclick = () => neuBeginnen(() => { wendeDesignAn(); showAsk(); });
   pruefeErfolge(G.PROFIL, fortschrittCtx());
   pruefeFreischaltungen(G.PROFIL, fortschrittCtx());

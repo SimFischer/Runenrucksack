@@ -1404,3 +1404,18 @@ body[data-design="silberbanner"] #grid-bag { border-color: #c9d4ea; }
 .bericht-liste.themen li { padding: 4px 8px; border-radius: 8px; }
 .bericht-liste.themen li.ueben { background: rgba(224,165,38,.14); border-left: 4px solid var(--gold); }
 .bericht-liste.themen li.gut b { color: #2f7d32; }
+/* Für Lehrkräfte */
+.lk-card { width: min(860px, 100%); }
+.lk-text { margin: 0 0 8px; }
+.lk-liste { display: grid; gap: 6px; text-align: left; }
+.lk-zeile { display: flex; align-items: center; justify-content: space-between; gap: 10px; background: #fff8e8; border: 2px solid var(--line); border-radius: 12px; padding: 6px 10px; }
+.lk-zeile.aus { opacity: .6; }
+.lk-name { display: flex; flex-direction: column; font-size: 16px; }
+.lk-name small { color: var(--ink-soft); font-size: 13px; }
+.lk-wahl { display: flex; gap: 6px; flex-shrink: 0; }
+.lk-wahl .btn { min-width: 58px; min-height: 44px; }
+.lk-code { margin-top: 12px; }
+.lk-code p { margin: 4px 0; }
+.lk-themen { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.lk-themen span { background: #fff8e8; border: 1px solid var(--line); border-radius: 8px; padding: 2px 8px; }
+.lk-themen b { color: #e0a526; }
