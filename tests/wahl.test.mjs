@@ -6,7 +6,7 @@ import { readFileSync } from 'node:fs';
 import { seededRng } from '../js/logic.js';
 import { mitRegeln } from '../js/aufgaben/themen.js';
 import {
-  ITEM_THEMEN, stufenBereich, waehleAufgabe, verbucheAufgabe, stufeFuer, maxStufe, STANDARD_MAX, themenBericht, GOLD_FUER_STUFE,
+  ITEM_THEMEN, stufenBereich, waehleAufgabe, verbucheAufgabe, stufeFuer, maxStufe, STANDARD_MAX, themenBericht, GOLD_FUER_STUFE, schaetzeLernstand,
 } from '../js/aufgaben/wahl.js';
 
 const json = (f) => JSON.parse(readFileSync(new URL('../' + f, import.meta.url)));
@@ -106,4 +106,22 @@ test('Lernbericht: Sterne je geübtem Thema, keine Prozente, Themen mit Fehlern 
 
 test('Belohnung: Stufe 1 nichts, Stufe 2 ein Gold, Stufe 3 zwei Gold', () => {
   assert.deepEqual([1, 2, 3].map((s) => GOLD_FUER_STUFE[s] || 0), [0, 1, 2]);
+});
+
+test('Lernstand beim Laufstart neu einschätzen: Startstufe nach Rang, Fehler senkt sie sofort, Treffer bestätigt', () => {
+  const themen = ['artikel', 'mehrzahl'];
+  const neu = { lernstand: {} };
+  schaetzeLernstand(neu, 1, themen);
+  assert.deepEqual(neu.lernstand, {}, 'Lehrling: nichts zu schätzen');
+  const p = { lernstand: { artikel: { stufe: 1, sicher: 1 } } };
+  schaetzeLernstand(p, 4, themen);
+  assert.deepEqual(p.lernstand.artikel, { stufe: 1, sicher: 1 }, 'vorhandener Lernstand bleibt');
+  assert.deepEqual(p.lernstand.mehrzahl, { stufe: 3, sicher: 0, geschaetzt: true });
+  const run = {};
+  const aufgabe = { thema: 'mehrzahl', stufe: 3, format: 'luecke', wort: 'n:Apfel' };
+  verbucheAufgabe({ run, profil: p, aufgabe, ergebnis: { richtig: false }, rng: () => 0 });
+  assert.equal(p.lernstand.mehrzahl.stufe, 2, 'Fehler auf geschätzter Stufe: gleich eine Stufe tiefer');
+  verbucheAufgabe({ run, profil: p, aufgabe: { ...aufgabe, stufe: 2 }, ergebnis: { richtig: true, ersterVersuch: true }, rng: () => 0 });
+  assert.equal(p.lernstand.mehrzahl.geschaetzt, undefined, 'Treffer bestätigt die Stufe');
+  assert.equal(p.lernstand.mehrzahl.stufe, 2);
 });

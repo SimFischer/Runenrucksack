@@ -1,7 +1,8 @@
-// Heldencode und Reisecode: anzeigen (groß, mit QR-Code und „Kopieren“), eingeben (auch per Kamera), neu beginnen.
-// Der QR-Code entsteht lokal (js/vendor/qrcode.js), das Einscannen nutzt js/vendor/jsQR.js – keine externen Dienste.
+// Heldencode: anzeigen (groß, zum Abschreiben ins Heft), eingeben, neu beginnen. Klassen-Code der Lehrkraft eingeben.
+// Der Heldencode hat 6 Zeichen (K7Q-M2X) und enthält nur Erfahrung und Tutorial. Alles andere – Buch der Wörter,
+// Erfolge, Regelkarten, Statistik, Lernstand, Klassen-Einstellungen und ein unterbrochener Lauf – bleibt auf dem Gerät.
 import { G, saveProfil, setPref, save, emit } from './state.js';
-import { heldencode, reisecode, leseCode, fehlerText, registryAus, saeubern, istKlassenCode, leseKlassenCode } from './code.js';
+import { heldencode, leseCode, fehlerText, registryAus, istKlassenCode, leseKlassenCode } from './code.js';
 import { neuesProfil, rangVon } from './fortschritt.js';
 import { toast } from './ui.js';
 import { sym } from './symbole.js';
@@ -10,24 +11,14 @@ let REG = null;
 const reg = () => (REG ||= registryAus(G.REGISTRY));
 const codeDaten = () => ({ defs: G.DEFS, heroes: G.HEROES, fates: G.FATES, encounters: G.ENCOUNTERS, exercises: G.EXERCISES });
 
-export const aktuellerHeldencode = () => heldencode(G.PROFIL, reg());
-export const aktuellerReisecode = () => reisecode(G.PROFIL, G.run, reg(), codeDaten());
+export const aktuellerHeldencode = () => heldencode(G.PROFIL);
 
-// QR-Code als SVG (oder nichts, falls die Bibliothek fehlt)
-export function qrSvg(text) {
-  try {
-    const qr = window.qrcode(0, 'L');
-    qr.addData(saeubern(text), 'Alphanumeric');
-    qr.make();
-    return qr.createSvgTag({ cellSize: 4, margin: 2, scalable: true });
-  } catch { return ''; }
-}
-
-// Code-Kasten zum Einbetten (Ende des Laufs, Menü)
+// Code-Kasten zum Einbetten (Ende des Laufs, Menü): groß, gut abzuschreiben
 export function codeKasten(code, klein = false) {
+  const [a, b] = code.split('-');
   return `<div class="code-kasten${klein ? ' klein' : ''}">
-    <div class="code-text" data-code>${code.split('-').map((g) => `<span>${g}</span>`).join('')}</div>
-    <div class="code-qr">${qrSvg(code)}</div>
+    <div class="code-text" data-code aria-label="Heldencode ${code}"><span>${a}</span><span class="code-strich">-</span><span>${b}</span></div>
+    <p class="code-heft">${sym('buch')} Schreib ihn in dein Heft.</p>
     <button class="btn small" data-kopieren>Kopieren</button>
   </div>`;
 }
@@ -56,39 +47,35 @@ function ebene(id, html) {
   return box;
 }
 
-// Heldencode (oder Reisecode) groß anzeigen.
-export function zeigeCode({ reise = false, zurueck = null } = {}) {
-  const code = reise ? aktuellerReisecode() : aktuellerHeldencode();
+// Heldencode groß anzeigen.
+export function zeigeCode({ zurueck = null } = {}) {
+  const code = aktuellerHeldencode();
   const box = ebene('code-layer', `
-    <h2>${reise ? 'Dein Reisecode' : 'Dein Heldencode'}</h2>
-    <p>${reise
-      ? 'Schreib den Code ab oder fotografiere den QR-Code. Damit spielst du deinen Lauf genau hier weiter – auch auf einem anderen iPad.'
-      : 'Schreib den Code ins Heft oder fotografiere ihn. Damit holst du deinen Fortschritt zurück – auch auf einem anderen iPad.'}</p>
+    <h2>Dein Heldencode</h2>
+    <p>Mit diesem Code holst du deinen Rang, deine Figuren und deine Rucksack-Designs zurück – auch auf einem anderen iPad.</p>
     ${codeKasten(code)}
-    <div class="row"><button class="btn primary big" data-ok>${reise ? 'Lauf beenden und zum Start' : 'Fertig'}</button>${reise ? '<button class="btn" data-weiter>Doch weiterspielen</button>' : ''}</div>`);
+    <p class="muted">Buch der Wörter, Erfolge und Statistik bleiben auf diesem iPad.</p>
+    <div class="row"><button class="btn primary big" data-ok>Fertig</button></div>`);
   kopierenAn(box, code);
   box.querySelector('[data-ok]').onclick = () => { box.remove(); emit('codeZu'); zurueck?.(true); };
-  box.querySelector('[data-weiter]')?.addEventListener('click', () => { box.remove(); emit('codeZu'); zurueck?.(false); });
   emit('codeZeigen');
 }
 
-// Startmenü: Code eingeben (Bindestriche optional, Großbuchstaben automatisch). Erkennt Helden-, Reise- und Klassen-Code.
+// Startmenü: Code eingeben (Bindestrich optional, Großbuchstaben automatisch). Erkennt Helden- und Klassen-Code,
+// auch alte, lange Heldencodes.
 export function zeigeEingabe({ geladen, zurueck = null }) {
   const box = ebene('code-layer', `
     <h2>${sym('schloss')} Heldencode eingeben</h2>
-    <p>Tippe deinen Helden- oder Reisecode ein – oder den Klassen-Code von deiner Lehrkraft. Die Bindestriche kannst du weglassen.</p>
-    <input class="code-input" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" placeholder="z. B. RWV6D-8AWXP-…">
+    <p>Tippe deinen Heldencode aus dem Heft ein – oder den Klassen-Code von deiner Lehrkraft. Den Bindestrich kannst du weglassen.</p>
+    <input class="code-input" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" placeholder="K7Q-M2X" aria-label="Heldencode">
     <p class="code-meldung" hidden></p>
-    <div class="code-kamera" hidden><video playsinline muted></video><p class="muted">Halte den QR-Code vor die Kamera.</p></div>
     <div class="row">
       <button class="btn primary big" data-lesen>Einlesen</button>
-      ${navigator.mediaDevices?.getUserMedia ? '<button class="btn" data-scan>QR-Code scannen</button>' : ''}
       <button class="btn" data-zurueck>Zurück</button>
     </div>`);
   const input = box.querySelector('.code-input');
   const meldung = box.querySelector('.code-meldung');
-  let stopp = null;
-  const schliessen = () => { stopp?.(); box.remove(); };
+  const schliessen = () => box.remove();
   input.addEventListener('input', () => {
     const pos = input.selectionStart;
     input.value = input.value.toUpperCase();
@@ -112,17 +99,10 @@ export function zeigeEingabe({ geladen, zurueck = null }) {
   input.addEventListener('keydown', (e) => { if (e.key === 'Enter') lesen(); });
   box.querySelector('[data-lesen]').onclick = lesen;
   box.querySelector('[data-zurueck]').onclick = () => { schliessen(); zurueck?.(); };
-  box.querySelector('[data-scan]')?.addEventListener('click', async () => {
-    stopp?.();
-    stopp = await scanne(box.querySelector('.code-kamera'), (text) => { input.value = saeubern(text); lesen(); }, (fehler) => {
-      meldung.textContent = fehler;
-      meldung.hidden = false;
-    });
-  });
   setTimeout(() => input.focus(), 50);
 }
 
-// Klassen-Code: zeigen, welche Themen drin sind, dann ins Profil (und damit in den Heldencode).
+// Klassen-Code: zeigen, welche Themen drin sind, dann auf diesem Gerät speichern (nicht im Heldencode).
 function klasseBestaetigen(einst, ok) {
   const an = G.THEMEN.themen.filter((t) => einst.themen[t.id] > 0);
   const box = ebene('code-frage', `
@@ -134,7 +114,7 @@ function klasseBestaetigen(einst, ok) {
     G.PROFIL.klasse = einst;
     saveProfil();
     box.remove();
-    toast('Klassen-Code gespeichert – er steht jetzt auch in deinem Heldencode.');
+    toast('Klassen-Code gespeichert – er gilt jetzt auf diesem iPad.');
     ok();
   };
   box.querySelector('[data-nein]').onclick = () => box.remove();
@@ -142,37 +122,35 @@ function klasseBestaetigen(einst, ok) {
 
 // Vor dem Laden zeigen, was im Code steckt.
 function bestaetigen(r, ok) {
-  const p = r.profil;
-  const rang = rangVon(p.xp, G.ACH.raenge);
-  const held = r.run && G.HEROES.find((h) => h.id === r.run.hero);
+  const rang = rangVon(r.xp, G.ACH.raenge);
   const box = ebene('code-frage', `
-    <h2>${r.typ === 'reise' ? 'Reisecode erkannt' : 'Heldencode erkannt'}</h2>
-    <p class="code-info">${sym('stern')} <b>${rang.name}</b> · ${p.xp} Erfahrung · ${sym('buch')} ${p.buch.length} Einträge · ${sym('pokal')} ${p.erfolge.length} Erfolge</p>
-    ${held ? `<p class="code-info">${held.name} · Tag ${r.run.day} · ${r.run.wins} Siege · ${sym('herz').repeat(r.run.hearts)}</p>` : ''}
-    <p>Der Fortschritt auf diesem iPad wird durch diesen Code ersetzt.</p>
+    <h2>Heldencode erkannt</h2>
+    <p class="code-info">${sym('stern')} <b>${rang.name}</b> · ${r.xp} Erfahrung${r.tutorial ? ' · Tutorial geschafft' : ''}</p>
+    ${r.alt ? '<p>Das ist ein alter, langer Code. Deine Erfahrung wird übernommen – ab jetzt reicht der kurze Code mit 6 Zeichen.</p>' : ''}
+    <p>Rang, Figuren und Rucksack-Designs kommen aus dem Code. Buch der Wörter, Erfolge und Statistik sammelst du auf diesem iPad neu.</p>
     <div class="row"><button class="btn primary big" data-ja>Laden</button><button class="btn" data-nein>Abbrechen</button></div>`);
   box.querySelector('[data-ja]').onclick = () => { box.remove(); ok(); };
   box.querySelector('[data-nein]').onclick = () => box.remove();
 }
 
-// Übernimmt einen eingelesenen Code. Gibt den Lauf zurück (Reisecode) oder null.
+// Übernimmt einen eingelesenen Heldencode: Erfahrung und Tutorial; Figuren und Designs folgen aus dem Rang
+// (pruefeFreischaltungen). Hat dieses iPad genau denselben Stand, bleiben Buch, Erfolge und Statistik erhalten –
+// sonst beginnt der Fortschritt, der nur auf dem Gerät liegt, neu. Klassen-Einstellungen bleiben immer.
 export function uebernehmen(r) {
-  G.PROFIL = r.profil;
+  const alt = G.PROFIL;
+  const p = alt && alt.xp === r.xp ? alt : { ...neuesProfil(), klasse: alt?.klasse || null };
+  p.xp = r.xp;
+  p.tutorial = p.tutorial || r.tutorial;
+  G.PROFIL = p;
   saveProfil();
-  if (r.profil.tutorial) setPref('tutorial', 'fertig');
-  if (r.typ === 'reise') {
-    G.run = r.run;
-    save();
-    return r.run;
-  }
-  return null;
+  if (p.tutorial) setPref('tutorial', 'fertig');
 }
 
 // „Neu beginnen“: Fortschritt auf diesem iPad löschen (mit Sicherheitsabfrage).
 export function neuBeginnen(fertig) {
   const box = ebene('code-frage', `
     <h2>Wirklich ganz neu beginnen?</h2>
-    <p>Rang, Erfahrung, Buch der Wörter, Figuren und Erfolge auf diesem iPad werden gelöscht. Mit deinem Heldencode kannst du sie später zurückholen.</p>
+    <p>Rang, Erfahrung, Buch der Wörter, Figuren und Erfolge auf diesem iPad werden gelöscht. Mit deinem Heldencode holst du Rang, Figuren und Designs später zurück.</p>
     <div class="row"><button class="btn" data-nein>Lieber nicht</button><button class="btn danger" data-ja>Ja, neu beginnen</button></div>`);
   box.querySelector('[data-nein]').onclick = () => box.remove();
   box.querySelector('[data-ja]').onclick = () => {
@@ -185,46 +163,4 @@ export function neuBeginnen(fertig) {
     toast('Alles zurückgesetzt – viel Spaß beim neuen Abenteuer!');
     fertig?.();
   };
-}
-
-// ---------- QR-Code mit der Kamera einscannen ----------
-
-function ladeJsQR() {
-  if (window.jsQR) return Promise.resolve(window.jsQR);
-  return new Promise((ok, fehler) => {
-    const s = document.createElement('script');
-    s.src = 'js/vendor/jsQR.js';
-    s.onload = () => ok(window.jsQR);
-    s.onerror = fehler;
-    document.head.append(s);
-  });
-}
-
-async function scanne(feld, gefunden, fehler) {
-  let stream = null, aktiv = true;
-  const stopp = () => { aktiv = false; stream?.getTracks().forEach((t) => t.stop()); feld.hidden = true; };
-  try {
-    const jsQR = await ladeJsQR();
-    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' } });
-    const video = feld.querySelector('video');
-    video.srcObject = stream;
-    feld.hidden = false;
-    await video.play();
-    const c = document.createElement('canvas'), g = c.getContext('2d', { willReadFrequently: true });
-    const schritt = () => {
-      if (!aktiv) return;
-      if (video.videoWidth) {
-        c.width = video.videoWidth; c.height = video.videoHeight;
-        g.drawImage(video, 0, 0);
-        const r = jsQR(g.getImageData(0, 0, c.width, c.height).data, c.width, c.height, { inversionAttempts: 'dontInvert' });
-        if (r?.data) { stopp(); gefunden(r.data); return; }
-      }
-      requestAnimationFrame(schritt);
-    };
-    schritt();
-  } catch {
-    stopp();
-    fehler('Die Kamera lässt sich gerade nicht öffnen. Tippe den Code einfach ein.');
-  }
-  return stopp;
 }

@@ -20,7 +20,7 @@ import {
 } from './ui.js';
 import { startNight, zeigeKampfErgebnis } from './battle-ui.js';
 import { frageImSpiel, wortschatz, einstellungen } from './aufgaben/spiel.js';
-import { stufenBereich, stufeFuer, aufgabenStand } from './aufgaben/wahl.js';
+import { stufenBereich, stufeFuer, aufgabenStand, schaetzeLernstand } from './aufgaben/wahl.js';
 import { verbSatz, verbSatzInhalt, PERSONEN_FOLGE, kurzName } from './aufgaben/verbsatz.js';
 import { runEncounter } from './encounters.js';
 import { initTutorial, startTutorial, tutorialDone, showHelp, tipsOn, setTips, tutorialDarf, tutorialAbgebrochen } from './tutorial.js';
@@ -140,21 +140,14 @@ function zeigeRang() {
     <small>${r.naechster ? `${G.PROFIL.xp} Erfahrung · noch ${r.bisNaechster} bis ${r.naechster.name}` : `${G.PROFIL.xp} Erfahrung · höchster Rang!`}</small></span>`;
 }
 
-// Ein eingelesener Helden- oder Reisecode: Fortschritt übernehmen, beim Reisecode gleich weiterspielen.
+// Ein eingelesener Heldencode: Erfahrung und Tutorial übernehmen; Rang, Figuren und Designs folgen daraus.
 function codeGeladen(r) {
-  const run = uebernehmen(r);
+  uebernehmen(r);
   pruefeErfolge(G.PROFIL, fortschrittCtx());
   pruefeFreischaltungen(G.PROFIL, fortschrittCtx());
   wendeDesignAn();
-  if (run) {
-    toast('Willkommen zurück! Deine Reise geht weiter.');
-    selected = null;
-    showGame();
-    continueFlow();
-  } else {
-    toast('Willkommen zurück! Dein Fortschritt ist geladen.');
-    showStart();
-  }
+  toast('Willkommen zurück! Dein Fortschritt ist geladen.');
+  showStart();
 }
 
 function continueSaved() {
@@ -210,6 +203,7 @@ function zeigeFigur(h, frei) {
 function startNewRun(h) {
   if (!h?.id) { showHeroes(); return; }
   G.run = newRun(G.ITEMS, G.REGIONS, { hero: h, fates: G.FATES, freieItems: freieItems(G.PROFIL, G.ITEMS, fortschrittCtx()) });
+  schaetzeLernstand(G.PROFIL, rangVon(G.PROFIL.xp, G.ACH.raenge).nr, G.THEMEN.themen.map((t) => t.id));
   selected = null;
   showGame();
   // Start-Items, die schon richtig liegen (z. B. Feuer links neben der Axt), verbinden sich gleich.
@@ -898,8 +892,8 @@ function openMenu() {
     buch: () => zeigeBuch(openMenu),
     sammlung: () => zeigeSammlung(openMenu),
     code: () => zeigeCode({ zurueck: G.run?.tutorial ? null : openMenu }), // im Tutorial führt Fenwick weiter
-    // Reisecode: Helden-Fortschritt + laufender Lauf; danach zum Start (der Lauf bleibt auch im Browser gemerkt)
-    pause: () => zeigeCode({ reise: true, zurueck: (beenden) => { if (beenden) { save(); showStart(); } } }),
+    // Unterbrechen: Der Lauf bleibt auf diesem iPad gespeichert (Weiterspielen im Startmenü)
+    pause: () => { save(); showStart(); toast('Dein Lauf ist auf diesem iPad gespeichert.'); },
     neustart: () => neuBeginnen(() => { wendeDesignAn(); showAsk(); }),
     tips: () => { setTips(!tipsOn()); toast(`Erste-Mal-Tipps sind jetzt ${tipsOn() ? 'an' : 'aus'}.`); openMenu(); },
   });

@@ -79,8 +79,6 @@ const FILES = [
   'js/sammlung-ui.js',
   'js/code.js',
   'js/code-ui.js',
-  'js/vendor/qrcode.js',
-  'js/vendor/jsQR.js',
   'js/mods.js',
   'js/battle.js',
   'js/battle-ui.js',

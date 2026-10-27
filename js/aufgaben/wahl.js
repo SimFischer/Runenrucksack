@@ -30,6 +30,16 @@ export const themaAn = (einst, thema) => maxStufe(einst, thema) > 0;
 // Lernstand eines Themas: { stufe 1–3, sicher (richtige beim ersten Versuch auf dieser Stufe), fehler }
 export const lernstandVon = (profil, thema) => profil?.lernstand?.[thema] || { stufe: 1, sicher: 0 };
 
+// Lernstand beim Laufstart kurz neu einschätzen: Er liegt nur auf dem Gerät. Fehlt er für ein Thema (z. B. nach dem
+// Heldencode auf einem neuen iPad), beginnt das Thema auf einer Stufe passend zum Rang – als „geschätzt“ markiert.
+// Der erste Fehler senkt eine geschätzte Stufe sofort, der erste Treffer bestätigt sie (verbucheAufgabe).
+export function schaetzeLernstand(profil, rangNr, themenIds) {
+  const start = rangNr >= 4 ? 3 : rangNr >= 2 ? 2 : 1;
+  if (start === 1) return;
+  profil.lernstand ||= {};
+  for (const t of themenIds) if (!profil.lernstand[t]) profil.lernstand[t] = { stufe: start, sicher: 0, geschaetzt: true };
+}
+
 // Stufe für eine Aufgabe: Lernstand im Bereich des Items, höchstens die Höchststufe der Lehrkraft.
 export function stufeFuer(profil, einst, thema, bereich) {
   const lern = lernstandVon(profil, thema).stufe;
@@ -101,6 +111,11 @@ export function verbucheAufgabe({ run, profil, aufgabe, ergebnis, rng }) {
   let aufgestiegen = false;
   const e = (stand.ergebnis[aufgabe.thema] ||= [0, 0]);
   e[ergebnis.richtig && ergebnis.ersterVersuch ? 0 : 1]++;
+  // Geschätzte Stufe: ein Treffer auf dieser Stufe bestätigt sie, ein Fehler senkt sie gleich um eins
+  if (l.geschaetzt && aufgabe.stufe >= l.stufe) {
+    if (ergebnis.richtig && ergebnis.ersterVersuch) delete l.geschaetzt;
+    else { l.stufe = Math.max(1, l.stufe - 1); if (l.stufe === 1) delete l.geschaetzt; }
+  }
   if (ergebnis.richtig && ergebnis.ersterVersuch) {
     if (aufgabe.stufe >= l.stufe) {
       l.sicher++;

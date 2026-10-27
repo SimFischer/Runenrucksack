@@ -22,8 +22,6 @@ export function zeigeBuch(zurueck = null) {
     const gesamt = G.BUCH.eintraege.length;
     const seiten = [...G.BUCH.seiten, regelSeite()];
     const seite = { ...seiten.find((s) => s.id === seiteAktiv) };
-    const lohn = G.ACH.designs.find((d) => d.freischaltung?.seite === seite.id);
-    if (lohn) seite.belohnung = `Rucksack-Design „${lohn.name}“`;
     const stand = seitenStand(seite, entdeckt);
     box.innerHTML = `
       <div class="buch-card" data-tut="buch-fenster">
@@ -39,7 +37,7 @@ export function zeigeBuch(zurueck = null) {
             <span class="buch-bar"><i style="width:${Math.round((st.gefunden / st.gesamt) * 100)}%"></i></span>
             <small>${st.gefunden}/${st.gesamt}</small></button>`;
         }).join('')}</nav>
-        <p class="buch-intro">${seite.text}${seite.belohnung ? ` <b class="buch-lohn${stand.voll ? ' da' : ''}">${stand.voll ? '✓' : sym('truhe')} Volle Seite: ${seite.belohnung}</b>` : ''}</p>
+        <p class="buch-intro">${seite.text}</p>
         <div class="buch-grid">${seite.eintraege.map((e) => karte(e, entdeckt.has(e.id))).join('')}</div>
       </div>`;
     box.querySelector('[data-close]').onclick = () => { box.remove(); emit('buchZu'); zurueck?.(); };

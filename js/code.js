@@ -1,8 +1,13 @@
-// Heldencode und Reisecode (ohne Darstellung, testbar).
-// - Heldencode: dauerhafter Fortschritt (Rang, Erfahrung, Figuren, Designs, Erfolge, Buch der Wörter, Statistik, Tutorial).
-// - Reisecode: Heldencode + laufender Lauf (zum Unterbrechen und Weiterspielen).
+// Heldencode und Klassen-Code (ohne Darstellung, testbar).
 //
-// Format: Großbuchstaben und Ziffern ohne verwechselbare Zeichen (kein 0/O, 1/I/L), Fünfergruppen mit
+// Heldencode (seit Version 2): genau 6 Zeichen, angezeigt in zwei Dreiergruppen (K7Q-M2X) – kurz genug fürs Heft.
+// 5 Inhaltszeichen (Version 2 Bit, Tutorial geschafft 1 Bit, Erfahrung 21 Bit) und 1 Prüfzeichen, das jeden
+// einzelnen Tippfehler und jeden Dreher zweier Nachbarzeichen erkennt. Rang, Figuren und Designs ergeben sich aus
+// der Erfahrung; Buch der Wörter, Erfolge, Regelkarten, Statistik und Lernstand bleiben nur auf dem Gerät.
+//
+// Alte, lange Codes (Helden- und Reisecodes bis Version 1) werden weiterhin gelesen: Erfahrung und Tutorial
+// werden übernommen. Ihr Aufbau steht unten (alterHeldencode, alterReisecode – nur noch für Tests).
+// Alter Aufbau: Großbuchstaben und Ziffern ohne verwechselbare Zeichen (kein 0/O, 1/I/L), Fünfergruppen mit
 // Bindestrichen, am Ende ein Prüfzeichen. Inhalt: Versionsnummer, kleine Zahlen als Varint, Listen
 // (z. B. entdeckte Buch-Einträge) sortiert und als Abstände kodiert – so ist der Code am Anfang kurz und wächst mit.
 // Wird eine Liste dicht (viele Einträge), speichert der Code sie automatisch als Bitfeld, falls das kürzer ist.
@@ -12,7 +17,9 @@
 import { GROW_ORDER, baseBagCells } from './logic.js';
 
 export const ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ'; // 31 Zeichen
-export const CODE_VERSION = 1;
+export const CODE_VERSION = 1; // alte, lange Codes
+export const HELD_VERSION = 1;  // kurzer Heldencode (2 Bit: 1–3)
+export const MAX_XP = 2 ** 21 - 1; // mehr Erfahrung wird gekappt (der höchste Rang beginnt weit darunter)
 export const TYP = { held: 0, reise: 1 };
 export const STAT_KEYS = ['laeufe', 'siege', 'gewonnen', 'ohneFehler', 'orkFehler', 'saetze', 'komposita', 'sterne4', 'richtig'];
 const REGEL_KEYS = ['artikel', 'mehrzahl', 'personalform', 'praeteritum', 'steigerung', 'rechtschreibung'];
@@ -142,6 +149,41 @@ function bytesZuText(bytes) {
 // Eingabe säubern: Bindestriche und Leerzeichen weg, Großbuchstaben.
 export const saeubern = (text) => String(text || '').toUpperCase().replace(/[\s\-–_.]/g, '');
 
+// ---------- Kurzer Heldencode: 6 Zeichen ----------
+// Prüfzeichen: Gewichte 1–6, gewichtete Summe durch 31 teilbar. 31 ist eine Primzahl und die Gewichte sind
+// verschieden – so ändert jeder einzelne Tippfehler und jeder Dreher zweier Nachbarn die Summe.
+const KURZ = 6;
+const INV6 = 26; // 6 · 26 = 156 = 5 · 31 + 1
+const pruefsumme = (werte) => werte.reduce((s, v, i) => (s + (i + 1) * v) % 31, 0);
+
+function zeichenWerte(roh) {
+  return [...roh].map((ch) => {
+    const v = ALPHABET.indexOf(ch);
+    if (v < 0) throw new CodeFehler('zeichen', ch);
+    return v;
+  });
+}
+
+export function heldencode(profil) {
+  const xp = Math.min(MAX_XP, Math.max(0, Math.floor(profil.xp || 0)));
+  let n = (xp * 2 + (profil.tutorial ? 1 : 0)) * 4 + HELD_VERSION;
+  const werte = [];
+  for (let k = 0; k < KURZ - 1; k++) { werte.unshift(n % 31); n = Math.floor(n / 31); }
+  werte.push(((31 - pruefsumme(werte)) * INV6) % 31);
+  const roh = werte.map((v) => ALPHABET[v]).join('');
+  return `${roh.slice(0, 3)}-${roh.slice(3)}`;
+}
+
+function leseKurz(roh) {
+  const werte = zeichenWerte(roh);
+  if (pruefsumme(werte) !== 0) throw new CodeFehler('pruefung');
+  const n = werte.slice(0, -1).reduce((a, v) => a * 31 + v, 0);
+  const version = n % 4, rest = Math.floor(n / 4);
+  if (version > HELD_VERSION) throw new CodeFehler('version');
+  if (version === 0 || rest > MAX_XP * 2 + 1) throw new CodeFehler('kaputt');
+  return { typ: 'held', xp: Math.floor(rest / 2), tutorial: rest % 2 === 1, alt: false };
+}
+
 function textZuBytes(text) {
   const roh = saeubern(text);
   if (roh.length < 4) throw new CodeFehler('kurz');
@@ -165,13 +207,14 @@ function textZuBytes(text) {
 // Freundliche Meldung für das Kind.
 export function fehlerText(e) {
   if (!(e instanceof CodeFehler)) return 'Mit diesem Code stimmt etwas nicht. Schau noch einmal genau hin.';
-  if (e.art === 'kurz') return 'Der Code ist zu kurz. Hast du alle Gruppen abgeschrieben?';
+  if (e.art === 'kurz') return 'Der Code ist zu kurz. Ein Heldencode hat 6 Zeichen, zum Beispiel K7Q-M2X.';
+  if (e.art === 'lang') return 'Der Code hat zu viele Zeichen. Ein Heldencode hat 6 Zeichen, zum Beispiel K7Q-M2X.';
   if (e.art === 'zeichen') {
     if ('0O'.includes(e.zeichen)) return 'Im Code gibt es kein O und keine Null. Schau noch einmal genau hin – vielleicht ist es ein Q oder ein D?';
     if ('1IL'.includes(e.zeichen)) return 'Im Code gibt es keine 1, kein I und kein L. Vielleicht ist es eine 7 oder ein J?';
     return `Das Zeichen „${e.zeichen}“ gibt es im Code nicht.`;
   }
-  if (e.art === 'pruefung') return 'Da hat sich ein Tippfehler eingeschlichen. Vergleiche den Code Zeichen für Zeichen.';
+  if (e.art === 'pruefung') return 'Da hat sich ein Tippfehler eingeschlichen – oder zwei Zeichen sind vertauscht. Vergleiche den Code Zeichen für Zeichen mit deinem Heft.';
   if (e.art === 'version') return 'Dieser Code stammt aus einer neueren Version des Spiels. Lade die Seite neu.';
   return 'Mit diesem Code stimmt etwas nicht. Schau noch einmal genau hin.';
 }
@@ -400,7 +443,8 @@ function fluchName(itemId, data) {
 
 // ---------- Öffentlich ----------
 
-export function heldencode(profil, reg) {
+// Alter, langer Heldencode (bis Version 1) – nur noch für Tests: So sahen gespeicherte Codes aus.
+export function alterHeldencode(profil, reg) {
   const w = new Schreiber();
   w.uint(CODE_VERSION); w.uint(TYP.held);
   schreibeHeld(w, profil, reg);
@@ -408,7 +452,8 @@ export function heldencode(profil, reg) {
   return bytesZuText(w.b);
 }
 
-export function reisecode(profil, run, reg, data) {
+// Alter Reisecode (bis Version 1) – nur noch für Tests.
+export function alterReisecode(profil, run, reg, data) {
   const w = new Schreiber();
   w.uint(CODE_VERSION); w.uint(TYP.reise);
   schreibeHeld(w, profil, reg);
@@ -437,9 +482,20 @@ export function leseKlassenCode(text, reg) {
   return { themen: Object.fromEntries(reg.teil('thema:').map((t, k) => [t, werte[k] ?? 0])) };
 }
 
-// Liest einen Code; erkennt selbst, ob Helden- oder Reisecode. Ergebnis: { typ, profil, run? }
+// Liest einen Heldencode: 6 Zeichen – oder einen alten, langen Helden- oder Reisecode, aus dem Erfahrung und
+// Tutorial übernommen werden. Ergebnis: { typ: 'held', xp, tutorial, alt }.
 // Wirft CodeFehler (fehlerText() macht daraus eine freundliche Meldung).
 export function leseCode(text, reg, data) {
+  const roh = saeubern(text);
+  if (roh.length < KURZ) throw new CodeFehler('kurz');
+  if (roh.length === KURZ) return leseKurz(roh);
+  if (roh.length < 15) throw new CodeFehler('lang'); // alte Codes sind viel länger
+  const alt = leseAltenCode(roh, reg, data);
+  return { typ: 'held', xp: Math.min(MAX_XP, alt.profil.xp), tutorial: !!alt.profil.tutorial, alt: true, altTyp: alt.typ };
+}
+
+// Alter Code: { typ ('held' | 'reise'), profil, run? } – vollständig gelesen (für Tests und die Umrechnung).
+export function leseAltenCode(text, reg, data) {
   const r = new Leser(textZuBytes(text));
   const version = r.uint();
   if (version > CODE_VERSION) throw new CodeFehler('version');

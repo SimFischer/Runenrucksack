@@ -191,7 +191,7 @@
         "siegelStartblock": 3
       },
       "freischaltung": {
-        "gewonnen": 3
+        "rang": 3
       },
       "start": [
         {
@@ -246,7 +246,7 @@
         "runenZiele": 2
       },
       "freischaltung": {
-        "buch": 25
+        "rang": 4
       },
       "start": [
         {

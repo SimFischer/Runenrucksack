@@ -493,3 +493,12 @@ button, input, select, textarea { font-family: inherit; }
 /* Lückensatz: Die Lücke ist so groß wie die Schrift und bricht nie vom Wort danach weg */
 .luecke-paar { white-space: nowrap; }
 .af-satz .blank, .quick-q .blank { font-size: inherit; line-height: inherit; vertical-align: baseline; }
+
+/* ---------- Heldencode: 6 Zeichen, groß in der Leseschrift, zum Abschreiben ins Heft ---------- */
+.code-kasten, .code-kasten.klein, .ende-code .code-kasten.klein { display: flex; flex-direction: column; align-items: center; gap: 6px; background: #fff8e8; border: 3px solid #8a6438; border-radius: 14px; padding: 12px 16px; }
+.code-kasten .code-text { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; font-family: var(--font); font-weight: 700; font-size: clamp(40px, 5vw, 56px); letter-spacing: .14em; color: var(--tinte); }
+.code-kasten .code-text span { background: none; border: none; padding: 0; }
+.code-kasten .code-text .code-strich { color: #a07a4a; letter-spacing: 0; }
+.code-kasten.klein .code-text { font-size: 32px; }
+.code-heft { margin: 0; font-weight: 700; color: var(--tinte); }
+.code-input { font-family: var(--font); font-weight: 700; font-size: 36px; letter-spacing: .14em; text-transform: none; min-height: 64px; }

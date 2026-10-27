@@ -41,7 +41,7 @@ test('Erfahrung: pro Sieg, pro Entdeckung, pro Frage beim ersten Versuch richtig
   assert.equal(b.nachher.nr, 1);
 });
 
-test('Freischaltungen: Faelith ab Wanderer, Theron nach 3 gewonnenen Läufen, Ysolde ab 25 Einträgen', async () => {
+test('Freischaltungen nur über die Erfahrung: Faelith ab Wanderer, Theron ab Runenkundige, Ysolde ab Wortmeister', async () => {
   const { pruefeFreischaltungen, figurFrei, freieItems, bedingungText } = await import('../js/fortschritt.js');
   const { baueBuch } = await import('../js/buch.js');
   const { buildCompounds, buildRuneLevels } = await import('../js/grammar.js');
@@ -57,18 +57,26 @@ test('Freischaltungen: Faelith ab Wanderer, Theron nach 3 gewonnenen Läufen, Ys
   assert.match(bedingungText(H.find((h) => h.id === 'faelith').freischaltung, ctx), /Wanderer/);
   p.xp = 400;
   assert.deepEqual(pruefeFreischaltungen(p, ctx).figuren, ['faelith']);
+  // Buch und Siege zählen nicht mehr (sie liegen nur auf dem Gerät, nicht im Heldencode)
   p.stats.gewonnen = 3;
-  p.buch = ctx.buch.eintraege.slice(0, 25).map((e) => e.id);
-  assert.deepEqual(pruefeFreischaltungen(p, ctx).figuren.sort(), ['theron', 'ysolde']);
+  p.buch = ctx.buch.eintraege.slice(0, 60).map((e) => e.id);
+  assert.deepEqual(pruefeFreischaltungen(p, ctx).figuren, []);
+  p.xp = 1200;
+  assert.deepEqual(pruefeFreischaltungen(p, ctx).figuren, ['theron']);
+  p.xp = 2600;
+  assert.deepEqual(pruefeFreischaltungen(p, ctx).figuren, ['ysolde']);
+  // Designs über die Ränge verteilt, alle Freischaltungen nur über den Rang
+  assert.deepEqual(ACH.designs.filter((d) => d.freischaltung).map((d) => d.freischaltung.rang), [2, 3, 4, 5]);
+  for (const x of [...H, ...ACH.designs, ...items]) if (x.freischaltung) assert.deepEqual(Object.keys(x.freischaltung), ['rang'], x.id);
   p.xp = 0;
   assert.equal(frei().length, 5, 'einmal frei bleibt frei');
   // Bilder der neuen Figuren
   const z = json('assets/zuordnung.json');
   for (const id of ['faelith', 'theron', 'ysolde']) assert.ok(z.figuren[id], id);
   // Items erst nach Freischaltung im Laden
-  assert.deepEqual(freieItems(p, items, ctx), ['runenstein'].filter(() => p.buch.length >= 60));
+  assert.deepEqual(freieItems(p, items, ctx), []);
   p.xp = 1200;
-  assert.deepEqual(freieItems(p, items, ctx), ['drachenfeuerschwert']);
+  assert.deepEqual(freieItems(p, items, ctx), ['drachenfeuerschwert', 'runenstein']);
   const { newRun, shopPool } = await import('../js/logic.js');
   const R = json('regions.json').gebiete;
   const run = newRun(items, R);
@@ -76,10 +84,8 @@ test('Freischaltungen: Faelith ab Wanderer, Theron nach 3 gewonnenen Läufen, Ys
   assert.ok(!shopPool(run, items, R).some((d) => d.id === 'drachenfeuerschwert'), 'gesperrt');
   run.freieItems = ['drachenfeuerschwert'];
   assert.ok(shopPool(run, items, R).some((d) => d.id === 'drachenfeuerschwert'), 'frei');
-  // Designs: volle Buchseite
-  const d = ACH.designs.find((x) => x.id === 'zwergenstahl');
-  p.buch.push(...ctx.buch.seiten.find((s) => s.id === 'komposita').eintraege.map((e) => e.id));
-  assert.ok(pruefeFreischaltungen(p, ctx).designs.includes(d.id));
+  // Designs: mit dem Rang freigeschaltet (bis Wortmeister drei, das Silberbanner erst beim höchsten Rang)
+  assert.deepEqual([...p.designs].sort(), ['elbenseide', 'reiterleder', 'zwergenstahl']);
 });
 
 test('Fähigkeiten: Ysoldes Runen wirken auf zwei Nomen, Theron gibt Startblock bei passendem Siegel', async () => {
@@ -106,7 +112,7 @@ test('Fähigkeiten: Ysoldes Runen wirken auf zwei Nomen, Theron gibt Startblock 
   assert.ok(!borga.get(3).def.startblock);
 });
 
-test('Erfolge: mindestens 15, jeder erreichbar geprüft, Silberbanner nach „Alle Helden“', async () => {
+test('Erfolge: mindestens 15, jeder erreichbar geprüft; Silberbanner ab dem höchsten Rang', async () => {
   const { pruefeErfolge, pruefeFreischaltungen } = await import('../js/fortschritt.js');
   const { baueBuch } = await import('../js/buch.js');
   const { buildCompounds, buildRuneLevels } = await import('../js/grammar.js');
@@ -133,6 +139,8 @@ test('Erfolge: mindestens 15, jeder erreichbar geprüft, Silberbanner nach „Al
   assert.deepEqual(pruefeErfolge(p, ctx), [], 'jeder nur einmal');
   p.figurSiege = H.map((h) => h.id);
   assert.deepEqual(pruefeErfolge(p, ctx), ['alle-figuren']);
+  assert.ok(!pruefeFreischaltungen(p, ctx).designs.includes('silberbanner'));
+  p.xp = 4000;
   assert.ok(pruefeFreischaltungen(p, ctx).designs.includes('silberbanner'));
 });
 

@@ -126,6 +126,9 @@ const BILDSCHIRME = [
   { name: 'sieg', profil: PROFIL, ohneScroll: true, schritte: `${KAMPF(true)} await __klick('#btn-start-battle', 200); await __klick('#btn-skip', 3200);` },
   { name: 'niederlage', profil: PROFIL, ohneScroll: true, schritte: `${KAMPF(false)} await __klick('#btn-start-battle', 200); await __klick('#btn-skip', 3200);` },
   { name: 'buch', profil: PROFIL, ohneScroll: false, schritte: `await __klick('#btn-known'); await __klick('#btn-buch', 500);` },
+  { name: 'heldencode', profil: PROFIL, ohneScroll: true, schritte: `${LAUF} await __klick('#btn-menu', 400); await __klick('#modal [data-act="code"]', 500);` },
+  { name: 'code-eingabe', profil: PROFIL, ohneScroll: true, schritte: `await __klick('#btn-known'); await __klick('#btn-code-ein', 400);
+      const i = document.querySelector('#code-layer .code-input'); i.value = 'k7q-m2x'; i.dispatchEvent(new Event('input')); await __klick('#code-layer [data-lesen]', 300);` },
   { name: 'lehrkraft', profil: PROFIL, ohneScroll: false, schritte: `await __klick('#btn-known'); await __klick('#btn-lehrkraft', 400);
       document.querySelector('#lk-layer .code-input').value = 'EULE-2026'; await __klick('#lk-layer [data-ok]', 500);` },
   { name: 'begegnung', profil: PROFIL, ohneScroll: false, schritte: `${LAUF}

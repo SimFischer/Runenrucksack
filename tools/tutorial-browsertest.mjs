@@ -183,7 +183,7 @@ try {
   check(await ev(`document.querySelectorAll('#buch-layer .buch-eintrag.dunkel').length > 10`), 'unentdeckte Einträge als dunkle Silhouetten');
   await tap('#buch-layer [data-close]'); await expect('Heldencode');
   await tap('#btn-menu'); await tap('#modal [data-act="code"]'); await expect('Schreib den Code');
-  check(await ev(`!!document.querySelector('#code-layer .code-qr svg') && /^[2-9A-Z]{5}/.test(document.querySelector('#code-layer [data-code]').innerText)`), 'Heldencode mit QR-Code');
+  check(await ev(`/^[2-9A-Z]{3}-[2-9A-Z]{3}$/.test(document.querySelector('#code-layer [data-code]').textContent) && !document.querySelector('#code-layer svg')`), 'Heldencode mit 6 Zeichen, ohne QR-Code');
   await tap('#code-layer [data-ok]');
   await sleep(600);
   check(!!(await rect('#tut-finale [data-go]')), 'Abschluss mit „Meinen ersten Lauf starten“');

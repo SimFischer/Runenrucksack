@@ -94,7 +94,7 @@
       "steigerung": { "komparativ": "besser", "superlativ": "am besten", "kStamm": "besser", "sStamm": "best", "unregelmaessig": true, "falschK": ["guter", "güter"], "falschS": ["am gutesten", "am bessersten"] } },
 
     { "id": "drachenfeuerschwert", "freischaltung": {"rang": 3}, "art": "nomen", "wortfeld": "schmiede", "name": "Drachenfeuerschwert", "artikel": "das", "emoji": "🗡️", "abzeichen": "🐉", "leuchten": "#ff5a1f", "w": 2, "h": 2, "seltenheit": "legendaer", "preis": 14, "abklingzeit": 2.2, "schaden": 13, "brand": 4, "plural": {"richtig": "Drachenfeuerschwerter", "falsch": ["Drachenfeuerschwerte", "Drachenfeuerschwerts"]} },
-    { "id": "runenstein", "freischaltung": {"buch": 60},          "art": "nomen", "wortfeld": "zauber", "name": "Runenstein",          "artikel": "der", "emoji": "🔮", "w": 1, "h": 1, "seltenheit": "legendaer", "preis": 12, "abklingzeit": 3.5, "schaden": 8, "heilung": 5, "plural": {"richtig": "Runensteine", "falsch": ["Runensteins", "Runensteinen"]} },
+    { "id": "runenstein", "freischaltung": {"rang": 3},          "art": "nomen", "wortfeld": "zauber", "name": "Runenstein",          "artikel": "der", "emoji": "🔮", "w": 1, "h": 1, "seltenheit": "legendaer", "preis": 12, "abklingzeit": 3.5, "schaden": 8, "heilung": 5, "plural": {"richtig": "Runensteine", "falsch": ["Runensteins", "Runensteinen"]} },
     { "id": "runenkrone", "freischaltung": {"rang": 4},          "art": "nomen", "wortfeld": "zauber", "name": "Runenkrone",          "artikel": "die", "emoji": "👑", "w": 1, "h": 1, "seltenheit": "legendaer", "preis": 12, "abklingzeit": 0, "tempo": 20, "startblock": 12, "leben": 15, "plural": {"richtig": "Runenkronen", "falsch": ["Runenkrones", "Runenkröne"]} }
   ]
 }
