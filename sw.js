@@ -1,6 +1,6 @@
 // Offline-Unterstützung: zuerst aus dem Netz laden (damit Änderungen an items.json sofort ankommen),
 // ohne Netz aus dem Zwischenspeicher. Bei neuen Dateien die Versionsnummer erhöhen.
-const CACHE = 'runenrucksack-v12';
+const CACHE = 'runenrucksack-v13';
 const FILES = [
   './',
   'index.html',
@@ -17,6 +17,14 @@ const FILES = [
   'assets/ui/banner/sieg.webp',
   'assets/ui/besiegt/schamane.webp',
   'assets/ui/besiegt/schildork.webp',
+  'assets/ui/begegnung/eule.webp',
+  'assets/ui/begegnung/haendler.webp',
+  'assets/ui/begegnung/hirtin.webp',
+  'assets/ui/begegnung/kobold.webp',
+  'assets/ui/begegnung/wirtin.webp',
+  'assets/ui/begegnung/zwerg.webp',
+  'assets/ui/besiegt/pluenderer.webp',
+  'assets/ui/besiegt/haeuptling.webp',
   'assets/ui/besiegt/spaeher.webp',
   'assets/ui/besiegt/wolfsreiter.webp',
   'assets/ui/effekte/blitz.webp',

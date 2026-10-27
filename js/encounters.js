@@ -15,6 +15,11 @@ import { frageImSpiel, wortschatz } from './aufgaben/spiel.js';
 import { speisekarteInhalt, satzOrdnenInhalt, koboldInhalt } from './aufgaben/themen.js';
 
 let done = null, rerender = null;
+// Bild der Begegnungsfigur (assets/ui/begegnung/), sonst ein Symbol als Ersatz
+const figur = (id, cls) => {
+  const pfad = G.BILDER.ui?.begegnung?.[id];
+  return pfad ? `<img class="${cls}" src="assets/${pfad}" alt="">` : sym('karte', 'gross');
+};
 const findEnc = (id) => G.ENCOUNTERS.begegnungen.find((b) => b.id === id);
 
 // Zeigt die Auswahl der Begegnungen. fertig() wird danach aufgerufen, neuZeichnen() nach Änderungen am Rucksack.
@@ -42,7 +47,7 @@ export function runEncounter(fertig, neuZeichnen, erzwungen = null) {
     <h2>Wen triffst du am Wegesrand?</h2>
     <div class="enc-choices">${list.map((b) => `
       <button class="enc-choice" data-id="${b.id}">
-        <span class="enc-emoji">${sym(b.id === 'eule' ? 'eule' : 'karte', 'gross')}</span>
+        <span class="enc-emoji">${figur(b.id, 'enc-figur')}</span>
         <b>${b.name}</b>
         <span class="enc-reward">${sym('truhe')} ${b.belohnung.text}</span>
       </button>`).join('')}
@@ -63,7 +68,7 @@ function finish(id) {
 
 function intro(enc, los = null) {
   const card = openModal(`
-    <div class="big-emoji">${sym(enc.id === 'eule' ? 'eule' : 'karte', 'gross')}</div>
+    <div class="big-emoji">${figur(enc.id, 'enc-figur gross')}</div>
     <h2>${enc.name}</h2>
     <p class="enc-text">${enc.text}</p>
     <p class="enc-reward-line">${sym('truhe')} Belohnung: <b>${enc.belohnung.text}</b></p>
@@ -85,7 +90,7 @@ function startTask(enc) {
   const n = a.anzahl || 1;
   (async () => {
     for (let i = 0; i < n; i++) {
-      const kopf = `<span class="af-wer">${enc.name}${n > 1 ? ` · ${i + 1}/${n}` : ''}</span>`;
+      const kopf = `<span class="af-wer">${figur(enc.id, 'af-wer-bild')}${enc.name}${n > 1 ? ` · ${i + 1}/${n}` : ''}</span>`;
       const inhalt = a.typ === 'speisekarte' ? speisekarteInhalt(ctx) : a.typ === 'satzordnen' ? satzOrdnenInhalt(ctx) : null;
       const r = await frageImSpiel(inhalt ? { inhalt, kopf, nein: 'Aufgeben' } : { format: a.format, kopf, nein: 'Aufgeben' });
       if (inhalt) ctx.benutzt.add(inhalt.wort);
@@ -168,7 +173,7 @@ function drawChoice(q, wrong, solved, broke) {
 
 function giveUp(enc) {
   const card = openModal(`
-    <div class="big-emoji">${sym(enc.id === 'eule' ? 'eule' : 'karte', 'gross')}</div>
+    <div class="big-emoji">${figur(enc.id, 'enc-figur gross')}</div>
     <h2>Schade!</h2>
     <p>Diesmal gibt es keine Belohnung. Morgen triffst du wieder jemanden.</p>
     <div class="row"><button class="btn primary" data-ok>Weiter</button></div>`);
@@ -234,7 +239,7 @@ function kobold(enc) {
   const def = G.DEFS[entry.item];
   const falscherName = entry.teile.join('');
   closeModal();
-  const kopf = `<span class="af-wer">${enc.name}</span><span class="glowing" style="--glow:#a259d9">${iconHtml(def, 'ic small')}</span>`;
+  const kopf = `<span class="af-wer">${figur(enc.id, 'af-wer-bild')}${enc.name}</span><span class="glowing" style="--glow:#a259d9">${iconHtml(def, 'ic small')}</span>`;
   frageImSpiel({ inhalt: koboldInhalt(entry, { rng: Math.random }), kopf, nein: 'Ich finde ihn nicht' }).then((r) => {
     const ok = !!r.richtig;
     const p = gewinn(def.id, ok ? {} : { fluch: falscherName });

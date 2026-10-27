@@ -118,6 +118,20 @@ const BILDSCHIRME = [
       const { runEncounter } = await import(new URL('js/encounters.js', location.href).href);
       __G.run.begegnung = { tag: __G.run.day, ids: ['eule', 'zwerg', 'haendler'] };
       runEncounter(() => {}, () => {}); await __s(600);` },
+  { name: 'begegnung-fenster', profil: PROFIL, ohneScroll: false, schritte: `${LAUF}
+      const { runEncounter } = await import(new URL('js/encounters.js', location.href).href);
+      __G.run.begegnung = { tag: __G.run.day, ids: ['hirtin', 'zwerg', 'haendler'] };
+      runEncounter(() => {}, () => {}); await __s(500); await __klick('[data-id="hirtin"]', 500);` },
+  { name: 'begegnung-aufgabe', profil: PROFIL, ohneScroll: false, schritte: `${LAUF}
+      const { runEncounter } = await import(new URL('js/encounters.js', location.href).href);
+      __G.run.begegnung = { tag: __G.run.day, ids: ['zwerg', 'eule', 'haendler'] };
+      runEncounter(() => {}, () => {}); await __s(500); await __klick('[data-id="zwerg"]', 500); await __klick('#modal [data-go]', 800);` },
+  { name: 'sieg-anfuehrer', profil: PROFIL, ohneScroll: true, schritte: `${LAUF}
+      __G.run.day = 5;
+      __G.run.items = [0, 1, 2].map((k) => ({ uid: 950 + k, id: 'feuer+schwert', area: 'bag', x: k, y: 0, rot: 0, stern: 4 }));
+      await __klick('#btn-fight', 800);
+      const ok = document.querySelector('#modal:not([hidden]) [data-ok]'); if (ok) { ok.click(); await __s(400); }
+      await __klick('#btn-start-battle', 200); await __klick('#btn-skip', 3200);` },
   { name: 'aufgabe', profil: PROFIL, ohneScroll: false, schritte: `${LAUF}
       const { frageImSpiel } = await import(new URL('js/aufgaben/spiel.js', location.href).href);
       frageImSpiel({ format: 'sortieren', nein: 'Aufgeben' }); await __s(700);` },

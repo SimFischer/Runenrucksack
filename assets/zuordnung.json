@@ -1009,6 +1009,78 @@
         766,
         722
       ]
+    },
+    "ui/besiegt/pluenderer.webp": {
+      "sheet": "ui/../anfuehrer-besiegt.webp",
+      "ausschnitt": [
+        0,
+        118,
+        779,
+        784
+      ]
+    },
+    "ui/besiegt/haeuptling.webp": {
+      "sheet": "ui/../anfuehrer-besiegt.webp",
+      "ausschnitt": [
+        767,
+        164,
+        769,
+        750
+      ]
+    },
+    "ui/begegnung/eule.webp": {
+      "sheet": "ui/../begegnungen.webp",
+      "ausschnitt": [
+        4,
+        4,
+        511,
+        505
+      ]
+    },
+    "ui/begegnung/zwerg.webp": {
+      "sheet": "ui/../begegnungen.webp",
+      "ausschnitt": [
+        524,
+        12,
+        523,
+        498
+      ]
+    },
+    "ui/begegnung/wirtin.webp": {
+      "sheet": "ui/../begegnungen.webp",
+      "ausschnitt": [
+        1048,
+        16,
+        486,
+        495
+      ]
+    },
+    "ui/begegnung/haendler.webp": {
+      "sheet": "ui/../begegnungen.webp",
+      "ausschnitt": [
+        5,
+        508,
+        526,
+        509
+      ]
+    },
+    "ui/begegnung/hirtin.webp": {
+      "sheet": "ui/../begegnungen.webp",
+      "ausschnitt": [
+        519,
+        506,
+        550,
+        510
+      ]
+    },
+    "ui/begegnung/kobold.webp": {
+      "sheet": "ui/../begegnungen.webp",
+      "ausschnitt": [
+        1064,
+        514,
+        472,
+        503
+      ]
     }
   },
   "figuren": {
@@ -1083,12 +1155,22 @@
       "spaeher": "ui/besiegt/spaeher.webp",
       "schildork": "ui/besiegt/schildork.webp",
       "schamane": "ui/besiegt/schamane.webp",
-      "wolfsreiter": "ui/besiegt/wolfsreiter.webp"
+      "wolfsreiter": "ui/besiegt/wolfsreiter.webp",
+      "pluenderer": "ui/besiegt/pluenderer.webp",
+      "haeuptling": "ui/besiegt/haeuptling.webp"
     },
     "fenwick": {
       "erklaert": "ui/fenwick/erklaert.webp",
       "tipp": "ui/fenwick/tipp.webp",
       "jubelt": "ui/fenwick/jubelt.webp"
+    },
+    "begegnung": {
+      "eule": "ui/begegnung/eule.webp",
+      "zwerg": "ui/begegnung/zwerg.webp",
+      "wirtin": "ui/begegnung/wirtin.webp",
+      "haendler": "ui/begegnung/haendler.webp",
+      "hirtin": "ui/begegnung/hirtin.webp",
+      "kobold": "ui/begegnung/kobold.webp"
     }
   }
 }

@@ -65,6 +65,9 @@ const UI_SHEETS = [
   ] },
   { datei: 'orks-besiegt.png', gruppe: 'besiegt', max: 512, reihen: [['spaeher', 'schildork'], ['schamane', 'wolfsreiter']] },
   { datei: 'fenwick-posen.png', gruppe: 'fenwick', max: 480, reihen: [['erklaert', 'tipp', 'jubelt']] },
+  // Nachlieferung, liegt direkt in assets/roh/
+  { datei: '../anfuehrer-besiegt.webp', gruppe: 'besiegt', max: 560, reihen: [['pluenderer', 'haeuptling']] },
+  { datei: '../begegnungen.webp', gruppe: 'begegnung', max: 420, reihen: [['eule', 'zwerg', 'wirtin'], ['haendler', 'hirtin', 'kobold']] },
 ];
 const UI_EINZELN = [
   { datei: 'tafel-rahmen.png', id: 'tafel-rahmen', breite: 724, qualitaet: 0.9, zuschneiden: true }, // für border-image
@@ -193,10 +196,10 @@ async function zerschneideUi() {
   for (const sheet of UI_SHEETS) {
     const ids = sheet.reihen.flat();
     const b64 = readFileSync(ROH + 'ui/' + sheet.datei).toString('base64');
-    const r = await chrome.run(`(${SEITE})(${JSON.stringify(b64)}, ${JSON.stringify(sheet.reihen)}, ${JSON.stringify(ids.map(() => ({ max: sheet.max })))}, 'image/png')`);
+    const r = await chrome.run(`(${SEITE})(${JSON.stringify(b64)}, ${JSON.stringify(sheet.reihen)}, ${JSON.stringify(ids.map(() => ({ max: sheet.max })))}, '${sheet.datei.endsWith('.webp') ? 'image/webp' : 'image/png'}')`);
     if (r.out.length !== ids.length) throw new Error(`${sheet.datei}: ${r.out.length} Teile gefunden, ${ids.length} erwartet`);
     mkdirSync(`assets/ui/${sheet.gruppe}`, { recursive: true });
-    z.ui[sheet.gruppe] = {};
+    z.ui[sheet.gruppe] ||= {}; // mehrere Sheets können eine Gruppe füllen
     ids.forEach((id, k) => {
       const buf = Buffer.from(r.out[k].webp.split(',')[1], 'base64');
       const pfad = `ui/${sheet.gruppe}/${id}.webp`;

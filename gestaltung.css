@@ -438,3 +438,11 @@ button, input, select, textarea { font-family: inherit; }
 #tut-bubble.compact { width: min(400px, calc(100vw - 24px)); }
 #tut-bubble.compact .tut-fenwick img { height: 150px; }
 .tut-fenwick { margin: -40px 0 -14px -30px; }
+
+/* ---------- Begegnungsfiguren ---------- */
+.enc-figur { display: block; height: 150px; width: auto; max-width: 100%; margin: 0 auto; object-fit: contain; filter: drop-shadow(0 6px 6px rgba(0, 0, 0, .35)); }
+.enc-figur.gross { height: min(240px, 30vh); }
+.enc-emoji { font-size: 0; line-height: 0; }
+.big-emoji .enc-figur.gross { margin-top: -6px; }
+.af-wer { display: inline-flex; align-items: center; gap: 8px; }
+.af-wer-bild { height: 48px; width: 48px; object-fit: cover; object-position: top; border-radius: 50%; border: 2px solid var(--gold); background: #3a2617; }
