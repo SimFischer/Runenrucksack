@@ -422,6 +422,9 @@ function finale() {
 // ---------- „So geht's“: kurze Übersicht zum Nachschlagen ----------
 
 // Karten aus tutorial.json (Feld „hilfe“), nur für Funktionen, die es gibt.
+// Symbol einer Hilfe-Karte: Bild aus assets/ui/symbole – oder „css:klasse“ für einen CSS-Ersatz (Laterne, Amboss)
+const symbolOderCss = (s) => (s?.startsWith('css:') ? `<span class="${s.slice(4)} gross"></span>` : sym(s || 'stern', 'gross'));
+
 export function helpCards() {
   const extra = G.TUTORIAL.zusatzHilfe || [];
   return activeSteps(G.TUTORIAL).filter((s) => s.hilfe).flatMap((s) => [s.hilfe, ...extra.filter((h) => h.nach === s.id)]);
@@ -439,7 +442,7 @@ export function showHelp(onClose = null) {
       </div>
       <div class="help-grid">${helpCards().map((h) => `
         <div class="help-item">
-          <span class="help-emoji anim-${h.animation || 'pulsieren'}">${sym(h.symbol || 'stern', 'gross')}</span>
+          <span class="help-emoji anim-${h.animation || 'pulsieren'}">${symbolOderCss(h.symbol)}</span>
           <div><b>${h.titel}</b><p>${h.text}</p></div>
         </div>`).join('')}
       </div>

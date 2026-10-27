@@ -4,7 +4,7 @@ import { newRun, findSpot, canPlace, bagGrid, sizeOf, STORE_GRID } from './logic
 import { analyze, findFusions, verbTargetCell } from './grammar.js';
 
 // Funktionen, die es im Spiel gibt. Schritte mit einer fehlenden voraussetzung werden übersprungen.
-export const FEATURES = new Set(['begegnungen', 'verschmelzen', 'siegel', 'runen', 'steigerung', 'unterklasse', 'taschen', 'buch', 'heldencode']);
+export const FEATURES = new Set(['begegnungen', 'verschmelzen', 'siegel', 'runen', 'steigerung', 'unterklasse', 'taschen', 'buch', 'heldencode', 'haendler']);
 
 export function activeSteps(data, features = FEATURES) {
   return data.schritte.filter((s) => !s.voraussetzung || features.has(s.voraussetzung));

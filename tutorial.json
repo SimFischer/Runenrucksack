@@ -509,6 +509,25 @@
       }
     },
     {
+      "id": "haendler",
+      "voraussetzung": "haendler",
+      "text": "Hier erhöhst du das Vertrauen des Händlers – dann bringt er seltenere Gegenstände. Du musst jetzt nichts kaufen.",
+      "tipp": "Tipp auf „Weiter“.",
+      "ziel": [
+        "vertrauen",
+        "haendler"
+      ],
+      "aktion": {
+        "typ": "weiter"
+      },
+      "hilfe": {
+        "titel": "Händler-Vertrauen",
+        "animation": "pulsieren",
+        "text": "Mit „Vertrauen“ bringt der Händler seltenere Gegenstände – höchstens eine Stufe am Tag, jeder Lauf beginnt bei Stufe 1.",
+        "symbol": "css:laterne an"
+      }
+    },
+    {
       "id": "kampf2-starten",
       "text": "Auf in den zweiten Kampf! Tipp auf „Zum Kampf“.",
       "ziel": [
@@ -588,7 +607,7 @@
       "hilfe": {
         "titel": "Buch der Wörter",
         "animation": "pulsieren",
-        "text": "Jede neue Kombination landet im Buch der Wörter. Dunkle Felder mit ??? kannst du noch entdecken – volle Seiten bringen Belohnungen. Auf der Seite „Regeln“ sammelst du Regelkarten.",
+        "text": "Jede neue Kombination landet im Buch der Wörter. Dunkle Felder mit ??? kannst du noch entdecken. Auf der Seite „Regeln“ sammelst du Regelkarten.",
         "symbol": "buch"
       }
     },
@@ -663,6 +682,20 @@
     "stufen": "Jedes Thema hat drei Stufen ★☆☆. Zweimal gleich richtig – dann wird es kniffliger. Ab Stufe 2 gibt es Gold dafür!"
   },
   "zusatzHilfe": [
+    {
+      "nach": "haendler",
+      "titel": "Schmied",
+      "animation": "pulsieren",
+      "text": "Zieh einen Gegenstand auf den Amboss: Für viel Gold wird er nach einer Aufgabe eine Stufe stärker – einmal am Tag.",
+      "symbol": "css:amboss"
+    },
+    {
+      "nach": "haendler",
+      "titel": "Neu würfeln",
+      "animation": "pulsieren",
+      "text": "Drei Würfe am Tag kosten 1 Gold, jeder weitere 2 Gold.",
+      "symbol": "wuerfel"
+    },
     {
       "nach": "sammeln",
       "titel": "Aufgaben und Stufen",

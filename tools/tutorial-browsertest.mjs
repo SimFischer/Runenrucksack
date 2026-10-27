@@ -45,8 +45,19 @@ const foto = async (name) => {
 const ev = async (expr) => (await send('Runtime.evaluate', { expression: expr, returnByValue: true, awaitPromise: true })).result?.result?.value;
 const rect = async (sel) => JSON.parse(await ev(`JSON.stringify(document.querySelector(${JSON.stringify(sel)})?.getBoundingClientRect() || null)`));
 const touch = (type, pts) => send('Input.dispatchTouchEvent', { type, touchPoints: pts });
+// Element abwarten (bis 3 s) – Fenster und Ergebnisse erscheinen mit kleinen Animationen; dann ruhig stehen lassen
+const warteAuf = async (sel) => {
+  let r = null, vorher = null;
+  for (let t = 0; t < 30; t++) {
+    r = await rect(sel);
+    if (r && vorher && Math.abs(r.left - vorher.left) < 1 && Math.abs(r.width - vorher.width) < 1) return r;
+    vorher = r;
+    await sleep(100);
+  }
+  return r;
+};
 const tap = async (sel) => {
-  const r = await rect(sel);
+  const r = await warteAuf(sel);
   if (!r) throw new Error('nicht gefunden: ' + sel);
   await touch('touchStart', [{ x: r.left + r.width / 2, y: r.top + r.height / 2, id: 1 }]); await touch('touchEnd', []); await sleep(250);
 };
@@ -167,6 +178,9 @@ try {
   const optsV = await ev(`[...document.querySelectorAll('#quick [data-k]')].map((x) => x.textContent)`);
   await tap(`#quick [data-k="${optsV.indexOf('schlägst')}"]`); await expect('schlägst du mit deinem Feuerschwert');
   check(await ev(`!!document.querySelector('#grid-bag .rune-lines line.verb')`), 'Leuchtlinie von der Rolle zum Feuerschwert');
+  await tap('#tut-next'); await expect('Vertrauen des Händlers');
+  check(!!(await rect('#btn-vertrauen')) && !!(await rect('#haendler-stufe')), 'Händler-Schritt zeigt Knopf und Laternen');
+  await foto('tutorial-haendler');
   await tap('#tut-next'); await expect('zweiten Kampf');
   await tap('#btn-fight'); await expect('Rüstung des Orks');
   await tap('#armor-word');
