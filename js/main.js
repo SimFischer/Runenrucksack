@@ -23,7 +23,8 @@ import { frageImSpiel, wortschatz, einstellungen } from './aufgaben/spiel.js';
 import { stufenBereich, stufeFuer, aufgabenStand } from './aufgaben/wahl.js';
 import { verbSatz, verbSatzInhalt, PERSONEN_FOLGE, kurzName } from './aufgaben/verbsatz.js';
 import { runEncounter } from './encounters.js';
-import { initTutorial, startTutorial, tutorialDone, showHelp, tipsOn, setTips } from './tutorial.js';
+import { initTutorial, startTutorial, tutorialDone, showHelp, tipsOn, setTips, tutorialDarf, tutorialAbgebrochen } from './tutorial.js';
+import { zurueckInLaden } from './tutorial-logic.js';
 import { entdeckungenIn } from './buch.js';
 import {
   entdecke, merkeAntwort, laufStand, laufAbschluss, rangVon, pruefeFreischaltungen, figurFrei, freieItems, bedingungText, pruefeErfolge,
@@ -932,9 +933,14 @@ function checkMerges() {
   while (pending.length) {
     const c = pending.shift();
     const a = findeVerbindung(G.run, G.DEFS, G.RECIPES, c);
+    // Im Tutorial nur die Verbindung des aktuellen Schritts (sonst ein Hinweis von Fenwick)
+    if (a && G.run.tutorial && !tutorialDarf(a.typ, a.typ === 'kompositum' ? { kraft: a.kraft.id, traeger: a.traeger.id } : { id: a.alt.id })) continue;
     if (a) { merging = true; askMerge(a, c); return; }
   }
-  const offen = itemsIn('bag').find((p) => bagInfo.get(p.uid)?.verb?.status === 'offen');
+  const offen = itemsIn('bag').find((p) => {
+    const v = bagInfo.get(p.uid)?.verb;
+    return v?.status === 'offen' && (!G.run.tutorial || tutorialDarf('verb', { verb: p.id, subjekt: v.subjekt.id }));
+  });
   if (offen) { merging = true; askVerb(offen); }
 }
 
@@ -997,7 +1003,10 @@ function askMerge(a, c) {
   }
   const anchor = itemNode(a.typ === 'kompositum' ? a.traeger.uid : a.alt.uid);
   if (run.tutorial) {
-    quiz({ q, regel: q.art, anchor, kopf, richtig: () => doMerge(a), trotzdem: () => doMerge(a), nein: null });
+    // Abbrechen: Der neue Gegenstand geht zurück in den Laden, der Schritt beginnt neu.
+    const neu = a.typ === 'kompositum' ? a.kraft : a.neu;
+    quiz({ q, regel: q.art, anchor, kopf, richtig: () => doMerge(a), trotzdem: () => doMerge(a), neinText: 'Abbrechen',
+      nein: () => { closeQuick(); zurueckInLaden(run, neu, G.DEFS); merging = false; render(); tutorialAbgebrochen('Kein Problem – der Gegenstand liegt wieder im Laden. Probier es noch einmal.'); } });
     return;
   }
   const d = G.DEFS[a.typ === 'kompositum' ? a.traeger.id : a.alt.id];
@@ -1110,7 +1119,9 @@ function askVerb(p) {
     quiz({
       regel: 'personalform',
       q: { titel: 'Welche Form passt?', prompt: inhalt.satz.replace('___', '<span class="blank">___</span>'), options: inhalt.optionen, correct: inhalt.richtig, explain: inhalt.merke },
-      anchor: itemNode(p.uid), kopf, richtig: () => store(true), nein: null,
+      anchor: itemNode(p.uid), kopf, richtig: () => store(true), neinText: 'Abbrechen',
+      // Abbrechen: Die Rolle dreht sich eins weiter, dann einfach wieder auf das Ziel drehen.
+      nein: () => { closeQuick(); p.rot = ((p.rot || 0) + 1) % 4; merging = false; render(); tutorialAbgebrochen('Kein Problem – dreh die Rolle noch einmal auf dein Feuerschwert.'); },
     });
     return;
   }

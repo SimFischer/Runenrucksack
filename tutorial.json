@@ -1,5 +1,5 @@
 {
-  "_hinweis": "Das Tutorial „Der erste Tag“. Jeder Schritt: id, text (höchstens zwei kurze Sätze), tipp (Zusatz nach 8 Sekunden ohne Aktion), ziel (data-tut-Namen der Elemente, die hell bleiben und bedienbar sind), aktion (wie es weitergeht), optional voraussetzung (Schritt nur, wenn es die Funktion gibt), laden (fester Laden-Inhalt), hand (Tipp- oder Zieh-Animation), falsch (freundliche Hinweise bei falschen Aktionen), hilfe (Karte für „So geht's“ mit titel, symbol aus assets/ui/symbole, animation, text). Ziele für Items: item-<id> im Rucksack, laden-<id> im Laden. Hand-Ziele: rucksack, links-von:<id>, neben:<id>. vorbereitung: platzLinksVon, geschenk (Items in einen Bereich legen), rolleFuer (Verb-Rolle neben ein Nomen legen, Pfeil noch falsch). kampfStarten: Kampf nach dem Schritt starten. zusatzHilfe: weitere Karten für „So geht's“ ohne eigenen Schritt (nach: id des Schritts, hinter dessen Karte sie steht).",
+  "_hinweis": "Das Tutorial „Der erste Tag“. Jeder Schritt: id, text (höchstens zwei kurze Sätze), tipp (Zusatz nach 8 Sekunden ohne Aktion), ziel (data-tut-Namen der Elemente, die hell bleiben und bedienbar sind), aktion (wie es weitergeht), optional voraussetzung (Schritt nur, wenn es die Funktion gibt), laden (fester Laden-Inhalt), hand (Tipp- oder Zieh-Animation), falsch (freundliche Hinweise bei falschen Aktionen), hilfe (Karte für „So geht's“ mit titel, symbol aus assets/ui/symbole, animation, text). Ziele für Items: item-<id> im Rucksack, laden-<id> im Laden. Hand-Ziele: rucksack, links-von:<id>, neben:<id>. vorbereitung: platzLinksVon, geschenk (Items in einen Bereich legen), rolleFuer (Verb-Rolle neben ein Nomen legen, Pfeil noch falsch). kampfStarten: Kampf nach dem Schritt starten. zusatzHilfe: weitere Karten für „So geht's“ ohne eigenen Schritt (nach: id des Schritts, hinter dessen Karte sie steht). fastHinweis: Fenwicks Satz, wenn gerade etwas anderes als das Ziel des Schritts ausgelöst würde.",
   "begleiter": {
     "name": "Meister Fenwick",
     "bild": "assets/figur-fenwick.webp",
@@ -482,7 +482,8 @@
         "animation": "drehen",
         "text": "Der Pfeil einer Schriftrolle zeigt auf das Subjekt: „Das Feuerschwert schlägt.“ Dann schlägt es mit.",
         "symbol": "menue"
-      }
+      },
+      "fastHinweis": "Fast! Dreh weiter, bis der Pfeil auf dein Feuerschwert zeigt."
     },
     {
       "id": "verb-frage",

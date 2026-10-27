@@ -3,17 +3,19 @@
 // danach startet ein normaler Lauf ohne Tutorial-Reste.
 //
 //   node tools/serve.mjs                                   (in einem zweiten Fenster)
-//   node tools/tutorial-browsertest.mjs [url] [breite] [höhe]
+//   node tools/tutorial-browsertest.mjs [url] [breite] [höhe] [ordner für Bildschirmfotos]
 //   z. B. node tools/tutorial-browsertest.mjs http://localhost:8080/ 1024 768
 //
 // Chrome wird automatisch gesucht; sonst den Pfad in der Umgebungsvariable CHROME angeben.
 import { spawn } from 'node:child_process';
-import { existsSync, mkdtempSync } from 'node:fs';
+import { existsSync, mkdtempSync, mkdirSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
 const URL_ = process.argv[2] || 'http://localhost:8080/';
 const W = +(process.argv[3] || 1180), H = +(process.argv[4] || 820);
+const FOTOS = process.argv[5] || null;
+if (FOTOS) mkdirSync(FOTOS, { recursive: true });
 const CHROME = [process.env.CHROME,
   'C:/Program Files/Google/Chrome/Application/chrome.exe', 'C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe',
   '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome', '/usr/bin/google-chrome', '/usr/bin/chromium', '/usr/bin/chromium-browser',
@@ -34,6 +36,12 @@ ws.onmessage = (m) => {
   if (d.method === 'Runtime.exceptionThrown') errors.push(JSON.stringify(d.params.exceptionDetails).slice(0, 300));
 };
 const send = (method, params = {}) => new Promise((r) => { const i = ++id; pending[i] = r; ws.send(JSON.stringify({ id: i, method, params })); });
+// Bildschirmfoto (nur mit Ordner-Angabe)
+const foto = async (name) => {
+  if (!FOTOS) return;
+  const shot = await send('Page.captureScreenshot', { format: 'jpeg', quality: 72 });
+  writeFileSync(join(FOTOS, `${name}-${W}x${H}.jpg`), Buffer.from(shot.result.data, 'base64'));
+};
 const ev = async (expr) => (await send('Runtime.evaluate', { expression: expr, returnByValue: true, awaitPromise: true })).result?.result?.value;
 const rect = async (sel) => JSON.parse(await ev(`JSON.stringify(document.querySelector(${JSON.stringify(sel)})?.getBoundingClientRect() || null)`));
 const touch = (type, pts) => send('Input.dispatchTouchEvent', { type, touchPoints: pts });
@@ -118,12 +126,23 @@ try {
     for (let y = 0; y < 3; y++) for (let x = 0; x < 4; x++) { const px = g.left + 3 + (x + .5) * c, py = g.top + 3 + (y + .5) * c;
       if (!document.elementsFromPoint(px, py).some((e) => e.classList?.contains('item'))) return [px, py]; } return null; })()`);
   await drag('[data-tut="laden-dolch"]', frei[0], frei[1]); await expect('Mehrzahl');
+  // Abbrechen: Der Dolch liegt wieder im Laden, das Tutorial geht beim Sammeln weiter
+  await tap('#quick [data-no]'); await sleep(600);
+  check(await ev(`!!document.querySelector('[data-tut="laden-dolch"]') && !document.getElementById('quick')`), 'Abbrechen beim Verbinden: Dolch wieder im Laden');
+  await drag('[data-tut="laden-dolch"]', frei[0], frei[1]); await expect('Mehrzahl');
   const optsD = await ev(`[...document.querySelectorAll('#quick [data-k]')].map((x) => x.textContent)`);
   await tap(`#quick [data-k="${optsD.indexOf('Dolche')}"]`); await sleep(1200);
   check(await ev(`!!document.querySelector('#grid-bag .item.s2')`), 'zwei Dolche werden sofort zu einem ★★-Dolch');
   await expect('1/2');
   check(await ev(`document.querySelector('[data-tut="sammeln-apfel"]')?.textContent === '1/2'`), 'Abzeichen 1/2 im Laden');
   await tap('#tut-next'); await expect('Verben');
+  for (let i = 0; i < 6 && !(await ev('!!document.getElementById("quick")')); i++) await tap('#grid-bag [data-tut="item-schlagen"]');
+  check(await ev(`document.querySelector('#quick')?.textContent.includes('Feuerschwert')`), 'Frage gilt dem Feuerschwert (nicht dem Dolch)');
+  await foto('tutorial-verb-frage');
+  // Abbrechen darf das Tutorial nicht blockieren: Hinweis, dann noch einmal drehen
+  await tap('#quick [data-no]'); await sleep(500);
+  await foto('tutorial-verb-abbrechen');
+  check(await ev(`(document.getElementById('tut-tip')?.textContent || '').includes('noch einmal')`), 'Abbrechen: Fenwick bittet, es noch einmal zu versuchen');
   for (let i = 0; i < 6 && !(await ev('!!document.getElementById("quick")')); i++) await tap('#grid-bag [data-tut="item-schlagen"]');
   await expect('welche Form');
   const optsV = await ev(`[...document.querySelectorAll('#quick [data-k]')].map((x) => x.textContent)`);

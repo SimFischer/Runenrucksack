@@ -90,22 +90,72 @@ export function prepareStep(run, step, defs) {
 }
 
 // Verb-Rolle so neben ein Nomen legen, dass ihr Pfeil durch Drehen auf das Nomen zeigen kann –
-// zu Beginn zeigt er genau in die Gegenrichtung.
+// zu Beginn zeigt er genau in die Gegenrichtung. Auf dem Weg dorthin darf der Pfeil auf keinen anderen
+// Gegenstand zeigen (sonst käme eine Frage zum falschen Gegenstand). Steht etwas im Weg, kommt es ins Lager.
 function placeRole(run, { verb, ziel }, defs) {
   if (run.items.some((p) => p.id === verb)) return;
   const t = run.items.find((p) => p.id === ziel && p.area === 'bag');
   if (!t) return;
   const grid = bagGrid(run);
-  const bag = run.items.filter((p) => p.area === 'bag');
   const ts = sizeOf(defs[t.id], t.rot);
   const hits = (c) => c.x >= t.x && c.x < t.x + ts.w && c.y >= t.y && c.y < t.y + ts.h;
-  for (const rot of [0, 2, 1, 3])
-    for (let y = 0; y < grid.rows; y++)
-      for (let x = 0; x < grid.cols; x++) {
-        if (!canPlace(bag, defs, defs[verb], x, y, rot, grid) || !hits(verbTargetCell({ x, y, rot }, defs[verb]))) continue;
-        run.items.push({ uid: run.nextUid++, id: verb, area: 'bag', x, y, rot: (rot + 2) % 4 });
-        return;
-      }
+  const versuche = (erlaubeHindernis) => {
+    const bag = run.items.filter((p) => p.area === 'bag');
+    for (const rot of [0, 2, 1, 3])
+      for (let y = 0; y < grid.rows; y++)
+        for (let x = 0; x < grid.cols; x++) {
+          if (!canPlace(bag, defs, defs[verb], x, y, rot, grid) || !hits(verbTargetCell({ x, y, rot }, defs[verb]))) continue;
+          // Die drei anderen Richtungen: Wer liegt dort?
+          const hindernisse = [1, 2, 3].map((d) => verbTargetCell({ x, y, rot: (rot + d) % 4 }, defs[verb]))
+            .map((c) => bag.find((p) => p !== t && belegt(p, defs, c))).filter(Boolean);
+          if (hindernisse.length && !erlaubeHindernis) continue;
+          return { x, y, rot, hindernisse };
+        }
+    return null;
+  };
+  const platz = versuche(false) || versuche(true);
+  if (!platz) return;
+  for (const p of platz.hindernisse) insLager(run, p, defs);
+  run.items.push({ uid: run.nextUid++, id: verb, area: 'bag', x: platz.x, y: platz.y, rot: (platz.rot + 2) % 4 });
+}
+
+const belegt = (p, defs, c) => { const s = sizeOf(defs[p.id], p.rot); return c.x >= p.x && c.x < p.x + s.w && c.y >= p.y && c.y < p.y + s.h; };
+function insLager(run, p, defs) {
+  const spot = findSpot(run.items.filter((q) => q.area === 'store'), defs, defs[p.id], STORE_GRID);
+  if (spot) Object.assign(p, { area: 'store', ...spot });
+}
+
+// Was darf im Tutorial gerade ausgelöst werden? Verbindungen, Verschmelzungen und Verb-Fragen nur für den
+// Ziel-Gegenstand des aktuellen Schritts (oder des Schritts direkt davor, z. B. „verb“ → „verb-frage“).
+// art: 'kompositum' { kraft, traeger } | 'paar' { id } | 'verb' { verb, subjekt }
+export function tutorialErlaubt(steps, idx, art, info, defs) {
+  const fenster = [steps[idx - 1], steps[idx]].filter(Boolean).map((x) => x.aktion || {});
+  const basis = (id) => baseId(id, defs);
+  if (art === 'kompositum') return fenster.some((a) => (a.typ === 'neben' && a.kraft === info.kraft && a.traeger === basis(info.traeger))
+    || (a.typ === 'verschmelzen' && a.ergebnis === `${info.kraft}+${basis(info.traeger)}`));
+  if (art === 'paar') return fenster.some((a) => a.typ === 'anzahl' && a.item === basis(info.id));
+  if (art === 'verb') return fenster.some((a) => a.typ === 'zeigt' && a.verb === info.verb && a.ziel === info.subjekt);
+  return true;
+}
+
+// Nach einer abgebrochenen Aufgabe: zurück zum Schritt, in dem man handelt (kaufen, legen, drehen …).
+// Wartet der aktuelle Schritt nur auf das Ergebnis der Aufgabe (z. B. „verb-frage“), ist das der Schritt davor.
+const HANDELN = ['kaufen', 'neben', 'verschmelzen', 'siegel', 'rune', 'anzahl', 'zeigt', 'drehen', 'antippen'];
+export function schrittNachAbbruch(steps, idx) {
+  if (HANDELN.includes(steps[idx]?.aktion?.typ)) {
+    // „verschmelzen“ wartet auf die Frage, gehandelt wird im Schritt davor (Kristall legen)
+    if (steps[idx].aktion.typ === 'verschmelzen' && steps[idx - 1]?.aktion?.typ === 'neben') return idx - 1;
+    return idx;
+  }
+  return HANDELN.includes(steps[idx - 1]?.aktion?.typ) ? idx - 1 : idx;
+}
+
+// Eine abgebrochene Aufgabe: Der neue Gegenstand geht zurück in den Laden (Gold zurück), der Schritt beginnt neu.
+export function zurueckInLaden(run, p, defs) {
+  run.items = run.items.filter((i) => i !== p);
+  run.gold += defs[p.id].preis;
+  const free = run.shop.findIndex((x) => !x);
+  run.shop[free >= 0 ? free : 0] = { id: p.id, locked: false };
 }
 
 // Prüft einen Schritt. ev: letztes Ereignis { typ, id } (z. B. auswahl, drehen, kampfStart).

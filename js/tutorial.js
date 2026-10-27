@@ -3,7 +3,7 @@
 import { G, onEvent, getPref, setPref, loadRun, emit, saveProfil } from './state.js';
 import { sym } from './symbole.js';
 import {
-  activeSteps, makeTutorialRun, applyShop, sichereLaden, prepareStep, checkStep, resetWrong, targetCell, spotFor,
+  activeSteps, makeTutorialRun, applyShop, sichereLaden, prepareStep, tutorialErlaubt, schrittNachAbbruch, checkStep, resetWrong, targetCell, spotFor,
 } from './tutorial-logic.js';
 import { closeModal } from './ui.js';
 import { battleControl } from './battle-ui.js';
@@ -12,7 +12,7 @@ import { runEncounter } from './encounters.js';
 const IDLE_MS = 8000;
 let api = null;            // Einstiegspunkte aus main.js
 let steps = [], idx = -1, active = false, shown = false;
-let idleTimer = 0, layoutTimer = 0, extraTip = '', warnText = '';
+let idleTimer = 0, layoutTimer = 0, weiterTimer = 0, extraTip = '', warnText = '';
 // Meister Fenwick in drei Posen: erklärt (Erklärungen), Tipp (Hinweise), jubelt (Erfolge)
 const pose = (p) => G.TUTORIAL.begleiter.posen?.[p] || G.TUTORIAL.begleiter.bild;
 const fenwickHtml = (p, cls = '') => `<img${cls ? ` class="${cls}"` : ''} src="${pose(p)}" alt="${G.TUTORIAL.begleiter.name}">`;
@@ -20,6 +20,29 @@ const el = {};
 
 export const tutorialDone = () => getPref('tutorial') === 'fertig' || !!G.PROFIL?.tutorial;
 export const tutorialActive = () => active;
+
+// Darf das Spiel diese Verbindung oder Frage jetzt auslösen? Wenn nicht, gibt Fenwick einen freundlichen Hinweis.
+export function tutorialDarf(art, info) {
+  if (!active || !step()) return true;
+  if (tutorialErlaubt(steps, idx, art, info, G.DEFS)) return true;
+  const text = step().fastHinweis || 'Fast! Das gehört gerade nicht zu diesem Schritt.';
+  if (warnText !== text) { warnText = text; draw(); }
+  return false;
+}
+
+// Eine Aufgabe im Tutorial wurde abgebrochen: zurück zum Schritt, in dem man handelt – ohne Geschenke
+// oder Vorbereitung noch einmal auszuführen –, mit einem freundlichen Hinweis. Ein schon geplanter
+// Schrittwechsel entfällt.
+export function tutorialAbgebrochen(text = 'Kein Problem – probier es gleich noch einmal.') {
+  if (!active || !step()) return;
+  clearTimeout(weiterTimer);
+  el['tut-bubble'].classList.remove('done');
+  idx = schrittNachAbbruch(steps, idx);
+  shown = true;
+  warnText = text;
+  extraTip = '';
+  draw();
+}
 
 // ---------- Aufbau ----------
 
@@ -152,7 +175,8 @@ function complete() {
   if (s.kampfPause) battleControl.resume();
   if (s.kampfStarten) battleControl.start();
   el['tut-bubble'].classList.add('done');
-  setTimeout(() => {
+  clearTimeout(weiterTimer);
+  weiterTimer = setTimeout(() => {
     el['tut-bubble'].classList.remove('done');
     if (active && step() === s) next();
   }, 350);
@@ -342,6 +366,8 @@ function resetIdle() {
 function blocker(e) {
   if (!active) return;
   if (e.target.closest?.('#tut-bubble, #tut-skip, #tut-confirm, #tut-finale')) return;
+  // Frage- und Aufgabenfenster sind immer bedienbar: antworten oder abbrechen darf man immer
+  if (e.target.closest?.('#quick, #aufgabe')) return;
   if (!shown) return; // während Fenwick wartet (z. B. im Kampf), ist alles bedienbar
   if (targetsOf(step()).some((t) => t.contains(e.target))) return;
   e.preventDefault();

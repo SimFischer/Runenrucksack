@@ -7,6 +7,7 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
   FEATURES, activeSteps, makeTutorialRun, applyShop, prepareStep, checkStep, resetWrong, targetCell, spotFor, sichereLaden, ladenZiel,
+  tutorialErlaubt, zurueckInLaden, schrittNachAbbruch,
 } from '../js/tutorial-logic.js';
 import { newRun, seededRng } from '../js/logic.js';
 import { buildCompounds, buildRuneLevels, analyze, DIRS } from '../js/grammar.js';
@@ -175,6 +176,102 @@ test('Fester Laden: Bei jedem Schritt mit Laden-Ziel liegt das Item im Laden –
     assert.equal(checkStep(step, run, DEFS, RECIPES, ev)?.ok, true, `${step.id} wird geschafft`);
   }
   assert.ok(geprueft >= 4, `${geprueft} Schritte mit Laden-Ziel`);
+});
+
+test('Verb-Schritt: Beim Drehen zeigt der Pfeil nie auf einen anderen Gegenstand', () => {
+  const steps = activeSteps(TUT);
+  const run = makeTutorialRun(ITEMS, REGIONS, TUT);
+  for (const step of steps) {
+    applyShop(run, step);
+    sichereLaden(run, step);
+    prepareStep(run, step, DEFS);
+    if (step.aktion.typ === 'zeigt') {
+      const rolle = run.items.find((p) => p.id === step.aktion.verb);
+      const ziel = run.items.find((p) => p.id === step.aktion.ziel);
+      for (let d = 0; d < 4; d++) {
+        rolle.rot = (rolle.rot + 1) % 4;
+        const s = analyze(bag(run), DEFS).get(rolle.uid).verb?.subjekt;
+        assert.ok(!s || s.uid === ziel.uid, `Drehung ${d + 1}: Pfeil zeigt auf ${s?.id}`);
+      }
+      return;
+    }
+    if (!['weiter', 'abschluss'].includes(step.aktion.typ)) act(step, run);
+  }
+  assert.fail('Verb-Schritt nicht erreicht');
+});
+
+test('Im Tutorial lösen nur die Ziele des aktuellen Schritts etwas aus', () => {
+  const steps = activeSteps(TUT);
+  const at = (id) => steps.findIndex((s) => s.id === id);
+  // Verb-Schritt und Frage danach: nur die Rolle „schlagen“ auf das Feuerschwert
+  for (const id of ['verb', 'verb-frage']) {
+    assert.ok(tutorialErlaubt(steps, at(id), 'verb', { verb: 'schlagen', subjekt: 'feuer+schwert' }, DEFS), id);
+    assert.ok(!tutorialErlaubt(steps, at(id), 'verb', { verb: 'schlagen', subjekt: 'dolch' }, DEFS), `${id}: Dolch nicht`);
+  }
+  assert.ok(!tutorialErlaubt(steps, at('sammeln'), 'verb', { verb: 'schlagen', subjekt: 'feuer+schwert' }, DEFS));
+  // Sammeln: zwei Dolche ja, Kompositum nein
+  assert.ok(tutorialErlaubt(steps, at('sammeln'), 'paar', { id: 'dolch' }, DEFS));
+  assert.ok(tutorialErlaubt(steps, at('sammeln-frage'), 'paar', { id: 'dolch' }, DEFS));
+  assert.ok(!tutorialErlaubt(steps, at('sammeln'), 'kompositum', { kraft: 'feuer', traeger: 'dolch' }, DEFS));
+  assert.ok(!tutorialErlaubt(steps, at('verb'), 'paar', { id: 'dolch' }, DEFS));
+  // Kristall und Verschmelzen: nur Feuer + Schwert
+  assert.ok(tutorialErlaubt(steps, at('kristall'), 'kompositum', { kraft: 'feuer', traeger: 'schwert' }, DEFS));
+  assert.ok(tutorialErlaubt(steps, at('verschmelzen'), 'kompositum', { kraft: 'feuer', traeger: 'schwert' }, DEFS));
+  assert.ok(!tutorialErlaubt(steps, at('rune'), 'kompositum', { kraft: 'feuer', traeger: 'schwert' }, DEFS));
+});
+
+test('Abbrechen führt zum Schritt, in dem man handelt – nie in einen Schritt, der nur wartet', () => {
+  const steps = activeSteps(TUT);
+  const at = (id) => steps.findIndex((s) => s.id === id);
+  assert.equal(steps[schrittNachAbbruch(steps, at('verb-frage'))].id, 'verb');
+  assert.equal(steps[schrittNachAbbruch(steps, at('verb'))].id, 'verb');
+  assert.equal(steps[schrittNachAbbruch(steps, at('sammeln-frage'))].id, 'sammeln');
+  assert.equal(steps[schrittNachAbbruch(steps, at('verschmelzen'))].id, 'kristall');
+  // Jeder Schritt, der auf eine Aufgabe wartet, landet bei einer Handlung, die man wiederholen kann
+  for (let i = 0; i < steps.length; i++) {
+    const z = steps[schrittNachAbbruch(steps, i)];
+    assert.ok(z, steps[i].id);
+  }
+});
+
+test('Falsche Aktionen blockieren das Tutorial nie: falscher Gegenstand, falsche Drehung, Abbrechen, ins Lager', () => {
+  const steps = activeSteps(TUT);
+  const run = makeTutorialRun(ITEMS, REGIONS, TUT);
+  for (const step of steps) {
+    applyShop(run, step);
+    sichereLaden(run, step);
+    prepareStep(run, step, DEFS);
+    const a = step.aktion;
+    if (['weiter', 'abschluss'].includes(a.typ)) continue;
+    // 1. Falscher Gegenstand angetippt oder gedreht
+    const fremd = run.items.find((p) => p.area === 'bag' && p.id !== a.item && p.id !== a.ziel && p.id !== a.verb);
+    if (fremd) {
+      assert.ok(!checkStep(step, run, DEFS, RECIPES, { typ: 'auswahl', id: fremd.id })?.ok || a.typ === 'kaufen', `${step.id}: falsches Antippen`);
+      assert.ok(!checkStep(step, run, DEFS, RECIPES, { typ: 'drehen', id: fremd.id })?.ok || a.typ === 'kaufen', `${step.id}: falsche Drehung`);
+    }
+    // 2. Aufgabe abbrechen: Der neue Gegenstand geht zurück in den Laden – danach geht es normal weiter
+    const ladenZielId = ladenZiel(step);
+    if (ladenZielId) {
+      const vorher = run.items.length;
+      act(step, run);
+      const neu = run.items.filter((p) => p.id === ladenZielId).at(-1);
+      if (neu && run.items.length > vorher) {
+        zurueckInLaden(run, neu, DEFS);
+        sichereLaden(run, step);
+        assert.ok(run.shop.some((x) => x?.id === ladenZielId), `${step.id}: wieder im Laden`);
+      }
+    }
+    // 3. Rolle falsch gedreht: kein falscher Gegenstand wird zum Subjekt
+    if (a.typ === 'zeigt') {
+      const r = run.items.find((p) => p.id === a.verb);
+      r.rot = (r.rot + 1) % 4;
+      const s = analyze(bag(run), DEFS).get(r.uid).verb?.subjekt;
+      assert.ok(!s || s.id === a.ziel, `${step.id}: falsche Drehung zeigt auf ${s?.id}`);
+    }
+    // Danach die richtige Aktion: Der Schritt wird geschafft
+    const ev = act(step, run);
+    assert.equal(checkStep(step, run, DEFS, RECIPES, ev)?.ok, true, `${step.id} geht nach falschen Aktionen weiter`);
+  }
 });
 
 test('Falsche Aktion: Schwert im Lager wird freundlich zurückgesetzt', () => {
