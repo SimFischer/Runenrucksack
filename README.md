@@ -2,7 +2,7 @@
 
 Ein Fantasy-Backpack-Battler fürs iPad (Querformat) als Web-App, in dem Grammatik das Regelwerk der Kombos ist. Das vollständige Spielkonzept steht in [konzept.md](konzept.md).
 
-**Stand: Aufgabensystem – großer Wortschatz, 15 Themen mit drei Stufen, elf Aufgabenformate, Lernstand, Bereich für Lehrkräfte**
+**Stand: Neue Gestaltung – Szenen statt Kästen, eigene Schriften, Symbole statt Emojis, alles auf einen Bildschirm; Verb-Rollen mit natürlichen Sätzen; keine Töne**
 
 Spielen: <https://simfischer.github.io/Runenrucksack/> – auf dem iPad in Safari öffnen, **Teilen → Zum Home-Bildschirm**, dann startet es wie eine App im Vollbild und läuft auch offline.
 
@@ -149,6 +149,21 @@ Alle Inhalte stehen in JSON-Dateien. Jede Datei hat oben ein Feld `_hinweis`, da
 
 Die Tests (siehe unten) melden, wenn eine Aufgabe nicht genau eine richtige Lösung hat oder eine falsche Antwort zufällig ein echtes Wort ist.
 
+## Gestaltung
+
+Vorbild ist die Haltung des Lernspiels Zwergeninsel: Das Bild ist der Bildschirm, eigene Schriften, keine Emojis, Materialien statt Flächen, wenig Text (mehr in `konzept.md`, Abschnitt „Grafikstil“).
+
+- `gestaltung.css` (nach `style.css` geladen): Farben nach Materialien, Knöpfe, Tafeln mit Holzrahmen, Kopfleiste, Startbildschirm, Figurenwahl, Spielfeld, Kampfszene, Sieg und Niederlage.
+- `schrift/`: Andika und Cinzel als WOFF2 mit Lizenztexten (SIL Open Font License) – nichts wird von fremden Servern geladen.
+- Keine Töne: kein Klang, keine Sprachausgabe (`tests/stille.test.mjs`).
+- Bildschirmfotos und Layout-Prüfung (kein seitliches Scrollen, kein Scrollen auf Start, Figurenwahl, Spielfeld und Kampf, keine Emojis) bei 1024×768, 1180×820 und 1366×1024:
+
+```bash
+node tools/bildschirme.mjs http://localhost:8080/ docs/screenshots
+```
+
+  Ohne Ordner (`-`) wird nur geprüft. Die Übersicht bei 1180×820 liegt in `docs/screenshots/`.
+
 ## Bilder
 
 Alle Bilder liegen in `assets/`. Die Originale (große PNGs) stehen in `assets/roh/` und werden nur von den Werkzeugen gelesen – sie kommen nicht in den Service Worker. Das Spiel lädt kleine WebP-Bilder:
@@ -159,10 +174,11 @@ Alle Bilder liegen in `assets/`. Die Originale (große PNGs) stehen in `assets/r
 | `assets/gegner/` | die vier Orks (512 px) |
 | `assets/figur-*.webp`, `assets/boss-*.webp` | Figuren und Bosse, 512 px hoch |
 | `assets/hintergrund-*.webp`, `assets/titelbild.webp` | Gebiets-Hintergründe und Titelbild, 1536 px breit |
+| `assets/ui/` | Oberfläche: Symbole (`symbole/`), Zustände (`zustand/`), Banner, Kampfeffekte, besiegte Orks, Fenwick-Posen, Flächen (Tafelrahmen, Rucksack aus Leder, Lager-Truhe, Händlerstand) – mit `node tools/zerschneide.mjs ui` aus `assets/roh/ui/` |
 | `assets/zuordnung.json` | welches Bild zu welcher id gehört (wird von den Werkzeugen geschrieben) |
 | `assets/vorschau.html` | Übersicht aller Items mit Bild zum Prüfen (im Browser öffnen, z. B. http://localhost:8080/assets/vorschau.html) |
 
-Fehlt zu einem Item ein Bild, zeigt das Spiel automatisch das Emoji aus `items.json`. Komposita (z. B. Feuerschwert) zeigen das Bild ihres Trägers mit dem Kraft-Leuchten darüber, gesteigerte Runen das Bild ihrer Grundrune. Sternstufen und Kraft-Effekte werden im Code darübergelegt.
+Fehlt zu einem Item ein Bild, zeigt das Spiel automatisch das Emoji aus `items.json` – das ist die einzige Stelle mit Emojis; sonst sind alle Symbole Bilder (`js/symbole.js`). Fehlende Oberflächen-Bilder stehen in `BILDER-OFFEN.md`. Komposita (z. B. Feuerschwert) zeigen das Bild ihres Trägers mit dem Kraft-Leuchten darüber, gesteigerte Runen das Bild ihrer Grundrune. Sternstufen und Kraft-Effekte werden im Code darübergelegt.
 
 ### Neue Bilder hinzufügen
 
@@ -206,7 +222,10 @@ node --test
 | `tests/themen.test.mjs` | Alle Themen auf allen Stufen in allen Formaten erzeugbar, genau eine richtige Lösung |
 | `tests/formate.test.mjs` | Jedes Format: genau eine richtige Antwort, falsche nie richtig, alle Stufen erzeugbar |
 | `tests/wahl.test.mjs` | Item → Thema, Stufen-Bereich, Lehrkraft-Grenzen, Aufstieg, Wiederholung nach Fehlern, Simulation (30 Aufgaben: ≥ 6 Formate, kein Wort doppelt), Lernbericht, Gold |
-| `tests/offline.test.mjs` | Alle Skripte und Daten stehen in der Liste des Service Workers |
+| `tests/offline.test.mjs` | Alle Skripte, Daten, Oberflächen-Bilder, Schriften und Stylesheets stehen in der Liste des Service Workers (Rohbilder nicht) |
+| `tests/oberflaeche.test.mjs` | Keine Emojis in Oberfläche und Texten, Symbole und Schriften liegen im Projekt |
+| `tests/stille.test.mjs` | Keine Töne im Code |
+| `tests/verbsatz.test.mjs` | Verb-Rollen: natürliche Sätze für alle Vorlagen, Gegenstände und Personen (Dativ nach „mit“), Aufgabe aus dem Aufgabensystem |
 | `tests/ablauf.test.mjs` | Gebiete, Bosse, Figuren, Schicksalsrunen, Unterklassen, Taschen, Ork-Rüstungen |
 | `tests/balance.test.mjs` | 200 simulierte Läufe: Siegquote pro Tag, Siege und Spielzeit; Sternstufen der Gegner; Rang-Aufstieg über viele Läufe |
 | `tests/sterne.test.mjs` | Mehrzahl- und Verbformen aller Items, Verbinden beim Kaufen, beim Ziehen auf ein gleiches Item, bei Belohnungen und als Kette, „Nicht verbinden“, Laden-Gewichtung |
@@ -241,6 +260,7 @@ Aktuelle Balance (200 Läufe, einfache Kaufstrategie, Aufgaben zu 75 % richtig):
 | `js/main.js` | Ablauf eines Laufs, Laden, Rucksack (Ziehen und Drehen), Info-Feld, Verbinden mit Frage-Fenster am Item |
 | `js/encounters.js` | Begegnungen am Morgen mit ihren Aufgaben |
 | `js/aufgaben/` | Aufgaben: Wortschatz-Hilfen (`wortschatz.js`), Themen-Generatoren (`themen.js`), Auswahl und Lernstand (`wahl.js`), Fenster (`host.js`), Anbindung ans Spiel (`spiel.js`), elf Formate in `formate/` |
+| `js/symbole.js` | Symbole, Fenwick-Posen, Banner und Effekte als Bilder statt Emojis |
 | `js/lehrkraft-ui.js` | Bereich „Für Lehrkräfte“ mit Klassen-Code |
 | `js/tutorial.js` | Tutorial: Spotlight, Sprechblase, Hand, „So geht's“, Erste-Mal-Tipps |
 | `js/tutorial-logic.js` | Tutorial ohne Darstellung: aktive Schritte, Prüfen, Zurücksetzen (testbar) |

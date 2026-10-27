@@ -299,6 +299,19 @@ Spaß hat Vorrang, aber eine Regel ist unverhandelbar: Eine grammatisch falsche 
 
 ## Grafikstil und Bildprompts
 
+### Haltung der Oberfläche
+
+Das Spiel soll sich wie eine Welt anfühlen, nicht wie eine Web-App: Holzhallen, Pergament, Gold, Eisen und Leder im Stil klassischer High Fantasy.
+
+- **Das Bild ist der Bildschirm.** Titelbild und Gebietshintergründe füllen den Bildschirm; darüber liegen nur Material-Flächen, keine großen hellen Kästen.
+- **Eigene Schriften, lokal im Projekt:** Andika zum Lesen (sehr gut lesbar für Kinder), Cinzel für Titel. Titel haben helle Füllung, dunkle Kontur und Schatten.
+- **Materialien statt Flächen:** Farben nach Materialien (dunkles Holz, Holz, Pergament, Tinte, Gold, Eisen, Moos, Glut). Knöpfe haben Kante und Druckeffekt: Gold für die Hauptaktion, Holz für Nebenaktionen, rund für Symbole, mindestens 56 px hoch. Tafeln sind Pergament im Holzrahmen (9-teiliger Rahmen aus `tafel-rahmen`).
+- **Keine Emojis:** Alle Symbole (Gold, Herzen, Pokal, Tag, Nacht, Menü, Würfel, Schloss, Sterne, Zustände) sind gemalte Bilder. Nur Items ohne eigenes Bild zeigen ersatzweise ihr Emoji.
+- **Wenig Text:** Karten zeigen Bild, Name und ein Wort; Details stehen in Tafeln, die man antippt.
+- **Alles auf einen Bildschirm:** kein Scrollen auf Start, Figurenwahl, Spielfeld und Kampf (1024×768 bis 1366×1024 quer, mit Safari-Leiste); nur lange Listen scrollen innerhalb ihrer Tafel.
+- **Szenen statt Dialoge:** Der Kampf zeigt beide Figuren groß, Treffer fliegen als Effekte, Sieg und Niederlage werden mit Bannern inszeniert.
+- **Keine Töne:** keine Musik, keine Geräusche, keine Sprachausgabe.
+
 Ein fester Grundprompt vor jedem Bild hält die Sammlung einheitlich. Film- oder Buchnamen gehören nicht in die Prompts, sonst versucht der Generator, das Original nachzubauen.
 
 ### Grundprompt

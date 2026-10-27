@@ -19,3 +19,15 @@ test('Service Worker kennt alle Skripte und Daten', () => {
   fehlt.push(...daten.filter((f) => !liste.has(f)));
   assert.deepEqual(fehlt, [], 'in sw.js ergänzen und CACHE erhöhen');
 });
+
+test('Service Worker kennt Oberflächen-Bilder, Schriften und Stylesheets – aber nicht die Rohbilder', () => {
+  const alle = (ordner) => readdirSync(new URL('../' + ordner, import.meta.url), { withFileTypes: true }).flatMap((e) =>
+    e.isDirectory() ? alle(`${ordner}/${e.name}`) : [`${ordner}/${e.name}`]);
+  const noetig = [
+    ...alle('assets/ui').filter((f) => f.endsWith('.webp')),
+    ...alle('schrift').filter((f) => /\.(woff2|css)$/.test(f)),
+    ...[...datei('index.html').matchAll(/<link rel="stylesheet" href="([^"]+)"/g)].map((m) => m[1]),
+  ];
+  assert.deepEqual(noetig.filter((f) => !liste.has(f)), [], 'in sw.js ergänzen und CACHE erhöhen');
+  assert.ok(![...liste].some((f) => f.includes('assets/roh/')), 'Rohbilder gehören nicht in den Service Worker');
+});
