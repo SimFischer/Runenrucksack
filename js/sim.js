@@ -1,11 +1,15 @@
 // Simulation ganzer Läufe mit einer einfachen Kaufstrategie – für die Balance (siehe tests/balance.test.mjs).
 // Annahmen über das Kind: löst Aufgaben meist richtig, kauft das Beste, was es sich leisten kann.
+// Strategien: „einfach“ würfelt bis zu dreimal am Tag neu und verkauft Schwaches für Besseres; „vorsichtig“ würfelt
+// höchstens einmal und kauft nur, was noch Platz hat oder sich verbindet (so sammelt sich Gold wie bei vielen Kindern).
+// Händler-Vertrauen und Schmied lassen sich für den Vergleich abschalten (opts.haendler, opts.schmied, opts.wuerfelAlt).
 import {
   CFG, newRun, finishBattle, rollShop, pickEnemy, makeEnemy, findSpot, bagGrid, STORE_GRID,
   growBag, attachTasche, enemyPool, shopPool, pickEncounters, pickOne, sellValue, seededRng, ARMOR_BONUS, reroll, wuerfelPreis,
+  HAENDLER, haendlerStufe, vertrauenKosten, vertrauenErhoehen, STERN_FAKTOR,
 } from './logic.js';
 import { buildCompounds, buildRuneLevels } from './grammar.js';
-import { partnerOf, placeNew, verbindeAlles } from './sterne.js';
+import { partnerOf, placeNew, verbindeAlles, schmiedZiel, schmiedPreis, schmiedSperre, schmiedAufwerten } from './sterne.js';
 import { playerContext, evaluateBag } from './mods.js';
 import { baueBuch, entdeckungenIn } from './buch.js';
 import { neuesProfil, entdecke, merkeAntwort, laufStand, laufAbschluss, rangVon } from './fortschritt.js';
@@ -29,8 +33,31 @@ function worth(d) {
   return per / d.abklingzeit;
 }
 
-function shop(run, data, rng, skill) {
+// Händler-Vertrauen erhöhen mit Gold, das nach dem Einkaufen übrig ist (bis Tag 8 – danach lohnt es kaum).
+const HAENDLER_RESERVE = 3;
+function haendlerKaufen(run) {
+  const k = vertrauenKosten(run);
+  if (k && run.day <= 8 && run.gold >= k + HAENDLER_RESERVE) vertrauenErhoehen(run);
+}
+
+// Schmied: der Gegenstand mit dem meisten Gewinn pro Gold (eine falsche erste Antwort kostet 1 Gold, wie beim Verbinden).
+function schmiedNutzen(run, data, rng, skill) {
+  const { defs } = data;
+  const kandidaten = run.items.filter((p) => p.area === 'bag' && !schmiedSperre(run, p, defs) && worth(defs[p.id]) > 0)
+    .map((p) => {
+      const z = schmiedZiel(p, defs);
+      return { p, nutzen: (worth(defs[p.id]) * (STERN_FAKTOR[z] - STERN_FAKTOR[z - 1])) / schmiedPreis(p, defs) };
+    })
+    .sort((a, b) => b.nutzen - a.nutzen);
+  const best = kandidaten[0];
+  if (!best) return;
+  if (rng() > skill) run.gold = Math.max(0, run.gold - 1);
+  schmiedAufwerten(run, best.p, defs);
+}
+
+function shop(run, data, rng, skill, opts = {}) {
   const { defs, items, regions } = data;
+  const vorsichtig = opts.strategie === 'vorsichtig';
   // Ein gleiches besitzt man schon: Kaufen verbindet sofort (braucht keinen Platz, spart sogar welchen).
   const value = (d) => worth(d) * (partnerOf(run.items, defs, { uid: -1, id: d.id }) ? 1.3 : 1);
   for (let round = 0; round < 3; round++) {
@@ -51,6 +78,7 @@ function shop(run, data, rng, skill) {
         }
         const bag = run.items.filter((p) => p.area === 'bag');
         let spot = findSpot(bag, defs, o.d, bagGrid(run));
+        if (!spot && vorsichtig) continue;
         if (!spot) {
           // Rucksack voll: schwächstes Item verkaufen, wenn das neue besser ist
           const weakest = bag.filter((p) => !p.fluch).sort((a, b) => worth(defs[a.id]) - worth(defs[b.id]))[0];
@@ -69,7 +97,14 @@ function shop(run, data, rng, skill) {
         break;
       }
     }
-    if (run.gold >= wuerfelPreis(run) + 3) reroll(run, items, regions, rng); else break;
+    if (opts.schmied !== false) schmiedNutzen(run, data, rng, skill);
+    if (opts.haendler !== false) haendlerKaufen(run);
+    if (vorsichtig && round > 0) break;
+    if (run.gold >= wuerfelPreis(run) + 3) {
+      reroll(run, items, regions, rng);
+      run.wuerfeTag = (run.wuerfeTag || 0) + 1;
+      if (opts.wuerfelAlt) { run.gold += wuerfelPreis(run) - 1; run.wuerfe = 0; } // bisher: jeder Wurf 1 Gold
+    } else break;
   }
 }
 
@@ -127,7 +162,8 @@ export function simulateRun(data, rng, opts = {}) {
   const days = [];
   while (!run.over) {
     morning(run, data, rng, skill);
-    shop(run, data, rng, skill);
+    run.wuerfeTag = 0;
+    shop(run, data, rng, skill, opts);
     const ctx = playerContext(run, ctxData);
     const bag = run.items.filter((p) => p.area === 'bag');
     const player = makeFighter('p', bag, data.defs, run.day, {
@@ -142,7 +178,8 @@ export function simulateRun(data, rng, opts = {}) {
     const foe = makeFighter('e', enemy.items, data.defs, run.day, { startHp: armor ? 1 - ARMOR_BONUS : 1, rng });
     const battle = new Battle(player, foe);
     const won = runToEnd(battle) === 'win';
-    days.push({ day: run.day, won, time: battle.time, boss: !!foeDef.boss });
+    days.push({ day: run.day, won, time: battle.time, boss: !!foeDef.boss,
+      gold: run.gold, haendler: haendlerStufe(run), schmied: run.schmiedTag === run.day ? 1 : 0, wuerfe: run.wuerfeTag || 0 });
     finishBattle(run, data.items, data.regions, won, enemy.name, rng);
   }
   const abschluss = opts.profil && data.achievements ? laufAbschluss(opts.profil, run, data) : null;
@@ -176,14 +213,21 @@ export function simulateMany(data, n, seed = 1, opts = {}) {
 export function summarize(results) {
   const perDay = {};
   for (const r of results) for (const d of r.days) {
-    perDay[d.day] ||= { kaempfe: 0, siege: 0 };
-    perDay[d.day].kaempfe++;
-    if (d.won) perDay[d.day].siege++;
+    perDay[d.day] ||= { kaempfe: 0, siege: 0, gold: 0, haendler: 0, schmied: 0, wuerfe: 0 };
+    const t = perDay[d.day];
+    t.kaempfe++;
+    if (d.won) t.siege++;
+    t.gold += d.gold || 0; t.haendler += d.haendler || 1; t.schmied += d.schmied || 0; t.wuerfe += d.wuerfe || 0;
   }
+  const jeTag = (k, stellen = 1) => Object.fromEntries(Object.entries(perDay).map(([d, v]) => [d, +(v[k] / v.kaempfe).toFixed(stellen)]));
   const avg = (f) => results.reduce((s, r) => s + f(r), 0) / results.length;
   return {
     siegquoteProTag: Object.fromEntries(Object.entries(perDay).map(([d, v]) => [d, Math.round((100 * v.siege) / v.kaempfe)])),
     erreichtProTag: Object.fromEntries(Object.entries(perDay).map(([d, v]) => [d, Math.round((100 * v.kaempfe) / results.length)])),
+    goldProTag: jeTag('gold'),          // ungenutztes Gold am Tagesende (vor dem Kampf)
+    haendlerProTag: jeTag('haendler'),  // durchschnittliche Händler-Stufe
+    schmiedProTag: jeTag('schmied', 2), // Anteil der Läufe, die an diesem Tag den Schmied nutzen
+    wuerfeProTag: jeTag('wuerfe'),      // Würfe pro Tag
     siegeDurchschnitt: avg((r) => r.wins),
     reiseGeschafft: Math.round(100 * avg((r) => (r.won ? 1 : 0))),
     minutenDurchschnitt: avg((r) => estimateMinutes(r.days)),

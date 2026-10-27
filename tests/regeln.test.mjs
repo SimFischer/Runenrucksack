@@ -185,5 +185,5 @@ test('Händler-Vertrauen: Stufen verschieben die Seltenheiten, Kosten 6-9-12-15,
   run.haendler = 1; run.haendlerTag = 0; run.gold = 5;
   assert.equal(L.vertrauenSperre(run), 'gold');
   // Gegner kaufen mit den Tagen bei einem vertrauteren Händler
-  assert.deepEqual([1, 3, 5, 7, 9, 10].map(L.gegnerHaendler), [1, 2, 3, 4, 5, 5]);
+  assert.deepEqual([1, 3, 4, 6, 9, 10].map(L.gegnerHaendler), [1, 1, 2, 3, 4, 4]);
 });

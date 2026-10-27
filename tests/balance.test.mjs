@@ -19,6 +19,11 @@ test('200 Zufallsläufe: Siegquote pro Tag, Siege und Spielzeit', (t) => {
   t.diagnostic('Tag:            ' + Object.keys(r.siegquoteProTag).map((d) => d.padStart(4)).join(''));
   t.diagnostic('Siegquote %:    ' + Object.values(r.siegquoteProTag).map((v) => String(v).padStart(4)).join(''));
   t.diagnostic('Tag erreicht %: ' + Object.values(r.erreichtProTag).map((v) => String(v).padStart(4)).join(''));
+  const zeile = (o) => Object.values(o).map((v) => String(v).padStart(4)).join('');
+  t.diagnostic('Gold am Ende:   ' + zeile(r.goldProTag));
+  t.diagnostic('Händler-Stufe:  ' + zeile(r.haendlerProTag));
+  t.diagnostic('Schmied % Läufe:' + zeile(Object.fromEntries(Object.entries(r.schmiedProTag).map(([d, v]) => [d, Math.round(100 * v)]))));
+  t.diagnostic('Würfe:          ' + zeile(r.wuerfeProTag));
   t.diagnostic(`Siege im Schnitt: ${r.siegeDurchschnitt.toFixed(1)} · Reise geschafft: ${r.reiseGeschafft} % · ` +
     `Spielzeit: ${r.minutenDurchschnitt.toFixed(1)} min · Kampf: ${r.kampfSekunden.toFixed(1)} s`);
 
@@ -27,6 +32,26 @@ test('200 Zufallsläufe: Siegquote pro Tag, Siege und Spielzeit', (t) => {
   assert.ok(r.minutenDurchschnitt >= 10 && r.minutenDurchschnitt <= 15, `Minuten: ${r.minutenDurchschnitt}`);
   assert.ok(r.kampfSekunden < 60, 'Kämpfe unter einer Minute');
   for (const [d, q] of Object.entries(r.siegquoteProTag)) assert.ok(q >= 35, `Tag ${d} zu schwer: ${q} %`);
+});
+
+// Händler-Vertrauen, Schmied und teureres Würfeln: Ein Kind, das vorsichtig kauft (einmal würfeln, nichts verkaufen),
+// sammelt bisher viel Gold an. Mit den neuen Ausgaben bleibt ab Tag 4 deutlich weniger übrig – bei mindestens so vielen Siegen.
+test('Gold bleibt knapp: vorsichtige Strategie bisher und neu', (t) => {
+  const bisher = summarize(simulateMany(data, 120, 7, { strategie: 'vorsichtig', haendler: false, schmied: false, wuerfelAlt: true }));
+  const neu = summarize(simulateMany(data, 120, 7, { strategie: 'vorsichtig' }));
+  const zeile = (o) => Object.values(o).map((v) => String(v).padStart(5)).join('');
+  t.diagnostic('Tag:              ' + Object.keys(neu.goldProTag).map((d) => d.padStart(5)).join(''));
+  t.diagnostic('Gold bisher:      ' + zeile(bisher.goldProTag));
+  t.diagnostic('Gold neu:         ' + zeile(neu.goldProTag));
+  t.diagnostic('Händler-Stufe:    ' + zeile(neu.haendlerProTag));
+  t.diagnostic('Schmied (Anteil): ' + zeile(neu.schmiedProTag));
+  t.diagnostic('Würfe:            ' + zeile(neu.wuerfeProTag));
+  t.diagnostic(`Siege bisher ${bisher.siegeDurchschnitt.toFixed(2)}, neu ${neu.siegeDurchschnitt.toFixed(2)}`);
+  const ab4 = (r) => [4, 5, 6, 7, 8, 9, 10].reduce((sum, d) => sum + r.goldProTag[d], 0) / 7;
+  assert.ok(ab4(neu) < 0.4 * ab4(bisher), `Gold ab Tag 4: neu ${ab4(neu).toFixed(1)}, bisher ${ab4(bisher).toFixed(1)}`);
+  assert.ok(neu.siegeDurchschnitt >= 6 && neu.siegeDurchschnitt <= 9, `Siege: ${neu.siegeDurchschnitt}`);
+  assert.ok(neu.haendlerProTag[8] > 2, 'Händler-Stufe wird genutzt');
+  assert.ok(Object.values(neu.schmiedProTag).some((v) => v > 0.2), 'Schmied wird genutzt');
 });
 
 test('Gegner-Stufen: ★★ ab Tag 3, ★★★ ab Tag 6, der Boss an Tag 10 immer mit ★★★★', async () => {

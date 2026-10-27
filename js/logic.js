@@ -76,8 +76,10 @@ export function vertrauenErhoehen(run) {
 export const SCHMIED = { faktor: 3, maxZiel: 3 };
 export const schmiedKosten = (grundpreis, ziel) => SCHMIED.faktor * grundpreis * ziel;
 
-// Gegner kaufen intern bei einem Händler, dem sie mit den Tagen mehr vertrauen (Tag 1–2: 1, 3–4: 2 … ab 9: 5).
-export const gegnerHaendler = (day) => Math.min(HAENDLER.max, 1 + Math.floor((day - 1) / 2));
+// Gegner kaufen intern bei einem Händler, dem sie mit den Tagen mehr vertrauen – etwa so wie ein Kind im Schnitt.
+// So wie ein Kind im Schnitt (laut Simulation): Tag 1–3 Stufe 1, 4–5 Stufe 2, 6–8 Stufe 3, ab Tag 9 Stufe 4.
+export const GEGNER_HAENDLER_PRO_TAG = 0.4;
+export const gegnerHaendler = (day) => Math.min(HAENDLER.max, 1 + Math.floor((day - 1) * GEGNER_HAENDLER_PRO_TAG));
 
 // Gewichte der Seltenheiten im Laden, abhängig vom Tag und der Händler-Stufe.
 export function rarityWeights(day, stufe = 1) {
