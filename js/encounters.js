@@ -5,6 +5,7 @@
 import {
   pickEncounters, growBag, shopPool, pickOne, RABATT,
 } from './logic.js';
+import { sym } from './symbole.js';
 import { GENUS } from './grammar.js';
 import { placeNew } from './sterne.js';
 import { G, save, region, emit } from './state.js';
@@ -37,13 +38,13 @@ export function runEncounter(fertig, neuZeichnen, erzwungen = null) {
   }
   const list = run.begegnung.ids.map(findEnc).filter(Boolean);
   const card = openModal(`
-    <div class="enc-top">🌅 Morgen in ${region().name}</div>
+    <div class="enc-top">${sym('tag')} Morgen in ${region().name}</div>
     <h2>Wen triffst du am Wegesrand?</h2>
     <div class="enc-choices">${list.map((b) => `
       <button class="enc-choice" data-id="${b.id}">
-        <span class="enc-emoji">${b.emoji}</span>
+        <span class="enc-emoji">${sym(b.id === 'eule' ? 'eule' : 'karte', 'gross')}</span>
         <b>${b.name}</b>
-        <span class="enc-reward">🎁 ${b.belohnung.text}</span>
+        <span class="enc-reward">${sym('truhe')} ${b.belohnung.text}</span>
       </button>`).join('')}
     </div>
     <div class="row"><button class="btn small" data-skip>Weiterziehen</button></div>`, 'wide');
@@ -62,10 +63,10 @@ function finish(id) {
 
 function intro(enc, los = null) {
   const card = openModal(`
-    <div class="big-emoji">${enc.emoji}</div>
+    <div class="big-emoji">${sym(enc.id === 'eule' ? 'eule' : 'karte', 'gross')}</div>
     <h2>${enc.name}</h2>
     <p class="enc-text">${enc.text}</p>
-    <p class="enc-reward-line">🎁 Belohnung: <b>${enc.belohnung.text}</b></p>
+    <p class="enc-reward-line">${sym('truhe')} Belohnung: <b>${enc.belohnung.text}</b></p>
     <div class="row">
       <button class="btn" data-back>Zurück</button>
       <button class="btn primary big" data-go>Los geht’s</button>
@@ -84,7 +85,7 @@ function startTask(enc) {
   const n = a.anzahl || 1;
   (async () => {
     for (let i = 0; i < n; i++) {
-      const kopf = `<span class="af-wer">${enc.emoji} ${enc.name}${n > 1 ? ` · ${i + 1}/${n}` : ''}</span>`;
+      const kopf = `<span class="af-wer">${enc.name}${n > 1 ? ` · ${i + 1}/${n}` : ''}</span>`;
       const inhalt = a.typ === 'speisekarte' ? speisekarteInhalt(ctx) : a.typ === 'satzordnen' ? satzOrdnenInhalt(ctx) : null;
       const r = await frageImSpiel(inhalt ? { inhalt, kopf, nein: 'Aufgeben' } : { format: a.format, kopf, nein: 'Aufgeben' });
       if (inhalt) ctx.benutzt.add(inhalt.wort);
@@ -108,10 +109,10 @@ function runTasks(enc, tasks, end) {
     const broke = paid && run.gold < 1 && !solved;
     const body = drawChoice(q, wrong, solved, broke);
     const card = openModal(`
-      <div class="enc-mini">${enc.emoji} ${enc.name}</div>
+      <div class="enc-mini">${enc.name}</div>
       ${tasks.length > 1 ? `<p class="enc-progress">Aufgabe ${qi + 1} von ${tasks.length}</p>` : ''}
       ${body}
-      <p class="cost">${solved ? '' : paid ? `Jeder weitere Versuch kostet 1 🪙 · du hast ${run.gold} 🪙` : 'Erster Versuch kostenlos'}</p>
+      <p class="cost">${solved ? '' : paid ? `Jeder weitere Versuch kostet 1 ${sym('gold')} · du hast ${run.gold} ${sym('gold')}` : 'Erster Versuch kostenlos'}</p>
       ${feedback ? `<p class="feedback ${solved ? 'good' : ''}">${feedback}</p>` : ''}
       ${broke ? '<p class="feedback">Kein Gold für einen weiteren Versuch.</p>' : ''}
       <div class="row">${solved
@@ -167,7 +168,7 @@ function drawChoice(q, wrong, solved, broke) {
 
 function giveUp(enc) {
   const card = openModal(`
-    <div class="big-emoji">${enc.emoji}</div>
+    <div class="big-emoji">${sym(enc.id === 'eule' ? 'eule' : 'karte', 'gross')}</div>
     <h2>Schade!</h2>
     <p>Diesmal gibt es keine Belohnung. Morgen triffst du wieder jemanden.</p>
     <div class="row"><button class="btn primary" data-ok>Weiter</button></div>`);
@@ -189,20 +190,20 @@ function reward(enc) {
   let text = '';
   if (b.typ === 'feld') {
     const c = growBag(run);
-    if (c) text = 'Dein Rucksack hat jetzt ein Feld mehr! 🧵';
-    else { run.gold += 3; text = 'Dein Rucksack ist schon riesig – dafür bekommst du 3 🪙.'; }
+    if (c) text = 'Dein Rucksack hat jetzt ein Feld mehr!';
+    else { run.gold += 3; text = `Dein Rucksack ist schon riesig – dafür bekommst du 3 ${sym('gold')}.`; }
   } else if (b.typ === 'item') {
     const pool = shopPool(run, G.ITEMS, G.REGIONS).filter((d) => d.seltenheit === (b.seltenheit || 'selten'));
     const def = pickOne(pool);
     const p = def && gewinn(def.id);
-    if (p) text = `Du bekommst ${nameAkk(def)} ${def.emoji}!${p.area === 'store' ? ' (im Lager)' : ''}`;
-    else { run.gold += 3; text = 'Kein Platz für ein Item – dafür bekommst du 3 🪙.'; }
+    if (p) text = `Du bekommst ${nameAkk(def)}!${p.area === 'store' ? ' (im Lager)' : ''}`;
+    else { run.gold += 3; text = `Kein Platz für ein Item – dafür bekommst du 3 ${sym('gold')}.`; }
   } else if (b.typ === 'gold') {
     run.gold += b.menge;
-    text = `Du bekommst ${b.menge} 🪙!`;
+    text = `Du bekommst ${b.menge} ${sym('gold')}!`;
   } else if (b.typ === 'rabatt') {
     run.rabatt = (run.rabatt || 0) + RABATT.kaeufe;
-    text = `Die nächsten ${RABATT.kaeufe} Käufe im Laden sind je ${RABATT.gold} 🪙 billiger! 🏷️`;
+    text = `Die nächsten ${RABATT.kaeufe} Käufe im Laden sind je ${RABATT.gold} ${sym('gold')} billiger!`;
   } else if (b.typ === 'mod') {
     run.mods.push(b.mod);
     text = `${b.mod.text}.`;
@@ -215,7 +216,7 @@ function showReward(enc, text) {
   save();
   rerender();
   const card = openModal(`
-    <div class="big-emoji">🎁</div>
+    <div class="big-emoji">${sym('truhe', 'gross')}</div>
     <h2>Geschafft!</h2>
     <p>${text}</p>
     <p class="muted">${enc.name} winkt dir zum Abschied.</p>
@@ -233,19 +234,19 @@ function kobold(enc) {
   const def = G.DEFS[entry.item];
   const falscherName = entry.teile.join('');
   closeModal();
-  const kopf = `<span class="af-wer">${enc.emoji} ${enc.name}</span><span class="glowing" style="--glow:#a259d9">${iconHtml(def, 'ic small')}</span>`;
+  const kopf = `<span class="af-wer">${enc.name}</span><span class="glowing" style="--glow:#a259d9">${iconHtml(def, 'ic small')}</span>`;
   frageImSpiel({ inhalt: koboldInhalt(entry, { rng: Math.random }), kopf, nein: 'Ich finde ihn nicht' }).then((r) => {
     const ok = !!r.richtig;
     const p = gewinn(def.id, ok ? {} : { fluch: falscherName });
     if (!p) { toast('Kein Platz im Rucksack – der Kobold zieht beleidigt ab.'); finish(enc.id); return; }
-    if (ok) showReward(enc, `Name repariert! ${fullName(def)} ${def.emoji} ist jetzt ganz normal stark.`);
+    if (ok) showReward(enc, `Name repariert! ${fullName(def)} ist jetzt ganz normal stark.`);
     else {
       save();
       rerender();
       const card = openModal(`
-        <div class="big-emoji">😈</div>
+        <div class="big-emoji">${iconHtml(def, 'ic big')}</div>
         <h2>Hihi!</h2>
-        <p>Du bekommst „${falscherName}“ ${def.emoji} – aber der Fehler im Namen macht es frech:
+        <p>Du bekommst „${falscherName}“ – aber der Fehler im Namen macht es frech:
         Es kostet dich zu Beginn jedes Kampfes 2 Leben, solange es im Rucksack liegt.</p>
         <p class="feedback">Richtig wäre: ${entry.richtig}. ${entry.erklaerung}</p>
         <div class="row"><button class="btn primary" data-ok>Weiter</button></div>`);

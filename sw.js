@@ -27,6 +27,7 @@ const FILES = [
   'js/tutorial.js',
   'js/tutorial-logic.js',
   'js/lehrkraft-ui.js',
+  'js/symbole.js',
   'js/aufgaben/host.js',
   'js/aufgaben/spiel.js',
   'js/aufgaben/themen.js',

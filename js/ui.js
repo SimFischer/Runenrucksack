@@ -2,6 +2,7 @@
 import { sizeOf } from './logic.js';
 import { GENUS, findFusions, isRune, isVerb, runeTargetCell, verbTargetCell } from './grammar.js';
 import { G, bildFuer, getPref } from './state.js';
+import { sym } from './symbole.js';
 
 export const $ = (id) => document.getElementById(id);
 export const fmt = (n) => n.toLocaleString('de-DE', { maximumFractionDigits: 1 });
@@ -14,10 +15,18 @@ export function nameAkk(d) {
   if (d.art === 'tasche') return `die ${d.name}`;
   return d.artikel ? `${d.artikel === 'der' ? 'den' : d.artikel} ${d.name}` : d.name;
 }
-// Kleines Bild für Fenster und Listen; ohne Bild das Emoji.
+// Kleines Bild für Fenster und Listen; ohne Bild das Emoji (als Ersatz markiert).
 export function iconHtml(def, cls = 'ic') {
   const src = bildFuer(def);
-  return src ? `<img class="${cls}" src="${src}" alt="" draggable="false">` : (def.emoji || '');
+  return src ? `<img class="${cls}" src="${src}" alt="" draggable="false">` : (def.emoji ? `<span class="emoji-ersatz">${def.emoji}</span>` : '');
+}
+
+// Abzeichen eines Items: bei Komposita das Bild des Kristalls, bei der Krone ein Zeichen.
+export function abzeichenHtml(def) {
+  if (!def?.abzeichen) return '';
+  const kraft = def.teile?.kraft && G.DEFS[def.teile.kraft];
+  if (kraft) return iconHtml(kraft, 'abz-img');
+  return /\p{Extended_Pictographic}/u.test(def.abzeichen) ? '' : def.abzeichen; // Emoji-Abzeichen aus items.json entfallen
 }
 export const genusChip = (g) => `<span class="genus" style="--genus:${GENUS[g].farbe}">${g}</span>`;
 
@@ -73,7 +82,7 @@ function flyCoins(delta) {
   for (let i = 0; i < n; i++) {
     const c = document.createElement('div');
     c.className = 'coin-fly';
-    c.textContent = '🪙';
+    c.innerHTML = sym('gold');
     document.body.append(c);
     const off = (i - n / 2) * 14;
     c.animate([
@@ -212,8 +221,8 @@ export function itemEl(def, rot, size, stern = 1) {
   }
 
   const em = document.createElement('span');
-  em.className = 'emoji';
-  em.textContent = def.emoji;
+  em.className = 'emoji emoji-ersatz';
+  em.textContent = def.emoji; // emoji-ersatz: Item ohne Bild
   em.style.fontSize = Math.round(Math.min(s.w, s.h) * size * (s.w * s.h === 1 ? 0.5 : 0.58)) + 'px';
   if (rot && def.w !== def.h) em.style.transform = 'rotate(90deg)';
   el.append(em);
@@ -246,10 +255,10 @@ export function itemEl(def, rot, size, stern = 1) {
     el.append(a);
     if ((rot || 0) % 2) em.style.transform = 'rotate(90deg)';
   }
-  if (def.abzeichen) {
+  if (abzeichenHtml(def)) {
     const b = document.createElement('span');
     b.className = 'badge';
-    b.textContent = def.abzeichen;
+    b.innerHTML = abzeichenHtml(def);
     b.style.fontSize = Math.round(size * 0.26) + 'px';
     el.append(b);
   }
@@ -282,7 +291,8 @@ export function buildGrid(el, grid, size) {
         c.classList.add('tasche');
         // Taschen-Symbol im ersten Feld der Tasche
         if (G.DEFS[t] && Object.entries(grid.taschen).find(([, v]) => v === t)[0] === key) {
-          c.dataset.symbol = G.DEFS[t].emoji;
+          const bild = bildFuer(G.DEFS[t]);
+          if (bild) { c.dataset.symbol = '1'; c.style.setProperty('--tasche-bild', `url("${bild}")`); }
         }
       }
       el.append(c);
@@ -329,7 +339,7 @@ export function drawItems(gridEl, grid, placed, size, info, area) {
       if (l) l.textContent = p.fluch;
       const m = document.createElement('span');
       m.className = 'mark-fluch';
-      m.textContent = '😈';
+      m.textContent = '!';
       it.append(m);
     }
     gridEl.append(it);
@@ -389,7 +399,7 @@ export function mergeAnimation(fromRects, toEl, opts = {}) {
   };
   // 1. Die Teile fliegen zusammen
   for (const r of fromRects) {
-    const f = fly(opts.icon || '✨', 'merge-fly', 0, 0);
+    const f = fly(opts.icon || '★', 'merge-fly', 0, 0);
     const sx = r.left + r.width / 2, sy = r.top + r.height / 2;
     f.animate?.([
       { transform: `translate(${sx - 28}px, ${sy - 28}px) scale(1)`, opacity: 1 },
@@ -404,7 +414,7 @@ export function mergeAnimation(fromRects, toEl, opts = {}) {
     const flash = fly('', 'merge-flash' + (opts.gross ? ' gross' : ''), cx, cy);
     setTimeout(() => flash.remove(), 700);
     for (let i = 0; i < (opts.gross ? 18 : 8); i++) {
-      const s = fly(i % 2 ? '★' : '✨', 'merge-star', 0, 0);
+      const s = fly('★', 'merge-star', 0, 0);
       const w = (i / (opts.gross ? 18 : 8)) * Math.PI * 2, d = opts.gross ? 150 : 80;
       s.animate?.([
         { transform: `translate(${cx - 12}px, ${cy - 12}px) scale(.4)`, opacity: 1 },

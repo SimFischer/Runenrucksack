@@ -1,9 +1,13 @@
 {
-  "_hinweis": "Das Tutorial „Der erste Tag“. Jeder Schritt: id, text (höchstens zwei kurze Sätze), tipp (Zusatz nach 8 Sekunden ohne Aktion), ziel (data-tut-Namen der Elemente, die hell bleiben und bedienbar sind), aktion (wie es weitergeht), optional voraussetzung (Schritt nur, wenn es die Funktion gibt), laden (fester Laden-Inhalt), hand (Tipp- oder Zieh-Animation), falsch (freundliche Hinweise bei falschen Aktionen), hilfe (Karte für „So geht's“). Ziele für Items: item-<id> im Rucksack, laden-<id> im Laden. Hand-Ziele: rucksack, links-von:<id>, neben:<id>. vorbereitung: platzLinksVon, geschenk (Items in einen Bereich legen), rolleFuer (Verb-Rolle neben ein Nomen legen, Pfeil noch falsch). kampfStarten: Kampf nach dem Schritt starten. zusatzHilfe: weitere Karten für „So geht's“ ohne eigenen Schritt (nach: id des Schritts, hinter dessen Karte sie steht).",
+  "_hinweis": "Das Tutorial „Der erste Tag“. Jeder Schritt: id, text (höchstens zwei kurze Sätze), tipp (Zusatz nach 8 Sekunden ohne Aktion), ziel (data-tut-Namen der Elemente, die hell bleiben und bedienbar sind), aktion (wie es weitergeht), optional voraussetzung (Schritt nur, wenn es die Funktion gibt), laden (fester Laden-Inhalt), hand (Tipp- oder Zieh-Animation), falsch (freundliche Hinweise bei falschen Aktionen), hilfe (Karte für „So geht's“ mit titel, symbol aus assets/ui/symbole, animation, text). Ziele für Items: item-<id> im Rucksack, laden-<id> im Laden. Hand-Ziele: rucksack, links-von:<id>, neben:<id>. vorbereitung: platzLinksVon, geschenk (Items in einen Bereich legen), rolleFuer (Verb-Rolle neben ein Nomen legen, Pfeil noch falsch). kampfStarten: Kampf nach dem Schritt starten. zusatzHilfe: weitere Karten für „So geht's“ ohne eigenen Schritt (nach: id des Schritts, hinter dessen Karte sie steht).",
   "begleiter": {
     "name": "Meister Fenwick",
-    "emoji": "🧙",
-    "bild": "assets/figur-fenwick.webp"
+    "bild": "assets/figur-fenwick.webp",
+    "posen": {
+      "erklaert": "assets/ui/fenwick/erklaert.webp",
+      "tipp": "assets/ui/fenwick/tipp.webp",
+      "jubelt": "assets/ui/fenwick/jubelt.webp"
+    }
   },
   "start": {
     "gold": 20,
@@ -63,9 +67,9 @@
       ],
       "hilfe": {
         "titel": "Kaufen",
-        "emoji": "🛒",
         "animation": "ziehen",
-        "text": "Zieh einen Gegenstand aus dem Laden in deinen Rucksack."
+        "text": "Zieh einen Gegenstand aus dem Laden in deinen Rucksack.",
+        "symbol": "gold"
       }
     },
     {
@@ -86,9 +90,9 @@
       },
       "hilfe": {
         "titel": "Infos",
-        "emoji": "ℹ️",
         "animation": "tippen",
-        "text": "Tippst du einen Gegenstand an, siehst du rechts, was er kann."
+        "text": "Tippst du einen Gegenstand an, siehst du rechts, was er kann.",
+        "symbol": "buch"
       }
     },
     {
@@ -109,9 +113,9 @@
       },
       "hilfe": {
         "titel": "Drehen",
-        "emoji": "🔄",
         "animation": "drehen",
-        "text": "Tipp einen Gegenstand zweimal an, dann dreht er sich. Beim Ziehen dreht auch ein zweiter Finger."
+        "text": "Tipp einen Gegenstand zweimal an, dann dreht er sich. Beim Ziehen dreht auch ein zweiter Finger.",
+        "symbol": "wuerfel"
       }
     },
     {
@@ -125,9 +129,9 @@
       },
       "hilfe": {
         "titel": "Lager",
-        "emoji": "📦",
         "animation": "wackeln",
-        "text": "Im Lager liegen Dinge sicher – im Kampf helfen sie aber nicht."
+        "text": "Im Lager liegen Dinge sicher – im Kampf helfen sie aber nicht.",
+        "symbol": "truhe"
       }
     },
     {
@@ -173,9 +177,9 @@
       ],
       "hilfe": {
         "titel": "Kraft-Kristalle",
-        "emoji": "🔥",
         "animation": "ziehen",
-        "text": "Leg einen Kristall links neben oder über einen Gegenstand. Sofort entsteht ein Kompositum."
+        "text": "Leg einen Kristall links neben oder über einen Gegenstand. Sofort entsteht ein Kompositum.",
+        "symbol": "brand"
       }
     },
     {
@@ -191,9 +195,9 @@
       },
       "hilfe": {
         "titel": "Verschmelzen",
-        "emoji": "✨",
         "animation": "pulsieren",
-        "text": "Feuer + Schwert = das Feuerschwert – sofort, sobald der Kristall richtig liegt. Das letzte Wort bestimmt den Artikel."
+        "text": "Feuer + Schwert = das Feuerschwert – sofort, sobald der Kristall richtig liegt. Das letzte Wort bestimmt den Artikel.",
+        "symbol": "stern"
       }
     },
     {
@@ -236,9 +240,9 @@
       ],
       "hilfe": {
         "titel": "Artikel-Siegel",
-        "emoji": "🟢",
         "animation": "pulsieren",
-        "text": "Ein Siegel mit dem richtigen Artikel neben einem Nomen macht es 25 % stärker."
+        "text": "Ein Siegel mit dem richtigen Artikel neben einem Nomen macht es 25 % stärker.",
+        "symbol": "schloss"
       }
     },
     {
@@ -281,9 +285,9 @@
       ],
       "hilfe": {
         "titel": "Adjektiv-Runen",
-        "emoji": "🔺",
         "animation": "drehen",
-        "text": "Der Pfeil einer Rune muss auf ein passendes Nomen zeigen: scharfes Schwert."
+        "text": "Der Pfeil einer Rune muss auf ein passendes Nomen zeigen: scharfes Schwert.",
+        "symbol": "tempo"
       }
     },
     {
@@ -314,14 +318,14 @@
       "kampfPause": true,
       "hilfe": {
         "titel": "Kampf",
-        "emoji": "⚔️",
         "animation": "pulsieren",
-        "text": "Nachts kämpft dein Rucksack von allein. Jeder Gegenstand schlägt zu, wenn sein Balken voll ist."
+        "text": "Nachts kämpft dein Rucksack von allein. Jeder Gegenstand schlägt zu, wenn sein Balken voll ist.",
+        "symbol": "kampf"
       }
     },
     {
       "id": "sieg",
-      "text": "Gewonnen – dafür gibt es eine Trophäe 🏆! Verlierst du einen Kampf, kostet das ein Herz ❤️.",
+      "text": "Gewonnen – dafür gibt es eine Trophäe! Verlierst du einen Kampf, kostet das ein Herz.",
       "ziel": [
         "fenster"
       ],
@@ -332,9 +336,9 @@
       },
       "hilfe": {
         "titel": "Herzen und Siege",
-        "emoji": "🏆",
         "animation": "pulsieren",
-        "text": "Jeder Sieg bringt eine Trophäe, jede Niederlage kostet ein Herz – du hast fünf. Nach zehn Tagen ist die Reise geschafft."
+        "text": "Jeder Sieg bringt eine Trophäe, jede Niederlage kostet ein Herz – du hast fünf. Nach zehn Tagen ist die Reise geschafft.",
+        "symbol": "pokal"
       }
     },
     {
@@ -364,9 +368,9 @@
       },
       "hilfe": {
         "titel": "Begegnungen",
-        "emoji": "🌅",
         "animation": "pulsieren",
-        "text": "Am Morgen triffst du Gestalten am Wegesrand – jede mit ihrer eigenen Aufgabe: Die Eule sortiert, der Zwerg baut Wörter, die Wirtin sucht Fehler, die Hirtin ordnet Sätze, der Händler fragt, was nicht passt."
+        "text": "Am Morgen triffst du Gestalten am Wegesrand – jede mit ihrer eigenen Aufgabe: Die Eule sortiert, der Zwerg baut Wörter, die Wirtin sucht Fehler, die Hirtin ordnet Sätze, der Händler fragt, was nicht passt.",
+        "symbol": "tag"
       }
     },
     {
@@ -412,9 +416,9 @@
       },
       "hilfe": {
         "titel": "Sternstufen",
-        "emoji": "⭐",
         "animation": "pulsieren",
-        "text": "Zwei gleiche Gegenstände werden zu einem stärkeren: ★ → ★★ → ★★★ → ★★★★. Vorher kommt eine kurze Aufgabe – je höher die Stufe, desto kniffliger. Rucksack und Lager zählen zusammen."
+        "text": "Zwei gleiche Gegenstände werden zu einem stärkeren: ★ → ★★ → ★★★ → ★★★★. Vorher kommt eine kurze Aufgabe – je höher die Stufe, desto kniffliger. Rucksack und Lager zählen zusammen.",
+        "symbol": "stern"
       }
     },
     {
@@ -475,9 +479,9 @@
       },
       "hilfe": {
         "titel": "Verben",
-        "emoji": "📜",
         "animation": "drehen",
-        "text": "Der Pfeil einer Schriftrolle zeigt auf das Subjekt: „Das Feuerschwert schlägt.“ Dann schlägt es mit."
+        "text": "Der Pfeil einer Schriftrolle zeigt auf das Subjekt: „Das Feuerschwert schlägt.“ Dann schlägt es mit.",
+        "symbol": "menue"
       }
     },
     {
@@ -536,9 +540,9 @@
       },
       "hilfe": {
         "titel": "Ork-Fehler",
-        "emoji": "🔍",
         "animation": "tippen",
-        "text": "Vor dem Kampf steht auf der Rüstung des Orks ein Satz mit einem Fehler. Tipp das falsche Wort an und verbessere es: Dann startet er geschwächt. Nur ein Versuch!"
+        "text": "Vor dem Kampf steht auf der Rüstung des Orks ein Satz mit einem Fehler. Tipp das falsche Wort an und verbessere es: Dann startet er geschwächt. Nur ein Versuch!",
+        "symbol": "kampf"
       }
     },
     {
@@ -567,7 +571,7 @@
     {
       "id": "buch",
       "voraussetzung": "buch",
-      "text": "Alles, was du entdeckst, landet im Buch der Wörter. Tipp oben auf 📚!",
+      "text": "Alles, was du entdeckst, landet im Buch der Wörter. Tipp oben auf!",
       "tipp": "Das Buch-Symbol ist oben rechts, neben dem Menü.",
       "ziel": [
         "buch"
@@ -582,9 +586,9 @@
       },
       "hilfe": {
         "titel": "Buch der Wörter",
-        "emoji": "📚",
         "animation": "pulsieren",
-        "text": "Jede neue Kombination landet im Buch der Wörter. Dunkle Felder mit ??? kannst du noch entdecken – volle Seiten bringen Belohnungen. Auf der Seite „Regeln“ sammelst du Regelkarten."
+        "text": "Jede neue Kombination landet im Buch der Wörter. Dunkle Felder mit ??? kannst du noch entdecken – volle Seiten bringen Belohnungen. Auf der Seite „Regeln“ sammelst du Regelkarten.",
+        "symbol": "buch"
       }
     },
     {
@@ -619,9 +623,9 @@
       },
       "hilfe": {
         "titel": "Heldencode",
-        "emoji": "🔑",
         "animation": "pulsieren",
-        "text": "Am Ende jedes Laufs bekommst du einen Heldencode. Schreib ihn ab oder fotografiere ihn – mit „Heldencode eingeben“ holst du deinen Fortschritt zurück, auch auf einem anderen iPad."
+        "text": "Am Ende jedes Laufs bekommst du einen Heldencode. Schreib ihn ab oder fotografiere ihn – mit „Heldencode eingeben“ holst du deinen Fortschritt zurück, auch auf einem anderen iPad.",
+        "symbol": "schloss"
       }
     },
     {
@@ -659,9 +663,9 @@
     {
       "nach": "sammeln",
       "titel": "Aufgaben und Stufen",
-      "emoji": "🎯",
       "animation": "pulsieren",
-      "text": "Jedes Thema hat drei Stufen ★☆☆. Zweimal gleich richtig, dann kommt die nächste. Ein Fehler? Die Aufgabe kommt bald in anderer Form wieder. Stufe 2 gleich richtig: +1 🪙, Stufe 3: +2 🪙 und das Item glänzt (+10 % im nächsten Kampf)."
+      "text": "Jedes Thema hat drei Stufen ★☆☆. Zweimal gleich richtig, dann kommt die nächste. Ein Fehler? Die Aufgabe kommt bald in anderer Form wieder. Stufe 2 gleich richtig: +1, Stufe 3: +2 und das Item glänzt (+10 % im nächsten Kampf).",
+      "symbol": "stern"
     }
   ]
 }

@@ -40,7 +40,7 @@ export default {
         };
         steine.append(b);
       }
-      const zurueck = knopf('↩︎ zurück', 'small');
+      const zurueck = knopf('zurück', 'small');
       zurueck.onclick = () => { gebaut.pop(); zeichne(); };
       if (gebaut.length) steine.append(zurueck);
     };

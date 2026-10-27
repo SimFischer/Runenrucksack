@@ -5,6 +5,7 @@ import { G, saveProfil } from './state.js';
 import { klassenCode, registryAus, saeubern } from './code.js';
 import { STANDARD_MAX } from './aufgaben/wahl.js';
 import { toast } from './ui.js';
+import { sym } from './symbole.js';
 
 const reg = () => registryAus(G.REGISTRY);
 
@@ -20,7 +21,7 @@ function ebene(html) {
 
 export function zeigeLehrkraft() {
   const box = ebene(`
-    <h2>🍎 Für Lehrkräfte</h2>
+    <h2>${sym('eule')} Für Lehrkräfte</h2>
     <p>Bitte den Lehrkraft-Code eingeben.</p>
     <input class="code-input" type="text" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false">
     <p class="code-meldung" hidden>Der Code stimmt nicht.</p>
@@ -42,7 +43,7 @@ const STUFEN = [['Aus', 0], ['★', 1], ['★★', 2], ['★★★', 3]];
 function einstellungen() {
   const themen = { ...standard(), ...(G.PROFIL.klasse?.themen || {}) };
   const box = ebene(`
-    <h2>🍎 Themen für die Klasse</h2>
+    <h2>${sym('eule')} Themen für die Klasse</h2>
     <p class="lk-text">Schalten Sie Themen aus oder begrenzen Sie die höchste Stufe. Ohne Klassen-Code gelten alle Themen mit Stufe 1–2.</p>
     <div class="lk-liste"></div>
     <div class="lk-code"></div>
@@ -57,7 +58,7 @@ function einstellungen() {
     liste.innerHTML = G.THEMEN.themen.map((t) => {
       const max = themen[t.id];
       return `<div class="lk-zeile${max ? '' : ' aus'}">
-        <span class="lk-name"><span>${t.emoji} <b>${t.name}</b></span><small>${max ? `bis Stufe ${max}: ${t.stufen[max - 1].text}` : 'ausgeschaltet'}</small></span>
+        <span class="lk-name"><span><b>${t.name}</b></span><small>${max ? `bis Stufe ${max}: ${t.stufen[max - 1].text}` : 'ausgeschaltet'}</small></span>
         <span class="lk-wahl">${STUFEN.map(([text, s]) => `<button class="btn small${s === max ? ' primary' : ''}" data-thema="${t.id}" data-stufe="${s}">${text}</button>`).join('')}</span>
       </div>`;
     }).join('');
@@ -65,7 +66,7 @@ function einstellungen() {
     const an = Object.values(themen).filter(Boolean).length;
     box.querySelector('.lk-code').innerHTML = `<p>Klassen-Code (${an} von ${G.THEMEN.themen.length} Themen an):</p>
       <div class="code-text lk-code-text">${code.split('-').map((g) => `<span>${g}</span>`).join('')}</div>
-      <p class="muted">Die Kinder tippen ihn bei „🔑 Heldencode eingeben“ ein. Er wird in ihrem Heldencode gespeichert.</p>`;
+      <p class="muted">Die Kinder tippen ihn bei „Heldencode eingeben“ ein. Er wird in ihrem Heldencode gespeichert.</p>`;
     liste.querySelectorAll('[data-thema]').forEach((b) => {
       b.onclick = () => { themen[b.dataset.thema] = +b.dataset.stufe; zeichne(); };
     });

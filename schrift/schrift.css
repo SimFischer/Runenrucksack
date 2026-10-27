@@ -1,0 +1,8 @@
+/* Schriften liegen im Projekt – nichts wird von Google oder anderen Servern geladen.
+   Andika (SIL, sehr gut lesbar für Kinder) als Leseschrift, Cinzel als Titelschrift.
+   Beide unter der SIL Open Font License 1.1, siehe OFL-Andika.txt und OFL-Cinzel.txt.
+   Quelle: npm-Pakete @fontsource/andika und @fontsource/cinzel (Teilmenge „latin“, enthält ä, ö, ü, ß). */
+@font-face { font-family: 'Andika'; font-style: normal; font-weight: 400; font-display: swap; src: url('andika-400.woff2') format('woff2'); }
+@font-face { font-family: 'Andika'; font-style: normal; font-weight: 700; font-display: swap; src: url('andika-700.woff2') format('woff2'); }
+@font-face { font-family: 'Cinzel'; font-style: normal; font-weight: 700; font-display: swap; src: url('cinzel-700.woff2') format('woff2'); }
+@font-face { font-family: 'Cinzel'; font-style: normal; font-weight: 900; font-display: swap; src: url('cinzel-900.woff2') format('woff2'); }

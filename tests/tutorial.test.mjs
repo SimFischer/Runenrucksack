@@ -229,6 +229,6 @@ test('So geht\'s und Erste-Mal-Tipps: Inhalte aus tutorial.json', () => {
   for (const t of ['Kaufen', 'Drehen', 'Lager', 'Verschmelzen', 'Artikel-Siegel', 'Adjektiv-Runen', 'Kampf', 'Herzen und Siege', 'Begegnungen', 'Buch der Wörter', 'Heldencode']) {
     assert.ok(karten.includes(t), `Hilfe-Karte ${t}`);
   }
-  for (const s of TUT.schritte.filter((x) => x.hilfe)) assert.ok(s.hilfe.emoji && s.hilfe.text, s.id);
+  for (const s of TUT.schritte.filter((x) => x.hilfe)) assert.ok(s.hilfe.symbol && s.hilfe.text, s.id);
   for (const k of ['boss', 'gebiet', 'steigerung', 'unterklasse']) assert.ok(TUT.tipps[k], `Tipp ${k}`);
 });

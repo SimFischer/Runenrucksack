@@ -755,12 +755,11 @@ h2 .hint { font-size: 12px; font-weight: 400; color: var(--ink-soft); }
   border-radius: 6px;
 }
 .grid .cell.tasche[data-symbol]::after {
-  content: attr(data-symbol);
+  content: '';
   position: absolute;
-  right: 3px; top: 2px;
-  font-family: var(--emoji);
-  font-size: 18px;
-  opacity: .85;
+  right: 3px; top: 3px; width: 26px; height: 26px;
+  background: var(--tasche-bild) center / contain no-repeat;
+  opacity: .9;
 }
 .topbar .stat, .topbar .btn { white-space: nowrap; flex: none; }
 @media (max-width: 1300px) { .brand-text { display: none; } }

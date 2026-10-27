@@ -13,9 +13,10 @@ import {
   G, loadData, save, loadRun, placedOf, itemsIn, gridOf, region, hero, playerCtx, emit, onEvent, figurBild, hintergrundBild, setPref, saveProfil,
 } from './state.js';
 import { evaluateBag, GLANZ_BONUS } from './mods.js';
+import { sym } from './symbole.js';
 import {
   $, fmt, fullName, genusChip, toast, bump, openModal, closeModal, modal, itemEl, buildGrid, drawItems, mergeAnimation, syncGold, iconHtml,
-  openQuick, closeQuick, sternVon,
+  openQuick, closeQuick, sternVon, abzeichenHtml,
 } from './ui.js';
 import { startNight } from './battle-ui.js';
 import { frageImSpiel, wortschatz, einstellungen } from './aufgaben/spiel.js';
@@ -128,7 +129,7 @@ function zeigeRang() {
   const r = rangVon(G.PROFIL.xp, G.ACH.raenge);
   const box = $('start-rang');
   const pct = r.naechster ? Math.round(((G.PROFIL.xp - r.ab) / (r.naechster.ab - r.ab)) * 100) : 100;
-  box.innerHTML = `<span class="rang-emoji">${r.emoji}</span><span><b>${r.name}</b>
+  box.innerHTML = `<span class="rang-emoji">${sym('stern')}</span><span><b>${r.name}</b>
     <span class="rang-bar"><i style="width:${pct}%"></i></span>
     <small>${r.naechster ? `${G.PROFIL.xp} Erfahrung · noch ${r.bisNaechster} bis ${r.naechster.name}` : `${G.PROFIL.xp} Erfahrung · höchster Rang!`}</small></span>`;
 }
@@ -167,10 +168,10 @@ function showHeroes() {
     card.className = 'hero-card' + (frei ? '' : ' gesperrt');
     card.style.setProperty('--hero', h.farbe);
     card.innerHTML = `
-      <div class="hero-emoji">${figurBild(h.id) ? `<img src="${figurBild(h.id)}" alt="">` : h.emoji}${frei ? '' : '<span class="sam-schloss">🔒</span>'}</div>
+      <div class="hero-emoji">${figurBild(h.id) ? `<img src="${figurBild(h.id)}" alt="">` : ''}${frei ? '' : `<span class="sam-schloss">${sym('schloss')}</span>`}</div>
       <div class="hero-name">${h.name}</div>
       <div class="hero-volk">${h.volk}</div>
-      <p class="hero-staerke">${frei ? h.staerke : `🔒 ${bedingungText(h.freischaltung, fortschrittCtx())}`}</p>
+      <p class="hero-staerke">${frei ? h.staerke : bedingungText(h.freischaltung, fortschrittCtx())}</p>
       ${frei ? `<div class="hero-start">Start mit: ${h.start.map((s) => `<span>${iconHtml(G.DEFS[s.id])} ${fullName(G.DEFS[s.id])}</span>`).join('')}</div>` : ''}`;
     card.onclick = () => (frei ? startNewRun(h) : toast(bedingungText(h.freischaltung, fortschrittCtx())));
     box.append(card);
@@ -232,12 +233,12 @@ function showRegion(next) {
   applyTheme();
   modal(`
     <div class="region-card">
-      ${hintergrundBild(reg.id) ? `<img class="region-img" src="${hintergrundBild(reg.id)}" alt="">` : `<div class="big-emoji">${reg.emoji}</div>`}
+      ${hintergrundBild(reg.id) ? `<img class="region-img" src="${hintergrundBild(reg.id)}" alt="">` : ''}
       <p class="region-over">${reg.tage[0] === 1 ? 'Deine Reise beginnt in' : 'Du erreichst'}</p>
       <h2>${reg.name}</h2>
       <p>${reg.text}</p>
-      <p class="region-facts">📖 Wortfeld: <b>${reg.wortfeldName}</b><br>
-      ${boss.emoji} Am ${reg.tage[1]}. Tag wartet: <b>${boss.name}</b></p>
+      <p class="region-facts">${sym('buch')} Wortfeld: <b>${reg.wortfeldName}</b><br>
+      ${sym('kampf')} Am ${reg.tage[1]}. Tag wartet: <b>${boss.name}</b></p>
       <div class="row"><button class="btn primary big" data-act="go">Los geht's</button></div>
     </div>`, { go: next }, 'region');
 }
@@ -247,7 +248,7 @@ function showFate(next) {
   if (!f) { next(); return; }
   modal(`
     <p class="region-over">Die Schicksalsrune für deine Reise</p>
-    <div class="big-emoji fate-rune">${f.emoji}</div>
+    <div class="big-emoji fate-rune">${sym('stern', 'gross')}</div>
     <h2>${f.name}</h2>
     <p class="fate-text">${f.text}</p>
     <p class="muted">Sie gilt für den ganzen Lauf. Im Info-Feld siehst du sie jederzeit.</p>
@@ -260,12 +261,12 @@ function chooseSubclass(next) {
   if (!h?.unterklassen?.length || G.run.unterklasse) { next(); return; }
   emit('tipp', { key: 'unterklasse' });
   const card = openModal(`
-    <div class="enc-top">${h.emoji} ${h.name}</div>
+    <div class="enc-top">${h.name}</div>
     <h2>Wähle deinen Weg</h2>
     <p>In Hrossmark lernst du dazu. Welche Unterklasse nimmst du?</p>
     <div class="enc-choices">${h.unterklassen.map((u) => `
       <button class="enc-choice" data-id="${u.id}">
-        <span class="enc-emoji">${u.emoji}</span><b>${u.name}</b>
+        <span class="enc-emoji">${sym('kampf', 'gross')}</span><b>${u.name}</b>
         <span class="enc-reward">${u.text}</span>
       </button>`).join('')}
     </div>`, 'wide');
@@ -335,12 +336,12 @@ function pruefeBuch() {
 function renderTop() {
   const run = G.run, reg = region();
   const c = playerCtx();
-  $('stat-hero').textContent = `${hero()?.emoji || ''} ${hero()?.kurz || ''}${c.unterklasse ? ` ${c.unterklasse.emoji}` : ''}${c.fate ? ` ${c.fate.emoji}` : ''}`;
+  $('stat-hero').innerHTML = `${hero() && figurBild(hero().id) ? `<img class="stat-bild" src="${figurBild(hero().id)}" alt="">` : ''}${hero()?.kurz || ''}`;
   $('stat-hero').title = [c.unterklasse?.name, c.fate?.name].filter(Boolean).join(' · ');
   $('stat-hero').hidden = !hero();
-  $('stat-day').textContent = `${reg.emoji} ${reg.name} · Tag ${run.day} / ${CFG.lastDay}`;
-  $('stat-hearts').textContent = '❤️'.repeat(Math.max(0, run.hearts)) + '🤍'.repeat(CFG.hearts - Math.max(0, run.hearts));
-  $('stat-wins').textContent = `🏆 ${run.wins}`;
+  $('stat-day').innerHTML = `${sym('karte')}${reg.name} <span class="stat-tag">${sym('tag')}${run.day}/${CFG.lastDay}</span>`;
+  $('stat-hearts').innerHTML = sym('herz').repeat(Math.max(0, run.hearts)) + sym('herz', 'leer').repeat(CFG.hearts - Math.max(0, run.hearts));
+  $('stat-wins').innerHTML = `${sym('pokal')}${run.wins}`;
   syncGold();
   $('btn-reroll').disabled = run.gold < CFG.rerollCost;
 }
@@ -414,23 +415,23 @@ function renderShop() {
     if (cp) {
       const chain = document.createElement('span');
       chain.className = 'chain';
-      chain.textContent = '⛓️';
+      chain.innerHTML = sym('stern');
       chain.title = fern ? 'Ergibt mit etwas, das du besitzt, ein Kompositum' : 'Ergibt mit etwas in deinem Rucksack ein Kompositum';
       holder.append(chain);
     }
 
     const price = document.createElement('div');
     price.className = 'price-tag' + (run.gold < preis ? ' cant' : '') + (preis < def.preis ? ' rabatt' : '');
-    price.textContent = `${preis < def.preis ? '🏷️ ' : ''}${preis} 🪙`;
+    price.innerHTML = `${preis}${sym('gold')}`;
     if (n > 0) {
       price.classList.add('merge-hint');
-      price.innerHTML = `${preis < def.preis ? '🏷️ ' : ''}${preis} 🪙 <small>= sofort ★★</small>`;
+      price.innerHTML = `${preis}${sym('gold')} <small>= ★★</small>`;
       price.title = 'Kaufen = sofort ★★';
     }
 
     const lock = document.createElement('button');
     lock.className = 'lock' + (s.locked ? ' on' : '');
-    lock.textContent = s.locked ? '🔒' : '🔓';
+    lock.innerHTML = sym('schloss');
     lock.setAttribute('aria-label', s.locked ? 'Reservierung aufheben' : 'Reservieren');
     lock.onclick = () => { s.locked = !s.locked; render(); };
 
@@ -440,19 +441,19 @@ function renderShop() {
 }
 
 const STAT_ROWS = [
-  ['abklingzeit', '⏱️ Abklingzeit', (v) => `${fmt(v)} s`],
-  ['schaden', '⚔️ Schaden', fmt],
-  ['block', '🛡️ Block', fmt],
-  ['heilung', '💚 Heilung', fmt],
-  ['gift', '🧪 Gift', (v) => `+${fmt(v)} je Treffer`],
-  ['brand', '🔥 Brand', (v) => `+${fmt(v)} je Treffer`],
-  ['kaelte', '❄️ Kälte', (v) => `${fmt(v)} s`],
-  ['betaeubung', '💫 Betäubung', (v) => `${fmt(v)} s`],
-  ['regeneration', '🌙 Heilung über Zeit', (v) => `+${fmt(v)}`],
-  ['glueck', '🍀 Glück', (v) => `${fmt(v)} %`],
-  ['tempo', '💨 Tempo', (v) => `+${fmt(v)} %`],
-  ['leben', '❤️ Leben', (v) => `+${fmt(v)}`],
-  ['startblock', '🧱 Startblock', (v) => `+${fmt(v)}`],
+  ['abklingzeit', `${sym('sanduhr')} Abklingzeit`, (v) => `${fmt(v)} s`],
+  ['schaden', `${sym('kampf')} Schaden`, fmt],
+  ['block', `${sym('block')} Block`, fmt],
+  ['heilung', `${sym('heilung')} Heilung`, fmt],
+  ['gift', `${sym('gift')} Gift`, (v) => `+${fmt(v)} je Treffer`],
+  ['brand', `${sym('brand')} Brand`, (v) => `+${fmt(v)} je Treffer`],
+  ['kaelte', `${sym('kaelte')} Kälte`, (v) => `${fmt(v)} s`],
+  ['betaeubung', `${sym('betaeubung')} Betäubung`, (v) => `${fmt(v)} s`],
+  ['regeneration', `${sym('heilung')} Heilung über Zeit`, (v) => `+${fmt(v)}`],
+  ['glueck', `${sym('glueck')} Glück`, (v) => `${fmt(v)} %`],
+  ['tempo', `${sym('tempo')} Tempo`, (v) => `+${fmt(v)} %`],
+  ['leben', `${sym('herz')} Leben`, (v) => `+${fmt(v)}`],
+  ['startblock', `${sym('block')} Startblock`, (v) => `+${fmt(v)}`],
 ];
 
 const EXPLAIN = {
@@ -483,7 +484,7 @@ function renderInfo() {
     : `${base.artikel ? `<span class="art">${base.artikel}</span> ` : ''}${base.name}`;
   const icon = base.art === 'siegel'
     ? `<span class="seal-icon" style="--genus:${GENUS[base.genus].farbe}">${base.name}</span>`
-    : `${iconHtml(base, 'info-img')}${base.abzeichen ? `<span class="badge">${base.abzeichen}</span>` : ''}`;
+    : `${iconHtml(base, 'info-img')}${base.abzeichen ? `<span class="badge">${abzeichenHtml(base)}</span>` : ''}`;
   box.insertAdjacentHTML('beforeend', `
     <div class="info-head">
       <div class="info-emoji">${icon}</div>
@@ -513,12 +514,12 @@ function renderInfo() {
   for (const n of notes) box.insertAdjacentHTML('beforeend', `<p class="muted">${n}</p>`);
   for (const b of ana?.boni || []) box.insertAdjacentHTML('beforeend', `<p class="gram ok">${b}</p>`);
   const cursed = selected.uid && placedOf(selected.uid)?.fluch;
-  if (cursed) box.insertAdjacentHTML('beforeend', `<p class="gram bad">😈 Verflucht: Der Kobold hat den Namen falsch geschrieben („${cursed}“). Solange es im Rucksack liegt, kostet es dich zu Kampfbeginn 2 Leben.</p>`);
+  if (cursed) box.insertAdjacentHTML('beforeend', `<p class="gram bad">Verflucht: Der Kobold hat den Namen falsch geschrieben („${cursed}“). Solange es im Rucksack liegt, kostet es dich zu Kampfbeginn 2 Leben.</p>`);
 
   if (base.art === 'tasche') {
     box.insertAdjacentHTML('beforeend', `<p class="gram">Wird außen an den Rucksack genäht: +${base.tasche.felder.length} Felder. Items aus dem Wortfeld <b>${G.WORTFELDER[base.wortfeld]}</b> darin wirken ${base.tasche.bonus} % stärker.</p>`);
   } else if (base.wortfeld) {
-    box.insertAdjacentHTML('beforeend', `<p class="muted">📖 Wortfeld: ${G.WORTFELDER[base.wortfeld] || base.wortfeld}</p>`);
+    box.insertAdjacentHTML('beforeend', `<p class="muted">${sym('buch')} Wortfeld: ${G.WORTFELDER[base.wortfeld] || base.wortfeld}</p>`);
   }
   if (ana?.tasche && !ana.tasche.ok) {
     box.insertAdjacentHTML('beforeend', `<p class="gram bad">✗ Liegt in der ${ana.tasche.def.name}, gehört aber nicht zum Wortfeld ${G.WORTFELDER[ana.tasche.def.wortfeld]} – kein Bonus.</p>`);
@@ -543,13 +544,13 @@ function renderInfo() {
   if (selected.src === 'shop') {
     const slot = selected.slot;
     const preis = preisVon(G.run, base);
-    btn(`Kaufen <span class="price">${preis} 🪙</span>`, () => buyAuto(slot), 'primary').disabled = G.run.gold < preis;
+    btn(`Kaufen <span class="price">${preis} ${sym('gold')}</span>`, () => buyAuto(slot), 'primary').disabled = G.run.gold < preis;
   } else {
     const uid = selected.uid;
     if (canRotate(base)) btn(isRune(base) || isVerb(base) ? '⟳ Pfeil drehen' : '⟳ Drehen', () => rotateInPlace(uid));
-    if (selected.src === 'bag') btn('📦 Ins Lager', () => moveAuto(uid, 'store'));
-    else btn('🎒 In den Rucksack', () => moveAuto(uid, 'bag'));
-    btn(`Verkaufen <span class="price">+${sellValue(G.DEFS[placedOf(uid).id], placedOf(uid).stern || 1)} 🪙</span>`, () => sell(uid), 'danger');
+    if (selected.src === 'bag') btn(`${sym('truhe')} Ins Lager`, () => moveAuto(uid, 'store'));
+    else btn('In den Rucksack', () => moveAuto(uid, 'bag'));
+    btn(`Verkaufen <span class="price">+${sellValue(G.DEFS[placedOf(uid).id], placedOf(uid).stern || 1)} ${sym('gold')}</span>`, () => sell(uid), 'danger');
   }
   box.append(actions);
 }
@@ -567,12 +568,12 @@ function collectNotes(base, ref) {
   } else if (!isRune(base) && stern === MAX_STERN) {
     out.push(`<p class="gram star-line"><b class="star-big">★★★★</b> Höchste Stufe – legendär!</p>`);
   } else if (isRune(base) && base.steigerung) {
-    out.push(`<p class="gram star-line">Zwei gleiche Runen werden sofort gesteigert: ${base.steigerung.komparativ} → ${base.steigerung.superlativ} → 👑</p>`);
+    out.push(`<p class="gram star-line">Zwei gleiche Runen werden sofort gesteigert: ${base.steigerung.komparativ} → ${base.steigerung.superlativ} → Krone</p>`);
   }
   if (ref.src === 'shop' && canMerge(base)) {
     if (ownedCount(G.run, base.id) > 0) out.push('<p class="gram ok"><b>1/2 – Du hast schon eins davon. Kaufen = sofort ★★!</b></p>');
     const c = compoundPartner(base, playerCtx().fernsicht ? G.run.items.filter((p) => p.area !== 'neu') : itemsIn('bag'), G.DEFS, G.RECIPES);
-    if (c) out.push(`<p class="gram ok">⛓️ Mit ${dativ(c.mit).replace(/^(dem|der) /, (m) => m === 'dem ' ? 'deinem ' : 'deiner ')} wird daraus sofort: <b>${fullName(G.DEFS[c.id])}</b></p>`);
+    if (c) out.push(`<p class="gram ok">Mit ${dativ(c.mit).replace(/^(dem|der) /, (m) => m === 'dem ' ? 'deinem ' : 'deiner ')} wird daraus sofort: <b>${fullName(G.DEFS[c.id])}</b></p>`);
   }
   return out;
 }
@@ -649,7 +650,7 @@ function grammarNotes(base, ana, ref) {
     const b0 = G.DEFS[runeBase(base)];
     if (b0.steigerung) {
       const lv = base.stufe || 1;
-      out.push({ html: `Steigerung: ${b0.name} → ${b0.steigerung.komparativ} → ${b0.steigerung.superlativ}. ${lv >= 4 ? 'Das ist die höchste Stufe: der Superlativ mit Krone 👑.' : lv === 3 ? 'Superlativ! Noch eine gleiche Rune, dann bekommt sie die Krone 👑.' : 'Zwei gleiche Runen werden sofort gesteigert.'}` });
+      out.push({ html: `Steigerung: ${b0.name} → ${b0.steigerung.komparativ} → ${b0.steigerung.superlativ}. ${lv >= 4 ? 'Das ist die höchste Stufe: der Superlativ mit Krone.' : lv === 3 ? 'Superlativ! Noch eine gleiche Rune, dann bekommt sie die Krone.' : 'Zwei gleiche Runen werden sofort gesteigert.'}` });
     }
     const z = ana?.ziel;
     if (ana && !z) out.push({ cls: 'bad', html: '✗ Der Pfeil zeigt auf kein Item. Tippe nochmal, um ihn zu drehen.' });
@@ -704,30 +705,27 @@ function renderSummary(box) {
     for (const k in perSec) perSec[k] += ((d[k] || 0) / d.abklingzeit) * speed;
   }
   const rows = [
-    ['❤️ Leben', leben],
-    ['🧱 Startblock', startblock],
-    ['💨 Tempo', `+${tempo} %`],
-    ['⚔️ Schaden pro s', fmt(perSec.schaden)],
-    ['🛡️ Block pro s', fmt(perSec.block)],
-    ['💚 Heilung pro s', fmt(perSec.heilung)],
+    [`${sym('herz')} Leben`, leben],
+    [`${sym('block')} Startblock`, startblock],
+    [`${sym('tempo')} Tempo`, `+${tempo} %`],
+    [`${sym('kampf')} Schaden pro s`, fmt(perSec.schaden)],
+    [`${sym('block')} Block pro s`, fmt(perSec.block)],
+    [`${sym('heilung')} Heilung pro s`, fmt(perSec.heilung)],
   ];
-  if (glueck) rows.push(['🍀 Glück', `${glueck} %`]);
-  if (perSec.gift) rows.push(['🧪 Gift pro s', fmt(perSec.gift)]);
-  if (perSec.brand) rows.push(['🔥 Brand pro s', fmt(perSec.brand)]);
+  if (glueck) rows.push([`${sym('glueck')} Glück`, `${glueck} %`]);
+  if (perSec.gift) rows.push([`${sym('gift')} Gift pro s`, fmt(perSec.gift)]);
+  if (perSec.brand) rows.push([`${sym('brand')} Brand pro s`, fmt(perSec.brand)]);
 
   const reg = region();
   const boss = G.ENEMIES.find((e) => e.id === reg.boss);
   box.innerHTML = `
     <h2>Dein Rucksack</h2>
-    ${ctx.hero ? `<p class="gram">${ctx.hero.emoji} <b>${ctx.hero.name}</b>: ${ctx.hero.staerke}</p>` : ''}
-    ${ctx.unterklasse ? `<p class="gram">${ctx.unterklasse.emoji} <b>${ctx.unterklasse.name}</b>: ${ctx.unterklasse.text}</p>` : ''}
-    ${ctx.fate ? `<p class="gram">${ctx.fate.emoji} <b>Schicksalsrune</b>: ${ctx.fate.text}</p>` : ''}
+    ${ctx.hero ? `<p class="gram">${figurBild(ctx.hero.id) ? `<img class="gram-bild" src="${figurBild(ctx.hero.id)}" alt="">` : ''}<b>${ctx.hero.kurz || ctx.hero.name}</b>: ${ctx.hero.staerke}</p>` : ''}
+    ${ctx.unterklasse ? `<p class="gram"><b>${ctx.unterklasse.name}</b>: ${ctx.unterklasse.text}</p>` : ''}
+    ${ctx.fate ? `<p class="gram">${sym('stern')} <b>Schicksalsrune</b>: ${ctx.fate.text}</p>` : ''}
     <ul class="stats">${rows.map(([a, b]) => `<li><span>${a}</span><b>${b}</b></li>`).join('')}</ul>
-    ${run.day === reg.tage[1] ? `<p class="gram bad"><b>Heute Nacht wartet der Anführer: ${boss.emoji} ${boss.name}!</b></p>` : `<p class="muted">${boss.emoji} ${boss.name} wartet am ${reg.tage[1]}. Tag.</p>`}
-    <h3>So geht's</h3>
-    <p class="muted">Ziehe Items aus dem Laden in den Rucksack. Tippe ein Item an für Infos, tippe nochmal zum Drehen. Beim Ziehen dreht ein zweiter Finger das Item.</p>
-    <p class="muted">⭐ Zwei gleiche → sofort stärker. 🔥 Kraft links neben oder über einen Träger legen → sofort ein Kompositum. ${genusChip('der')} ${genusChip('die')} ${genusChip('das')} Siegel neben ein passendes Nomen. ➤ Runen-Pfeil auf ein passendes Nomen richten.</p>
-    <p class="muted">${run.day < CFG.lastDay ? `Morgen gibt es ${income(run.day + 1) + (run.goldBonus || 0)} 🪙. ` : 'Heute ist der letzte Tag deiner Reise! '}Mit 🔓 reservierst du ein Item im Laden.</p>`;
+    ${run.day === reg.tage[1] ? `<p class="gram bad">${sym('kampf')} <b>Heute Nacht: ${boss.name}!</b></p>` : `<p class="muted">${sym('kampf')} ${boss.name} am ${reg.tage[1]}. Tag</p>`}
+    <p class="muted">${run.day < CFG.lastDay ? `${sym('tag')} Morgen +${income(run.day + 1) + (run.goldBonus || 0)} ${sym('gold')}` : 'Letzter Tag der Reise!'}</p>`;
 }
 
 // ---------- Aktionen ----------
@@ -794,7 +792,7 @@ function sell(uid) {
   G.run.items = G.run.items.filter((i) => i !== p);
   G.run.gold += wert;
   selected = null;
-  toast(`${fullName(def)} verkauft: +${wert} 🪙`);
+  toast(`${fullName(def)} verkauft: +${wert} Gold`);
   bump('stat-gold');
   render();
 }
@@ -834,7 +832,7 @@ function rotateInPlace(uid) {
 function onFight() {
   if (!itemsIn('bag').length) {
     modal(`
-      <div class="big-emoji">🎒</div>
+      <div class="big-emoji">${sym('truhe', 'gross')}</div>
       <h2>Dein Rucksack ist leer</h2>
       <p>Ohne Items im Rucksack kannst du nicht kämpfen. Items im Lager wirken nicht.</p>
       <div class="row"><button class="btn primary" data-act="close">Zurück</button></div>`);
@@ -848,23 +846,23 @@ function onFight() {
 function openMenu() {
   const run = G.run, l = run.lernen;
   modal(`
-    <div class="big-emoji">🎒</div>
+    <div class="big-emoji">${sym('truhe', 'gross')}</div>
     <h2>Menü</h2>
     <p>${region().name} · Tag ${run.day} · ${run.wins} Siege · ${run.hearts} Herzen</p>
     ${l.richtig + l.falsch ? `<p>Grammatik-Aufgaben: ${l.richtig} richtig, ${l.falsch} daneben</p>` : ''}
     <div class="row">
       <button class="btn primary" data-act="close">Weiterspielen</button>
-      ${run.tutorial ? '' : '<button class="btn" data-act="pause">🧳 Lauf unterbrechen</button>'}
+      ${run.tutorial ? '' : '<button class="btn" data-act="pause">Lauf unterbrechen</button>'}
       <button class="btn danger" data-act="new">Neuer Lauf</button>
     </div>
     <div class="row">
-      <button class="btn small" data-act="buch">📚 Buch der Wörter</button>
-      <button class="btn small" data-act="sammlung">🏆 Sammlung</button>
-      <button class="btn small" data-act="code">🔑 Heldencode</button>
-      <button class="btn small" data-act="help">📖 So geht's</button>
-      <button class="btn small" data-act="tutorial">🧙 Tutorial wiederholen</button>
-      <button class="btn small" data-act="tips">💡 Erste-Mal-Tipps: ${tipsOn() ? 'an' : 'aus'}</button>
-      <button class="btn small" data-act="neustart">🗑️ Neu beginnen</button>
+      <button class="btn small" data-act="buch">${sym('buch')} Buch der Wörter</button>
+      <button class="btn small" data-act="sammlung">${sym('pokal')} Sammlung</button>
+      <button class="btn small" data-act="code">${sym('schloss')} Heldencode</button>
+      <button class="btn small" data-act="help">${sym('menue')} So geht's</button>
+      <button class="btn small" data-act="tutorial">${sym('stern')} Tutorial wiederholen</button>
+      <button class="btn small" data-act="tips">Erste-Mal-Tipps: ${tipsOn() ? 'an' : 'aus'}</button>
+      <button class="btn small" data-act="neustart">Neu beginnen</button>
     </div>`, {
     new: () => confirmNew(),
     tutorial: startTutorial,
@@ -922,7 +920,7 @@ function quiz(opts) {
   const draw = () => {
     const extra = tries > 0 && !run.tutorial;
     const broke = extra && run.gold < 1;
-    const cost = run.tutorial ? (tries ? 'Probier es noch einmal!' : '') : extra ? `Nächster Versuch: 1 🪙 (du hast ${run.gold})` : 'Erster Versuch frei';
+    const cost = run.tutorial ? (tries ? 'Probier es noch einmal!' : '') : extra ? `Nächster Versuch: 1 ${sym('gold')} (du hast ${run.gold})` : 'Erster Versuch frei';
     const card = openQuick(`
       <div class="quick-head">${opts.kopf || ''}<span class="quick-title">${q.titel}</span></div>
       <div class="quick-q">${q.prompt}</div>
@@ -1042,10 +1040,10 @@ function doMerge(a, glanz = false) {
   if (a.typ === 'kompositum') laufStand(run).komposita++;
   if (gross) laufStand(run).sterne4++;
   mergeAnimation(from, itemNode(p.uid), { icon, sterne: a.typ === 'kompositum' ? 0 : st, gewinn: gewinnText(a, p), gross });
-  if (gross) toast(isRune(nd) ? `👑 ${nd.name}! Die Rune trägt jetzt die Krone.` : `★★★★ ${nd.name} – legendär!`);
+  if (gross) toast(isRune(nd) ? `${nd.name}! Die Rune trägt jetzt die Krone.` : `★★★★ ${nd.name} – legendär!`);
   if (gross) { /* Feier-Toast steht oben */ } else if (a.typ === 'kompositum') toast(`${fullName(nd)} ist entstanden!`);
-  else toast(isRune(nd) ? `Rune gesteigert: ${nd.name}${nd.krone ? ' 👑' : ''}!` : `${'★'.repeat(p.stern)} ${nd.name}: jetzt viel stärker!`);
-  if (glanz) setTimeout(() => toast(`✨ ${nd.name} glänzt: +${GLANZ_BONUS} % im nächsten Kampf!`), 1300);
+  else toast(isRune(nd) ? `Rune gesteigert: ${nd.name}${nd.krone ? ' mit Krone' : ''}!` : `${'★'.repeat(p.stern)} ${nd.name}: jetzt viel stärker!`);
+  if (glanz) setTimeout(() => toast(`${nd.name} glänzt: +${GLANZ_BONUS} % im nächsten Kampf!`), 1300);
   emit('verschmolzen', { id: p.id, stern: sternVon(p), art: a.typ });
   // Kette: Gibt es zum neuen Item wieder ein gleiches? Erst nach der Animation weiter.
   pending.unshift({ uid: p.uid, paar: true });
@@ -1313,15 +1311,15 @@ function battleOver(won, enemyName) {
   save();
   const heartsLeft = Math.max(0, run.hearts);
   modal(won ? `
-      <div class="big-emoji">🏆</div>
+      <div class="big-emoji">${sym('pokal', 'gross')}</div>
       <h2>Sieg!</h2>
       <p>Du hast gegen ${enemyName} gewonnen.</p>
-      <p>Siege: <b>${run.wins}</b> · Herzen: <b>${'❤️'.repeat(heartsLeft)}${'🤍'.repeat(CFG.hearts - heartsLeft)}</b></p>
+      <p>Siege: <b>${run.wins}</b> · Herzen: <b>${sym('herz').repeat(heartsLeft)}${sym('herz', 'leer').repeat(CFG.hearts - heartsLeft)}</b></p>
       <div class="row"><button class="btn primary big" data-act="next">Weiter</button></div>` : `
-      <div class="big-emoji">💔</div>
+      <div class="big-emoji">${sym('herzZerbrochen', 'gross')}</div>
       <h2>Niederlage</h2>
       <p>${enemyName} war heute stärker. Du verlierst ein Herz.</p>
-      <p>Herzen: <b>${'❤️'.repeat(heartsLeft)}${'🤍'.repeat(CFG.hearts - heartsLeft)}</b></p>
+      <p>Herzen: <b>${sym('herz').repeat(heartsLeft)}${sym('herz', 'leer').repeat(CFG.hearts - heartsLeft)}</b></p>
       <div class="row"><button class="btn primary big" data-act="next">Weiter</button></div>`,
   { next: afterBattle });
   emit('kampfEnde', { won });
@@ -1331,7 +1329,7 @@ function afterBattle() {
   if (G.run.tutorial) { showGame(); render(); emit('nachKampf'); return; } // das Tutorial führt weiter
   if (G.run.over) { showRunEnd(); return; }
   showGame();
-  toast(`Neuer Tag: +${income(G.run.day)} 🪙`);
+  toast(`Neuer Tag: +${income(G.run.day)} Gold`);
   continueFlow();
 }
 

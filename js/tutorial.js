@@ -1,6 +1,7 @@
 // Tutorial „Der erste Tag“: Meister Fenwick führt mit Spotlight, Sprechblase und Hand durch einen
 // festgelegten, echten Lauf. Die Schritte stehen in tutorial.json, die Prüf-Logik in tutorial-logic.js.
 import { G, onEvent, getPref, setPref, loadRun, emit, saveProfil } from './state.js';
+import { sym } from './symbole.js';
 import {
   activeSteps, makeTutorialRun, applyShop, sichereLaden, prepareStep, checkStep, resetWrong, targetCell, spotFor,
 } from './tutorial-logic.js';
@@ -12,7 +13,9 @@ const IDLE_MS = 8000;
 let api = null;            // Einstiegspunkte aus main.js
 let steps = [], idx = -1, active = false, shown = false;
 let idleTimer = 0, layoutTimer = 0, extraTip = '', warnText = '';
-let fenwickImg = null;
+// Meister Fenwick in drei Posen: erklärt (Erklärungen), Tipp (Hinweise), jubelt (Erfolge)
+const pose = (p) => G.TUTORIAL.begleiter.posen?.[p] || G.TUTORIAL.begleiter.bild;
+const fenwickHtml = (p, cls = '') => `<img${cls ? ` class="${cls}"` : ''} src="${pose(p)}" alt="${G.TUTORIAL.begleiter.name}">`;
 const el = {};
 
 export const tutorialDone = () => getPref('tutorial') === 'fertig' || !!G.PROFIL?.tutorial;
@@ -28,9 +31,9 @@ export function initTutorial(mainApi) {
   layer.innerHTML = `
     <svg id="tut-shade" width="100%" height="100%"><defs><mask id="tut-mask"><rect width="100%" height="100%" fill="white"/><g id="tut-holes"></g></mask></defs>
       <rect width="100%" height="100%" fill="rgba(8,5,2,.66)" mask="url(#tut-mask)"/><g id="tut-rings"></g></svg>
-    <div id="tut-hand">👆</div>
+    <div id="tut-hand"><span class="tut-finger"></span></div>
     <div id="tut-bubble" role="dialog" aria-live="polite">
-      <div class="tut-fenwick" id="tut-fenwick">🧙</div>
+      <div class="tut-fenwick" id="tut-fenwick"></div>
       <div class="tut-body">
         <div class="tut-name">${G.TUTORIAL.begleiter.name}</div>
         <p class="tut-text" id="tut-text"></p>
@@ -55,14 +58,12 @@ export function initTutorial(mainApi) {
   window.addEventListener('resize', () => active && layout());
   onEvent(handleEvent);
 
-  // Bild von Fenwick, falls vorhanden – sonst bleibt das Emoji.
-  const img = new Image();
-  img.onload = () => { fenwickImg = img.src; if (active) drawFenwick(); };
-  img.src = G.TUTORIAL.begleiter.bild;
 }
 
 function drawFenwick() {
-  el['tut-fenwick'].innerHTML = fenwickImg ? `<img src="${fenwickImg}" alt="${G.TUTORIAL.begleiter.name}">` : G.TUTORIAL.begleiter.emoji;
+  // Pose nach Schritt: Hinweis oder Warnung → Tipp, sonst erklärt
+  const s = step();
+  el['tut-fenwick'].innerHTML = fenwickHtml(s?.hinweis || warnText ? 'tipp' : 'erklaert');
 }
 
 // ---------- Start, Ende, Überspringen ----------
@@ -98,7 +99,7 @@ function confirmSkip() {
   box.id = 'tut-confirm';
   box.innerHTML = `
     <div class="tut-confirm-card">
-      <div class="big-emoji">${fenwickImg ? `<img class="confirm-fenwick" src="${fenwickImg}" alt="">` : '🧙'}</div>
+      <div class="big-emoji">${fenwickHtml('tipp', 'confirm-fenwick')}</div>
       <h2>Tutorial überspringen?</h2>
       <p>Du kannst es im Menü jederzeit wiederholen.</p>
       <div class="row">
@@ -187,6 +188,7 @@ function draw() {
   el['tut-bubble'].hidden = !shown;
   el['tut-skip'].hidden = false;
   if (!shown) { clearHand(); layout(); return; }
+  drawFenwick();
   el['tut-text'].textContent = s.text;
   const tip = [warnText, extraTip, s.hinweis].filter(Boolean)[0] || '';
   el['tut-tip'].textContent = tip;
@@ -366,12 +368,12 @@ function finale() {
   const box = document.createElement('div');
   box.id = 'tut-finale';
   const confetti = Array.from({ length: 36 }, (_, i) =>
-    `<span style="left:${(i * 37) % 100}%;animation-delay:${(i % 9) * 0.18}s;animation-duration:${2.4 + (i % 5) * 0.35}s">${['✨', '⭐', '🎉', '🔥', '📜', '💎'][i % 6]}</span>`).join('');
+    `<span style="left:${(i * 37) % 100}%;animation-delay:${(i % 9) * 0.18}s;animation-duration:${2.4 + (i % 5) * 0.35}s">★</span>`).join('');
   const saved = api.hasSavedRun();
   box.innerHTML = `
     <div class="confetti">${confetti}</div>
     <div class="tut-finale-card">
-      <div class="tut-finale-fenwick">${fenwickImg ? `<img src="${fenwickImg}" alt="">` : G.TUTORIAL.begleiter.emoji}</div>
+      <div class="tut-finale-fenwick">${fenwickHtml('jubelt')}</div>
       <h2>Geschafft!</h2>
       <p>${step().text}</p>
       <div class="row">
@@ -398,13 +400,13 @@ export function showHelp(onClose = null) {
   box.innerHTML = `
     <div class="help-card">
       <div class="help-head">
-        <span class="help-fenwick">${fenwickImg ? `<img src="${fenwickImg}" alt="">` : G.TUTORIAL.begleiter.emoji}</span>
+        <span class="help-fenwick">${fenwickHtml('erklaert')}</span>
         <h2>So geht's</h2>
         <button class="btn icon" data-close aria-label="Schließen">✕</button>
       </div>
       <div class="help-grid">${helpCards().map((h) => `
         <div class="help-item">
-          <span class="help-emoji anim-${h.animation || 'pulsieren'}">${h.emoji}</span>
+          <span class="help-emoji anim-${h.animation || 'pulsieren'}">${sym(h.symbol || 'stern', 'gross')}</span>
           <div><b>${h.titel}</b><p>${h.text}</p></div>
         </div>`).join('')}
       </div>
@@ -431,7 +433,7 @@ function firstTip(key) {
   document.getElementById('tip-bubble')?.remove();
   const b = document.createElement('div');
   b.id = 'tip-bubble';
-  b.innerHTML = `<span class="tip-fenwick">${fenwickImg ? `<img src="${fenwickImg}" alt="">` : G.TUTORIAL.begleiter.emoji}</span><p>${text}</p><button class="btn small" aria-label="Tipp schließen">OK</button>`;
+  b.innerHTML = `<span class="tip-fenwick">${fenwickHtml('tipp')}</span><p>${text}</p><button class="btn small" aria-label="Tipp schließen">OK</button>`;
   document.body.append(b);
   const close = () => b.remove();
   b.querySelector('button').onclick = close;

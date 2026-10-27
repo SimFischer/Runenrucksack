@@ -5,18 +5,18 @@ import { isRune, pluralOf } from './grammar.js';
 import { verbSatz } from './aufgaben/verbsatz.js';
 
 export const SEITEN = [
-  { id: 'komposita', titel: 'Komposita', emoji: '🔥', text: 'Kraft + Träger = ein neues Wort. Das letzte Wort bestimmt den Artikel.' },
-  { id: 'stufen', titel: 'Sternstufen', emoji: '⭐', text: 'Zwei gleiche werden sofort stärker – bis zur legendären Stufe ★★★★.' },
-  { id: 'steigerungen', titel: 'Steigerungen', emoji: '✨', text: 'Adjektive steigern: scharf → schärfer → am schärfsten.' },
-  { id: 'saetze', titel: 'Sätze', emoji: '📜', text: 'Ein Verb braucht ein Subjekt: „Die Axt schlägt.“' },
-  { id: 'besondere', titel: 'Schätze', emoji: '💎', text: 'Seltene Fundstücke aus den Wanderlanden.' },
+  { id: 'komposita', titel: 'Komposita', symbol: 'brand', text: 'Kraft + Träger = ein neues Wort. Das letzte Wort bestimmt den Artikel.' },
+  { id: 'stufen', titel: 'Sternstufen', symbol: 'stern', text: 'Zwei gleiche werden sofort stärker – bis zur legendären Stufe ★★★★.' },
+  { id: 'steigerungen', titel: 'Steigerungen', symbol: 'tempo', text: 'Adjektive steigern: scharf → schärfer → am schärfsten.' },
+  { id: 'saetze', titel: 'Sätze', symbol: 'menue', text: 'Mit dem Gegenstand handelt eine Person: „Eadrun schlägt mit der Axt kräftig zu.“' },
+  { id: 'besondere', titel: 'Schätze', symbol: 'truhe', text: 'Seltene Fundstücke aus den Wanderlanden.' },
 ];
 
 const cap = (s) => s.charAt(0).toUpperCase() + s.slice(1);
 const voll = (d) => (d.artikel ? `${d.artikel} ${d.name}` : d.name);
 // Kurze Wirkung für die Karte im Buch.
-const WIRKUNG = [['schaden', '⚔️'], ['block', '🛡️'], ['heilung', '💚'], ['gift', '🧪'], ['brand', '🔥'], ['kaelte', '❄️'],
-  ['betaeubung', '💫'], ['regeneration', '🌙'], ['leben', '❤️'], ['startblock', '🧱'], ['tempo', '💨'], ['glueck', '🍀']];
+const WIRKUNG = [['schaden', 'Schaden'], ['block', 'Block'], ['heilung', 'Heilung'], ['gift', 'Gift'], ['brand', 'Brand'], ['kaelte', 'Kälte'],
+  ['betaeubung', 'Betäubung'], ['regeneration', 'Heilung'], ['leben', 'Leben'], ['startblock', 'Startblock'], ['tempo', 'Tempo'], ['glueck', 'Glück']];
 export const kurzWirkung = (d) => WIRKUNG.filter(([k]) => d[k]).slice(0, 3).map(([k, e]) => `${e} ${String(d[k]).replace('.', ',')}`).join(' · ');
 
 // Kann ein Item Sternstufen bekommen? (wie sterne.canMerge, ohne Runen)
@@ -59,7 +59,7 @@ export function baueBuch(defs, items, recipes, ws = null) {
       const lv = defs[`${d.id}@${s}`];
       if (!lv) continue;
       add('steigerungen', {
-        id: `steig:${d.id}@${s}`, def: lv, stern: s, name: lv.name + (s === 4 ? ' 👑' : ''), gruppe: d.id,
+        id: `steig:${d.id}@${s}`, def: lv, stern: s, name: lv.name + (s === 4 ? ' (Krone)' : ''), gruppe: d.id,
         wirkung: s === 2 ? 'Komparativ (Vergleichsstufe)' : s === 3 ? 'Superlativ (höchste Stufe)' : 'Superlativ mit Krone',
         hinweis: `${d.name} → ${d.steigerung.komparativ} → ${d.steigerung.superlativ}${d.steigerung.unregelmaessig ? ' (unregelmäßig!)' : ''}`,
       });

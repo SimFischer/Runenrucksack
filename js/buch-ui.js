@@ -1,13 +1,14 @@
 // Buch der Wörter: Bildschirm mit Seiten, Fortschrittsbalken und Karten; Einblendung bei neuen Entdeckungen.
 import { G, emit } from './state.js';
 import { seitenStand } from './buch.js';
-import { iconHtml, genusChip } from './ui.js';
+import { iconHtml, genusChip, abzeichenHtml } from './ui.js';
+import { sym } from './symbole.js';
 
 let seiteAktiv = 'komposita';
 
 // Seite „Regeln“: Regelkarten aus den Aufgaben (themen.json), gesammelt in G.PROFIL.regeln – zählt nicht zu den Buch-Einträgen.
 const regelSeite = () => ({
-  id: 'regeln', emoji: '📜', titel: 'Regeln', text: 'Regelkarten: Jede Regel, die du beim Lösen einer Aufgabe richtig angewendet hast, landet hier.',
+  id: 'regeln', symbol: 'buch', titel: 'Regeln', text: 'Regelkarten: Jede Regel, die du beim Lösen einer Aufgabe richtig angewendet hast, landet hier.',
   eintraege: G.THEMEN.themen.flatMap((t) => t.regeln.map((r) => ({ id: `regel:${r.id}`, regel: r, thema: t }))),
 });
 
@@ -22,23 +23,23 @@ export function zeigeBuch(zurueck = null) {
     const seiten = [...G.BUCH.seiten, regelSeite()];
     const seite = { ...seiten.find((s) => s.id === seiteAktiv) };
     const lohn = G.ACH.designs.find((d) => d.freischaltung?.seite === seite.id);
-    if (lohn) seite.belohnung = `Rucksack-Design „${lohn.name}“ ${lohn.emoji}`;
+    if (lohn) seite.belohnung = `Rucksack-Design „${lohn.name}“`;
     const stand = seitenStand(seite, entdeckt);
     box.innerHTML = `
       <div class="buch-card" data-tut="buch-fenster">
         <header class="buch-head">
-          <h2>📚 Buch der Wörter</h2>
-          <span class="buch-total">${G.PROFIL.buch.length} von ${gesamt} entdeckt · 📜 ${(G.PROFIL.regeln || []).length} Regeln</span>
+          <h2>${sym('buch')} Buch der Wörter</h2>
+          <span class="buch-total">${G.PROFIL.buch.length} von ${gesamt} entdeckt · ${(G.PROFIL.regeln || []).length} Regeln</span>
           <button class="btn primary" data-close>Schließen</button>
         </header>
         <nav class="buch-tabs">${seiten.map((s) => {
           const st = seitenStand(s, entdeckt);
           return `<button class="buch-tab${s.id === seiteAktiv ? ' on' : ''}${st.voll ? ' voll' : ''}" data-seite="${s.id}">
-            <span>${s.emoji} ${s.titel}</span>
+            <span>${sym(s.symbol)} ${s.titel}</span>
             <span class="buch-bar"><i style="width:${Math.round((st.gefunden / st.gesamt) * 100)}%"></i></span>
             <small>${st.gefunden}/${st.gesamt}</small></button>`;
         }).join('')}</nav>
-        <p class="buch-intro">${seite.text}${seite.belohnung ? ` <b class="buch-lohn${stand.voll ? ' da' : ''}">${stand.voll ? '✓' : '🎁'} Volle Seite: ${seite.belohnung}</b>` : ''}</p>
+        <p class="buch-intro">${seite.text}${seite.belohnung ? ` <b class="buch-lohn${stand.voll ? ' da' : ''}">${stand.voll ? '✓' : sym('truhe')} Volle Seite: ${seite.belohnung}</b>` : ''}</p>
         <div class="buch-grid">${seite.eintraege.map((e) => karte(e, entdeckt.has(e.id))).join('')}</div>
       </div>`;
     box.querySelector('[data-close]').onclick = () => { box.remove(); emit('buchZu'); zurueck?.(); };
@@ -50,13 +51,13 @@ export function zeigeBuch(zurueck = null) {
 
 function karte(e, da) {
   if (e.regel) {
-    return da ? `<div class="buch-eintrag regel-karte"><span class="regel-emoji">${e.thema.emoji}</span><b>${e.thema.name}</b><small>${e.regel.text}</small></div>`
-      : `<div class="buch-eintrag regel-karte dunkel"><span class="regel-emoji">📜</span><b>???</b><small>${e.thema.name}</small></div>`;
+    return da ? `<div class="buch-eintrag regel-karte"><span class="regel-emoji">${sym('buch')}</span><b>${e.thema.name}</b><small>${e.regel.text}</small></div>`
+      : `<div class="buch-eintrag regel-karte dunkel"><span class="regel-emoji">${sym('menue')}</span><b>???</b><small>${e.thema.name}</small></div>`;
   }
   const sterne = e.stern && e.seite === 'stufen' ? `<em class="buch-sterne">${'★'.repeat(e.stern)}</em>` : '';
   const bild = e.seite === 'saetze'
     ? `<span class="buch-pair">${iconHtml(e.subjekt, 'buch-img')}<b>+</b>${iconHtml(e.def, 'buch-img')}</span>`
-    : `<span class="buch-pic${e.stern === 4 ? ' legendaer' : ''}"${e.def.leuchten ? ` style="--glow:${e.def.leuchten}"` : ''}>${iconHtml(e.def, 'buch-img')}${sterne}${e.def.abzeichen && e.seite === 'komposita' ? `<em class="buch-kraft">${e.def.abzeichen}</em>` : ''}</span>`;
+    : `<span class="buch-pic${e.stern === 4 ? ' legendaer' : ''}"${e.def.leuchten ? ` style="--glow:${e.def.leuchten}"` : ''}>${iconHtml(e.def, 'buch-img')}${sterne}${e.def.abzeichen && e.seite === 'komposita' ? `<em class="buch-kraft">${abzeichenHtml(e.def)}</em>` : ''}</span>`;
   if (!da) return `<div class="buch-eintrag dunkel">${bild}<b>???</b></div>`;
   return `<div class="buch-eintrag">${bild}
     <b>${e.artikel ? genusChip(e.artikel) + ' ' : ''}${e.name}</b>
@@ -93,10 +94,10 @@ function naechste() {
   zeigt = true;
   const n = document.createElement('div');
   n.className = 'buch-neu';
-  if (e.regel) n.innerHTML = `<span class="buch-neu-pic">📜</span><span><small>Neue Regelkarte im Buch!</small><b>${e.regel.thema.emoji} ${e.regel.thema.name}</b></span>`;
-  else if (e.erfolg) n.innerHTML = `<span class="buch-neu-pic">${e.erfolg.emoji}</span><span><small>🏆 Neuer Erfolg!</small><b>${e.erfolg.name}</b></span>`;
+  if (e.regel) n.innerHTML = `<span class="buch-neu-pic">${sym('menue')}</span><span><small>Neue Regelkarte im Buch!</small><b>${e.regel.thema.name}</b></span>`;
+  else if (e.erfolg) n.innerHTML = `<span class="buch-neu-pic">${sym('pokal')}</span><span><small>Neuer Erfolg!</small><b>${e.erfolg.name}</b></span>`;
   else n.innerHTML = `<span class="buch-neu-pic">${iconHtml(e.def, 'buch-img')}</span>
-    <span><small>📚 Neu im Buch der Wörter!</small><b>${e.seite === 'stufen' ? '★'.repeat(e.stern) + ' ' : ''}${e.artikel ? e.artikel + ' ' : ''}${e.name}</b></span>`;
+    <span><small>Neu im Buch der Wörter!</small><b>${e.seite === 'stufen' ? '★'.repeat(e.stern) + ' ' : ''}${e.artikel ? e.artikel + ' ' : ''}${e.name}</b></span>`;
   document.body.append(n);
   setTimeout(() => n.remove(), 2400);
   setTimeout(naechste, warteschlange.length ? 900 : 2400);

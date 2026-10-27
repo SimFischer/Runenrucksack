@@ -89,7 +89,7 @@ export function evaluateBag(placed, defs, ctx = {}) {
     // Glanz (Aufgabe der Stufe 3 gleich richtig): +10 % im nächsten Kampf.
     if (p.glanz) {
       i.def = applyMod(i.def, { prozent: GLANZ_BONUS });
-      i.boni.push(`✨ Glanz: +${GLANZ_BONUS} % im nächsten Kampf`);
+      i.boni.push(`Glanz: +${GLANZ_BONUS} % im nächsten Kampf`);
     }
     // Wortfeld-Tasche: passende Items darin werden stärker.
     const t = tascheOf(p, defs, ctx.taschenFelder);

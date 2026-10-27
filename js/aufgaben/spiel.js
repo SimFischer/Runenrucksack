@@ -42,7 +42,7 @@ export async function frageImSpiel(opts) {
   emit('tipp', { key: 'stufen' });
   const ergebnis = await stelleAufgabe(aufgabe, {
     anker: opts.anker,
-    titel: `${t?.emoji || ''} ${t?.name || ''}`,
+    titel: t?.name || '',
     kopf: opts.kopf,
     tutorial: run.tutorial,
     gold: () => run.gold,
@@ -59,11 +59,11 @@ export async function frageImSpiel(opts) {
     merkeAntwort(run, REGEL_GRUPPE[aufgabe.thema] || 'rechtschreibung', !!ergebnis.richtig, !!ergebnis.ersterVersuch);
     const v = verbucheAufgabe({ run, profil: G.PROFIL, aufgabe, ergebnis, rng });
     if (v.aufgestiegen && v.stufe <= maxStufe(einstellungen(), aufgabe.thema)) {
-      toast(`${t.emoji} ${t.name}: Du kannst das schon sicher – jetzt kommt Stufe ${'★'.repeat(v.stufe)}!`);
+      toast(`${t.name}: Du kannst das schon sicher – jetzt kommt Stufe ${'★'.repeat(v.stufe)}!`);
     }
     if (ergebnis.richtig && ergebnis.ersterVersuch && !run.tutorial) {
       const gold = GOLD_FUER_STUFE[aufgabe.stufe] || 0;
-      if (gold) { run.gold += gold; bump('stat-gold'); toast(`Gleich richtig auf Stufe ${aufgabe.stufe}: +${gold} 🪙`); }
+      if (gold) { run.gold += gold; bump('stat-gold'); toast(`Gleich richtig auf Stufe ${aufgabe.stufe}: +${gold} Gold`); }
     }
     // Regelkarte fürs Buch: jede Regel, die richtig angewendet wurde
     G.PROFIL.regeln ||= [];

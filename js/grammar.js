@@ -77,7 +77,7 @@ export function buildCompounds(defs, recipes) {
         art: 'kompositum',
         name: kd.name + lowerFirst(td.name),
         artikel: td.artikel,
-        abzeichen: kd.emoji,
+        abzeichen: kd.id, // Kristall als Abzeichen (Bild über abzeichenHtml)
         leuchten: kraft.farbe,
         seltenheit: bump[td.seltenheit] || td.seltenheit,
         preis: td.preis + kd.preis + (k.preisAufschlag || 0),
@@ -262,7 +262,7 @@ export function buildRuneLevels(defs) {
         basis: d.id,
         stufe,
         name: stufe === 2 ? d.steigerung.komparativ : d.steigerung.superlativ,
-        abzeichen: stufe === 4 ? '👑' : null,
+        abzeichen: stufe === 4 ? '♛' : null,
         krone: stufe === 4,
         seltenheit: stufe === 4 ? 'legendaer' : bump[prev.seltenheit],
         preis: d.preis * 2 ** (stufe - 1),

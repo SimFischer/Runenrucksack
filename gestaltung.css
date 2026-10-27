@@ -1,0 +1,205 @@
+/* Runenrucksack – Gestaltung: Materialien statt Flächen (dunkles Holz, Holz, Pergament, Tinte, Gold, Eisen, Moos, Glut),
+   eigene Schriften (Andika zum Lesen, Cinzel für Titel), Knöpfe mit Kante und Druck, Tafeln mit Holzrahmen,
+   Symbole als Bilder statt Emojis. Wird nach style.css geladen und überschreibt dessen Grundlagen. */
+
+:root {
+  /* Materialien */
+  --holz-dunkel: #22150d;
+  --holz: #6b4226;
+  --holz-hell: #9a6a3e;
+  --pergament: #f1e0bb;
+  --pergament-dunkel: #d9c08e;
+  --tinte: #3a2617;
+  --tinte-hell: #6b5442;
+  --gold: #e8b23a;
+  --gold-hell: #ffd96f;
+  --gold-dunkel: #a2701a;
+  --eisen: #4a4e57;
+  --eisen-hell: #8f949e;
+  --moos: #6f8f3a;
+  --moos-dunkel: #4b6524;
+  --glut: #e0662a;
+  --glut-hell: #ffb05c;
+  --blut: #b23b2c;
+
+  /* Alte Namen aus style.css zeigen auf die Materialien */
+  --wood: var(--holz-dunkel);
+  --wood-2: #33211a;
+  --wood-3: var(--holz);
+  --parchment: var(--pergament);
+  --parchment-2: var(--pergament-dunkel);
+  --ink: var(--tinte);
+  --ink-soft: var(--tinte-hell);
+  --gold-dark: var(--gold-dunkel);
+  --red: var(--blut);
+  --green: var(--moos);
+  --line: #1a100a;
+
+  --font: 'Andika', 'Trebuchet MS', sans-serif;
+  --titel: 'Cinzel', Georgia, 'Times New Roman', serif;
+  --radius: 14px;
+  /* Höhe des sichtbaren Bereichs – mit eingeblendeter Safari-Leiste */
+  --hoehe: 100vh;
+}
+@supports (height: 100dvh) { :root { --hoehe: 100dvh; } }
+
+html, body { background: var(--holz-dunkel); font-family: var(--font); font-size: 17px; }
+body { height: var(--hoehe); }
+.screen { height: var(--hoehe); bottom: auto; animation: einblenden .35s ease-out; }
+@keyframes einblenden { from { opacity: 0; } to { opacity: 1; } }
+
+h1, h2, h3, .titel { font-family: var(--titel); font-weight: 700; letter-spacing: .03em; }
+
+/* Titel, die auf jedem Hintergrund lesbar sind: helle Füllung, dunkle Kontur, Schatten */
+.titel-gross, .logo-schrift {
+  font-family: var(--titel); font-weight: 900; color: #ffe9b8;
+  -webkit-text-stroke: 2px #2a1407; paint-order: stroke fill;
+  text-shadow: 0 3px 0 #2a1407, 0 8px 18px rgba(0, 0, 0, .6);
+}
+
+/* ---------- Symbole ---------- */
+.sym { height: 1.35em; width: auto; vertical-align: -.32em; display: inline-block; filter: drop-shadow(0 1px 1px rgba(0, 0, 0, .45)); pointer-events: none; }
+.sym.gross { height: 2.2em; vertical-align: middle; }
+.sym.klein { height: 1.1em; vertical-align: -.22em; }
+
+/* ---------- Knöpfe: Holz für Nebenaktionen, Gold für die Hauptaktion, rund für Symbole ---------- */
+.btn {
+  min-height: 56px; padding: 8px 20px 11px;
+  font-family: var(--titel); font-weight: 700; font-size: 18px; letter-spacing: .02em;
+  color: var(--pergament);
+  background: linear-gradient(180deg, #8a5a34, #5c3920);
+  border: 2px solid #26150a; border-radius: 14px;
+  box-shadow: inset 0 1px 0 rgba(255, 220, 160, .25), inset 0 -5px 0 rgba(0, 0, 0, .35), 0 4px 0 rgba(0, 0, 0, .45);
+  text-shadow: 0 1px 0 rgba(0, 0, 0, .55);
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  transition: transform .08s, box-shadow .08s, filter .15s;
+}
+.btn:active { transform: translateY(3px); box-shadow: inset 0 1px 0 rgba(255, 220, 160, .2), inset 0 -2px 0 rgba(0, 0, 0, .35), 0 1px 0 rgba(0, 0, 0, .45); }
+.btn:disabled { filter: grayscale(.7) brightness(.75); opacity: 1; transform: none; }
+.btn.primary, .btn.active {
+  color: var(--tinte); text-shadow: 0 1px 0 rgba(255, 240, 200, .6);
+  background: linear-gradient(180deg, var(--gold-hell), var(--gold));
+  border-color: #6d4a10;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .45), inset 0 -5px 0 var(--gold-dunkel), 0 4px 0 rgba(0, 0, 0, .45);
+}
+.btn.danger { color: #fff3e6; background: linear-gradient(180deg, #c85a46, #8e2c20); border-color: #4a120b; }
+.btn.big { font-size: 22px; padding: 10px 30px 14px; min-height: 64px; }
+.btn.small { font-size: 16px; min-height: 56px; padding: 6px 16px 9px; }
+.btn.icon, .btn.rund {
+  width: 56px; min-width: 56px; height: 56px; padding: 0; border-radius: 50%;
+}
+.btn.icon .sym, .btn.rund .sym { height: 34px; vertical-align: middle; }
+.btn .sym { height: 1.3em; }
+.quick-no, .btn.quick-no {
+  background: none; border: none; box-shadow: none; min-height: 44px; color: inherit;
+  font-family: var(--font); font-weight: 700; text-decoration: underline; text-shadow: none;
+}
+
+/* ---------- Tafeln: Pergament im Holzrahmen (9-teiliger Rahmen) ---------- */
+.tafel, .modal-card, .code-card, .help-card, .buch-card, .af-fenster, .tut-confirm-card {
+  color: var(--tinte);
+  background: none;
+  border: 26px solid transparent;
+  border-image: url('assets/ui/tafel-rahmen.webp') 64 fill / 26px stretch;
+  border-radius: 0;
+  box-shadow: none;
+  filter: drop-shadow(0 12px 22px rgba(0, 0, 0, .55));
+}
+.modal-card h2, .code-card h2, .help-card h2, .buch-card h2 { font-family: var(--titel); color: var(--tinte); }
+
+/* Pergament ohne Rahmen (kleinere Flächen innerhalb von Tafeln) */
+.pergament {
+  color: var(--tinte);
+  background: radial-gradient(ellipse at 20% 0%, rgba(255, 255, 255, .3), transparent 55%), linear-gradient(180deg, var(--pergament), var(--pergament-dunkel));
+  border: 3px solid #7a5530; border-radius: var(--radius);
+  box-shadow: inset 0 0 24px rgba(120, 80, 30, .25), 0 4px 0 rgba(0, 0, 0, .35);
+}
+
+/* ---------- Kopfleiste: dunkles Holz mit Goldkante, Werte als Plaketten ---------- */
+.topbar {
+  background: linear-gradient(180deg, #4a2f1d, #2a1a10 70%, #1e130b);
+  border: none; border-bottom: 3px solid var(--gold);
+  box-shadow: 0 4px 0 rgba(0, 0, 0, .45), inset 0 1px 0 rgba(255, 210, 140, .2);
+  border-radius: 0 0 14px 14px;
+  padding: 6px 12px; gap: 10px; min-height: 64px;
+}
+.stat {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-family: var(--titel); font-weight: 700; font-size: 18px; color: #ffe7b0;
+  background: linear-gradient(180deg, rgba(0, 0, 0, .45), rgba(0, 0, 0, .25));
+  border: 2px solid rgba(232, 178, 58, .55); border-radius: 999px;
+  padding: 3px 12px 3px 6px; min-height: 44px; white-space: nowrap;
+  box-shadow: inset 0 1px 0 rgba(255, 220, 160, .15);
+}
+.stat .sym { height: 32px; vertical-align: middle; }
+.stat.gold { color: var(--gold-hell); }
+
+/* ---------- Toast und Einblendungen ---------- */
+.toast {
+  font-family: var(--font); font-weight: 700; color: var(--pergament);
+  background: linear-gradient(180deg, #3e2817, #24170e); border: 2px solid var(--gold); border-radius: 14px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .55);
+}
+
+/* ---------- Bitte drehen (Hochformat) ---------- */
+.rotate-hint { background: var(--holz-dunkel); color: var(--pergament); font-family: var(--titel); }
+.rotate-hint .sym { height: 96px; }
+
+/* ---------- Fenster-Hintergrund ---------- */
+.modal { background: rgba(14, 8, 4, .62); }
+
+/* ---------- Startbildschirm ---------- */
+#start { padding: 0; overflow: hidden; }
+.start-bild { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; }
+#start::after { content: ''; position: absolute; inset: 0; z-index: 1; pointer-events: none;
+  background: radial-gradient(ellipse 60% 55% at 50% 48%, rgba(20, 10, 4, .45), transparent 75%), linear-gradient(180deg, transparent 55%, rgba(16, 9, 4, .75)); }
+.start-mitte {
+  position: relative; z-index: 2; flex: 1; min-height: 0;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: clamp(10px, 2.2vh, 22px);
+  padding: max(16px, env(safe-area-inset-top)) 24px max(16px, env(safe-area-inset-bottom)); text-align: center;
+}
+.logo-schrift { font-size: clamp(56px, 9.5vw, 116px); line-height: .95; margin: 0; }
+.start-unter { margin: 0; font-size: clamp(18px, 2.2vw, 24px); font-weight: 700; color: #fff3d6; text-shadow: 0 2px 6px rgba(0, 0, 0, .85), 0 0 2px #000; }
+.start-ask, .start-haupt { display: flex; gap: 18px; justify-content: center; flex-wrap: wrap; }
+.start-menu { display: flex; flex-direction: column; align-items: center; gap: clamp(10px, 2vh, 18px); }
+.start-haupt .btn { min-width: 250px; }
+.start-runde { display: flex; gap: clamp(10px, 2vw, 22px); justify-content: center; flex-wrap: wrap; }
+.symbolknopf {
+  background: none; border: none; padding: 0; min-width: 76px;
+  display: flex; flex-direction: column; align-items: center; gap: 4px; color: #fff3d6;
+  font: 700 15px var(--font); text-shadow: 0 1px 3px #000, 0 0 2px #000;
+}
+.symbolknopf .btn.rund { width: 66px; height: 66px; min-width: 66px; pointer-events: none; }
+.symbolknopf .btn.rund .sym { height: 40px; }
+.symbolknopf:active .btn.rund { transform: translateY(3px); }
+.start-rang {
+  display: flex; align-items: center; gap: 10px; color: #fff3d6; font-weight: 700; text-shadow: 0 1px 3px #000;
+  background: rgba(20, 11, 5, .55); border: 2px solid rgba(232, 178, 58, .5); border-radius: 999px; padding: 4px 16px 4px 6px;
+}
+.start-rang .sym { height: 34px; }
+.start-rang .rang-bar { background: rgba(0, 0, 0, .5); }
+#btn-neu-beginnen { color: #fff3d6; text-shadow: 0 1px 3px #000; font-size: 14px; min-height: 40px; }
+
+/* ---------- Kleine Bausteine ---------- */
+.emoji-ersatz { font-family: var(--emoji); }
+.sym.leer { filter: grayscale(1) brightness(.45) opacity(.75); }
+#stat-hearts { gap: 0; padding-left: 8px; }
+#stat-hearts .sym { height: 26px; margin-right: -3px; }
+.stat-bild { height: 38px; width: 38px; object-fit: cover; object-position: top; border-radius: 50%; border: 2px solid var(--gold); background: #3a2617; margin-left: -2px; }
+.stat-tag { display: inline-flex; align-items: center; gap: 2px; margin-left: 6px; color: var(--gold-hell); }
+.stat-tag .sym { height: 26px; }
+.abz-img { width: 100%; height: 100%; object-fit: contain; }
+.item .badge { display: flex; align-items: center; justify-content: center; }
+.item .badge .abz-img { width: 1.6em; height: 1.6em; }
+.gram-bild { height: 34px; width: 34px; object-fit: cover; object-position: top; border-radius: 50%; vertical-align: middle; margin-right: 6px; border: 2px solid var(--holz); }
+.help-emoji .sym.gross { height: 56px; }
+.big-emoji .sym.gross { height: 84px; }
+.slot .lock .sym { height: 26px; }
+.slot .lock:not(.on) .sym { filter: grayscale(1) opacity(.55); }
+.price-tag .sym { height: 22px; }
+/* Tipp-Finger im Tutorial: leuchtender Goldkreis */
+#tut-hand { font-size: 0; }
+.tut-finger { display: block; width: 46px; height: 46px; border-radius: 50%; border: 4px solid var(--gold-hell);
+  background: radial-gradient(circle, rgba(255, 220, 120, .65), rgba(255, 180, 60, .15) 70%); box-shadow: 0 0 18px var(--gold), inset 0 0 8px #fff3c4; }
+.start-rang small { color: #f6e4bb; opacity: 1; }
+.start-rang b { font-family: var(--titel); color: var(--gold-hell); }

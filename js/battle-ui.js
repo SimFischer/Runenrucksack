@@ -7,6 +7,7 @@ import { evaluateBag } from './mods.js';
 import { merkeAntwort, laufStand } from './fortschritt.js';
 import { frageImSpiel } from './aufgaben/spiel.js';
 import { $, fmt, buildGrid, drawItems, openModal, closeModal } from './ui.js';
+import { sym } from './symbole.js';
 
 let battle = null, enemy = null, speed = 1, rafId = 0, lastFrame = 0, itemEls = {}, onDone = null;
 let bcell = 100, selfHit = 0, armor = null, paused = false;
@@ -54,11 +55,11 @@ export function startNight(done) {
   const enemyGrid = rectGrid(CFG.bagCols, CFG.bagRows);
   bcell = cellSize(Math.max(playerGrid.cols, 4), Math.max(playerGrid.rows, 3));
 
-  $('battle-title').textContent = `🌙 ${reg.name} · Nacht ${run.day}${enemy.boss ? ' · Anführer!' : ''}`;
+  $('battle-title').innerHTML = `${sym('nacht')} ${reg.name} · Nacht ${run.day}${enemy.boss ? ' · Anführer!' : ''}`;
   const h = hero();
   const hb = h && figurBild(h.id), gb = gegnerBild(enemy.id);
-  buildFighter('player', hb ? `<img class="f-img" src="${hb}" alt="">` : `${h?.emoji || ''}<span class="f-bag">🎒</span>`, h?.name || 'Dein Rucksack', h ? `mit dem Runenrucksack · ${h.volk}` : `Tag ${run.day}`, bag, playerGrid, evaluateBag(bag, G.DEFS, ctx));
-  buildFighter('enemy', gb ? `<img class="f-img" src="${gb}" alt="">` : enemy.emoji, enemy.name, armorHtml(), enemy.items, enemyGrid, analyze(enemy.items, G.DEFS));
+  buildFighter('player', hb ? `<img class="f-img" src="${hb}" alt="">` : '', h?.name || 'Dein Rucksack', h ? `mit dem Runenrucksack · ${h.volk}` : `Tag ${run.day}`, bag, playerGrid, evaluateBag(bag, G.DEFS, ctx));
+  buildFighter('enemy', gb ? `<img class="f-img" src="${gb}" alt="">` : '', enemy.name, armorHtml(), enemy.items, enemyGrid, analyze(enemy.items, G.DEFS));
   bindArmor();
   updateBattleUi();
   setSpeed(speed);
@@ -99,7 +100,7 @@ function setSpeed(s) {
 function beginBattle() {
   $('btn-start-battle').hidden = true;
   if (armor?.status === 'offen') { armor.status = 'vorbei'; refreshArmor(); }
-  if (selfHit) floater($('fighter-player'), `😈 -${selfHit} Fluch`, 'gift');
+  if (selfHit) floater($('fighter-player'), `-${selfHit} Fluch`, 'gift');
   lastFrame = performance.now();
   rafId = requestAnimationFrame(frame);
 }
@@ -132,7 +133,7 @@ function finish() {
 }
 
 function updateBattleUi() {
-  $('battle-time').textContent = `⏳ ${fmt(Math.floor(battle.time * 10) / 10)} s`;
+  $('battle-time').innerHTML = `${sym('sanduhr')} ${fmt(Math.floor(battle.time * 10) / 10)} s`;
   for (const side of ['player', 'enemy']) {
     const f = battle.sides[side];
     const box = $('fighter-' + side);
@@ -140,14 +141,14 @@ function updateBattleUi() {
     box.querySelector('.fill').style.width = (100 * Math.max(0, f.hp)) / f.maxHp + '%';
     box.querySelector('.hpbar .text').textContent = `${hp} / ${f.maxHp}`;
     const chips = [];
-    if (f.block > 0) chips.push(`<span class="chip block">🛡️ ${Math.round(f.block)}</span>`);
-    if (f.gift > 0) chips.push(`<span class="chip gift">🧪 ${f.gift}</span>`);
-    if (f.brand > 0) chips.push(`<span class="chip brand">🔥 ${f.brand}</span>`);
-    if (f.kaelte > 0) chips.push(`<span class="chip kaelte">❄️ ${fmt(Math.ceil(f.kaelte * 10) / 10)} s</span>`);
-    if (f.betaeubt > 0) chips.push(`<span class="chip betaeubung">💫 ${fmt(Math.ceil(f.betaeubt * 10) / 10)} s</span>`);
-    if (f.regeneration > 0) chips.push(`<span class="chip regeneration">🌙 ${f.regeneration}</span>`);
-    if (f.tempo > 0) chips.push(`<span class="chip">💨 +${Math.round(f.tempo * 100)} %</span>`);
-    if (f.glueck > 0) chips.push(`<span class="chip">🍀 ${Math.round(f.glueck * 100)} %</span>`);
+    if (f.block > 0) chips.push(`<span class="chip block">${sym('block')}${Math.round(f.block)}</span>`);
+    if (f.gift > 0) chips.push(`<span class="chip gift">${sym('gift')}${f.gift}</span>`);
+    if (f.brand > 0) chips.push(`<span class="chip brand">${sym('brand')}${f.brand}</span>`);
+    if (f.kaelte > 0) chips.push(`<span class="chip kaelte">${sym('kaelte')}${fmt(Math.ceil(f.kaelte * 10) / 10)} s</span>`);
+    if (f.betaeubt > 0) chips.push(`<span class="chip betaeubung">${sym('betaeubung')}${fmt(Math.ceil(f.betaeubt * 10) / 10)} s</span>`);
+    if (f.regeneration > 0) chips.push(`<span class="chip regeneration">${sym('heilung')}${f.regeneration}</span>`);
+    if (f.tempo > 0) chips.push(`<span class="chip">${sym('tempo')}+${Math.round(f.tempo * 100)} %</span>`);
+    if (f.glueck > 0) chips.push(`<span class="chip">${sym('glueck')}${Math.round(f.glueck * 100)} %</span>`);
     box.querySelector('.f-status').innerHTML = chips.join('');
     for (const it of f.items) {
       const el = itemEls[side][it.uid];
@@ -174,7 +175,7 @@ function showEvent(ev) {
     const el = itemEls[ev.side][ev.uid];
     if (el) { el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse'); }
     if (!ev.crit) return;
-    text = '🍀 Glück! ×2';
+    text = 'Glück! ×2';
     cls = 'glueck';
   } else if (ev.type === 'damage') {
     if (ev.amount > 0) {
@@ -182,11 +183,11 @@ function showEvent(ev) {
       cls = ev.kind;
       const p = box.querySelector('.f-portrait');
       p.classList.remove('hit'); void p.offsetWidth; p.classList.add('hit');
-    } else if (ev.blocked > 0) { text = '🛡️ geblockt'; cls = 'block'; }
-  } else if (ev.type === 'block') { text = `+${ev.amount} 🛡️`; cls = 'block'; }
-  else if (ev.type === 'heal') { text = `+${ev.amount} ${ev.kind === 'regeneration' ? '🌙' : '💚'}`; cls = 'heal'; }
+    } else if (ev.blocked > 0) { text = 'geblockt'; cls = 'block'; }
+  } else if (ev.type === 'block') { text = `+${ev.amount} Block`; cls = 'block'; }
+  else if (ev.type === 'heal') { text = `+${ev.amount}`; cls = 'heal'; }
   else if (ev.type === 'status') {
-    const icon = { gift: '🧪', brand: '🔥', kaelte: '❄️', betaeubung: '💫', regeneration: '🌙' }[ev.kind];
+    const icon = '';
     const secs = ev.kind === 'kaelte' || ev.kind === 'betaeubung';
     text = `${icon} +${secs ? fmt(ev.amount) + ' s' : ev.amount}`;
     cls = ev.kind;
@@ -203,11 +204,11 @@ function armorHtml() {
     if (armor.status === 'richtig') return `Rüstung: <b class="ok">${armor.richtig || 'Fehler'} ✓</b> · geschwächt!`;
     if (armor.status === 'falsch') return `Rüstung: Fehler nicht gefunden${armor.richtig ? ` (richtig: ${armor.richtig})` : ''}`;
     if (armor.status === 'vorbei') return 'Auf der Rüstung steht ein Satz mit einem Fehler.';
-    return '<button class="armor-word" id="armor-word" data-tut="ruestung">Satz mit Fehler 🔍</button>';
+    return '<button class="armor-word" id="armor-word" data-tut="ruestung">Satz mit Fehler</button>';
   }
   if (armor.status === 'richtig') return `Rüstung: <s>${armor.falsch}</s> → <b class="ok">${armor.richtig}</b> · geschwächt!`;
   if (armor.status === 'falsch' || armor.status === 'vorbei') return `Auf der Rüstung steht: <b>${armor.falsch}</b>`;
-  return `Auf der Rüstung steht: <button class="armor-word" id="armor-word" data-tut="ruestung">${armor.falsch} 🔍</button>`;
+  return `Auf der Rüstung steht: <button class="armor-word" id="armor-word" data-tut="ruestung">${armor.falsch}</button>`;
 }
 
 function refreshArmor() {
@@ -236,7 +237,7 @@ function openArmor() {
   const run = G.run;
   if (armor.satz) {
     frageImSpiel({ art: 'ork', format: 'fehler', einVersuch: true, nein: 'Lieber nicht',
-      kopf: `<span class="af-wer">${enemy.emoji} Rüstung · nur ein Versuch!</span>` }).then((r) => {
+      kopf: `<span class="af-wer">Rüstung · nur ein Versuch!</span>` }).then((r) => {
       if (r.abgebrochen) return;
       const a = r.aufgabe;
       armor.richtig = Object.values(a.korrektur || {})[0] || '';
@@ -249,7 +250,7 @@ function openArmor() {
   }
   const options = shuffle(armor.optionen);
   const card = openModal(`
-    <div class="big-emoji">${enemy.emoji}</div>
+    <div class="big-emoji">${sym('kampf', 'gross')}</div>
     <p class="enc-hint">Auf der Rüstung steht ein falsches Wort: <b class="bad-word">${armor.falsch}</b></p>
     <h2>Wie schreibt man es richtig?</h2>
     <div class="row wrap">${options.map((o, k) => `<button class="btn opt-btn" data-k="${k}">${o}</button>`).join('')}</div>
@@ -263,11 +264,11 @@ function openArmor() {
       merkeAntwort(run, 'rechtschreibung', ok, true);
       armorErgebnis(ok);
       const res = openModal(ok ? `
-        <div class="big-emoji">💥</div>
+        <div class="big-emoji">${sym('stern', 'gross')}</div>
         <h2>Richtig: ${armor.richtig}</h2>
         <p>Die Rüstung bekommt einen Riss! ${enemy.name} startet mit 15 % weniger Leben.</p>
         <div class="row"><button class="btn primary big" data-ok>Weiter</button></div>` : `
-        <div class="big-emoji">🛡️</div>
+        <div class="big-emoji">${sym('block', 'gross')}</div>
         <h2>Leider nicht</h2>
         <p class="feedback">Richtig wäre: <b>${armor.richtig}</b>. ${armor.erklaerung}</p>
         <p class="muted">Der Ork bleibt so stark wie vorher.</p>

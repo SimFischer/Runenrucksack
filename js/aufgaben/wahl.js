@@ -123,6 +123,6 @@ export function themenBericht(run, profil, themen) {
     const t = themen.themen.find((x) => x.id === id);
     if (!t) return null;
     const stufe = lernstandVon(profil, id).stufe;
-    return { id, name: t.name, emoji: t.emoji, stufe, richtig, fehler, tipp: t.regeln[Math.min(stufe, t.regeln.length) - 1]?.text || '' };
+    return { id, name: t.name, stufe, richtig, fehler, tipp: t.regeln[Math.min(stufe, t.regeln.length) - 1]?.text || '' };
   }).filter(Boolean).sort((a, b) => b.fehler - a.fehler || a.name.localeCompare(b.name));
 }

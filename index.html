@@ -13,39 +13,38 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="icon" href="icons/icon-192.png" type="image/png">
   <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
+  <link rel="stylesheet" href="schrift/schrift.css">
   <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="gestaltung.css">
 </head>
 <body>
-  <!-- Startbildschirm -->
+  <!-- Startbildschirm: Das Titelbild ist der Bildschirm, darauf nur Schriftzug, Untertitel und wenige große Knöpfe -->
   <section id="start" class="screen">
-    <div class="start-card">
-      <img class="title-img" src="assets/titelbild.webp" alt="" onerror="this.remove()">
-      <h1>Runenrucksack</h1>
-      <p class="tagline">Packe deinen Rucksack, besiege die Wirrwarr-Orks und rette die Wörter der Wanderlande.</p>
+    <img class="start-bild" src="assets/titelbild.webp" alt="" onerror="this.remove()">
+    <div class="start-mitte">
+      <h1 class="logo-schrift">Runenrucksack</h1>
+      <p class="start-unter">Packe deinen Rucksack und rette die Wörter der Wanderlande.</p>
       <!-- Erst fragen: Mehrere Kinder teilen sich oft ein iPad. -->
       <div class="start-ask" id="start-ask">
-        <button id="btn-first" class="btn big ask-btn">🧙 Ich bin zum ersten Mal hier<small>Meister Fenwick zeigt dir alles (3–4 Minuten)</small></button>
-        <button id="btn-known" class="btn big ask-btn">🎒 Ich kenne das schon<small>Direkt zum Spiel</small></button>
+        <button id="btn-first" class="btn big primary">Ich bin zum ersten Mal hier</button>
+        <button id="btn-known" class="btn big">Ich kenne das schon</button>
       </div>
-      <div class="start-buttons" id="start-menu" hidden>
+      <div class="start-menu" id="start-menu" hidden>
+        <div class="start-haupt">
+          <button id="btn-continue" class="btn big primary" hidden>Weiterspielen</button>
+          <button id="btn-new" class="btn big">Neuer Lauf</button>
+        </div>
         <div class="start-rang" id="start-rang"></div>
-        <button id="btn-continue" class="btn big primary" hidden>Weiterspielen</button>
-        <button id="btn-new" class="btn big">Neuer Lauf</button>
-        <button id="btn-code-ein" class="btn">🔑 Heldencode eingeben</button>
-        <button id="btn-buch" class="btn">📚 Buch der Wörter</button>
-        <button id="btn-sammlung" class="btn">🏆 Sammlung</button>
-        <button id="btn-tutorial" class="btn">🧙 Tutorial</button>
-        <button id="btn-help" class="btn">📖 So geht's</button>
-        <button id="btn-lehrkraft" class="btn small quick-no">🍎 Für Lehrkräfte</button>
+        <div class="start-runde">
+          <button id="btn-code-ein" class="symbolknopf"><span class="btn rund"><img class="sym" src="assets/ui/symbole/schloss.webp" alt=""></span><small>Heldencode</small></button>
+          <button id="btn-buch" class="symbolknopf"><span class="btn rund"><img class="sym" src="assets/ui/symbole/buch.webp" alt=""></span><small>Buch</small></button>
+          <button id="btn-sammlung" class="symbolknopf"><span class="btn rund"><img class="sym" src="assets/ui/symbole/pokal.webp" alt=""></span><small>Sammlung</small></button>
+          <button id="btn-tutorial" class="symbolknopf"><span class="btn rund"><img class="sym" src="assets/ui/symbole/stern.webp" alt=""></span><small>Tutorial</small></button>
+          <button id="btn-help" class="symbolknopf"><span class="btn rund"><img class="sym" src="assets/ui/symbole/menue.webp" alt=""></span><small>So geht's</small></button>
+          <button id="btn-lehrkraft" class="symbolknopf"><span class="btn rund"><img class="sym" src="assets/ui/symbole/eule.webp" alt=""></span><small>Lehrkraft</small></button>
+        </div>
         <button id="btn-neu-beginnen" class="btn small quick-no">Neu beginnen …</button>
       </div>
-      <ul class="rules">
-        <li>🧔‍♀️ Wähle eine Figur und reise 10 Tage lang durch Kleinwurzel und Hrossmark.</li>
-        <li>🛒 Kaufe Items im Laden und ziehe sie in deinen Rucksack. Tippe zweimal zum Drehen.</li>
-        <li>📖 Grammatik macht stark: Komposita, Artikel-Siegel und Adjektiv-Runen.</li>
-        <li>🌅 Morgens triffst du Gestalten am Wegesrand – löse ihre Aufgaben für Belohnungen.</li>
-        <li>⚔️ Nachts kämpft dein Rucksack von selbst. Finde vorher den Fehler auf der Ork-Rüstung!</li>
-      </ul>
     </div>
   </section>
 
@@ -61,16 +60,16 @@
   <!-- Tag: Laden und Rucksack -->
   <section id="game" class="screen" hidden>
     <header class="topbar">
-      <div class="brand">🎒<span class="brand-text"> Runenrucksack</span></div>
+      <div class="brand"><span class="brand-text">Runenrucksack</span></div>
       <div class="stat" id="stat-hero"></div>
       <div class="stat" id="stat-day"></div>
       <div class="stat" id="stat-hearts" data-tut="herzen"></div>
       <div class="stat" id="stat-wins" data-tut="siege"></div>
-      <div class="stat gold" id="stat-gold" data-tut="gold" aria-label="Gold"><span class="coin">🪙</span><span class="gold-num" id="gold-num">0</span></div>
+      <div class="stat gold" id="stat-gold" data-tut="gold" aria-label="Gold"><span class="coin"><img class="sym" src="assets/ui/symbole/gold.webp" alt=""></span><span class="gold-num" id="gold-num">0</span></div>
       <div class="spacer"></div>
-      <button id="btn-buch-spiel" class="btn icon" aria-label="Buch der Wörter" data-tut="buch">📚</button>
-      <button id="btn-menu" class="btn icon" aria-label="Menü" data-tut="menue">☰</button>
-      <button id="btn-fight" class="btn primary fight" data-tut="kampf">⚔️ Zum Kampf</button>
+      <button id="btn-buch-spiel" class="btn icon" aria-label="Buch der Wörter" data-tut="buch"><img class="sym" src="assets/ui/symbole/buch.webp" alt=""></button>
+      <button id="btn-menu" class="btn icon" aria-label="Menü" data-tut="menue"><img class="sym" src="assets/ui/symbole/menue.webp" alt=""></button>
+      <button id="btn-fight" class="btn primary fight" data-tut="kampf"><img class="sym" src="assets/ui/symbole/kampf.webp" alt=""> Zum Kampf</button>
     </header>
 
     <main class="board">
@@ -86,8 +85,8 @@
       <section class="panel shop-panel" id="shop" data-tut="laden">
         <div class="shop-head">
           <h2>Laden</h2>
-          <span class="shop-gold" id="shop-gold" data-tut="ladengold">Du hast <b id="shop-gold-num">0</b> 🪙</span>
-          <button id="btn-reroll" class="btn">🎲 Neu würfeln <span class="price">1 🪙</span></button>
+          <span class="shop-gold" id="shop-gold" data-tut="ladengold"><img class="sym" src="assets/ui/symbole/gold.webp" alt=""> <b id="shop-gold-num">0</b></span>
+          <button id="btn-reroll" class="btn"><img class="sym" src="assets/ui/symbole/wuerfel.webp" alt=""> Neu würfeln <span class="price">1 <img class="sym klein" src="assets/ui/symbole/gold.webp" alt=""></span></button>
         </div>
         <div class="shop-slots" id="shop-slots"></div>
         <div class="sell-hint">Hierher ziehen zum Verkaufen</div>
@@ -106,7 +105,7 @@
         <button class="btn" data-speed="2">2×</button>
         <button class="btn" data-speed="4">4×</button>
       </div>
-      <button id="btn-skip" class="btn">⏭ Überspringen</button>
+      <button id="btn-skip" class="btn small">Überspringen</button>
     </header>
     <main class="arena">
       <div class="fighter" id="fighter-player" data-tut="kampf-rucksack"></div>
@@ -123,8 +122,9 @@
   </div>
   <div id="toast" class="toast" hidden></div>
   <div id="rotate-hint" class="rotate-hint">
-    <div>📱↻</div>
-    <p>Bitte das iPad quer halten.</p>
+    <img class="sym gross" src="assets/ui/symbole/karte.webp" alt="">
+    <p class="titel">Bitte dreh dein iPad</p>
+    <p>Runenrucksack spielt man im Querformat.</p>
   </div>
 
   <script src="js/vendor/qrcode.js"></script>

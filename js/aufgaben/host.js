@@ -2,6 +2,7 @@
 // zeigt nach jeder Antwort eine kurze Erklärung mit Merkhilfe. Falsch: neuer Versuch – ab dem zweiten
 // kostet jeder 1 Gold (im Tutorial nicht). Ergebnis als Promise: { richtig, ersterVersuch, versuche, abgebrochen, trotzdem }.
 import { FORMATE } from './formate/index.js';
+import { sym } from '../symbole.js';
 
 let offen = null; // Abbruch des gerade offenen Fensters
 const sterne = (s) => '★'.repeat(s) + `<i>${'☆'.repeat(3 - s)}</i>`;
@@ -29,7 +30,7 @@ export function stelleAufgabe(a, opts = {}) {
 
     const zeichne = () => {
       const extra = versuche > 0 && !opts.tutorial;
-      const kosten = opts.einVersuch ? 'Nur ein Versuch!' : opts.tutorial ? (versuche ? 'Probier es noch einmal!' : '') : extra ? `Nächster Versuch: 1 🪙 (du hast ${opts.gold?.() ?? 0})` : 'Erster Versuch frei';
+      const kosten = opts.einVersuch ? 'Nur ein Versuch!' : opts.tutorial ? (versuche ? 'Probier es noch einmal!' : '') : extra ? `Nächster Versuch: 1 ${sym('gold')} (du hast ${opts.gold?.() ?? 0})` : 'Erster Versuch frei';
       karte.innerHTML = `
         <div class="af-kopf">${opts.kopf || ''}<span class="af-titel">${opts.titel || ''}${a.stufe ? ` <span class="af-stufe" title="Stufe ${a.stufe}">${sterne(a.stufe)}</span>` : ''}</span></div>
         <div class="af-frage">${a.frage}</div>
@@ -75,7 +76,7 @@ export function stelleAufgabe(a, opts = {}) {
       karte.innerHTML = `
         <div class="af-kopf">${opts.kopf || ''}<span class="af-titel">${opts.titel || ''}</span></div>
         <p class="af-rueck falsch">✗ Leider nicht.</p>
-        <p class="af-merke">💡 ${a.merke}</p>
+        <p class="af-merke">${a.merke}</p>
         <div class="af-fuss"><button class="btn primary" data-weiter>Weiter</button></div>`;
       platziere();
       karte.querySelector('[data-weiter]').onclick = () => schliessen({ richtig: false, ersterVersuch: false, versuche });
@@ -85,7 +86,7 @@ export function stelleAufgabe(a, opts = {}) {
       karte.innerHTML = `
         <div class="af-kopf">${opts.kopf || ''}<span class="af-titel">${opts.titel || ''}</span></div>
         <p class="af-rueck richtig">✓ ${versuche === 1 ? 'Richtig – gleich beim ersten Versuch!' : 'Richtig!'}</p>
-        <p class="af-merke">💡 ${a.merke}</p>
+        <p class="af-merke">${a.merke}</p>
         <div class="af-fuss"><button class="btn primary" data-weiter>Weiter</button></div>`;
       platziere();
       const zu = setTimeout(weiter, 4500);

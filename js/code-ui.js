@@ -4,6 +4,7 @@ import { G, saveProfil, setPref, save, emit } from './state.js';
 import { heldencode, reisecode, leseCode, fehlerText, registryAus, saeubern, istKlassenCode, leseKlassenCode } from './code.js';
 import { neuesProfil, rangVon } from './fortschritt.js';
 import { toast } from './ui.js';
+import { sym } from './symbole.js';
 
 let REG = null;
 const reg = () => (REG ||= registryAus(G.REGISTRY));
@@ -27,7 +28,7 @@ export function codeKasten(code, klein = false) {
   return `<div class="code-kasten${klein ? ' klein' : ''}">
     <div class="code-text" data-code>${code.split('-').map((g) => `<span>${g}</span>`).join('')}</div>
     <div class="code-qr">${qrSvg(code)}</div>
-    <button class="btn small" data-kopieren>📋 Kopieren</button>
+    <button class="btn small" data-kopieren>Kopieren</button>
   </div>`;
 }
 
@@ -59,7 +60,7 @@ function ebene(id, html) {
 export function zeigeCode({ reise = false, zurueck = null } = {}) {
   const code = reise ? aktuellerReisecode() : aktuellerHeldencode();
   const box = ebene('code-layer', `
-    <h2>${reise ? '🧳 Dein Reisecode' : '🔑 Dein Heldencode'}</h2>
+    <h2>${reise ? 'Dein Reisecode' : 'Dein Heldencode'}</h2>
     <p>${reise
       ? 'Schreib den Code ab oder fotografiere den QR-Code. Damit spielst du deinen Lauf genau hier weiter – auch auf einem anderen iPad.'
       : 'Schreib den Code ins Heft oder fotografiere ihn. Damit holst du deinen Fortschritt zurück – auch auf einem anderen iPad.'}</p>
@@ -74,14 +75,14 @@ export function zeigeCode({ reise = false, zurueck = null } = {}) {
 // Startmenü: Code eingeben (Bindestriche optional, Großbuchstaben automatisch). Erkennt Helden-, Reise- und Klassen-Code.
 export function zeigeEingabe({ geladen, zurueck = null }) {
   const box = ebene('code-layer', `
-    <h2>🔑 Heldencode eingeben</h2>
+    <h2>${sym('schloss')} Heldencode eingeben</h2>
     <p>Tippe deinen Helden- oder Reisecode ein – oder den Klassen-Code von deiner Lehrkraft. Die Bindestriche kannst du weglassen.</p>
     <input class="code-input" type="text" inputmode="text" autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" placeholder="z. B. RWV6D-8AWXP-…">
     <p class="code-meldung" hidden></p>
     <div class="code-kamera" hidden><video playsinline muted></video><p class="muted">Halte den QR-Code vor die Kamera.</p></div>
     <div class="row">
       <button class="btn primary big" data-lesen>Einlesen</button>
-      ${navigator.mediaDevices?.getUserMedia ? '<button class="btn" data-scan>📷 QR-Code scannen</button>' : ''}
+      ${navigator.mediaDevices?.getUserMedia ? '<button class="btn" data-scan>QR-Code scannen</button>' : ''}
       <button class="btn" data-zurueck>Zurück</button>
     </div>`);
   const input = box.querySelector('.code-input');
@@ -125,9 +126,9 @@ export function zeigeEingabe({ geladen, zurueck = null }) {
 function klasseBestaetigen(einst, ok) {
   const an = G.THEMEN.themen.filter((t) => einst.themen[t.id] > 0);
   const box = ebene('code-frage', `
-    <h2>🍎 Klassen-Code erkannt</h2>
+    <h2>${sym('eule')} Klassen-Code erkannt</h2>
     <p>Deine Lehrkraft hat diese Themen ausgewählt:</p>
-    <p class="code-info lk-themen">${an.map((t) => `<span>${t.emoji} ${t.name} <b>${'★'.repeat(einst.themen[t.id])}</b></span>`).join('')}</p>
+    <p class="code-info lk-themen">${an.map((t) => `<span>${t.name} <b>${'★'.repeat(einst.themen[t.id])}</b></span>`).join('')}</p>
     <div class="row"><button class="btn primary big" data-ja>Übernehmen</button><button class="btn" data-nein>Abbrechen</button></div>`);
   box.querySelector('[data-ja]').onclick = () => {
     G.PROFIL.klasse = einst;
@@ -145,9 +146,9 @@ function bestaetigen(r, ok) {
   const rang = rangVon(p.xp, G.ACH.raenge);
   const held = r.run && G.HEROES.find((h) => h.id === r.run.hero);
   const box = ebene('code-frage', `
-    <h2>${r.typ === 'reise' ? '🧳 Reisecode erkannt' : '🔑 Heldencode erkannt'}</h2>
-    <p class="code-info">${rang.emoji} <b>${rang.name}</b> · ${p.xp} Erfahrung · 📚 ${p.buch.length} Einträge · 🏆 ${p.erfolge.length} Erfolge</p>
-    ${held ? `<p class="code-info">${held.emoji} ${held.name} · Tag ${r.run.day} · ${r.run.wins} Siege · ${'❤️'.repeat(r.run.hearts)}</p>` : ''}
+    <h2>${r.typ === 'reise' ? 'Reisecode erkannt' : 'Heldencode erkannt'}</h2>
+    <p class="code-info">${sym('stern')} <b>${rang.name}</b> · ${p.xp} Erfahrung · ${sym('buch')} ${p.buch.length} Einträge · ${sym('pokal')} ${p.erfolge.length} Erfolge</p>
+    ${held ? `<p class="code-info">${held.name} · Tag ${r.run.day} · ${r.run.wins} Siege · ${sym('herz').repeat(r.run.hearts)}</p>` : ''}
     <p>Der Fortschritt auf diesem iPad wird durch diesen Code ersetzt.</p>
     <div class="row"><button class="btn primary big" data-ja>Laden</button><button class="btn" data-nein>Abbrechen</button></div>`);
   box.querySelector('[data-ja]').onclick = () => { box.remove(); ok(); };
@@ -170,7 +171,7 @@ export function uebernehmen(r) {
 // „Neu beginnen“: Fortschritt auf diesem iPad löschen (mit Sicherheitsabfrage).
 export function neuBeginnen(fertig) {
   const box = ebene('code-frage', `
-    <h2>⚠️ Wirklich ganz neu beginnen?</h2>
+    <h2>Wirklich ganz neu beginnen?</h2>
     <p>Rang, Erfahrung, Buch der Wörter, Figuren und Erfolge auf diesem iPad werden gelöscht. Mit deinem Heldencode kannst du sie später zurückholen.</p>
     <div class="row"><button class="btn" data-nein>Lieber nicht</button><button class="btn danger" data-ja>Ja, neu beginnen</button></div>`);
   box.querySelector('[data-nein]').onclick = () => box.remove();

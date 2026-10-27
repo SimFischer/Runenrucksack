@@ -67,7 +67,7 @@ const UI_SHEETS = [
   { datei: 'fenwick-posen.png', gruppe: 'fenwick', max: 480, reihen: [['erklaert', 'tipp', 'jubelt']] },
 ];
 const UI_EINZELN = [
-  { datei: 'tafel-rahmen.png', id: 'tafel-rahmen', breite: 724, qualitaet: 0.9 },
+  { datei: 'tafel-rahmen.png', id: 'tafel-rahmen', breite: 724, qualitaet: 0.9, zuschneiden: true }, // für border-image
   { datei: 'rucksack-flaeche.png', id: 'rucksack-flaeche', breite: 1024 },
   { datei: 'lager-truhe.png', id: 'lager-truhe', breite: 1024 },
   { datei: 'haendlerstand.png', id: 'haendlerstand', breite: 1280 },
@@ -210,9 +210,16 @@ async function zerschneideUi() {
   for (const e of UI_EINZELN) {
     const b64 = readFileSync(ROH + 'ui/' + e.datei).toString('base64');
     const r = await chrome.run(`(async () => { const img = new Image(); img.src = 'data:image/png;base64,${b64}'; await img.decode();
+      let sx = 0, sy = 0, sw = img.width, sh = img.height;
+      if (${!!e.zuschneiden}) { // durchsichtigen Rand abschneiden
+        const c = new OffscreenCanvas(sw, sh), cg = c.getContext('2d'); cg.drawImage(img, 0, 0);
+        const a = cg.getImageData(0, 0, sw, sh).data; let x0 = sw, y0 = sh, x1 = 0, y1 = 0;
+        for (let y = 0; y < sh; y++) for (let x = 0; x < sw; x++) if (a[(y * sw + x) * 4 + 3] > 20) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+        sx = x0; sy = y0; sw = x1 - x0 + 1; sh = y1 - y0 + 1;
+      }
       const f = Math.min(1, ${e.breite} / img.width), o = document.createElement('canvas');
-      o.width = Math.round(img.width * f); o.height = Math.round(img.height * f);
-      const g = o.getContext('2d'); g.imageSmoothingQuality = 'high'; g.drawImage(img, 0, 0, o.width, o.height);
+      o.width = Math.round(sw * f); o.height = Math.round(sh * f);
+      const g = o.getContext('2d'); g.imageSmoothingQuality = 'high'; g.drawImage(img, sx, sy, sw, sh, 0, 0, o.width, o.height);
       return { w: o.width, h: o.height, webp: o.toDataURL('image/webp', ${e.qualitaet || 0.82}) }; })()`);
     const buf = Buffer.from(r.webp.split(',')[1], 'base64');
     const pfad = `ui/${e.id}.webp`;
