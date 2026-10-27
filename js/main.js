@@ -724,6 +724,8 @@ function renderSummary(box) {
 // ---------- Aktionen ----------
 
 function onReroll() {
+  // Im Tutorial bleibt der Laden fest
+  if (G.run.tutorial) { toast('Im Tutorial bleibt der Laden, wie er ist.'); return; }
   if (!reroll(G.run, G.ITEMS, G.REGIONS)) { toast('Zu wenig Gold'); return; }
   if (selected?.src === 'shop') selected = null;
   bump('stat-gold');

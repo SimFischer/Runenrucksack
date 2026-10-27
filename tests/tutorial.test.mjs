@@ -6,7 +6,7 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
-  FEATURES, activeSteps, makeTutorialRun, applyShop, prepareStep, checkStep, resetWrong, targetCell, spotFor,
+  FEATURES, activeSteps, makeTutorialRun, applyShop, prepareStep, checkStep, resetWrong, targetCell, spotFor, sichereLaden, ladenZiel,
 } from '../js/tutorial-logic.js';
 import { newRun, seededRng } from '../js/logic.js';
 import { buildCompounds, buildRuneLevels, analyze, DIRS } from '../js/grammar.js';
@@ -153,6 +153,28 @@ test('Tutorial komplett durchspielen: jeder Schritt ist erreichbar', () => {
   const i = analyze(bag(run), DEFS).get(fs.uid);
   assert.equal(i.phrase, 'scharfes Feuerschwert');
   assert.ok(i.siegel.some((s) => s.ok));
+});
+
+test('Fester Laden: Bei jedem Schritt mit Laden-Ziel liegt das Item im Laden – auch nach Neu würfeln oder fremdem Laden', () => {
+  const steps = activeSteps(TUT);
+  const run = makeTutorialRun(ITEMS, REGIONS, TUT);
+  let geprueft = 0;
+  for (const step of steps) {
+    // Störung: ein zufälliger Laden wie nach „Neu würfeln“ oder aus einem gespeicherten Lauf
+    run.shop = [{ id: 'apfel', locked: false }, { id: 'helm', locked: false }, null, { id: 'bogen', locked: false }, { id: 'brot', locked: false }];
+    applyShop(run, step);
+    sichereLaden(run, step);
+    prepareStep(run, step, DEFS);
+    const ziel = ladenZiel(step);
+    if (ziel && !run.items.some((p) => p.id === ziel)) {
+      assert.ok(run.shop.some((s) => s?.id === ziel), `${step.id}: ${ziel} liegt im Laden`);
+      geprueft++;
+    }
+    if (['weiter', 'abschluss'].includes(step.aktion.typ)) continue;
+    const ev = act(step, run);
+    assert.equal(checkStep(step, run, DEFS, RECIPES, ev)?.ok, true, `${step.id} wird geschafft`);
+  }
+  assert.ok(geprueft >= 4, `${geprueft} Schritte mit Laden-Ziel`);
 });
 
 test('Falsche Aktion: Schwert im Lager wird freundlich zurückgesetzt', () => {

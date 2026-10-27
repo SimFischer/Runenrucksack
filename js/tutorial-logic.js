@@ -27,6 +27,31 @@ export function applyShop(run, step, slots = 5) {
   run.shop = Array.from({ length: slots }, (_, i) => (step.laden[i] ? { id: step.laden[i], locked: false } : null));
 }
 
+// Welches Item muss für diesen Schritt im Laden liegen? (Kaufen, Kristall, Siegel, Rune, Sammeln)
+export function ladenZiel(step) {
+  const a = step.aktion || {};
+  if (a.typ === 'kaufen' || a.typ === 'anzahl') return a.item;
+  if (a.typ === 'neben') return a.kraft;
+  if (a.typ === 'siegel') return a.siegel;
+  if (a.typ === 'rune') return a.rune;
+  return null;
+}
+
+// Sorgt dafür, dass das Ziel-Item eines Schritts im Laden liegt – egal, was vorher mit dem Laden passiert ist
+// (Neustart, gespeicherter Lauf, Neu würfeln). Liegt es schon im Rucksack oder Lager (bei „anzahl“: genug), nichts tun.
+// Gibt true zurück, wenn der Laden geändert wurde.
+export function sichereLaden(run, step, slots = 5) {
+  const id = ladenZiel(step);
+  if (!id) return false;
+  const besitz = run.items.filter((p) => p.id === id && p.area !== 'neu').length;
+  if (step.aktion.typ === 'anzahl' ? besitz >= (step.aktion.min || 1) : besitz > 0) return false;
+  if (run.shop.some((s) => s?.id === id)) return false;
+  while (run.shop.length < slots) run.shop.push(null);
+  const frei = run.shop.findIndex((s) => !s);
+  run.shop[frei >= 0 ? frei : 0] = { id, locked: false };
+  return true;
+}
+
 const baseId = (id, defs) => defs[id]?.teile?.traeger || id;
 const bagItems = (run) => run.items.filter((p) => p.area === 'bag');
 const find = (run, id, area) => run.items.find((p) => p.id === id && (!area || p.area === area));

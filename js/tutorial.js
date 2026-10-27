@@ -2,7 +2,7 @@
 // festgelegten, echten Lauf. Die Schritte stehen in tutorial.json, die Prüf-Logik in tutorial-logic.js.
 import { G, onEvent, getPref, setPref, loadRun, emit, saveProfil } from './state.js';
 import {
-  activeSteps, makeTutorialRun, applyShop, prepareStep, checkStep, resetWrong, targetCell, spotFor,
+  activeSteps, makeTutorialRun, applyShop, sichereLaden, prepareStep, checkStep, resetWrong, targetCell, spotFor,
 } from './tutorial-logic.js';
 import { closeModal } from './ui.js';
 import { battleControl } from './battle-ui.js';
@@ -131,6 +131,7 @@ function next() {
   warnText = '';
   extraTip = '';
   applyShop(G.run, s);
+  sichereLaden(G.run, s);
   if (prepareStep(G.run, s, G.DEFS)) warnText = 'Ich habe dein Schwert ein Stück verschoben, damit links Platz ist.';
   shown = !s.zeigenBei && !s.kampfPause;
   if (!s.kampfPause && !s.zeigenBei && s.aktion.typ !== 'abschluss') api.render();
@@ -169,6 +170,8 @@ function handleEvent(ev) {
   if (!active || !step()) return;
   const s = step();
   if (s.zeigenBei && ev.typ === s.zeigenBei) { shown = true; draw(); }
+  // Laden prüfen: Liegt das Ziel-Item nicht (mehr) im Laden, wieder hineinlegen
+  if (ev.typ === 'render' && sichereLaden(G.run, s)) { api.render(); return; }
   if (ev.typ === 'render' && shown) layout();
   if (['weiter', 'abschluss'].includes(s.aktion.typ) || s.kampfPause) return;
   const r = checkStep(s, G.run, G.DEFS, G.RECIPES, ev);
