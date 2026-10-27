@@ -31,14 +31,57 @@ export const RABATT = { kaeufe: 3, gold: 2 };
 export const preisVon = (run, def) => (run?.rabatt > 0 && def.art !== 'tasche' ? Math.max(1, def.preis - RABATT.gold) : def.preis);
 export const sellValue = (def, stern = 1) => Math.max(1, Math.floor((def.preis * STERN_FAKTOR[stern]) / 2));
 
-// Gewichte der Seltenheiten im Laden, abhängig vom Tag.
-export function rarityWeights(day) {
+// Händler-Vertrauen (wie in Oaken Tower): 5 Stufen, jeder Lauf beginnt auf Stufe 1. Jede Stufe verschiebt die
+// Seltenheiten im Laden nach oben – zusätzlich zum Tag. bonus wird zu den Gewichten des Tages addiert
+// (gewöhnliche nie unter 5). kosten: Gold für die nächste Stufe; höchstens eine Stufe pro Tag.
+// Die Erhöhung wirkt ab dem nächsten Neu-Würfeln bzw. dem nächsten Tag (der aktuelle Laden bleibt).
+export const HAENDLER = {
+  max: 5,
+  kosten: { 2: 6, 3: 9, 4: 12, 5: 15 },
+  bonus: {
+    1: { gewoehnlich: 0, selten: 0, episch: 0, legendaer: 0 },
+    2: { gewoehnlich: -15, selten: 18, episch: 4, legendaer: 0 },   // deutlich mehr seltene
+    3: { gewoehnlich: -25, selten: 20, episch: 14, legendaer: 1 },  // epische regelmäßig
+    4: { gewoehnlich: -32, selten: 18, episch: 18, legendaer: 5 },  // legendäre möglich, auch früh
+    5: { gewoehnlich: -40, selten: 15, episch: 22, legendaer: 10 }, // legendäre häufiger
+  },
+  // In einfachen Worten für die Tafel am Händlerstand (statt Prozenttabellen)
+  texte: {
+    1: 'Der Händler zeigt dir vor allem gewöhnliche Gegenstände.',
+    2: 'Mehr seltene Gegenstände.',
+    3: 'Epische Gegenstände kommen regelmäßig.',
+    4: 'Legendäre Gegenstände sind möglich – auch schon früh.',
+    5: 'Legendäre Gegenstände kommen öfter.',
+  },
+};
+export const haendlerStufe = (run) => run?.haendler || 1;
+export const vertrauenKosten = (run) => HAENDLER.kosten[haendlerStufe(run) + 1] ?? null;
+// Warum es gerade nicht geht: 'max' | 'heute' | 'gold' | null
+export function vertrauenSperre(run) {
+  if (haendlerStufe(run) >= HAENDLER.max) return 'max';
+  if (run.haendlerTag === run.day) return 'heute';
+  if (run.gold < vertrauenKosten(run)) return 'gold';
+  return null;
+}
+export function vertrauenErhoehen(run) {
+  if (vertrauenSperre(run)) return false;
+  run.gold -= vertrauenKosten(run);
+  run.haendler = haendlerStufe(run) + 1;
+  run.haendlerTag = run.day;
+  return true;
+}
+// Gegner kaufen intern bei einem Händler, dem sie mit den Tagen mehr vertrauen (Tag 1–2: 1, 3–4: 2 … ab 9: 5).
+export const gegnerHaendler = (day) => Math.min(HAENDLER.max, 1 + Math.floor((day - 1) / 2));
+
+// Gewichte der Seltenheiten im Laden, abhängig vom Tag und der Händler-Stufe.
+export function rarityWeights(day, stufe = 1) {
   const d = day - 1;
+  const b = HAENDLER.bonus[stufe] || HAENDLER.bonus[1];
   return {
-    gewoehnlich: Math.max(20, 80 - 8 * d),
-    selten: Math.min(40, 18 + 4 * d),
-    episch: Math.min(30, 2 + 3 * d),
-    legendaer: Math.min(12, Math.max(0, (d - 3) * 2)),
+    gewoehnlich: Math.max(5, Math.max(20, 80 - 8 * d) + b.gewoehnlich),
+    selten: Math.min(40, 18 + 4 * d) + b.selten,
+    episch: Math.min(30, 2 + 3 * d) + b.episch,
+    legendaer: Math.min(12, Math.max(0, (d - 3) * 2)) + b.legendaer,
   };
 }
 
@@ -161,6 +204,7 @@ export function newRun(items, regions, opts = {}) {
     queue: ['gebiet'], // Schritte am Morgen, bevor der Laden öffnet
     lernen: { richtig: 0, falsch: 0 },
     hero: opts.hero?.id || null,
+    haendler: 1, // Händler-Vertrauen (1–5)
     mods: [], // dauerhafte Boni aus Begegnungen
     fate: null, // Schicksalsrune
     unterklasse: null,
@@ -200,7 +244,7 @@ export function attachTasche(run, def) {
 
 export function rollShop(run, items, regions, force = false, rng = Math.random) {
   const pool = shopPool(run, items, regions);
-  const weights = rarityWeights(run.day);
+  const weights = rarityWeights(run.day, haendlerStufe(run));
   const slots = run.shopSlots || CFG.shopSlots;
   const next = [];
   for (let i = 0; i < slots; i++) {
@@ -288,7 +332,7 @@ export const sternPreis = (preis, stern = 1) => preis * 2 ** (stern - 1);
 
 export function makeEnemy(day, enemy, items, defs, rng = Math.random) {
   let budget = enemyBudget(day, enemy.boss);
-  const weights = rarityWeights(day);
+  const weights = rarityWeights(day, gegnerHaendler(day));
   const grid = rectGrid(CFG.bagCols, CFG.bagRows);
   const placed = [];
   let uid = 1;

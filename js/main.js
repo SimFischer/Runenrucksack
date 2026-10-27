@@ -1,6 +1,7 @@
 // Runenrucksack – Ablauf eines Laufs, Laden, Rucksack (Ziehen und Drehen) und Info-Feld.
 import {
   CFG, income, baseHp, sellValue, newRun, reroll, finishBattle, wuerfelPreis, WUERFEL,
+  HAENDLER, haendlerStufe, vertrauenKosten, vertrauenSperre, vertrauenErhoehen,
   canPlace, overlapping, findSpot, sizeOf, shuffle, attachTasche, ownedCount, MAX_STERN, STERN_FAKTOR, preisVon,
 } from './logic.js';
 import {
@@ -68,6 +69,8 @@ async function boot() {
   initTutorial({ render, showGame, showStart, showHeroes, continueSaved, hasSavedRun: () => !!loadRun() });
   showAsk();
   $('btn-reroll').onclick = onReroll;
+  $('btn-vertrauen').onclick = onVertrauen;
+  $('haendler-stufe').onclick = zeigeHaendler;
   $('btn-fight').onclick = onFight;
   $('btn-menu').onclick = openMenu;
 
@@ -370,6 +373,7 @@ function renderTop() {
   $('btn-reroll').disabled = run.gold < wp;
   $('btn-reroll').querySelector('.price').innerHTML = `${wp} ${sym('gold', 'klein')}`;
   $('btn-reroll').classList.toggle('teuer', wp > WUERFEL.preis);
+  renderHaendler();
 }
 
 function renderGrid(area) {
@@ -755,6 +759,62 @@ function renderSummary(box) {
 }
 
 // ---------- Aktionen ----------
+
+// ---------- Händler-Vertrauen ----------
+
+const laternen = (stufe) => Array.from({ length: HAENDLER.max }, (_, i) => `<span class="laterne${i < stufe ? ' an' : ''}"></span>`).join('');
+const SPERRE_TEXT = { max: 'Höchste Stufe', heute: 'Morgen wieder' };
+
+// Laternen am Stand (eine pro Stufe) und der Knopf mit Preis
+function renderHaendler() {
+  const run = G.run, stufe = haendlerStufe(run), sperre = vertrauenSperre(run);
+  const box = $('haendler-stufe');
+  box.innerHTML = laternen(stufe);
+  box.title = `Händler-Vertrauen: Stufe ${stufe} von ${HAENDLER.max}`;
+  const knopf = $('btn-vertrauen');
+  knopf.disabled = !!sperre; // im Tutorial bleibt er bedienbar, kauft aber nichts (onVertrauen)
+  knopf.querySelector('.price').innerHTML = SPERRE_TEXT[sperre] || `${vertrauenKosten(run)} ${sym('gold', 'klein')}`;
+  knopf.classList.toggle('gesperrt', sperre === 'max' || sperre === 'heute');
+}
+
+// Tafel beim Antippen der Laternen: Was bringt die aktuelle, was die nächste Stufe? (in Worten, ohne Prozente)
+function zeigeHaendler() {
+  const run = G.run, stufe = haendlerStufe(run), sperre = vertrauenSperre(run), kosten = vertrauenKosten(run);
+  const hinweis = { max: 'Der Händler vertraut dir voll und ganz.', heute: 'Heute hat der Händler dir schon mehr vertraut – morgen wieder.',
+    gold: `Dir fehlen noch ${(kosten || 0) - run.gold} Gold.` }[sperre] || 'Der jetzige Laden bleibt – ab dem nächsten Neu-Würfeln und dem nächsten Tag gilt die neue Stufe.';
+  modal(`
+    <h2>Händler-Vertrauen</h2>
+    <div class="haendler-gross">${laternen(stufe)}</div>
+    <div class="haendler-stufen">
+      <p class="pergament"><b>Jetzt – Stufe ${stufe}</b><br>${HAENDLER.texte[stufe]}</p>
+      ${stufe < HAENDLER.max ? `<p class="pergament naechste"><b>Stufe ${stufe + 1}</b><br>${HAENDLER.texte[stufe + 1]}</p>` : ''}
+    </div>
+    <p class="muted">${hinweis} Höchstens eine Stufe pro Tag; jeder Lauf beginnt wieder bei Stufe 1.</p>
+    <div class="row">
+      ${stufe < HAENDLER.max ? `<button class="btn primary" data-act="mehr" ${sperre || run.tutorial ? 'disabled' : ''}>Vertrauen erhöhen · ${kosten} ${sym('gold', 'klein')}</button>` : ''}
+      <button class="btn" data-act="close">Schließen</button>
+    </div>`, { mehr: onVertrauen });
+  emit('haendlerTafel');
+}
+
+function onVertrauen() {
+  const run = G.run;
+  if (run.tutorial) { toast('Im Tutorial schaust du es dir nur an.'); return; }
+  const sperre = vertrauenSperre(run);
+  if (sperre === 'gold') { toast(`Dir fehlen noch ${vertrauenKosten(run) - run.gold} Gold.`); return; }
+  if (!vertrauenErhoehen(run)) return;
+  bump('stat-gold');
+  render();
+  // Belohnung: Der Stand leuchtet auf, die neue Laterne geht an
+  const neu = $('haendler-stufe').querySelectorAll('.laterne')[run.haendler - 1];
+  neu?.classList.add('neu');
+  $('shop').classList.remove('stand-leuchtet');
+  void $('shop').offsetWidth;
+  $('shop').classList.add('stand-leuchtet');
+  setTimeout(() => $('shop').classList.remove('stand-leuchtet'), 1400);
+  toast(`Der Händler vertraut dir mehr – Stufe ${run.haendler}!`);
+  emit('vertrauen', { stufe: run.haendler });
+}
 
 function onReroll() {
   // Im Tutorial bleibt der Laden fest

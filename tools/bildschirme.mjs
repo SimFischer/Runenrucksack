@@ -114,6 +114,10 @@ const BILDSCHIRME = [
   { name: 'spielfeld', profil: PROFIL, ohneScroll: true, schritte: LAUF },
   { name: 'wuerfeln-teuer', profil: PROFIL, ohneScroll: true, schritte: `${LAUF}
       __G.run.gold = 30; for (let k = 0; k < 3; k++) await __klick('#btn-reroll', 250); await __s(300);` },
+  { name: 'haendler-stufe', profil: PROFIL, ohneScroll: true, frei: ['.shop-head h2', '#haendler-stufe', '#shop-gold', '#btn-vertrauen', '#btn-reroll'], schritte: `${LAUF}
+      __G.run.gold = 30; await __klick('#btn-vertrauen', 1500);` },
+  { name: 'haendler-tafel', profil: PROFIL, ohneScroll: true, schritte: `${LAUF}
+      __G.run.haendler = 3; __G.run.gold = 30; await __klick('#haendler-stufe', 500);` },
   { name: 'kampf', profil: PROFIL, ohneScroll: true, frei: ['#btn-start-battle', '#armor-word', '#fighter-player .f-figur', '#fighter-enemy .f-figur', '#fighter-player .f-rucksack', '#fighter-enemy .f-rucksack', '#fighter-player .f-band', '#fighter-enemy .f-band', '#battle .vs'], schritte: `${KAMPF(true)} await __s(300);` },
   { name: 'kampf-gross', profil: PROFIL, ohneScroll: true, frei: ['#btn-start-battle', '#armor-word', '#fighter-player .f-figur', '#fighter-enemy .f-figur', '#fighter-player .f-rucksack', '#fighter-enemy .f-rucksack', '#fighter-player .f-band', '#fighter-enemy .f-band', '#battle .vs'], schritte: `${LAUF}
       // größter Rucksack: 5×4 und beide Taschen

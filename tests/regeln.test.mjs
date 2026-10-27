@@ -146,3 +146,44 @@ test('Neu würfeln: 1-1-1-2-2 Gold, der Zähler beginnt jeden Tag neu', async ()
   assert.ok(reroll(run, items, regions));
   assert.ok(!reroll(run, items, regions), 'ohne Gold kein Wurf');
 });
+
+test('Händler-Vertrauen: Stufen verschieben die Seltenheiten, Kosten 6-9-12-15, höchstens eine Stufe pro Tag, wird gespeichert', async () => {
+  const L = await import('../js/logic.js');
+  const items = json('items.json').items;
+  const regions = json('regions.json').gebiete;
+  const anteil = (day, stufe, r) => { const w = L.rarityWeights(day, stufe); return w[r] / Object.values(w).reduce((a, b) => a + b, 0); };
+  // Stufe 1 wie bisher, jede Stufe verschiebt nach oben
+  assert.deepEqual(L.rarityWeights(1, 1), L.rarityWeights(1));
+  for (let s = 2; s <= 5; s++) {
+    assert.ok(anteil(1, s, 'gewoehnlich') < anteil(1, s - 1, 'gewoehnlich'), `Stufe ${s}: weniger gewöhnliche`);
+    assert.ok(anteil(5, s, 'episch') > anteil(5, s - 1, 'episch'), `Stufe ${s}: mehr epische`);
+  }
+  assert.ok(anteil(1, 2, 'selten') > 1.6 * anteil(1, 1, 'selten'), 'Stufe 2: deutlich mehr seltene');
+  assert.ok(anteil(1, 3, 'episch') >= 0.12, 'Stufe 3: epische regelmäßig');
+  assert.equal(anteil(1, 3, 'legendaer') < 0.02 && anteil(1, 1, 'legendaer'), 0, 'Tag 1, Stufe 1: keine legendären');
+  assert.ok(anteil(1, 4, 'legendaer') > 0.03, 'Stufe 4: legendäre schon an Tag 1 möglich');
+  assert.ok(anteil(5, 5, 'legendaer') > 1.4 * anteil(5, 4, 'legendaer'), 'Stufe 5: legendäre häufiger');
+  assert.deepEqual(L.HAENDLER.kosten, { 2: 6, 3: 9, 4: 12, 5: 15 });
+
+  const run = L.newRun(items, regions);
+  assert.equal(L.haendlerStufe(run), 1, 'jeder Lauf beginnt auf Stufe 1');
+  run.gold = 100;
+  const laden = JSON.stringify(run.shop);
+  assert.ok(L.vertrauenErhoehen(run));
+  assert.equal(run.haendler, 2);
+  assert.equal(run.gold, 94);
+  assert.equal(JSON.stringify(run.shop), laden, 'der aktuelle Laden wird nicht neu gewürfelt');
+  assert.equal(L.vertrauenSperre(run), 'heute');
+  assert.ok(!L.vertrauenErhoehen(run), 'höchstens eine Stufe pro Tag');
+  // Gespeicherter Lauf (JSON im localStorage) enthält die Stufe
+  assert.equal(JSON.parse(JSON.stringify(run)).haendler, 2);
+  for (let tag = 2; tag <= 4; tag++) { L.finishBattle(run, items, regions, true, 'Ork'); assert.ok(L.vertrauenErhoehen(run), `Tag ${tag}`); }
+  assert.equal(run.haendler, 5);
+  assert.equal(run.gold, 100 - 6 - 9 - 12 - 15 + [2, 3, 4].reduce((s, d) => s + L.income(d), 0));
+  L.finishBattle(run, items, regions, true, 'Ork');
+  assert.equal(L.vertrauenSperre(run), 'max');
+  run.haendler = 1; run.haendlerTag = 0; run.gold = 5;
+  assert.equal(L.vertrauenSperre(run), 'gold');
+  // Gegner kaufen mit den Tagen bei einem vertrauteren Händler
+  assert.deepEqual([1, 3, 5, 7, 9, 10].map(L.gegnerHaendler), [1, 2, 3, 4, 5, 5]);
+});

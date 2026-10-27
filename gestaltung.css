@@ -502,3 +502,34 @@ button, input, select, textarea { font-family: inherit; }
 .code-kasten.klein .code-text { font-size: 32px; }
 .code-heft { margin: 0; font-weight: 700; color: var(--tinte); }
 .code-input { font-family: var(--font); font-weight: 700; font-size: 36px; letter-spacing: .14em; text-transform: none; min-height: 64px; }
+
+/* ---------- Händler-Vertrauen: Laternen am Stand (CSS-Ersatz, siehe BILDER-OFFEN.md) ---------- */
+.haendler-stufe { display: inline-flex; align-items: flex-end; gap: 4px; min-height: 48px; padding: 4px 8px; background: rgba(0, 0, 0, .35); border: 2px solid rgba(232, 178, 58, .55); border-radius: 12px; cursor: pointer; }
+.laterne { position: relative; display: inline-block; width: 13px; height: 20px; border-radius: 4px 4px 6px 6px; background: linear-gradient(180deg, #3a2a1c, #1b120b); border: 2px solid #6b5333; box-shadow: inset 0 0 3px #000; }
+.laterne::before { content: ''; position: absolute; left: 50%; top: -7px; width: 7px; height: 6px; margin-left: -3.5px; border: 2px solid #6b5333; border-bottom: none; border-radius: 4px 4px 0 0; }
+.laterne.an { background: radial-gradient(circle at 50% 55%, #fff6c8 0, #ffd65a 35%, #e8a12a 70%, #7a4a10 100%); border-color: #b58a3a; box-shadow: 0 0 8px 2px rgba(255, 200, 80, .75); }
+.laterne.neu { animation: laterne-an 1.2s ease-out; }
+@keyframes laterne-an { 0% { transform: scale(1.8); box-shadow: 0 0 24px 10px rgba(255, 220, 120, 1); } 100% { transform: scale(1); } }
+#shop.stand-leuchtet { animation: stand-leuchtet 1.3s ease-out; }
+@keyframes stand-leuchtet { 0%, 100% { box-shadow: none; } 30% { box-shadow: 0 0 0 4px var(--gold-hell), 0 0 40px 8px rgba(255, 210, 110, .8); } }
+.haendler-gross { display: flex; justify-content: center; gap: 12px; margin: 6px 0 14px; }
+.haendler-gross .laterne { width: 26px; height: 38px; }
+.haendler-gross .laterne::before { width: 12px; height: 10px; margin-left: -6px; top: -12px; }
+.haendler-stufen { display: flex; gap: 12px; justify-content: center; }
+.haendler-stufen p { flex: 1; max-width: 260px; margin: 0; padding: 10px 12px; text-align: left; }
+.haendler-stufen .naechste { border-color: var(--gold); }
+#btn-vertrauen .kurz { display: none; }
+#btn-vertrauen.gesperrt .price { font-size: 14px; }
+#btn-reroll.teuer .price { color: #ffcf8a; }
+@media (max-width: 1250px) {
+  #btn-vertrauen .lang { display: none; }
+  #btn-vertrauen .kurz { display: inline; }
+}
+.shop-head .btn, .modal-card [data-act="mehr"] { white-space: nowrap; }
+@media (max-width: 1100px) {
+  .shop-head { gap: 6px; }
+  .shop-head .btn { font-size: 15px; padding: 6px 10px 8px; }
+  .shop-head .shop-gold { margin-right: 0; font-size: 17px; padding: 3px 8px 3px 4px; }
+  .haendler-stufe { gap: 3px; padding: 4px 6px; }
+  .haendler-stufe .laterne { width: 11px; height: 17px; }
+}

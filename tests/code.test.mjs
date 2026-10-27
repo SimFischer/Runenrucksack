@@ -260,6 +260,7 @@ test('Alter Reisecode: voller Rucksack mit Stufen, Drehung, Sätzen, Fluch, Lade
   assert.deepEqual(norm(r.profil), norm(mittel()));
   const erwartet = laufNorm(run);
   delete erwartet.version;
+  delete erwartet.haendler; // kennt der alte Reisecode nicht (liegt nur im gespeicherten Lauf)
   const ist = laufNorm(r.run);
   delete ist.version;
   for (const k of Object.keys(erwartet)) assert.deepEqual(ist[k], erwartet[k], k);

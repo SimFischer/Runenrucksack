@@ -2,7 +2,13 @@
 
 Bilder, die noch fehlen oder ersetzt werden könnten. Bis dahin gibt es einen sauberen Ersatz aus CSS oder vorhandenen Bildern.
 
-Zurzeit fehlt kein Bild. Erledigt:
+Es fehlen:
+
+| Bild | Wofür | Ersatz bis dahin |
+| --- | --- | --- |
+| Laterne (aus und an), Symbol im Stil von `assets/ui/symbole/` | Händler-Vertrauen: eine Laterne pro Stufe am Händlerstand und auf der Tafel | Laternen aus CSS (`.laterne` in `gestaltung.css`) |
+
+Erledigt:
 
 - Ork-Plünderer und Wolfsreiter-Häuptling besiegt (`assets/roh/anfuehrer-besiegt.webp` → `assets/ui/besiegt/`) – für die Sieg-Inszenierung.
 - Die sechs Begegnungsfiguren (`assets/roh/begegnungen.webp` → `assets/ui/begegnung/`) – für die Auswahl am Morgen und das Begegnungsfenster.
