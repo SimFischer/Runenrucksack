@@ -2,7 +2,7 @@
 
 Ein Fantasy-Backpack-Battler fürs iPad (Querformat) als Web-App, in dem Grammatik das Regelwerk der Kombos ist. Das vollständige Spielkonzept steht in [konzept.md](konzept.md).
 
-**Stand: Etappe 4 – Fortschritt: Buch der Wörter, Ränge, Freischaltungen, Erfolge, Lernbericht, Helden- und Reisecode**
+**Stand: Aufgabensystem – großer Wortschatz, 15 Themen mit drei Stufen, elf Aufgabenformate, Lernstand, Bereich für Lehrkräfte**
 
 Spielen: <https://simfischer.github.io/Runenrucksack/> – auf dem iPad in Safari öffnen, **Teilen → Zum Home-Bildschirm**, dann startet es wie eine App im Vollbild und läuft auch offline.
 
@@ -74,10 +74,10 @@ Alle Werte stehen in `achievements.json` (Erfahrung, Ränge, Designs, Erfolge), 
 
 ## Heldencode und Reisecode
 
-- **Heldencode:** gesamter Fortschritt (Rang, Erfahrung, Figuren, Designs, Erfolge, Buch der Wörter, Statistik, Tutorial). Erscheint am Ende jedes Laufs und im Menü – groß, mit QR-Code und Knopf „Kopieren“.
+- **Heldencode:** gesamter Fortschritt (Rang, Erfahrung, Figuren, Designs, Erfolge, Buch der Wörter, Statistik, Tutorial, Lernstand je Thema, Regelkarten, Klassen-Einstellung). Erscheint am Ende jedes Laufs und im Menü – groß, mit QR-Code und Knopf „Kopieren“.
 - **Reisecode:** Heldencode plus laufender Lauf (Menü → „Lauf unterbrechen“).
-- **Eingeben:** Startmenü → „Heldencode eingeben“. Bindestriche sind optional, Kleinbuchstaben werden groß. Das Spiel erkennt selbst, ob es ein Helden- oder Reisecode ist, und meldet Tippfehler freundlich. Mit „📷 QR-Code scannen“ geht es auch über die iPad-Kamera.
-- **Format:** Großbuchstaben und Ziffern ohne 0/O und 1/I/L, Fünfergruppen, Prüfzeichen am Ende. Länge: Anfänger 35, Mittelstand etwa 125, voller Fortschritt etwa 150 Zeichen; ein Reisecode ist länger (120–370 Zeichen).
+- **Eingeben:** Startmenü → „Heldencode eingeben“. Bindestriche sind optional, Kleinbuchstaben werden groß. Das Spiel erkennt selbst, ob es ein Helden-, Reise- oder Klassen-Code (`THEMEN-…`) ist, und meldet Tippfehler freundlich. Mit „📷 QR-Code scannen“ geht es auch über die iPad-Kamera.
+- **Format:** Großbuchstaben und Ziffern ohne 0/O und 1/I/L, Fünfergruppen, Prüfzeichen am Ende. Länge: Anfänger 35, Mittelstand etwa 125, voller Fortschritt (mit allen Regelkarten und vollem Lernstand) etwa 190 Zeichen; ein Reisecode ist länger (120–400 Zeichen). Lernstand, Regelkarten und Klasse stehen nur dann am Ende, wenn es sie gibt – ältere Codes bleiben gültig.
 - Der Browser merkt sich den letzten Stand zusätzlich (Komfort). „Neu beginnen“ im Menü löscht ihn nach einer Sicherheitsabfrage.
 
 ### Wichtige Regel: registry.json nur hinten ergänzen
@@ -98,15 +98,27 @@ Das Werkzeug hängt neue Einträge **nur hinten an**. Nie Einträge umsortieren,
 | Artikel-Siegel | der/die/das neben einem Nomen mit passendem Genus: +25 % | Genus der Nomen |
 | Adjektiv-Runen | Pfeil zeigt auf ein passendes Nomen: „scharfes Schwert“ | Adjektiv vor dem Nomen, Endungen |
 | Steigerung | Zwei gleiche Runen → Komparativ (★★) → Superlativ (★★★) → Superlativ mit Krone (★★★★), Werte wie die Sternstufen | scharf – schärfer – am schärfsten, gut – besser – am besten |
-| Begegnungen | Plural, Artikel, Rechtschreibung auf der Speisekarte, Personalformen, Fehler im Namen | Wiederholung Klasse 5 |
-| Ork-Rüstung | Falsch geschriebenes Wort verbessern | Rechtschreibung |
+| Begegnungen | Jede Gestalt mit eigenem Format: Eule sortiert, Zwerg baut Komposita, Wirtin verbessert die Speisekarte (2–3 Fehler), Hirtin ordnet Satzglieder, Händler fragt „Was passt nicht?“ (Rabatt), Kobold verdreht einen Namen | Wiederholung Klasse 5 |
+| Ork-Rüstung | Satz mit einem Fehler: falsches Wort antippen und verbessern, nur ein Versuch | Rechtschreibung |
 | Wortfeld-Taschen | Gartentasche, Satteltasche: Items aus dem passenden Wortfeld +20 % | Wortfelder |
-| Sternstufen | Zwei gleiche Items (Rucksack + Lager) werden sofort zu ★★ (2,2-fach), ★★★ (5-fach), ★★★★ (11-fach, legendär); vorher Mehrzahl-, Präteritum- oder Steigerungsfrage | zwei Äxte, gestern schlug er |
+| Sternstufen | Zwei gleiche Items (Rucksack + Lager) werden sofort zu ★★ (2,2-fach), ★★★ (5-fach), ★★★★ (11-fach, legendär); vorher eine Aufgabe zum Thema des Items (siehe unten) | zwei Äxte, gestern schlug er |
 | Verben mit Subjekt | Pfeil der Schriftrolle zeigt auf ein Nomen, Frage nach der Personalform; richtig: Rolle voll und das Subjekt schlägt mit, sonst nur halbe Wirkung | Das Feuerschwert schlägt. Die Speere schlagen. |
 
-**Regel für alle Aufgaben:** Der erste Versuch ist kostenlos, jeder weitere kostet 1 Gold, bei Fehlern erscheint eine kurze Erklärzeile. **Eine grammatisch falsche Kombination ist nie stärker als eine richtige** – die Tests prüfen das.
+**Regel für alle Aufgaben:** Der erste Versuch ist kostenlos, jeder weitere kostet 1 Gold; nach jeder Antwort erscheint eine kurze Erklärung mit Merkhilfe. **Eine grammatisch falsche Kombination ist nie stärker als eine richtige** – die Tests prüfen das.
 
-**Verbinden ohne Bremse:** Die Fragen zum Verbinden erscheinen als kleines Fenster direkt am Item. Wer dieselbe Frage (gleiches Wort, gleiche Art) in einem Lauf dreimal gleich richtig beantwortet hat, bekommt sie nicht mehr – das Verbinden passiert dann direkt mit einem Hinweis wie „die Äxte ✓“. Mit „Nicht verbinden“ bleiben die Items getrennt. Im Menü lässt sich der Klang beim Verbinden ausschalten.
+**Verbinden ohne Bremse:** Kurze Aufgaben erscheinen als kleines Fenster direkt am Item, größere (Sortieren, Satz ordnen, Tastatur) in der Mitte. Mit „Nicht verbinden“ bleiben die Items getrennt. Im Menü lässt sich der Klang beim Verbinden ausschalten.
+
+## Aufgaben und Lernstand
+
+Die Aufgaben entstehen aus `wortschatz.json` (508 Nomen, 135 Verben, 93 Adjektive, 47 Komposita, 41 Wortfamilien, 44 Sätze, Wortfelder der Gebiete) und `themen.json` (15 Themen mit je drei Stufen und Regelkarten). Der Code dazu steht in `js/aufgaben/`.
+
+- **Das Item bestimmt das Thema, nicht das Wort:** Nomen → Mehrzahl oder Artikel, Komposita → Komposita, Verben → Personalformen oder Zeitformen, Runen → Steigerung, Ork-Rüstung → Rechtschreibung. Das Wort ist zufällig, bevorzugt aus dem Wortfeld des Gebiets.
+- **Die Item-Stufe bestimmt den Bereich:** ★★ = Stufe 1–2, ★★★ = Stufe 2–3, ★★★★ = Stufe 3 (ist Stufe 3 nicht erlaubt: zwei Aufgaben).
+- **Elf Formate:** Auswahl, Lückensatz, Buchstaben ergänzen (eigene Bildschirmtastatur), Eintippen (nur Stufe 3), Baukasten, Sortieren (Ziehen oder Antippen), Fehler finden, Satz ordnen, Passt nicht, Regel entdecken, Paare.
+- **Lernstand je Thema:** zweimal gleich beim ersten Versuch richtig → nächste Stufe. Ein Fehler kommt als zweite bis vierte Aufgabe danach wieder – in anderer Form, mit anderem Wort. Jedes Wort höchstens einmal pro Thema und Lauf. Der Lernstand steht im Heldencode; der Lernbericht zeigt Sterne je Thema, keine Prozente.
+- **Belohnungen:** gleich richtig auf Stufe 2 → +1 Gold, auf Stufe 3 → +2 Gold, und beim Verbinden glänzt das neue Item (+10 % im nächsten Kampf). Jede richtig angewendete Regel wird eine Regelkarte im Buch (Seite „Regeln“).
+- **Für Lehrkräfte** (Startmenü, Code in `lehrkraft.json`): Themen an/aus und höchste Stufe je Thema. Daraus entsteht ein Klassen-Code wie `THEMEN-3DFTS-R8UD8`, den die Kinder bei „Heldencode eingeben“ eintippen; er wird im Heldencode gespeichert. Ohne Klassen-Code gelten alle Themen mit Stufe 1–2. Der Lehrkraft-Code liegt offen im Repository – er hält Kinder ab, ist aber kein echter Schutz.
+- **Prüfliste für Lehrkräfte:** `node tools/pruefliste.mjs` erzeugt `wortschatz-pruefliste.html` (sortierbar, mit Häkchen-Spalte, unsichere Einträge markiert).
 
 ## Inhalte ändern (ohne Programmieren)
 
@@ -116,8 +128,11 @@ Alle Inhalte stehen in JSON-Dateien. Jede Datei hat oben ein Feld `_hinweis`, da
 | --- | --- |
 | `items.json` | Alle Items im Laden: Wortart (`art`), Artikel, Wortfeld, Form, Seltenheit, Preis, Kampfwerte; Mehrzahl mit zwei falschen Formen (`plural`), Verbformen (`formen`: er, sie, Präteritum), Extras für passende Subjekte (`subjektBonus`); Runen mit Steigerungsformen; Taschen |
 | `recipes.json` | Welche Items Träger sind und was jede Kraft beim Verschmelzen dazugibt |
-| `exercises.json` | **Die Wörter der Aufgaben:** Plural, Artikel, Speisekarten, Personalformen, Kobold-Namen |
-| `encounters.json` | Die Begegnungen: Figur, Text, Aufgabentyp, Belohnung, Gebiet |
+| `wortschatz.json` | **Die Wörter der Aufgaben:** Nomen mit Artikel, Mehrzahl, Pluralmuster, Silben, Wortfeld, Schwierigkeit und Rechtschreib-Phänomenen; Verben, Adjektive, Komposita, Wortfamilien, Sätze, Wortfelder der Gebiete |
+| `themen.json` | Themen mit drei Stufen (Beschreibung, erlaubte Formate) und Regelkarten |
+| `lehrkraft.json` | Code für den Bereich „Für Lehrkräfte“ |
+| `exercises.json` | Verdrehte Namen für den Zwielichtigen Kobold |
+| `encounters.json` | Die Begegnungen: Figur, Text, Aufgabenformat, Belohnung, Gebiet |
 | `enemies.json` | Die Orks: Vorlieben beim Packen und die falschen Wörter auf ihren Rüstungen |
 | `regions.json` | Die Gebiete: Tage, Farben, Wortfeld, Gegner, Boss |
 | `heroes.json` | Startfiguren mit Bonus, Start-Items und Unterklassen; die sechs Schicksalsrunen |
@@ -127,15 +142,12 @@ Alle Inhalte stehen in JSON-Dateien. Jede Datei hat oben ein Feld `_hinweis`, da
 
 ### Beispiele
 
-- **Neues Plural-Wort:** in `exercises.json` unter `plural` eine Zeile ergänzen:
-  `{ "wort": "das Kind", "richtig": "die Kinder", "falsch": ["die Kinds", "die Kinde"], "regel": "Kind → Kinder: dazu kommt -er." }`
-- **Neues Artikel-Rätsel:** unter `artikel`: `{ "wort": "Schüssel", "artikel": "die" }`
-- **Neue Speisekarte:** unter `speisekarten`; das falsch geschriebene Wort als `falsch|richtig`:
-  `{ "zeilen": ["Tomatensuppe", "Reis mit Gemüse", "Kirschen mit Sahne|Sahne"], "erklaerung": "…" }` – genau ein Wort pro Karte mit `|`.
+- **Neues Nomen:** in `wortschatz.json` unter `nomen` eine Zeile mit allen Feldern ergänzen (siehe `_hinweis`); falsche Mehrzahlformen entstehen automatisch aus dem Pluralmuster. Ist ein Wort nicht eindeutig (z. B. „der/das Teil“), `"mehrdeutig": true` setzen – dann kommt es in keiner Aufgabe vor. Danach `node tools/pruefliste.mjs` und die Tests laufen lassen.
+- **Thema anpassen:** in `themen.json` Text oder Formate einer Stufe ändern, Regelkarten ergänzen (neue Regeln brauchen danach `node tools/registry.mjs`).
 - **Neuer Fehler auf einer Ork-Rüstung:** in `enemies.json` beim Gegner unter `fehler`; `optionen` enthält genau eine richtige Schreibung.
 - **Neuer Träger** (z. B. ein Besen): Item in `items.json` mit `"art": "traeger"` anlegen und die id in `recipes.json` unter `traeger` eintragen – alle acht Komposita entstehen automatisch.
 
-Die Tests (siehe unten) melden, wenn eine Aufgabe nicht genau eine richtige Lösung hat.
+Die Tests (siehe unten) melden, wenn eine Aufgabe nicht genau eine richtige Lösung hat oder eine falsche Antwort zufällig ein echtes Wort ist.
 
 ## Bilder
 
@@ -189,16 +201,21 @@ node --test
 | --- | --- |
 | `tests/regeln.test.mjs` | Komposita, Siegel, Runen; falsch nie stärker als richtig |
 | `tests/steigerung.test.mjs` | Steigerungsformen, Deklination, Erkennung von drei Runen, +50 % je Stufe |
-| `tests/begegnungen.test.mjs` | Begegnungen, Aufgaben (genau eine Lösung), Rucksack-Wachstum, Kobold-Fluch |
+| `tests/begegnungen.test.mjs` | Begegnungen mit eigenem Format, Speisekarte mit 2–3 Fehlern, Kobold-Lücke am Fehler, Rabatt, Rucksack-Wachstum, Kobold-Fluch |
+| `tests/wortschatz.test.mjs` | Wortschatz: Pflichtfelder, keine Dubletten, Mehrzahl und Artikel passend, falsche Formen nie echte Wörter |
+| `tests/themen.test.mjs` | Alle Themen auf allen Stufen in allen Formaten erzeugbar, genau eine richtige Lösung |
+| `tests/formate.test.mjs` | Jedes Format: genau eine richtige Antwort, falsche nie richtig, alle Stufen erzeugbar |
+| `tests/wahl.test.mjs` | Item → Thema, Stufen-Bereich, Lehrkraft-Grenzen, Aufstieg, Wiederholung nach Fehlern, Simulation (30 Aufgaben: ≥ 6 Formate, kein Wort doppelt), Lernbericht, Gold |
+| `tests/offline.test.mjs` | Alle Skripte und Daten stehen in der Liste des Service Workers |
 | `tests/ablauf.test.mjs` | Gebiete, Bosse, Figuren, Schicksalsrunen, Unterklassen, Taschen, Ork-Rüstungen |
 | `tests/balance.test.mjs` | 200 simulierte Läufe: Siegquote pro Tag, Siege und Spielzeit; Sternstufen der Gegner; Rang-Aufstieg über viele Läufe |
-| `tests/sterne.test.mjs` | Mehrzahl- und Verbformen aller Items, Verbinden beim Kaufen, beim Ziehen auf ein gleiches Item, bei Belohnungen und als Kette, „Nicht verbinden“, gekonnte Fragen, Laden-Gewichtung |
+| `tests/sterne.test.mjs` | Mehrzahl- und Verbformen aller Items, Verbinden beim Kaufen, beim Ziehen auf ein gleiches Item, bei Belohnungen und als Kette, „Nicht verbinden“, Laden-Gewichtung |
 | `tests/komposita.test.mjs` | Komposita entstehen sofort beim Ablegen und Drehen, Stufe vom Träger, Feueraxt ★ + ★ → ★★, falsch nie stärker |
 | `tests/verben.test.mjs` | Pfeil, Personalform, Verb mit und ohne Subjekt (falsch nie stärker) |
 | `tests/tutorial.test.mjs` | Tutorial komplett durchspielen, Zurücksetzen, Überspringen fehlender Funktionen, danach normaler Lauf |
 | `tests/buch.test.mjs` | Buch der Wörter: alle Einträge aus den Daten, Entdeckungen aus dem Lauf, Seitenstand |
 | `tests/fortschritt.test.mjs` | Erfahrung, Ränge, Freischaltungen, Fähigkeiten der neuen Figuren, Erfolge, Lernbericht |
-| `tests/code.test.mjs` | Helden- und Reisecode: exakt derselbe Stand (auch voll), Tippfehler und Dreher, angehängte Inhalte, gespeicherter Code aus Version 1; nennt die Codelängen |
+| `tests/code.test.mjs` | Helden-, Reise- und Klassen-Code: exakt derselbe Stand (auch voll, mit Lernstand und Regelkarten), Tippfehler und Dreher, angehängte Inhalte, gespeicherter Code aus Version 1; nennt die Codelängen |
 
 Das Tutorial in einem echten Browser per Touch durchspielen (braucht Chrome oder Edge; Server vorher mit `node tools/serve.mjs` starten):
 
@@ -223,6 +240,8 @@ Aktuelle Balance (200 Läufe, einfache Kaufstrategie, Aufgaben zu 75 % richtig):
 | `index.html`, `style.css` | Bildschirme und Aussehen |
 | `js/main.js` | Ablauf eines Laufs, Laden, Rucksack (Ziehen und Drehen), Info-Feld, Verbinden mit Frage-Fenster am Item |
 | `js/encounters.js` | Begegnungen am Morgen mit ihren Aufgaben |
+| `js/aufgaben/` | Aufgaben: Wortschatz-Hilfen (`wortschatz.js`), Themen-Generatoren (`themen.js`), Auswahl und Lernstand (`wahl.js`), Fenster (`host.js`), Anbindung ans Spiel (`spiel.js`), elf Formate in `formate/` |
+| `js/lehrkraft-ui.js` | Bereich „Für Lehrkräfte“ mit Klassen-Code |
 | `js/tutorial.js` | Tutorial: Spotlight, Sprechblase, Hand, Vorlesen, „So geht's“, Erste-Mal-Tipps |
 | `js/tutorial-logic.js` | Tutorial ohne Darstellung: aktive Schritte, Prüfen, Zurücksetzen (testbar) |
 | `js/battle-ui.js` | Kampfanzeige und Fehler auf der Ork-Rüstung |
@@ -230,7 +249,7 @@ Aktuelle Balance (200 Läufe, einfache Kaufstrategie, Aufgaben zu 75 % richtig):
 | `js/state.js` | Geladene Inhalte und Speichern im Browser |
 | `js/logic.js` | Regeln: Raster, Laden, Gold, Gebiete, Lauf, Gegner, Begegnungen |
 | `js/grammar.js` | Grammatik-Regeln: Komposita, Siegel, Runen, Steigerung, Verben mit Subjekt, Mehrzahl |
-| `js/sterne.js` | Sofortiges Verbinden: zwei gleiche und Kristall + Träger finden, Frage bauen, verbinden (auch als Kette), gekonnte Fragen |
+| `js/sterne.js` | Sofortiges Verbinden: zwei gleiche und Kristall + Träger finden, Frage bauen, verbinden (auch als Kette) |
 | `js/mods.js` | Boni von Figur, Unterklasse, Schicksalsrune, Begegnungen und Taschen |
 | `js/battle.js` | Kampfsimulation |
 | `js/sim.js` | Simulation ganzer Läufe (und vieler Läufe hintereinander) für die Balance |

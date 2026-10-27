@@ -410,7 +410,8 @@ function finale() {
 
 // Karten aus tutorial.json (Feld „hilfe“), nur für Funktionen, die es gibt.
 export function helpCards() {
-  return activeSteps(G.TUTORIAL).filter((s) => s.hilfe).map((s) => s.hilfe);
+  const extra = G.TUTORIAL.zusatzHilfe || [];
+  return activeSteps(G.TUTORIAL).filter((s) => s.hilfe).flatMap((s) => [s.hilfe, ...extra.filter((h) => h.nach === s.id)]);
 }
 
 export function showHelp(onClose = null) {

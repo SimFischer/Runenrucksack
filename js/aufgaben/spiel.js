@@ -39,6 +39,7 @@ export async function frageImSpiel(opts) {
     : waehleAufgabe({ themen: G.THEMEN, ws, profil: G.PROFIL, einst: einstellungen(), run, rng, art: opts.art, kandidaten: opts.kandidaten,
       bereich: opts.bereich, format: opts.format, felder: felderJetzt(), itemNomen });
   const t = thema(aufgabe.thema);
+  emit('tipp', { key: 'stufen' });
   const ergebnis = await stelleAufgabe(aufgabe, {
     anker: opts.anker,
     titel: `${t?.emoji || ''} ${t?.name || ''}`,

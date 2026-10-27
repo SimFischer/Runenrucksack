@@ -62,12 +62,12 @@ Man trifft eine Figur am Wegesrand und wählt aus zwei bis drei Boni. Jede Begeg
 
 | Begegnung | Aufgabe | Belohnung |
 | --- | --- | --- |
-| Eulenbibliothekarin (Lindrael) | Plural von drei Nomen bilden | Rucksack +1 Feld |
-| Rätselzwerg (Khazrûm) | richtigen Artikel oder Fall wählen | seltenes Rezept |
-| Wirtin vom „Krummen Kessel“ | Fehler auf der Speisekarte finden | Gold |
-| Fahrender Händler | – | ein Item tauschen |
-| Pferdehirtin (Hrossmark) | Verben dem richtigen Bild zuordnen | schnellere Schriftrollen |
-| Zwielichtiger Kobold | versteckten Fehler im Geschenk finden | sehr starkes Item, sonst schadet es dir |
+| Eulenbibliothekarin | Sortieren (z. B. der/die/das, groß/klein, d/t) | Rucksack +1 Feld |
+| Rätselzwerg | Baukasten: Komposita aus Bausteinen bauen | seltenes Item |
+| Wirtin vom „Krummen Kessel“ | Fehler finden: 2–3 falsch geschriebene Gerichte auf der Speisekarte | Gold |
+| Fahrender Händler | Passt nicht: welches Wort gehört nicht dazu? | Rabatt auf die nächsten Käufe |
+| Pferdehirtin (Hrossmark) | Satz ordnen: Satzglieder in die richtige Reihenfolge | schnellere Schriftrollen |
+| Zwielichtiger Kobold | Buchstaben ergänzen: den verdrehten Namen reparieren | sehr starkes Item, sonst schadet es dir |
 
 ### Tag: Laden und Rucksack
 
@@ -152,7 +152,7 @@ Das Kombinieren ist die größte Stärke des Spiels, und es belohnt sofort wie i
 
 - Die Frage erscheint als kleines, schnelles Fenster direkt über dem Item, mit großen Antwortknöpfen; ein Tipp genügt.
 - Richtig: sofort verbinden mit Animation. Falsch: eine kurze Erklärzeile, dann ein neuer Versuch; ab dem zweiten Versuch kostet jeder weitere 1 Gold.
-- Hat ein Kind dieselbe Frage (gleiches Wort, gleiche Art) in einem Lauf dreimal gleich beim ersten Versuch richtig beantwortet, kommt sie in diesem Lauf nicht mehr; das Verbinden passiert dann direkt mit einem kleinen Hinweis („die Äxte ✓“).
+- Das Item bestimmt das Thema der Aufgabe, die Item-Stufe ihren Schwierigkeitsbereich. Statt gekonnte Fragen wegzulassen, werden die Themen schwerer (siehe „Lernsicherung“).
 - Jedes Fenster hat einen kleinen Knopf „Nicht verbinden“: Das Item wird ohne Verbinden abgelegt (beim Kaufen ins Lager, falls kein Platz).
 
 ### Komposita: Kraft + Träger
@@ -246,8 +246,8 @@ Das Spiel erzeugt Codes, die die Kinder ins Heft schreiben oder fotografieren. S
 
 | Code | Inhalt | Form | Beispiel |
 | --- | --- | --- | --- |
-| Heldencode | dauerhafter Fortschritt: Rang, Erfahrung, Figuren, Designs, Erfolge, Buch der Wörter, Statistik für Erfolge, Tutorial abgeschlossen | Fünfergruppen aus Großbuchstaben und Ziffern, wächst mit (Anfänger 35, voller Fortschritt etwa 150 Zeichen) | RWV6D-8AWXP-UXKUP-EQHE4-FGCHA-NM6U8-GK5PA |
-| Reisecode | Heldencode plus laufender Lauf: Figur, Unterklasse, Schicksalsrune, Tag, Herzen, Siege, Gold, Rucksack und Lager mit Positionen, Drehung und Stufen, Verb-Subjekt-Verbindungen, reservierte Ladenplätze, gekonnte Fragen | gleiches Format, länger, mit QR-Code | – |
+| Heldencode | dauerhafter Fortschritt: Rang, Erfahrung, Figuren, Designs, Erfolge, Buch der Wörter, Statistik für Erfolge, Tutorial abgeschlossen, Lernstand je Thema, Regelkarten, Klassen-Einstellung | Fünfergruppen aus Großbuchstaben und Ziffern, wächst mit (Anfänger 35, voller Fortschritt etwa 150 Zeichen) | RWV6D-8AWXP-UXKUP-EQHE4-FGCHA-NM6U8-GK5PA |
+| Reisecode | Heldencode plus laufender Lauf: Figur, Unterklasse, Schicksalsrune, Tag, Herzen, Siege, Gold, Rucksack und Lager mit Positionen, Drehung und Stufen, Verb-Subjekt-Verbindungen, reservierte Ladenplätze, Rabatt, fällige Wiederholungen, Glanz | gleiches Format, länger, mit QR-Code | – |
 | Rucksack-Code | ein fertiger Rucksack für die Arena | mittellang | Code aus Buchstaben und Zahlen |
 
 - **Zeichen:** Großbuchstaben und Ziffern ohne verwechselbare Zeichen (kein 0/O, 1/I/L), in Fünfergruppen mit Bindestrichen. Beim Eingeben sind Bindestriche optional, Kleinbuchstaben werden automatisch groß.
@@ -272,20 +272,25 @@ Spaß hat Vorrang, aber eine Regel ist unverhandelbar: Eine grammatisch falsche 
 
 ### Damit Lernen passiert
 
-- **Raten bremsen:** Der erste Versuch bei einer Grammatik-Entscheidung ist frei, jeder weitere kostet 1 Gold.
-- **Kurzes Feedback** nach einem Fehler, eine Zeile mit der Regel: „Feuer**schwert** – das Schwert bestimmt den Artikel.“
-- **Lupe als Hilfe:** zeigt die Regel vorab, kostet aber einen kleinen Bonus.
-- **Lernaufgaben bleiben kurz** und stecken im Aufbau (Laden, Begegnungen, Verschmelzen), nie mitten im Kampf.
-- **Fehler auf Orks:** vor dem Kampf einen falschen Begriff auf der Gegnerrüstung antippen und korrigieren → Gegner geschwächt.
-- **Lernbericht am Ende eines Laufs:** welche Regeln sicher saßen, welche nicht – nur für das Kind sichtbar.
+- **Raten bremsen:** Der erste Versuch ist frei, jeder weitere kostet 1 Gold. Auf der Ork-Rüstung gibt es nur einen Versuch.
+- **Erklärung nach jeder Antwort** mit Merkhilfe – auch nach einer richtigen: „Brot + Korb = Brotkorb: Das Grundwort steht hinten und bestimmt, was es ist.“
+- **Großer Wortschatz statt fester Fragen:** über 500 Nomen mit Artikel, Mehrzahl, Pluralmuster, Silben, Wortfeld, Schwierigkeit und Rechtschreib-Phänomenen, dazu Verben, Adjektive, Komposita, Wortfamilien und Sätze. Mehrdeutige Wörter kommen nicht vor. Falsche Antworten entstehen aus typischen Fehlermustern und sind nie zufällig ein echtes Wort – die Tests prüfen das.
+- **15 Themen mit je drei Stufen** (Artikel, Mehrzahl, Wortarten, Groß/klein, Personalformen, Zeitformen, Steigerung, Verlängerung, Ableitung, Doppelkonsonant, ie, tz/ck, Komposita, Satzglieder, Wortfelder) und **elf Aufgabenformate**, damit dieselbe Regel in verschiedenen Formen geübt wird.
+- **Das Item bestimmt das Thema**, die Item-Stufe den Bereich (★★ = Stufe 1–2, ★★★ = 2–3, ★★★★ = 3). Jede Begegnung hat ihr eigenes Format.
+- **Lernstand je Thema:** zweimal gleich richtig → nächste Stufe. Statt „nach dreimal richtig nicht mehr fragen“ werden die Themen schwerer.
+- **Verteilte Wiederholung:** Ein Fehler kommt zwei bis vier Aufgaben später wieder – in anderer Form und mit anderem Wort. Jedes Wort höchstens einmal pro Thema und Lauf.
+- **Belohnung für Können:** Stufe 2 gleich richtig +1 Gold, Stufe 3 +2 Gold und Glanz (+10 % im nächsten Kampf). Regelkarten werden im Buch gesammelt.
+- **Lernaufgaben bleiben kurz** und stecken im Aufbau (Laden, Begegnungen, Verbinden), nie mitten im Kampf.
+- **Lernbericht am Ende eines Laufs:** Sterne je geübtem Thema und ein Tipp, wo es noch hakt – keine Prozente, keine Noten, nur für das Kind sichtbar.
+- Der Lernstand reist im **Heldencode** mit (ältere Codes bleiben gültig).
 
 ### Lehrkraft-Modus
 
-- Alle Wörter, Rezepte und Begegnungen stehen in **JSON-Dateien** pro Pfad. Neue Wörter, etwa aus dem aktuellen Lesetext, lassen sich ohne Programmieren ergänzen.
-- **Freischalt-Code** pro Gebiet, damit niemand dem Unterricht vorauseilt.
-- **Turniermodus** für die Klassenarena am Beamer.
-- **Champion-Rucksack** per Code als festen Gegner eintragen.
-- Zugang über einen Lehrkraft-Code, nicht über ein Passwort.
+- **„Für Lehrkräfte“** im Startmenü, geschützt mit einem Lehrkraft-Code aus `lehrkraft.json` (kein Passwort, kein Server).
+- Themen an- und ausschalten und je Thema die **höchste Stufe** festlegen. Ohne Einstellung: alle Themen, Stufe 1–2.
+- Daraus entsteht ein **Klassen-Code** wie `THEMEN-3DFTS-R8UD8`. Die Kinder tippen ihn bei „Heldencode eingeben“ ein; er wird in ihrem Heldencode gespeichert und gilt so auch auf anderen iPads.
+- Alle Wörter und Themen stehen in **JSON-Dateien**. Neue Wörter, etwa aus dem aktuellen Lesetext, lassen sich ohne Programmieren ergänzen; `tools/pruefliste.mjs` erzeugt eine sortierbare Prüfliste zum Abhaken.
+- Später denkbar: **Turniermodus** für die Klassenarena am Beamer, **Champion-Rucksack** per Code als festen Gegner.
 
 ### Offene Fragen
 

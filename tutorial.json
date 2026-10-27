@@ -1,5 +1,5 @@
 {
-  "_hinweis": "Das Tutorial „Der erste Tag“. Jeder Schritt: id, text (höchstens zwei kurze Sätze), tipp (Zusatz nach 8 Sekunden ohne Aktion), ziel (data-tut-Namen der Elemente, die hell bleiben und bedienbar sind), aktion (wie es weitergeht), optional voraussetzung (Schritt nur, wenn es die Funktion gibt), laden (fester Laden-Inhalt), hand (Tipp- oder Zieh-Animation), falsch (freundliche Hinweise bei falschen Aktionen), hilfe (Karte für „So geht's“). Ziele für Items: item-<id> im Rucksack, laden-<id> im Laden. Hand-Ziele: rucksack, links-von:<id>, neben:<id>. vorbereitung: platzLinksVon, geschenk (Items in einen Bereich legen), rolleFuer (Verb-Rolle neben ein Nomen legen, Pfeil noch falsch). kampfStarten: Kampf nach dem Schritt starten.",
+  "_hinweis": "Das Tutorial „Der erste Tag“. Jeder Schritt: id, text (höchstens zwei kurze Sätze), tipp (Zusatz nach 8 Sekunden ohne Aktion), ziel (data-tut-Namen der Elemente, die hell bleiben und bedienbar sind), aktion (wie es weitergeht), optional voraussetzung (Schritt nur, wenn es die Funktion gibt), laden (fester Laden-Inhalt), hand (Tipp- oder Zieh-Animation), falsch (freundliche Hinweise bei falschen Aktionen), hilfe (Karte für „So geht's“). Ziele für Items: item-<id> im Rucksack, laden-<id> im Laden. Hand-Ziele: rucksack, links-von:<id>, neben:<id>. vorbereitung: platzLinksVon, geschenk (Items in einen Bereich legen), rolleFuer (Verb-Rolle neben ein Nomen legen, Pfeil noch falsch). kampfStarten: Kampf nach dem Schritt starten. zusatzHilfe: weitere Karten für „So geht's“ ohne eigenen Schritt (nach: id des Schritts, hinter dessen Karte sie steht).",
   "begleiter": {
     "name": "Meister Fenwick",
     "emoji": "🧙",
@@ -366,7 +366,7 @@
         "titel": "Begegnungen",
         "emoji": "🌅",
         "animation": "pulsieren",
-        "text": "Am Morgen triffst du Gestalten am Wegesrand. Für richtige Antworten gibt es Belohnungen."
+        "text": "Am Morgen triffst du Gestalten am Wegesrand – jede mit ihrer eigenen Aufgabe: Die Eule sortiert, der Zwerg baut Wörter, die Wirtin sucht Fehler, die Hirtin ordnet Sätze, der Händler fragt, was nicht passt."
       }
     },
     {
@@ -414,7 +414,7 @@
         "titel": "Sternstufen",
         "emoji": "⭐",
         "animation": "pulsieren",
-        "text": "Zwei gleiche Gegenstände werden sofort zu einem stärkeren: ★ → ★★ → ★★★ → ★★★★. Rucksack und Lager zählen zusammen."
+        "text": "Zwei gleiche Gegenstände werden zu einem stärkeren: ★ → ★★ → ★★★ → ★★★★. Vorher kommt eine kurze Aufgabe – je höher die Stufe, desto kniffliger. Rucksack und Lager zählen zusammen."
       }
     },
     {
@@ -538,7 +538,7 @@
         "titel": "Ork-Fehler",
         "emoji": "🔍",
         "animation": "tippen",
-        "text": "Vor dem Kampf steht ein falsches Wort auf der Rüstung des Orks. Verbessere es: Dann startet er geschwächt. Nur ein Versuch!"
+        "text": "Vor dem Kampf steht auf der Rüstung des Orks ein Satz mit einem Fehler. Tipp das falsche Wort an und verbessere es: Dann startet er geschwächt. Nur ein Versuch!"
       }
     },
     {
@@ -584,7 +584,7 @@
         "titel": "Buch der Wörter",
         "emoji": "📚",
         "animation": "pulsieren",
-        "text": "Jede neue Kombination landet im Buch der Wörter. Dunkle Felder mit ??? kannst du noch entdecken – volle Seiten bringen Belohnungen."
+        "text": "Jede neue Kombination landet im Buch der Wörter. Dunkle Felder mit ??? kannst du noch entdecken – volle Seiten bringen Belohnungen. Auf der Seite „Regeln“ sammelst du Regelkarten."
       }
     },
     {
@@ -652,6 +652,16 @@
     "unterklasse": "Jetzt wählst du eine Unterklasse. Sie macht deine Figur in einer Sache besonders stark.",
     "sterne": "Zwei gleiche Gegenstände werden sofort zu einem stärkeren – egal, ob sie im Rucksack oder im Lager liegen!",
     "verben": "Eine Schriftrolle braucht ein Subjekt: Dreh ihren Pfeil auf ein Nomen, dann wirkt sie voll.",
-    "ruestung": "Auf der Rüstung des Orks steht ein Fehler. Tipp ihn an – richtig verbessert startet er geschwächt."
-  }
+    "ruestung": "Auf der Rüstung des Orks steht ein Satz mit einem Fehler. Tipp ihn an – richtig verbessert startet der Ork geschwächt.",
+    "stufen": "Jedes Thema hat drei Stufen ★☆☆. Zweimal gleich richtig – dann wird es kniffliger. Ab Stufe 2 gibt es Gold dafür!"
+  },
+  "zusatzHilfe": [
+    {
+      "nach": "sammeln",
+      "titel": "Aufgaben und Stufen",
+      "emoji": "🎯",
+      "animation": "pulsieren",
+      "text": "Jedes Thema hat drei Stufen ★☆☆. Zweimal gleich richtig, dann kommt die nächste. Ein Fehler? Die Aufgabe kommt bald in anderer Form wieder. Stufe 2 gleich richtig: +1 🪙, Stufe 3: +2 🪙 und das Item glänzt (+10 % im nächsten Kampf)."
+    }
+  ]
 }
