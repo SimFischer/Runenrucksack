@@ -128,3 +128,21 @@ test('Kampf: richtig gelegte Siegel und Runen gewinnen gegen falsch gelegte', ()
   }
   assert.ok(rightWins > N * 0.9, `richtig gewinnt nur ${rightWins}/${N}`);
 });
+
+test('Neu würfeln: 1-1-1-2-2 Gold, der Zähler beginnt jeden Tag neu', async () => {
+  const { newRun, reroll, wuerfelPreis, finishBattle, WUERFEL } = await import('../js/logic.js');
+  const items = JSON.parse(readFileSync(new URL('../items.json', import.meta.url))).items;
+  const regions = JSON.parse(readFileSync(new URL('../regions.json', import.meta.url))).gebiete;
+  const run = newRun(items, regions);
+  run.gold = 100;
+  const preise = [];
+  for (let i = 0; i < 5; i++) { preise.push(wuerfelPreis(run)); reroll(run, items, regions); }
+  assert.deepEqual(preise, [1, 1, 1, 2, 2]);
+  assert.equal(run.gold, 100 - 7);
+  assert.equal(WUERFEL.billig, 3);
+  finishBattle(run, items, regions, true, 'Ork');
+  assert.equal(wuerfelPreis(run), 1, 'am nächsten Tag wieder billig');
+  run.gold = 1;
+  assert.ok(reroll(run, items, regions));
+  assert.ok(!reroll(run, items, regions), 'ohne Gold kein Wurf');
+});

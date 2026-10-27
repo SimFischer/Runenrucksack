@@ -658,6 +658,7 @@
     "sterne": "Zwei gleiche Gegenstände werden sofort zu einem stärkeren – egal, ob sie im Rucksack oder im Lager liegen!",
     "verben": "Eine Schriftrolle braucht ein Subjekt: Dreh ihren Pfeil auf ein Nomen, dann wirkt sie voll.",
     "ruestung": "Auf der Rüstung des Orks steht ein Satz mit einem Fehler. Tipp ihn an – richtig verbessert startet der Ork geschwächt.",
+    "wuerfeln": "Drei Würfe am Tag kosten 1 Gold, jeder weitere 2. Überleg gut, ob sich noch ein Wurf lohnt – morgen ist es wieder billig.",
     "stufen": "Jedes Thema hat drei Stufen ★☆☆. Zweimal gleich richtig – dann wird es kniffliger. Ab Stufe 2 gibt es Gold dafür!"
   },
   "zusatzHilfe": [

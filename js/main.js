@@ -1,6 +1,6 @@
 // Runenrucksack – Ablauf eines Laufs, Laden, Rucksack (Ziehen und Drehen) und Info-Feld.
 import {
-  CFG, income, baseHp, sellValue, newRun, reroll, finishBattle,
+  CFG, income, baseHp, sellValue, newRun, reroll, finishBattle, wuerfelPreis, WUERFEL,
   canPlace, overlapping, findSpot, sizeOf, shuffle, attachTasche, ownedCount, MAX_STERN, STERN_FAKTOR, preisVon,
 } from './logic.js';
 import {
@@ -365,7 +365,11 @@ function renderTop() {
   $('stat-hearts').innerHTML = sym('herz').repeat(Math.max(0, run.hearts)) + sym('herz', 'leer').repeat(CFG.hearts - Math.max(0, run.hearts));
   $('stat-wins').innerHTML = `${sym('pokal')}${run.wins}`;
   syncGold();
-  $('btn-reroll').disabled = run.gold < CFG.rerollCost;
+  // Neu würfeln: Der Knopf zeigt immer den aktuellen Preis
+  const wp = wuerfelPreis(run);
+  $('btn-reroll').disabled = run.gold < wp;
+  $('btn-reroll').querySelector('.price').innerHTML = `${wp} ${sym('gold', 'klein')}`;
+  $('btn-reroll').classList.toggle('teuer', wp > WUERFEL.preis);
 }
 
 function renderGrid(area) {
@@ -756,6 +760,11 @@ function onReroll() {
   // Im Tutorial bleibt der Laden fest
   if (G.run.tutorial) { toast('Im Tutorial bleibt der Laden, wie er ist.'); return; }
   if (!reroll(G.run, G.ITEMS, G.REGIONS)) { toast('Zu wenig Gold'); return; }
+  if (G.run.wuerfe === WUERFEL.billig) {
+    // Beim ersten Mal erklärt es Fenwick, sonst ein kurzer Hinweis
+    emit('tipp', { key: 'wuerfeln' });
+    if (!document.getElementById('tip-bubble')) toast(`Ab jetzt kostet Neu würfeln ${WUERFEL.teuer} Gold.`);
+  }
   if (selected?.src === 'shop') selected = null;
   bump('stat-gold');
   render();

@@ -112,6 +112,8 @@ const BILDSCHIRME = [
   { name: 'figur-detail', profil: PROFIL, ohneScroll: true, schritte: `await __klick('#btn-known'); await __klick('#btn-new', 600);
       const k = [...document.querySelectorAll('.hero-card, .figur-karte')].find((x) => x.textContent.includes('Borga')); await __klick(k, 600);` },
   { name: 'spielfeld', profil: PROFIL, ohneScroll: true, schritte: LAUF },
+  { name: 'wuerfeln-teuer', profil: PROFIL, ohneScroll: true, schritte: `${LAUF}
+      __G.run.gold = 30; for (let k = 0; k < 3; k++) await __klick('#btn-reroll', 250); await __s(300);` },
   { name: 'kampf', profil: PROFIL, ohneScroll: true, frei: ['#btn-start-battle', '#armor-word', '#fighter-player .f-figur', '#fighter-enemy .f-figur', '#fighter-player .f-rucksack', '#fighter-enemy .f-rucksack', '#fighter-player .f-band', '#fighter-enemy .f-band', '#battle .vs'], schritte: `${KAMPF(true)} await __s(300);` },
   { name: 'kampf-gross', profil: PROFIL, ohneScroll: true, frei: ['#btn-start-battle', '#armor-word', '#fighter-player .f-figur', '#fighter-enemy .f-figur', '#fighter-player .f-rucksack', '#fighter-enemy .f-rucksack', '#fighter-player .f-band', '#fighter-enemy .f-band', '#battle .vs'], schritte: `${LAUF}
       // größter Rucksack: 5×4 und beide Taschen

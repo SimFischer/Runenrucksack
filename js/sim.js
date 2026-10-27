@@ -2,7 +2,7 @@
 // Annahmen über das Kind: löst Aufgaben meist richtig, kauft das Beste, was es sich leisten kann.
 import {
   CFG, newRun, finishBattle, rollShop, pickEnemy, makeEnemy, findSpot, bagGrid, STORE_GRID,
-  growBag, attachTasche, enemyPool, shopPool, pickEncounters, pickOne, sellValue, seededRng, ARMOR_BONUS,
+  growBag, attachTasche, enemyPool, shopPool, pickEncounters, pickOne, sellValue, seededRng, ARMOR_BONUS, reroll, wuerfelPreis,
 } from './logic.js';
 import { buildCompounds, buildRuneLevels } from './grammar.js';
 import { partnerOf, placeNew, verbindeAlles } from './sterne.js';
@@ -69,7 +69,7 @@ function shop(run, data, rng, skill) {
         break;
       }
     }
-    if (run.gold >= CFG.rerollCost + 3) { run.gold -= CFG.rerollCost; rollShop(run, items, regions, false, rng); } else break;
+    if (run.gold >= wuerfelPreis(run) + 3) reroll(run, items, regions, rng); else break;
   }
 }
 

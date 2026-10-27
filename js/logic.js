@@ -4,13 +4,15 @@ export const CFG = {
   bagCols: 4, bagRows: 3,
   storeCols: 4, storeRows: 3,
   startGold: 12,
-  rerollCost: 1,
   shopSlots: 5,
   hearts: 5,
   lastDay: 10,
 };
 
 export const income = (day) => 8 + day;
+// Neu würfeln: die ersten Würfe pro Tag sind billig, jeder weitere teurer. Der Zähler beginnt jeden Tag neu.
+export const WUERFEL = { billig: 3, preis: 1, teuer: 2 };
+export const wuerfelPreis = (run) => ((run.wuerfe || 0) < WUERFEL.billig ? WUERFEL.preis : WUERFEL.teuer);
 export const ARMOR_BONUS = 0.15; // Rüstungsfehler richtig verbessert: Gegner startet mit 15 % weniger Leben
 export const baseHp = (day) => Math.round(60 + 14 * (day - 1) + 2.5 * (day - 1) ** 2);
 // Sternstufen: Zwei gleiche Gegenstände verbinden sich sofort zu einem der nächsten Stufe.
@@ -227,8 +229,10 @@ export function randomShopItem(items, weights, rng = Math.random, run = null) {
 }
 
 export function reroll(run, items, regions, rng = Math.random) {
-  if (run.gold < CFG.rerollCost) return false;
-  run.gold -= CFG.rerollCost;
+  const preis = wuerfelPreis(run);
+  if (run.gold < preis) return false;
+  run.gold -= preis;
+  run.wuerfe = (run.wuerfe || 0) + 1;
   rollShop(run, items, regions, false, rng);
   return true;
 }
@@ -243,6 +247,7 @@ export function finishBattle(run, items, regions, won, enemyName, rng = Math.ran
   if (run.day >= CFG.lastDay) { run.over = 'won'; return; }
   run.day++;
   run.gold += income(run.day) + (run.goldBonus || 0);
+  run.wuerfe = 0;
   rollShop(run, items, regions, false, rng);
   for (const s of run.shop) if (s) s.locked = false;
   run.queue = [];
