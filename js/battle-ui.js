@@ -7,7 +7,7 @@ import { evaluateBag } from './mods.js';
 import { merkeAntwort, laufStand } from './fortschritt.js';
 import { frageImSpiel } from './aufgaben/spiel.js';
 import { $, fmt, buildGrid, drawItems, openModal, closeModal } from './ui.js';
-import { sym } from './symbole.js';
+import { sym, bild } from './symbole.js';
 
 let battle = null, enemy = null, speed = 1, rafId = 0, lastFrame = 0, itemEls = {}, onDone = null;
 let bcell = 100, selfHit = 0, armor = null, paused = false;
@@ -19,10 +19,11 @@ export const battleControl = {
   resume: () => { paused = false; },
 };
 
+// Feldgröße der Rucksäcke: Pro Seite stehen Figur und Rucksack nebeneinander.
 function cellSize(cols, rows) {
   const w = window.innerWidth, h = window.innerHeight;
-  const perSide = (w - 200) / 2 - 40;
-  return Math.max(44, Math.min(130, Math.floor(Math.min(perSide / cols, (h - 300) / rows))));
+  const perSide = (w - 150) / 2 - Math.min(230, w * 0.17) - 70;
+  return Math.max(36, Math.min(110, Math.floor(Math.min(perSide / cols, (h - 300) / rows))));
 }
 
 // Startet die Nacht. done(won, enemyName) wird nach dem Ergebnisfenster aufgerufen.
@@ -58,7 +59,7 @@ export function startNight(done) {
   $('battle-title').innerHTML = `${sym('nacht')} ${reg.name} · Nacht ${run.day}${enemy.boss ? ' · Anführer!' : ''}`;
   const h = hero();
   const hb = h && figurBild(h.id), gb = gegnerBild(enemy.id);
-  buildFighter('player', hb ? `<img class="f-img" src="${hb}" alt="">` : '', h?.name || 'Dein Rucksack', h ? `mit dem Runenrucksack · ${h.volk}` : `Tag ${run.day}`, bag, playerGrid, evaluateBag(bag, G.DEFS, ctx));
+  buildFighter('player', hb ? `<img class="f-img" src="${hb}" alt="">` : '', h?.kurz || 'Dein Rucksack', '', bag, playerGrid, evaluateBag(bag, G.DEFS, ctx));
   buildFighter('enemy', gb ? `<img class="f-img" src="${gb}" alt="">` : '', enemy.name, armorHtml(), enemy.items, enemyGrid, analyze(enemy.items, G.DEFS));
   bindArmor();
   updateBattleUi();
@@ -73,19 +74,18 @@ export function startNight(done) {
   else if (armor) emit('tipp', { key: 'ruestung' });
 }
 
-function buildFighter(side, emoji, name, sub, placed, grid, info) {
+// Eine Seite der Szene: Namensband, Lebensbalken, Zustände; darunter die Figur groß und der Rucksack aus Leder.
+function buildFighter(side, bildHtml, name, sub, placed, grid, info) {
   const box = $('fighter-' + side);
   box.innerHTML = `
-    <div class="f-head">
-      <div class="f-portrait">${emoji}</div>
-      <div class="f-text">
-        <div class="f-name">${name}</div>
-        <div class="f-armor">${sub}</div>
-      </div>
+    <div class="f-oben">
+      <div class="f-band"><span class="f-name">${name}</span></div>
+      <div class="hpbar"><div class="fill"></div><div class="text"></div></div>
+      <div class="f-status"></div>
+      <div class="f-armor">${sub}</div>
     </div>
-    <div class="hpbar"><div class="fill"></div><div class="text"></div></div>
-    <div class="f-status"></div>
-    <div class="grid"></div>`;
+    <div class="f-figur">${bildHtml}</div>
+    <div class="f-rucksack"><div class="grid"></div></div>`;
   const gridEl = box.querySelector('.grid');
   buildGrid(gridEl, grid, bcell);
   itemEls[side] = drawItems(gridEl, grid, placed, bcell, info, 'battle');
@@ -162,10 +162,56 @@ export function floater(box, text, cls) {
   const f = document.createElement('div');
   f.className = 'floater ' + cls;
   f.textContent = text;
-  f.style.left = 30 + Math.random() * 50 + '%';
-  f.style.top = 150 + Math.random() * 120 + 'px';
+  const fig = box.querySelector('.f-figur');
+  const b = box.getBoundingClientRect(), r = fig?.getBoundingClientRect() || b;
+  f.style.left = Math.max(10, Math.min(b.width - 170, r.left - b.left + r.width * (0.15 + Math.random() * 0.4))) + 'px';
+  f.style.top = r.top - b.top + r.height * (0.15 + Math.random() * 0.25) + 'px';
   box.append(f);
   setTimeout(() => f.remove(), 1000);
+}
+
+// Welcher Effekt fliegt? Nach der stärksten Wirkung des Gegenstands (Bögen schießen Pfeile).
+function effektFuer(def) {
+  if (!def) return null;
+  const basis = def.teile?.traeger || def.id;
+  if (def.heilung || def.regeneration) return { bild: 'heilung', ziel: 'selbst' };
+  if (def.block && !def.schaden) return { bild: 'schildblitz', ziel: 'selbst' };
+  if (def.brand) return { bild: 'feuer', ziel: 'gegner' };
+  if (def.gift) return { bild: 'giftwolke', ziel: 'gegner' };
+  if (def.kaelte) return { bild: 'eis', ziel: 'gegner' };
+  if (def.betaeubung) return { bild: 'blitz', ziel: 'gegner' };
+  if (/bogen|schiessen/.test(basis)) return { bild: 'pfeil', ziel: 'gegner' };
+  if (def.schaden) return { bild: 'treffer', ziel: 'gegner' };
+  return null;
+}
+
+function effektFliegt(side, el, def) {
+  const e = effektFuer(def);
+  if (!e || !el || !document.body.animate || document.querySelectorAll('.effekt').length > 6) return;
+  const zielSeite = e.ziel === 'selbst' ? side : side === 'player' ? 'enemy' : 'player';
+  const ziel = $('fighter-' + zielSeite).querySelector('.f-figur')?.getBoundingClientRect();
+  const von = el.getBoundingClientRect();
+  if (!ziel) return;
+  const f = document.createElement('img');
+  f.className = 'effekt';
+  f.src = bild('effekte', e.bild);
+  document.body.append(f);
+  const ax = von.left + von.width / 2, ay = von.top + von.height / 2, bx = ziel.left + ziel.width / 2, by = ziel.top + ziel.height * 0.45;
+  const winkel = Math.atan2(by - ay, bx - ax) * 180 / Math.PI;
+  const dreh = e.bild === 'pfeil' || e.bild === 'feuer' ? ` rotate(${winkel}deg)` : '';
+  const dauer = Math.max(260, 520 / speed);
+  f.animate([
+    { transform: `translate(${ax}px, ${ay}px) translate(-50%, -50%)${dreh} scale(.6)`, opacity: 0 },
+    { opacity: 1, offset: .2 },
+    { transform: `translate(${bx}px, ${by}px) translate(-50%, -50%)${dreh} scale(1.15)`, opacity: 1, offset: .85 },
+    { transform: `translate(${bx}px, ${by}px) translate(-50%, -50%)${dreh} scale(1.4)`, opacity: 0 },
+  ], { duration: dauer, easing: 'ease-in' }).onfinish = () => f.remove();
+}
+
+function wackeln(side) {
+  const p = $('fighter-' + side).querySelector('.f-figur');
+  if (!p) return;
+  p.classList.remove('hit'); void p.offsetWidth; p.classList.add('hit');
 }
 
 function showEvent(ev) {
@@ -174,6 +220,7 @@ function showEvent(ev) {
   if (ev.type === 'trigger') {
     const el = itemEls[ev.side][ev.uid];
     if (el) { el.classList.remove('pulse'); void el.offsetWidth; el.classList.add('pulse'); }
+    effektFliegt(ev.side, el, battle.sides[ev.side].items.find((x) => x.uid === ev.uid)?.def);
     if (!ev.crit) return;
     text = 'Glück! ×2';
     cls = 'glueck';
@@ -181,15 +228,13 @@ function showEvent(ev) {
     if (ev.amount > 0) {
       text = `-${ev.amount}`;
       cls = ev.kind;
-      const p = box.querySelector('.f-portrait');
-      p.classList.remove('hit'); void p.offsetWidth; p.classList.add('hit');
+      wackeln(ev.side);
     } else if (ev.blocked > 0) { text = 'geblockt'; cls = 'block'; }
   } else if (ev.type === 'block') { text = `+${ev.amount} Block`; cls = 'block'; }
   else if (ev.type === 'heal') { text = `+${ev.amount}`; cls = 'heal'; }
   else if (ev.type === 'status') {
-    const icon = '';
     const secs = ev.kind === 'kaelte' || ev.kind === 'betaeubung';
-    text = `${icon} +${secs ? fmt(ev.amount) + ' s' : ev.amount}`;
+    text = `+${secs ? fmt(ev.amount) + ' s' : ev.amount}`;
     cls = ev.kind;
   }
   if (text) floater(box, text, cls);
@@ -198,15 +243,13 @@ function showEvent(ev) {
 // ---------- Fehler auf der Ork-Rüstung ----------
 
 function armorHtml() {
-  const who = enemy.boss ? 'Anführer der Orks' : 'Wirrwarr-Ork';
-  if (!armor) return who;
+  if (!armor) return '';
+  if (armor.status === 'richtig') return '<span class="f-siegel" title="Rüstungsfehler verbessert"><b>✓</b>geschwächt</span>';
   if (armor.satz) {
     if (armor.status === 'richtig') return `Rüstung: <b class="ok">${armor.richtig || 'Fehler'} ✓</b> · geschwächt!`;
-    if (armor.status === 'falsch') return `Rüstung: Fehler nicht gefunden${armor.richtig ? ` (richtig: ${armor.richtig})` : ''}`;
-    if (armor.status === 'vorbei') return 'Auf der Rüstung steht ein Satz mit einem Fehler.';
-    return '<button class="armor-word" id="armor-word" data-tut="ruestung">Satz mit Fehler</button>';
+    if (armor.status === 'falsch' || armor.status === 'vorbei') return '';
+    return '<button class="armor-word btn small" id="armor-word" data-tut="ruestung">Fehler auf der Rüstung</button>';
   }
-  if (armor.status === 'richtig') return `Rüstung: <s>${armor.falsch}</s> → <b class="ok">${armor.richtig}</b> · geschwächt!`;
   if (armor.status === 'falsch' || armor.status === 'vorbei') return `Auf der Rüstung steht: <b>${armor.falsch}</b>`;
   return `Auf der Rüstung steht: <button class="armor-word" id="armor-word" data-tut="ruestung">${armor.falsch}</button>`;
 }

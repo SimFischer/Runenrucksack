@@ -43,7 +43,10 @@
 }
 @supports (height: 100dvh) { :root { --hoehe: 100dvh; } }
 
-html, body { background: var(--holz-dunkel); font-family: var(--font); font-size: 17px; }
+html { background: var(--holz-dunkel); }
+html, body { font-family: var(--font); font-size: 17px; }
+/* Gebietshintergrund bleibt sichtbar: nur leicht abgedunkelt */
+body { background: linear-gradient(rgba(14, 9, 4, .22), rgba(14, 9, 4, .5)), var(--bg-image, none) center / cover no-repeat, var(--holz-dunkel); }
 body { height: var(--hoehe); }
 .screen { height: var(--hoehe); bottom: auto; animation: einblenden .35s ease-out; }
 @keyframes einblenden { from { opacity: 0; } to { opacity: 1; } }
@@ -309,3 +312,55 @@ button, input, select, textarea { font-family: inherit; }
   .topbar .btn.icon { width: 50px; min-width: 50px; height: 50px; }
   .topbar .fight { padding: 6px 14px 9px; font-size: 16px; }
 }
+
+/* ---------- Kampf als Szene ---------- */
+#battle { padding-top: 0; }
+#battle .topbar { min-height: 58px; }
+#battle .speed .btn, #battle #btn-skip { min-height: 46px; font-size: 16px; padding: 4px 14px 7px; }
+#battle .arena { flex: 1; min-height: 0; display: grid; grid-template-columns: 1fr auto 1fr; gap: 6px; align-items: stretch; background: none; }
+#battle .fighter {
+  background: none; border: none; box-shadow: none; padding: 0; color: var(--pergament); position: relative;
+  display: grid; grid-template-columns: auto 1fr; grid-template-rows: auto 1fr; grid-template-areas: "oben oben" "figur rucksack";
+  align-items: end; gap: 4px 6px; min-height: 0;
+}
+#battle #fighter-enemy { grid-template-columns: 1fr auto; grid-template-areas: "oben oben" "rucksack figur"; }
+.f-oben { grid-area: oben; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.f-band {
+  width: min(360px, 92%); height: 58px; display: flex; align-items: center; justify-content: center;
+  background: url('assets/ui/banner/namensband.webp') center / 100% 100% no-repeat; padding: 0 60px 8px;
+}
+.f-name { font-family: var(--titel); font-weight: 900; font-size: 21px; color: #fff3d6; text-shadow: 0 2px 0 #1d2a0c, 0 0 4px #000; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#battle .hpbar {
+  width: min(380px, 94%); height: 30px; border-radius: 16px; position: relative; overflow: hidden;
+  background: linear-gradient(180deg, #1a0e07, #2e1a0e); border: 3px solid var(--gold); box-shadow: 0 0 0 2px #3a240f, 0 4px 8px rgba(0, 0, 0, .55), inset 0 2px 6px rgba(0, 0, 0, .7);
+}
+#battle .hpbar .fill { background: linear-gradient(180deg, #e0574a, #a3261d); box-shadow: inset 0 2px 0 rgba(255, 255, 255, .25); }
+#fighter-player .hpbar .fill { background: linear-gradient(180deg, #7cc95f, #3f8a35); }
+#battle .hpbar .text { font-family: var(--titel); font-weight: 900; font-size: 18px; color: #fff; text-shadow: 0 1px 0 #000, 0 0 3px #000; }
+#battle .f-status { min-height: 34px; gap: 6px; }
+#battle .chip { display: inline-flex; align-items: center; gap: 3px; background: rgba(20, 11, 5, .7); border: 2px solid rgba(232, 178, 58, .45); color: #fff3d6; font-weight: 700; font-size: 16px; padding: 1px 9px 1px 3px; }
+#battle .chip .sym { height: 26px; }
+#battle .f-armor { min-height: 0; color: #fff3d6; }
+.armor-word.btn { min-height: 44px; font-size: 15px; animation: atmen 1.6s ease-in-out infinite; }
+@keyframes atmen { 50% { box-shadow: inset 0 -5px 0 rgba(0, 0, 0, .35), 0 4px 0 rgba(0, 0, 0, .45), 0 0 18px var(--gold); } }
+.f-figur { grid-area: figur; align-self: end; height: 100%; max-height: 62vh; display: flex; align-items: flex-end; justify-content: center; min-height: 0; position: relative; }
+.f-figur img { height: 100%; width: auto; max-width: min(330px, 26vw); object-fit: contain; object-position: bottom; filter: drop-shadow(0 10px 8px rgba(0, 0, 0, .6)); }
+#fighter-enemy .f-figur img { transform: scaleX(-1); }
+.f-figur.hit { animation: wackeln .32s; }
+.f-figur.besiegt img { transform: none; transition: none; }
+@keyframes wackeln { 0%, 100% { transform: none; } 20% { transform: translateX(-10px) rotate(-2deg); } 50% { transform: translateX(9px) rotate(2deg); } 75% { transform: translateX(-5px); } }
+.f-rucksack { grid-area: rucksack; justify-self: center; align-self: end; border: 30px solid transparent; border-image: url('assets/ui/rucksack-flaeche.webp') 130 fill / 30px stretch; }
+.f-rucksack .grid { background: rgba(30, 14, 5, .25); border: 2px solid rgba(255, 214, 150, .25); border-radius: 6px; }
+.f-rucksack .grid .cell { border: 1px dashed rgba(255, 220, 160, .2); background: none; }
+#battle .versus { justify-content: center; }
+#battle .vs { font-family: var(--titel); font-weight: 900; font-size: 44px; color: #ffe9b8; -webkit-text-stroke: 2px #2a1407; paint-order: stroke fill; text-shadow: 0 4px 10px rgba(0, 0, 0, .7); }
+#battle .floater { font-family: var(--titel); font-weight: 900; font-size: 30px; -webkit-text-stroke: 1.5px #1a0d05; paint-order: stroke fill; z-index: 6; }
+.effekt { position: fixed; left: 0; top: 0; width: 84px; height: auto; z-index: 250; pointer-events: none; filter: drop-shadow(0 0 8px rgba(255, 220, 140, .8)); }
+.f-siegel {
+  display: inline-flex; align-items: center; gap: 6px; font-family: var(--titel); font-weight: 900; font-size: 15px; color: #fff3d6; text-shadow: 0 1px 2px #000;
+}
+.f-siegel b { width: 36px; height: 36px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 20px; color: #fff3d6;
+  background: radial-gradient(circle at 35% 35%, #d8584a, #8e231a 70%); border: 3px solid #5e140e; box-shadow: 0 2px 4px rgba(0, 0, 0, .6), inset 0 0 0 2px rgba(255, 190, 170, .25); }
+.f-figur { margin-right: -36px; z-index: 0; }
+#fighter-enemy .f-figur { margin-right: 0; margin-left: -36px; }
+.f-rucksack { z-index: 1; position: relative; }
