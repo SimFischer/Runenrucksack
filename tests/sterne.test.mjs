@@ -201,3 +201,54 @@ test('Falsch nie stärker: Ein verbundenes Item wirkt mehr als die zwei unverbun
   const getrennt = run.items.reduce((s, p) => s + starDef(DEFS[p.id], p.stern).schaden, 0);
   assert.ok(starDef(DEFS.axt, 2).schaden > getrennt);
 });
+
+test('Schmied: Kosten 3 × Grundpreis × Zielstufe, einmal pro Tag, höchstens ★★★, Siegel und Taschen nie', async () => {
+  const { schmiedZiel, schmiedPreis, schmiedSperre, schmiedAufwerten } = await import('../js/sterne.js');
+  const { newRun, finishBattle } = await import('../js/logic.js');
+  const ITEMS2 = json('items.json').items;
+  const regions = json('regions.json').gebiete;
+  const run = newRun(ITEMS2, regions);
+  run.items = [];
+  run.gold = 200;
+  const speer = { uid: 1, id: 'speer', area: 'bag', x: 0, y: 0, rot: 0 };
+  run.items.push(speer);
+  const p = DEFS.speer.preis;
+  assert.equal(schmiedPreis(speer, DEFS), 3 * p * 2, 'Speer von ★ auf ★★: 3 × Grundpreis × 2');
+  // Abbruch (Aufgabe nicht gelöst) kostet nichts: Ohne schmiedAufwerten bleibt alles, wie es ist
+  assert.equal(run.gold, 200);
+  assert.equal(schmiedAufwerten(run, speer, DEFS), speer);
+  assert.equal(speer.stern, 2);
+  assert.equal(run.gold, 200 - 6 * p);
+  assert.equal(schmiedSperre(run, speer, DEFS), 'heute', 'höchstens einmal pro Tag');
+  assert.equal(schmiedAufwerten(run, speer, DEFS), null);
+  finishBattle(run, ITEMS2, regions, true, 'Ork');
+  assert.equal(schmiedPreis(speer, DEFS), 9 * p, '★★ → ★★★: 3 × Grundpreis × 3');
+  const gold = run.gold;
+  schmiedAufwerten(run, speer, DEFS);
+  assert.equal(speer.stern, 3);
+  assert.equal(run.gold, gold - 9 * p);
+  finishBattle(run, ITEMS2, regions, true, 'Ork');
+  assert.equal(schmiedZiel(speer, DEFS), null, '★★★★ nur durch Verbinden');
+  assert.equal(schmiedSperre(run, speer, DEFS), 'max');
+  // Das aufgewertete Item verbindet sich ganz normal mit einem gleichen
+  const zweiter = { uid: 2, id: 'speer', area: 'store', x: 0, y: 0, rot: 0, stern: 3 };
+  run.items.push(zweiter);
+  assert.equal(partnerOf(run.items, DEFS, zweiter), speer);
+  // Siegel und Taschen nie
+  for (const art of ['siegel', 'tasche']) {
+    const d = ITEMS2.find((x) => x.art === art);
+    assert.equal(schmiedSperre(run, { uid: 9, id: d.id }, DEFS), 'art', art);
+  }
+  // Runen: Steigerung um eine Stufe, die Krone nur durch Verbinden
+  const rune = ITEMS2.find((x) => x.art === 'rune' && x.steigerung);
+  const r = { uid: 3, id: rune.id, area: 'bag', x: 1, y: 0, rot: 0 };
+  run.items.push(r);
+  assert.equal(schmiedPreis(r, DEFS), 3 * rune.preis * 2);
+  schmiedAufwerten(run, r, DEFS);
+  assert.equal(r.id, rune.id + '@2');
+  r.id = rune.id + '@3';
+  assert.equal(schmiedZiel(r, DEFS), null, 'Krone nur durch Verbinden');
+  // Zu wenig Gold
+  run.day++; run.gold = 5;
+  assert.equal(schmiedSperre(run, { uid: 4, id: 'speer' }, DEFS), 'gold');
+});

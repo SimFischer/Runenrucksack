@@ -4,7 +4,7 @@
 //   vorhandene lag; gibt es dazu wieder ein gleiches, geht es weiter (Kette).
 // - Ein Kraft-Kristall direkt links neben oder über einem Träger wird mit ihm zum Kompositum.
 // Vorher eine Grammatik-Frage: Kompositum → Artikel, Nomen → Mehrzahl, Verben → Präteritum, Runen → Steigerung.
-import { MAX_STERN, sternOf, bagGrid, STORE_GRID, findSpot, shuffle } from './logic.js';
+import { MAX_STERN, sternOf, bagGrid, STORE_GRID, findSpot, shuffle, SCHMIED, schmiedKosten } from './logic.js';
 import { isRune, runeBase, nextLevelId, pluralOf, findFusions } from './grammar.js';
 import { rahmenSatz } from './aufgaben/saetze.js';
 
@@ -71,6 +71,45 @@ export function placeWaiting(run, defs, p) {
     if (spot) { Object.assign(p, { area, ...spot }); return true; }
   }
   return false;
+}
+
+// ---------- Schmied (Werte in logic.js: SCHMIED) ----------
+
+// Jetzige Stufe: Sternstufe, bei Runen die Steigerungsstufe (Grundform 1, Komparativ 2, Superlativ 3, Krone 4).
+const stufeVon = (p, d) => (isRune(d) ? d.stufe || 1 : sternOf(p));
+// Zielstufe beim Schmied oder null (Siegel, Taschen, schon ★★★ oder höher, Rune ohne Steigerung).
+export function schmiedZiel(p, defs) {
+  const d = defs[p?.id];
+  if (!d || d.art === 'siegel' || d.art === 'tasche') return null;
+  if (isRune(d) && !(defs[runeBase(d)]?.steigerung && nextLevelId(d))) return null;
+  const ziel = stufeVon(p, d) + 1;
+  return ziel <= SCHMIED.maxZiel ? ziel : null;
+}
+// Grundpreis: bei Runen der Preis der Grundform
+const grundpreis = (d, defs) => (isRune(d) ? defs[runeBase(d)]?.preis ?? d.preis : d.preis);
+export function schmiedPreis(p, defs) {
+  const ziel = schmiedZiel(p, defs);
+  return ziel ? schmiedKosten(grundpreis(defs[p.id], defs), ziel) : null;
+}
+// Warum es nicht geht: 'art' (Siegel, Tasche) | 'max' | 'heute' | 'gold' | null
+export function schmiedSperre(run, p, defs) {
+  const d = defs[p?.id];
+  if (!d || d.art === 'siegel' || d.art === 'tasche') return 'art';
+  if (!schmiedZiel(p, defs)) return 'max';
+  if (run.schmiedTag === run.day) return 'heute';
+  if (run.gold < schmiedPreis(p, defs)) return 'gold';
+  return null;
+}
+// Aufwerten (erst nach richtig gelöster Aufgabe): Gold bezahlen, Stufe +1. Das Item bleibt dasselbe (uid, Platz)
+// und verhält sich danach ganz normal (kann weiter verbunden werden). Gibt das Item zurück oder null.
+export function schmiedAufwerten(run, p, defs) {
+  if (schmiedSperre(run, p, defs)) return null;
+  const d = defs[p.id];
+  run.gold -= schmiedPreis(p, defs);
+  run.schmiedTag = run.day;
+  if (isRune(d)) p.id = nextLevelId(d);
+  else p.stern = sternOf(p) + 1;
+  return p;
 }
 
 // Verbindet neu + alt. Das Ergebnis liegt dort, wo das schon vorhandene (alt) lag.

@@ -70,6 +70,12 @@ export function vertrauenErhoehen(run) {
   run.haendlerTag = run.day;
   return true;
 }
+// Schmied: wertet einen Gegenstand aus Rucksack oder Lager für Gold um eine Sternstufe auf – ohne zweites Exemplar.
+// Teuer: faktor × Grundpreis × Zielstufe (Preis 4 von ★ auf ★★: 3 × 4 × 2 = 24 Gold). Höchstens einmal
+// pro Tag; höchstens bis maxZiel (★★★) – ★★★★ (legendär) gibt es nur durch Verbinden. Siegel und Taschen nie.
+export const SCHMIED = { faktor: 3, maxZiel: 3 };
+export const schmiedKosten = (grundpreis, ziel) => SCHMIED.faktor * grundpreis * ziel;
+
 // Gegner kaufen intern bei einem Händler, dem sie mit den Tagen mehr vertrauen (Tag 1–2: 1, 3–4: 2 … ab 9: 5).
 export const gegnerHaendler = (day) => Math.min(HAENDLER.max, 1 + Math.floor((day - 1) / 2));
 

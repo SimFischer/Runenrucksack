@@ -1,14 +1,15 @@
 // Runenrucksack – Ablauf eines Laufs, Laden, Rucksack (Ziehen und Drehen) und Info-Feld.
 import {
   CFG, income, baseHp, sellValue, newRun, reroll, finishBattle, wuerfelPreis, WUERFEL,
-  HAENDLER, haendlerStufe, vertrauenKosten, vertrauenSperre, vertrauenErhoehen,
+  HAENDLER, haendlerStufe, vertrauenKosten, vertrauenSperre, vertrauenErhoehen, SCHMIED,
   canPlace, overlapping, findSpot, sizeOf, shuffle, attachTasche, ownedCount, MAX_STERN, STERN_FAKTOR, preisVon,
 } from './logic.js';
 import {
-  GENUS, SIEGEL_BONUS, findFusions, wrongOrderNeighbor, canRotate, nextRot, isNoun, isRune, isVerb, runeBase, starDef,
+  GENUS, SIEGEL_BONUS, findFusions, wrongOrderNeighbor, canRotate, nextRot, isNoun, isRune, isVerb, runeBase, starDef, nextLevelId,
 } from './grammar.js';
 import {
   canMerge, compoundPartner, placeNew, findeVerbindung, fuehreAus, frageFuer, sameKind, nichtVerbinden,
+  schmiedZiel, schmiedPreis, schmiedSperre, schmiedAufwerten,
 } from './sterne.js';
 import {
   G, loadData, save, loadRun, placedOf, itemsIn, gridOf, region, hero, playerCtx, emit, onEvent, figurBild, hintergrundBild, setPref, saveProfil,
@@ -71,6 +72,7 @@ async function boot() {
   $('btn-reroll').onclick = onReroll;
   $('btn-vertrauen').onclick = onVertrauen;
   $('haendler-stufe').onclick = zeigeHaendler;
+  $('amboss').onclick = onAmboss;
   $('btn-fight').onclick = onFight;
   $('btn-menu').onclick = openMenu;
 
@@ -581,6 +583,7 @@ function renderInfo() {
     if (selected.src === 'bag') btn(`${sym('truhe')} Ins Lager`, () => moveAuto(uid, 'store'));
     else btn('In den Rucksack', () => moveAuto(uid, 'bag'));
     btn(`Verkaufen <span class="price">+${sellValue(G.DEFS[placedOf(uid).id], placedOf(uid).stern || 1)} ${sym('gold')}</span>`, () => sell(uid), 'danger');
+    if (schmiedZiel(placedOf(uid), G.DEFS) && !G.run.tutorial) btn('<span class="amboss klein"></span> Schmied', () => zeigeSchmied(uid));
   }
   box.append(actions);
 }
@@ -775,6 +778,9 @@ function renderHaendler() {
   knopf.disabled = !!sperre; // im Tutorial bleibt er bedienbar, kauft aber nichts (onVertrauen)
   knopf.querySelector('.price').innerHTML = SPERRE_TEXT[sperre] || `${vertrauenKosten(run)} ${sym('gold', 'klein')}`;
   knopf.classList.toggle('gesperrt', sperre === 'max' || sperre === 'heute');
+  // Erste-Mal-Tipp zum Schmied, sobald er sich für einen Gegenstand im Rucksack leisten lässt
+  if (!run.tutorial && run.day >= 2 && $('modal').hidden
+    && itemsIn('bag').some((p) => !schmiedSperre(run, p, G.DEFS))) emit('tipp', { key: 'schmied' });
 }
 
 // Tafel beim Antippen der Laternen: Was bringt die aktuelle, was die nächste Stufe? (in Worten, ohne Prozente)
@@ -814,6 +820,78 @@ function onVertrauen() {
   setTimeout(() => $('shop').classList.remove('stand-leuchtet'), 1400);
   toast(`Der Händler vertraut dir mehr – Stufe ${run.haendler}!`);
   emit('vertrauen', { stufe: run.haendler });
+}
+
+// ---------- Schmied ----------
+
+// Amboss antippen: mit ausgewähltem Gegenstand gleich zur Tafel, sonst kurz erklären
+function onAmboss() {
+  if (G.run.tutorial) { toast('Den Schmied lernst du später kennen.'); return; }
+  if (selected && selected.src !== 'shop') { zeigeSchmied(selected.uid); return; }
+  toast('Zieh einen Gegenstand aus Rucksack oder Lager auf den Amboss.');
+}
+
+// Werte eines Gegenstands auf einer Stufe (bei Runen: die nächste Steigerung) für den Vergleich
+function schmiedWerte(p, ziel) {
+  const d = G.DEFS[p.id];
+  if (isRune(d)) {
+    const id = ziel > (d.stufe || 1) ? nextLevelId(d) : d.id;
+    return { def: G.DEFS[id], stern: G.DEFS[id].stufe || 1 };
+  }
+  return { def: starDef(d, ziel, p.kraftStern || 1), stern: ziel };
+}
+
+const SCHMIED_TEXT = {
+  art: 'Artikel-Siegel und Taschen kann der Schmied nicht aufwerten.',
+  max: '★★★★ (legendär) gibt es nur durch Verbinden.',
+  heute: 'Der Schmied hat heute schon gearbeitet – morgen wieder.',
+};
+
+function zeigeSchmied(uid) {
+  const run = G.run, p = placedOf(uid);
+  if (!p) return;
+  const d = G.DEFS[p.id];
+  const sperre = schmiedSperre(run, p, G.DEFS);
+  if (sperre === 'art' || sperre === 'max') { toast(SCHMIED_TEXT[sperre]); return; }
+  const ziel = schmiedZiel(p, G.DEFS), preis = schmiedPreis(p, G.DEFS);
+  const jetzt = schmiedWerte(p, ziel - 1), danach = schmiedWerte(p, ziel);
+  const keys = STAT_ROWS.filter(([k]) => k !== 'abklingzeit' && (jetzt.def[k] || danach.def[k])).slice(0, 4);
+  const sterne = (n) => `<b class="schmied-sterne">${'★'.repeat(n)}${'☆'.repeat(MAX_STERN - n)}</b>`;
+  const spalte = (w, cls) => `<div class="schmied-seite pergament ${cls}">
+      <span class="schmied-bild">${iconHtml(w.def, 'ic')}</span><b class="schmied-name">${w.def.name}</b>${sterne(w.stern)}
+      <ul class="stats">${keys.map(([k, label, f]) => `<li><span>${label}</span><b>${w.def[k] ? f(w.def[k]) : '–'}</b></li>`).join('')}</ul>
+    </div>`;
+  const hinweis = sperre === 'heute' ? SCHMIED_TEXT.heute : sperre === 'gold' ? `Dir fehlen noch ${preis - run.gold} Gold.` : '';
+  modal(`
+    <h2><span class="amboss"></span> Schmied</h2>
+    <p>Der Schmied macht deinen Gegenstand eine Stufe stärker – ganz ohne zweites Exemplar. Vorher kommt eine Aufgabe.</p>
+    <div class="schmied-vergleich">${spalte(jetzt, 'jetzt')}<span class="schmied-pfeil">➜</span>${spalte(danach, 'danach')}</div>
+    ${hinweis ? `<p class="schmied-hinweis">${hinweis}</p>` : `<p class="muted">Höchstens einmal pro Tag. Bei „Abbrechen“ bezahlst du nichts.</p>`}
+    <div class="row">
+      <button class="btn primary" data-act="los" ${sperre ? 'disabled' : ''}>Aufwerten · ${preis} ${sym('gold', 'klein')}</button>
+      <button class="btn" data-act="close">Abbrechen</button>
+    </div>`, { los: () => schmieden(uid) }, 'schmied-karte');
+  emit('schmiedTafel');
+}
+
+// Die passende Aufgabe wie beim Verbinden (Mehrzahl, Steigerung, Präteritum …); erst danach wird bezahlt.
+async function schmieden(uid) {
+  const run = G.run, p = placedOf(uid);
+  const d = G.DEFS[p.id];
+  const ziel = schmiedZiel(p, G.DEFS);
+  const art = isRune(d) ? 'rune' : d.art === 'verb' ? 'verb' : 'nomen';
+  const kopf = `<span class="quick-eq"><span class="amboss klein"></span>${iconHtml(d, 'ic small')}<b>➜</b><em class="goal-stars">${'★'.repeat(ziel)}</em></span>`;
+  const r = await frageImSpiel({ art, bereich: stufenBereich(ziel), anker: itemNode(uid), beteiligt: [itemNode(uid)], kopf,
+    itemWort: art === 'nomen' ? d.name : null, nein: 'Abbrechen' });
+  if (!r.richtig) { toast('Abgebrochen – du hast nichts bezahlt.'); render(); return; }
+  if (!schmiedAufwerten(run, p, G.DEFS)) { toast(`Zu wenig Gold – dir fehlen ${schmiedPreis(p, G.DEFS) - run.gold}.`); render(); return; }
+  if (r.glanz) p.glanz = 1;
+  bump('stat-gold');
+  selected = { src: p.area, uid };
+  render();
+  itemNode(uid)?.classList.add('pulse');
+  toast(`Der Schmied hat ${G.DEFS[p.id].name} auf ${'★'.repeat(ziel)} gebracht!`);
+  emit('geschmiedet', { id: p.id, stern: ziel });
 }
 
 function onReroll() {
@@ -1295,6 +1373,7 @@ function updateTarget() {
   drag.target = null;
   const shop = $('shop');
   shop.classList.remove('hot');
+  $('amboss').classList.remove('hot');
 
   const { s, left, top } = ghostBox();
   for (const area of ['bag', 'store']) {
@@ -1319,6 +1398,12 @@ function updateTarget() {
     return;
   }
   if (drag.ref.src !== 'shop') {
+    const a = $('amboss').getBoundingClientRect(), rand = 14;
+    if (drag.px >= a.left - rand && drag.px <= a.right + rand && drag.py >= a.top - rand && drag.py <= a.bottom + rand) {
+      drag.target = { schmied: true };
+      $('amboss').classList.add('hot');
+      return;
+    }
     const r = shop.getBoundingClientRect();
     if (drag.px >= r.left && drag.px <= r.right && drag.py >= r.top && drag.py <= r.bottom) {
       drag.target = { sell: true };
@@ -1360,6 +1445,7 @@ function endDrag() {
   drag.preview?.remove();
   drag.el.classList.remove('dragging');
   $('shop').classList.remove('selling', 'hot');
+  $('amboss').classList.remove('hot');
   drag = null;
 }
 
@@ -1367,6 +1453,7 @@ function drop(d) {
   const t = d.target;
   if (!t) { render(); return; }
   if (t.sell) { sell(d.ref.uid); return; }
+  if (t.schmied) { render(); zeigeSchmied(d.ref.uid); return; }
   if (d.def.art === 'tasche') { buyTasche(d.ref.slot); return; }
   if (t.status === 'bad') {
     if (t.reason === 'gold') toast('Zu wenig Gold');

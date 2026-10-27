@@ -533,3 +533,25 @@ button, input, select, textarea { font-family: inherit; }
   .haendler-stufe { gap: 3px; padding: 4px 6px; }
   .haendler-stufe .laterne { width: 11px; height: 17px; }
 }
+
+/* ---------- Schmied: Amboss im Laden (CSS-Ersatz, siehe BILDER-OFFEN.md) ---------- */
+.amboss-stand { display: inline-flex; align-items: center; justify-content: center; width: 56px; min-width: 56px; height: 48px; padding: 0;
+  background: radial-gradient(ellipse at 50% 85%, rgba(255, 140, 40, .35), transparent 60%), rgba(0, 0, 0, .35);
+  border: 2px solid rgba(232, 178, 58, .55); border-radius: 12px; cursor: pointer; }
+.amboss-stand.hot { border-color: var(--gold-hell); box-shadow: 0 0 0 3px var(--gold-hell), 0 0 18px rgba(255, 200, 80, .9); transform: scale(1.12); }
+.amboss { display: inline-block; width: 34px; height: 22px; vertical-align: middle;
+  background: linear-gradient(180deg, #b9c2cc 0, #6f7a86 40%, #3d454f 100%);
+  clip-path: polygon(0 0, 100% 0, 100% 30%, 78% 40%, 70% 62%, 86% 100%, 14% 100%, 30% 62%, 22% 40%, 0 30%);
+  filter: drop-shadow(0 1px 0 #000); }
+.amboss.klein { width: 22px; height: 15px; margin-right: 4px; }
+h2 .amboss { width: 40px; height: 26px; margin-right: 6px; }
+.schmied-vergleich { display: flex; align-items: stretch; justify-content: center; gap: 12px; margin: 8px 0; }
+.schmied-seite { flex: 1; max-width: 250px; padding: 10px 12px; display: flex; flex-direction: column; align-items: center; gap: 2px; }
+.schmied-seite.danach { border-color: var(--gold); box-shadow: 0 0 14px rgba(232, 178, 58, .5), 0 4px 0 rgba(0, 0, 0, .35); }
+.schmied-bild .ic { width: 56px; height: 56px; object-fit: contain; }
+.schmied-name { font-size: 18px; }
+.schmied-sterne { color: #e0a526; letter-spacing: 2px; }
+.schmied-seite .stats { width: 100%; margin: 4px 0 0; }
+.schmied-pfeil { align-self: center; font-size: 30px; color: var(--gold-dunkel); }
+.schmied-hinweis { color: #8e2c20; font-weight: 700; }
+@media (max-width: 1100px) { .amboss-stand { width: 48px; min-width: 48px; } }

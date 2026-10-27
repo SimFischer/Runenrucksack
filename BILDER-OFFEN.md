@@ -7,6 +7,7 @@ Es fehlen:
 | Bild | Wofür | Ersatz bis dahin |
 | --- | --- | --- |
 | Laterne (aus und an), Symbol im Stil von `assets/ui/symbole/` | Händler-Vertrauen: eine Laterne pro Stufe am Händlerstand und auf der Tafel | Laternen aus CSS (`.laterne` in `gestaltung.css`) |
+| Amboss, Symbol im Stil von `assets/ui/symbole/` | Schmied-Stand im Laden, Schmied-Tafel und Aufgabenkopf | Amboss aus CSS (`.amboss` in `gestaltung.css`) |
 
 Erledigt:
 
