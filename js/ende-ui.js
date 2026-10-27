@@ -5,6 +5,7 @@ import { laufStand, lernbericht } from './fortschritt.js';
 import { modal, klang, iconHtml } from './ui.js';
 import { figurBild } from './state.js';
 import { codeKasten, kopierenAn, aktuellerHeldencode } from './code-ui.js';
+import { themenBericht } from './aufgaben/wahl.js';
 
 const rangBalken = (r) => {
   const pct = r.naechster ? Math.round(((G.PROFIL.xp - r.ab) / (r.naechster.ab - r.ab)) * 100) : 100;
@@ -55,7 +56,8 @@ export function zeigeLaufende(run, abschluss, aktionen) {
 
 // Lernbericht: Siege, neue Entdeckungen, „Das sitzt schon“ und „Das üben wir noch“ – freundlich, ohne Noten.
 function berichtHtml(run, a) {
-  const b = lernbericht(run);
+  const themen = themenBericht(run, G.PROFIL, G.THEMEN);
+  const b = themen.length ? { sitzt: [], ueben: [] } : lernbericht(run); // ohne neue Aufgaben (Tutorial): Regeln wie bisher
   const neu = (a?.neu || []).map((id) => G.BUCH.byId.get(id)).filter(Boolean);
   const zeige = neu.slice(0, 6);
   return `<div class="bericht">
@@ -65,8 +67,9 @@ function berichtHtml(run, a) {
       <div class="bericht-neu">${zeige.map((e) => `<span title="${e.name}">${iconHtml(e.def, 'bericht-img')}<small>${e.seite === 'stufen' ? '★'.repeat(e.stern) + ' ' : ''}${e.name}</small></span>`).join('')}${neu.length > zeige.length ? `<span class="bericht-mehr">+${neu.length - zeige.length}</span>` : ''}</div>` : ''}
     ${b.sitzt.length ? `<h4>💪 Das sitzt schon</h4><ul class="bericht-liste gut">${b.sitzt.map((r) => `<li>✓ ${r.name}</li>`).join('')}</ul>` : ''}
     ${b.ueben.length ? `<h4>🌱 Das üben wir noch</h4><ul class="bericht-liste ueben">${b.ueben.map((r) => `<li><b>${r.name}</b><small>${r.tipp}</small></li>`).join('')}</ul>` : ''}
-    ${!b.sitzt.length && !b.ueben.length ? '<p class="muted">In diesem Lauf gab es keine Grammatik-Fragen.</p>' : ''}
-    ${b.ueben.length === 0 && b.sitzt.length ? '<p class="bericht-lob">Kein einziger Fehler – stark!</p>' : ''}
+    ${themen.length ? `<h4>⭐ Deine Themen</h4><ul class="bericht-liste themen">${themen.map((t) => `<li class="${t.fehler ? 'ueben' : 'gut'}"><span>${t.emoji} <b>${t.name}</b></span><span class="bericht-sterne" title="Stufe ${t.stufe} von 3">${'★'.repeat(t.stufe)}<i>${'☆'.repeat(3 - t.stufe)}</i></span>${t.fehler ? `<small>🌱 ${t.tipp}</small>` : ''}</li>`).join('')}</ul>` : ''}
+    ${!themen.length && !b.sitzt.length && !b.ueben.length ? '<p class="muted">In diesem Lauf gab es keine Grammatik-Fragen.</p>' : ''}
+    ${(themen.length ? themen.every((t) => !t.fehler) : b.ueben.length === 0 && b.sitzt.length) ? '<p class="bericht-lob">Kein einziger Fehler – stark!</p>' : ''}
   </div>`;
 }
 

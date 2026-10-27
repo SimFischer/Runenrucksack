@@ -24,7 +24,7 @@ const REG = registryAus(REGJSON);
 const DATA = { defs: DEFS, heroes: H.helden, fates: H.schicksalsrunen, encounters: json('encounters.json'), exercises: json('exercises.json') };
 
 // Listen sind im Code sortiert gespeichert – für den Vergleich ebenso sortieren.
-const norm = (p) => ({ ...p, buch: [...p.buch].sort(), erfolge: [...p.erfolge].sort(), figuren: [...p.figuren].sort(), designs: [...p.designs].sort(), figurSiege: [...p.figurSiege].sort() });
+const norm = (p) => ({ ...p, buch: [...p.buch].sort(), erfolge: [...p.erfolge].sort(), figuren: [...p.figuren].sort(), designs: [...p.designs].sort(), figurSiege: [...p.figurSiege].sort(), regeln: [...(p.regeln || [])].sort() });
 
 function anfaenger() {
   return { ...neuesProfil(), xp: 164, buch: ['komp:feuer+axt', 'stufe:axt:2'], stats: { laeufe: 1, siege: 6, richtig: 12 }, tutorial: true };
@@ -51,6 +51,10 @@ function voll() {
   p.figurSiege = H.helden.map((h) => h.id);
   p.stats = Object.fromEntries(STAT_KEYS.map((k, i) => [k, 1000 + i * 77]));
   p.tutorial = true;
+  const THEMEN = json('themen.json').themen;
+  p.lernstand = Object.fromEntries(THEMEN.map((t, i) => [t.id, { stufe: 1 + (i % 3), sicher: 1 + (i % 3) }]));
+  p.regeln = THEMEN.flatMap((t) => t.regeln.map((x) => x.id));
+  p.klasse = { themen: Object.fromEntries(THEMEN.map((t, i) => [t.id, i % 4])) };
   return p;
 }
 
@@ -153,6 +157,8 @@ function vollerLauf() {
   run.gekonnt = { 'mehrzahl|axt': 3, 'artikel|feuer+speer': 1, 'praeteritum|schlagen': 2, 'steigerung|rune-scharf@2': 3 };
   run.prog = { neu: ['komp:feuer+speer', 'stufe:dolch:4'], erster: 21, fehler: 3, orkFehler: 4, saetze: 2, komposita: 3, sterne4: 1,
     regeln: { mehrzahl: [8, 1], artikel: [5, 0], personalform: [2, 1], rechtschreibung: [6, 1] } };
+  run.rabatt = 2;
+  run.aufgaben = { zaehler: 17, benutzt: {}, wiederholen: [{ thema: 'mehrzahl', stufe: 2, format: 'luecke', wort: null, faellig: 19 }, { thema: 'ie', stufe: 3, format: 'fehler', wort: null, faellig: 20 }] };
   return run;
 }
 
@@ -176,9 +182,23 @@ test('Reisecode: voller Rucksack mit Stufen, Drehung, Sätzen, Fluch, Laden und 
   t.diagnostic(`Reisecode (Tag 1, Anfänger): ${saeubern(anfang).length} Zeichen`);
 });
 
+test('Lernstand, Regelkarten und Klasse: nur angehängt, wenn vorhanden', () => {
+  // Ohne Lernstand ist der Code genau so lang wie früher (alte Codes und alte Leser bleiben passend)
+  assert.equal(heldencode(anfaenger(), REG), heldencode({ ...anfaenger(), lernstand: { artikel: { stufe: 1, sicher: 0 } } }, REG));
+  const p = { ...anfaenger(), lernstand: { mehrzahl: { stufe: 3, sicher: 1 }, ie: { stufe: 2, sicher: 0 } }, regeln: ['ie-lang'], klasse: { themen: { artikel: 3, ie: 0 } } };
+  const r = leseCode(heldencode(p, REG), REG, DATA).profil;
+  assert.deepEqual(r.lernstand, p.lernstand);
+  assert.deepEqual(r.regeln, ['ie-lang']);
+  assert.equal(r.klasse.themen.artikel, 3);
+  assert.equal(r.klasse.themen.ie, 0, 'ausgeschaltet bleibt aus');
+  assert.equal(r.klasse.themen.mehrzahl, 2, 'nicht eingestellt: Standard 1–2');
+  assert.equal(Object.keys(r.klasse.themen).length, json('themen.json').themen.length);
+});
+
 test('Dichte Listen werden als Bitfeld gespeichert (voller Fortschritt bleibt abschreibbar)', () => {
   const p = voll();
-  assert.ok(saeubern(heldencode(p, REG)).length < 160, `voller Fortschritt: ${saeubern(heldencode(p, REG)).length} Zeichen`);
+  // mit allen Regelkarten, vollem Lernstand und Klassen-Einstellungen (zusammen etwa 22 Byte mehr)
+  assert.ok(saeubern(heldencode(p, REG)).length < 200, `voller Fortschritt: ${saeubern(heldencode(p, REG)).length} Zeichen`);
   // Mischung: einzelne weit auseinander liegende Einträge bleiben Abstands-Listen
   const q = { ...neuesProfil(), buch: [BUCH.eintraege[0].id, BUCH.eintraege.at(-1).id] };
   assert.deepEqual(norm(leseCode(heldencode(q, REG), REG, DATA).profil), norm(q));

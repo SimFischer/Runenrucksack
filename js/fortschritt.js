@@ -14,6 +14,9 @@ export function neuesProfil() {
     stats: {},      // Zähler für Erfolge, z. B. { laeufe: 3, orkFehler: 5 }
     figurSiege: [], // Figuren, mit denen schon ein Lauf gewonnen wurde
     tutorial: false,
+    lernstand: {},  // pro Thema { stufe 1–3, sicher } (Aufgaben, js/aufgaben/wahl.js)
+    regeln: [],     // gesammelte Regelkarten (ids aus themen.json)
+    klasse: null,   // Einstellungen der Lehrkraft aus dem Klassen-Code: { themen: { id: max 0–3 } }
   };
 }
 

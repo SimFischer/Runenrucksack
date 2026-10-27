@@ -19,7 +19,7 @@ export function aktuelleIds() {
   const H = json('heroes.json');
   return alleIds({
     defs, buch: baueBuch(defs, items, recipes), heroes: H.helden, fates: H.schicksalsrunen,
-    achievements: json('achievements.json'), encounters: json('encounters.json'),
+    achievements: json('achievements.json'), encounters: json('encounters.json'), themen: json('themen.json'),
   });
 }
 

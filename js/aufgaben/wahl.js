@@ -44,6 +44,8 @@ export function themenFuer(art, einst, alle) {
 // Laufzustand der Aufgaben: Zähler, benutzte Wörter je Thema, fällige Wiederholungen.
 export function aufgabenStand(run) {
   run.aufgaben ||= { zaehler: 0, benutzt: {}, wiederholen: [] };
+  run.aufgaben.benutzt ||= {};
+  run.aufgaben.ergebnis ||= {}; // je Thema [richtig beim ersten Versuch, mit Fehler] – für den Lernbericht
   return run.aufgaben;
 }
 
@@ -94,6 +96,8 @@ export function verbucheAufgabe({ run, profil, aufgabe, ergebnis, rng }) {
   profil.lernstand ||= {};
   const l = (profil.lernstand[aufgabe.thema] ||= { stufe: 1, sicher: 0 });
   let aufgestiegen = false;
+  const e = (stand.ergebnis[aufgabe.thema] ||= [0, 0]);
+  e[ergebnis.richtig && ergebnis.ersterVersuch ? 0 : 1]++;
   if (ergebnis.richtig && ergebnis.ersterVersuch) {
     if (aufgabe.stufe >= l.stufe) {
       l.sicher++;
@@ -102,8 +106,20 @@ export function verbucheAufgabe({ run, profil, aufgabe, ergebnis, rng }) {
     }
   } else {
     l.sicher = 0;
-    // Ein Fehler: kommt 2–4 Aufgaben später in anderer Form und mit anderem Wort zurück
-    stand.wiederholen.push({ thema: aufgabe.thema, stufe: aufgabe.stufe, format: aufgabe.format, wort: aufgabe.wort, faellig: stand.zaehler + 2 + Math.floor((rng || Math.random)() * 3) });
+    // Ein Fehler: kommt als zweite, dritte oder vierte Aufgabe danach zurück – in anderer Form und mit anderem Wort
+    stand.wiederholen.push({ thema: aufgabe.thema, stufe: aufgabe.stufe, format: aufgabe.format, wort: aufgabe.wort, faellig: stand.zaehler + 1 + Math.floor((rng || Math.random)() * 3) });
   }
   return { aufgestiegen, stufe: l.stufe };
+}
+
+// Lernbericht nach dem Lauf: je geübtem Thema die Sterne des Lernstands (keine Prozente, keine Noten).
+// Ergebnis: [{ id, name, emoji, stufe, richtig, fehler, tipp }] – zuerst die Themen mit Fehlern.
+export function themenBericht(run, profil, themen) {
+  const ergebnis = run.aufgaben?.ergebnis || {};
+  return Object.entries(ergebnis).map(([id, [richtig, fehler]]) => {
+    const t = themen.themen.find((x) => x.id === id);
+    if (!t) return null;
+    const stufe = lernstandVon(profil, id).stufe;
+    return { id, name: t.name, emoji: t.emoji, stufe, richtig, fehler, tipp: t.regeln[Math.min(stufe, t.regeln.length) - 1]?.text || '' };
+  }).filter(Boolean).sort((a, b) => b.fehler - a.fehler || a.name.localeCompare(b.name));
 }

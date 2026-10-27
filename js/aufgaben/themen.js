@@ -15,6 +15,14 @@ export function mische(liste, rng) {
 const nimm = (liste, n, rng) => mische(liste, rng).slice(0, n);
 
 // Ein Wort wählen: nicht schon benutzt, bevorzugt aus den Wortfeldern des Gebiets.
+// n Wörter, zuerst solche, die in diesem Lauf (in diesem Thema) noch nicht dran waren. Das erste ist das
+// Schlüsselwort der Aufgabe – es ist frisch, solange es überhaupt noch ein frisches gibt.
+function nimmFrisch(liste, ctx, n = 3, schluessel = (x) => 'n:' + x.wort) {
+  const frei = liste.filter((x) => !ctx.benutzt?.has(schluessel(x)));
+  const rest = liste.filter((x) => ctx.benutzt?.has(schluessel(x)));
+  return [...mische(frei, ctx.rng), ...mische(rest, ctx.rng)].slice(0, n);
+}
+
 function waehle(liste, schluessel, ctx) {
   const frei = liste.filter((x) => !ctx.benutzt?.has(schluessel(x)));
   const basis = frei.length ? frei : liste;
@@ -76,7 +84,7 @@ const THEMEN = {
       const quelle = alle.filter((k, i) => alle.findIndex((x) => x.wort === k.wort) === i);
       const gwArt = (k) => ws.nomen.find((n) => n.wort === k.grundwort).artikel;
       if (format === 'regel') {
-        const bsp = nimm(quelle.filter((k) => !ctx.benutzt?.has('k:' + k.wort)), 3, rng);
+        const bsp = nimmFrisch(quelle, ctx, 3, (k) => 'k:' + k.wort);
         return {
           format, frage: 'Schau dir die Beispiele an. Welche Regel stimmt?', wort: 'k:' + bsp[0].wort, regel: 'artikel-grundwort',
           beispiele: bsp.map((k) => `${gwArt(k)} ${k.grundwort} → ${k.artikel} ${k.wort}`),
@@ -110,7 +118,7 @@ const THEMEN = {
     const quelle = ws.nomen.filter((n) => !n.mehrdeutig && muster.includes(n.pluralmuster) && falschePlurale(n, formen).length >= 2);
     if (format === 'regel') {
       const m = zufall(muster.filter((x) => quelle.filter((n) => n.pluralmuster === x).length >= 3), rng);
-      const bsp = nimm(quelle.filter((n) => n.pluralmuster === m), 3, rng);
+      const bsp = nimmFrisch(quelle.filter((n) => n.pluralmuster === m), ctx, 3);
       const passt = MEHRZAHL_PASST[m] || [MEHRZAHL_REGEL[m]];
       const richtig = ws.regelText(MEHRZAHL_REGEL[m]);
       const andere = ws.themaRegeln('mehrzahl').filter((r) => !passt.includes(r.id)).map((r) => r.text);
@@ -120,7 +128,7 @@ const THEMEN = {
       };
     }
     if (format === 'paare') {
-      const ns = nimm(quelle.filter((n) => !ctx.benutzt?.has('n:' + n.wort)), 4, rng);
+      const ns = nimmFrisch(quelle, ctx, 4, (n) => 'n:' + n.wort);
       return {
         format, frage: 'Verbinde Einzahl und Mehrzahl.', wort: 'n:' + ns[0].wort, regel: MEHRZAHL_REGEL[ns[0].pluralmuster],
         paare: ns.map((n) => [`${n.artikel} ${n.wort}`, `die ${n.plural}`]), merke: ns.map((n) => `${n.wort} – ${n.plural}`).join(', ') + '.',
@@ -273,13 +281,13 @@ const THEMEN = {
     const quelle = ws.verben.filter((v) => (stufe === 1 ? !v.unregelmaessig : v.unregelmaessig) && v.infinitiv !== 'sterben');
     const regel = stufe === 1 ? 'zeit-te' : 'zeit-stark';
     if (format === 'regel') {
-      const bsp = nimm(ws.verben.filter((v) => !v.unregelmaessig), 3, rng);
+      const bsp = nimmFrisch(ws.verben.filter((v) => !v.unregelmaessig), ctx, 3, (v) => 'v:' + v.infinitiv);
       return { format, frage: 'Schau dir die Beispiele an. Welche Regel stimmt?', beispiele: bsp.map((v) => `${v.infinitiv} – er ${v.praeteritum}`), wort: 'v:' + bsp[0].infinitiv, regel: 'zeit-te',
         optionen: mische([ws.regelText('zeit-te'), 'Im Präteritum kommt immer „ge-“ vor das Verb.', 'Im Präteritum ändert sich immer der Vokal.', 'Im Präteritum hängt man -en an.'], rng),
         richtig: ws.regelText('zeit-te'), merke: ws.regelText('zeit-te') };
     }
     if (format === 'paare') {
-      const vs = nimm(quelle.filter((v) => !ctx.benutzt?.has('v:' + v.infinitiv)), 4, rng);
+      const vs = nimmFrisch(quelle, ctx, 4, (v) => 'v:' + v.infinitiv);
       return { format, frage: 'Verbinde Grundform und Präteritum.', paare: vs.map((v) => [v.infinitiv, `er ${v.praeteritum}`]), wort: 'v:' + vs[0].infinitiv, regel,
         merke: vs.map((v) => `${v.infinitiv} – ${v.praeteritum}`).join(', ') + '.' };
     }
@@ -295,13 +303,13 @@ const THEMEN = {
     const quelle = ws.adjektive.filter((a) => a.schwierigkeit === stufe);
     const regel = { 1: 'steigerung-regel', 2: 'steigerung-umlaut', 3: 'steigerung-unregel' }[stufe];
     if (format === 'regel') {
-      const bsp = nimm(ws.adjektive.filter((a) => a.schwierigkeit === 2), 3, rng);
+      const bsp = nimmFrisch(ws.adjektive.filter((a) => a.schwierigkeit === 2), ctx, 3, (a) => 'a:' + a.positiv);
       return { format, frage: 'Schau dir die Beispiele an. Welche Regel stimmt?', beispiele: bsp.map((a) => `${a.positiv} – ${a.komparativ} – ${a.superlativ}`), wort: 'a:' + bsp[0].positiv,
         regel: 'steigerung-umlaut', optionen: mische([ws.regelText('steigerung-umlaut'), 'Beim Steigern bleibt das Wort immer gleich.', 'Beim Steigern kommt immer „mehr“ davor.', 'Beim Steigern fällt der Umlaut weg.'], rng),
         richtig: ws.regelText('steigerung-umlaut'), merke: ws.regelText('steigerung-umlaut') };
     }
     if (format === 'paare') {
-      const as = nimm(quelle.filter((a) => !ctx.benutzt?.has('a:' + a.positiv)), 4, rng);
+      const as = nimmFrisch(quelle, ctx, 4, (a) => 'a:' + a.positiv);
       return { format, frage: 'Verbinde Grundform und Komparativ.', paare: as.map((a) => [a.positiv, a.komparativ]), wort: 'a:' + as[0].positiv, regel,
         merke: as.map((a) => `${a.positiv} – ${a.komparativ}`).join(', ') + '.' };
     }
@@ -395,7 +403,7 @@ const THEMEN = {
 
 function artikelSortieren(quelle, ctx, regel, merkeFn) {
   const { rng } = ctx;
-  const proArt = ['der', 'die', 'das'].map((a) => nimm(quelle.filter((n) => n.artikel === a), 2, rng)).flat();
+  const proArt = ['der', 'die', 'das'].map((a) => nimmFrisch(quelle.filter((n) => n.artikel === a), ctx, 2)).flat();
   return { format: 'sortieren', frage: 'Sortiere: der, die oder das?', kisten: ['der', 'die', 'das'].map((a) => ({ id: a, name: a, genus: a })),
     karten: mische(proArt.map((n) => ({ text: n.wort, kiste: n.artikel })), rng), wort: 'n:' + proArt[0].wort, regel, merke: merkeFn(proArt[0]) };
 }
@@ -463,7 +471,7 @@ function rechtschreibung(phs, regel, stufe, format, ctx) {
 function verlaengerungSortieren(ctx, formen) {
   const { ws, rng } = ctx;
   const mit = (re, ph) => ws.nomen.filter((n) => re.test(n.wort) && n.wort.length >= 4 && !/dt$/.test(n.wort) && sichererSchreibfehler(n.wort, ph, formen));
-  const d = nimm(mit(/d$/, 'auslaut-d'), 3, rng);
+  const d = nimmFrisch(mit(/d$/, 'auslaut-d'), ctx, 3);
   const t = nimm(ws.nomen.filter((n) => /[aeiouäöülrn]t$/.test(n.wort) && n.wort.length >= 4 && !formen.has(n.wort.replace(/t$/, 'd'))), 3, rng);
   return { format: 'sortieren', frage: 'd oder t? Verlängere das Wort im Kopf.', kisten: [{ id: 'd', name: 'd' }, { id: 't', name: 't' }],
     karten: mische([...d.map((n) => ({ text: n.wort.slice(0, -1) + '_', kiste: 'd', loesung: n.wort })), ...t.map((n) => ({ text: n.wort.slice(0, -1) + '_', kiste: 't', loesung: n.wort }))], rng),

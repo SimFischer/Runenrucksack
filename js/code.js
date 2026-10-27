@@ -7,6 +7,8 @@
 // (z. B. entdeckte Buch-Einträge) sortiert und als Abstände kodiert – so ist der Code am Anfang kurz und wächst mit.
 // Wird eine Liste dicht (viele Einträge), speichert der Code sie automatisch als Bitfeld, falls das kürzer ist.
 // Alle Einträge haben feste Nummern in registry.json; neue Inhalte werden nur hinten angehängt (tools/registry.mjs).
+// Erweiterung (seit den Aufgaben-Themen): Lernstand, Regelkarten, Klassen-Einstellungen und Aufgaben-Stand des Laufs
+// stehen ganz am Ende und nur, wenn es etwas zu speichern gibt – ältere Codes ohne diesen Teil bleiben gültig.
 import { GROW_ORDER, baseBagCells } from './logic.js';
 
 export const ALPHABET = '23456789ABCDEFGHJKMNPQRSTUVWXYZ'; // 31 Zeichen
@@ -32,6 +34,7 @@ export function alleIds(data) {
     ...data.encounters.begegnungen.map((b) => `begegnung:${b.id}`),
     ...Object.keys(data.defs).map((id) => `item:${id}`),
     ...data.buch.eintraege.map((e) => e.id),
+    ...(data.themen?.themen || []).flatMap((t) => [`thema:${t.id}`, ...t.regeln.map((r) => `regel:${r.id}`)]),
   ];
 }
 
@@ -46,6 +49,8 @@ export function registryAus(json) {
       return n;
     },
     id: (n) => ids[n - 1] || null,
+    // alle ids eines Bereichs in fester Reihenfolge (z. B. 'thema:') – Position = kurze Nummer im Code
+    teil: (prefix) => ids.filter((id) => id.startsWith(prefix)).map((id) => id.slice(prefix.length)),
   };
 }
 
@@ -80,6 +85,7 @@ class Schreiber {
 
 class Leser {
   constructor(b) { this.b = b; this.i = 0; }
+  mehr() { return this.i < this.b.length; }
   uint() {
     let n = 0, f = 1;
     for (;;) {
@@ -190,7 +196,7 @@ function schreibeHeld(w, profil, reg) {
 const ids = (reg, nums, prefix = '') => nums.map((n) => reg.id(n)).filter((id) => id && id.startsWith(prefix)).map((id) => id.slice(prefix.length));
 
 function leseHeld(r, reg) {
-  const profil = { v: 1, xp: r.uint(), buch: [], erfolge: [], figuren: [], designs: [], design: 'leder', stats: {}, figurSiege: [], tutorial: false };
+  const profil = { v: 1, xp: r.uint(), buch: [], erfolge: [], figuren: [], designs: [], design: 'leder', stats: {}, figurSiege: [], tutorial: false, lernstand: {}, regeln: [], klasse: null };
   profil.tutorial = (r.uint() & 1) === 1;
   const d = r.uint();
   if (d) profil.design = (reg.id(d) || 'design:leder').replace('design:', '');
@@ -318,6 +324,74 @@ function leseLauf(r, reg, data) {
   return run;
 }
 
+// ---------- Erweiterung: Lernstand, Regelkarten, Klasse, Aufgaben-Stand ----------
+
+const STANDARD_STUFE = 2; // wie STANDARD_MAX in js/aufgaben/wahl.js
+const FORMAT_IDS = ['auswahl', 'luecke', 'buchstaben', 'eintippen', 'baukasten', 'sortieren', 'fehler', 'ordnen', 'passtnicht', 'regel', 'paare'];
+const heldErweitert = (profil) => Object.values(profil.lernstand || {}).some((l) => l.stufe > 1 || l.sicher > 0) || (profil.regeln || []).length > 0 || !!profil.klasse;
+const laufErweitert = (run) => !!(run.rabatt || run.aufgaben?.zaehler || run.aufgaben?.wiederholen?.length);
+
+// Kleine Werte (0–15 bzw. 0–3) je Thema dicht gepackt: Anzahl, dann Bits. Themen in fester Reihenfolge (registry.json).
+function packe(w, werte, bits) {
+  let n = werte.length;
+  while (n > 0 && !werte[n - 1]) n--;
+  w.uint(n);
+  const proByte = 8 / bits;
+  for (let k = 0; k < n; k += proByte) {
+    let b = 0;
+    for (let m = 0; m < proByte; m++) b |= ((werte[k + m] || 0) & ((1 << bits) - 1)) << (m * bits);
+    w.b.push(b);
+  }
+}
+function entpacke(r, bits) {
+  const n = r.uint(), proByte = 8 / bits, out = [];
+  for (let k = 0; k < n; k += proByte) {
+    if (!r.mehr()) throw new CodeFehler('kaputt');
+    const b = r.b[r.i++];
+    for (let m = 0; m < proByte && k + m < n; m++) out.push((b >> (m * bits)) & ((1 << bits) - 1));
+  }
+  return out;
+}
+
+function schreibeErweiterung(w, profil, run, reg) {
+  w.uint(1); // Version der Erweiterung
+  const themen = reg.teil('thema:');
+  // Lernstand: je Thema stufe·4 + sicher (0 = noch nichts)
+  packe(w, themen.map((t) => { const l = profil.lernstand?.[t]; return l && (l.stufe > 1 || l.sicher > 0) ? Math.min(3, l.stufe) * 4 + Math.min(3, l.sicher) : 0; }), 4);
+  const regeln = reg.teil('regel:'), da = new Set(profil.regeln || []);
+  packe(w, regeln.map((id) => (da.has(id) ? 1 : 0)), 1);
+  // Klasse: 0 = keine; sonst je Thema die Höchststufe 0–3 (0 = aus; fehlt ein Thema, gilt der Standard)
+  w.uint(profil.klasse ? 1 : 0);
+  if (profil.klasse) packe(w, themen.map((t) => profil.klasse.themen?.[t] ?? STANDARD_STUFE), 2);
+  if (!run) return;
+  const a = run.aufgaben || { zaehler: 0, wiederholen: [] };
+  w.uint(run.rabatt); w.uint(a.zaehler);
+  w.uint(a.wiederholen.length);
+  for (const x of a.wiederholen) {
+    w.uint(themen.indexOf(x.thema)); w.uint(x.stufe); w.uint(FORMAT_IDS.indexOf(x.format) + 1); w.uint(Math.max(0, x.faellig - a.zaehler));
+  }
+}
+
+function leseErweiterung(r, reg, profil, run) {
+  if (!r.mehr()) return;
+  r.uint(); // Version
+  const themen = reg.teil('thema:'), regeln = reg.teil('regel:');
+  entpacke(r, 4).forEach((v, k) => { if (v && themen[k]) profil.lernstand[themen[k]] = { stufe: Math.max(1, v >> 2), sicher: v & 3 }; });
+  profil.regeln = entpacke(r, 1).map((v, k) => (v ? regeln[k] : null)).filter(Boolean);
+  if (r.uint()) {
+    const werte = entpacke(r, 2);
+    profil.klasse = { themen: Object.fromEntries(themen.map((t, k) => [t, werte[k] ?? 0])) };
+  }
+  if (!run || !r.mehr()) return;
+  run.rabatt = r.uint();
+  const a = { zaehler: r.uint(), benutzt: {}, wiederholen: [] };
+  for (let k = r.uint(); k > 0; k--) {
+    const t = themen[r.uint()], stufe = r.uint(), f = FORMAT_IDS[r.uint() - 1], faellig = a.zaehler + r.uint();
+    if (t) a.wiederholen.push({ thema: t, stufe, format: f || null, wort: null, faellig });
+  }
+  run.aufgaben = a;
+}
+
 function fluchName(itemId, data) {
   const e = data.exercises?.kobold?.find((k) => k.item === itemId);
   return e ? e.teile.join('') : data.defs[itemId]?.name || '???';
@@ -329,6 +403,7 @@ export function heldencode(profil, reg) {
   const w = new Schreiber();
   w.uint(CODE_VERSION); w.uint(TYP.held);
   schreibeHeld(w, profil, reg);
+  if (heldErweitert(profil)) schreibeErweiterung(w, profil, null, reg);
   return bytesZuText(w.b);
 }
 
@@ -337,6 +412,7 @@ export function reisecode(profil, run, reg, data) {
   w.uint(CODE_VERSION); w.uint(TYP.reise);
   schreibeHeld(w, profil, reg);
   schreibeLauf(w, run, reg, data);
+  if (heldErweitert(profil) || laufErweitert(run)) schreibeErweiterung(w, profil, run, reg);
   return bytesZuText(w.b);
 }
 
@@ -349,6 +425,8 @@ export function leseCode(text, reg, data) {
   const typ = r.uint();
   if (typ !== TYP.held && typ !== TYP.reise) throw new CodeFehler('kaputt');
   const profil = leseHeld(r, reg);
-  if (typ === TYP.held) return { typ: 'held', profil };
-  return { typ: 'reise', profil, run: leseLauf(r, reg, data) };
+  if (typ === TYP.held) { leseErweiterung(r, reg, profil, null); return { typ: 'held', profil }; }
+  const run = leseLauf(r, reg, data);
+  leseErweiterung(r, reg, profil, run);
+  return { typ: 'reise', profil, run };
 }
