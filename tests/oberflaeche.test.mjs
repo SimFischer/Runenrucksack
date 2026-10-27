@@ -14,9 +14,10 @@ const EMOJI = /\p{Extended_Pictographic}/u;
 
 test('Keine Emojis in index.html, den Skripten und tutorial.json', () => {
   const funde = [];
-  for (const f of ['index.html', 'tutorial.json', ...jsDateien('js')]) {
+  // encounters.json: Texte werden angezeigt (das Datenfeld "emoji" nicht)
+  for (const f of ['index.html', 'tutorial.json', 'encounters.json', ...jsDateien('js')]) {
     lesen(f).split(/\r?\n/).forEach((zeile, i) => {
-      if (EMOJI.test(zeile) && !zeile.includes('emoji-ersatz')) funde.push(`${f}:${i + 1}: ${zeile.trim().slice(0, 80)}`);
+      if (EMOJI.test(zeile) && !zeile.includes('emoji-ersatz') && !/"emoji":/.test(zeile)) funde.push(`${f}:${i + 1}: ${zeile.trim().slice(0, 80)}`);
     });
   }
   assert.deepEqual(funde, []);

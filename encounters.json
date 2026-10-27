@@ -32,7 +32,7 @@
       "emoji": "🐫",
       "text": "„Was passt hier nicht dazu? Löse meine zwei Rätsel, dann mache ich dir einen Sonderpreis im Laden!“",
       "aufgabe": { "typ": "format", "format": "passtnicht", "anzahl": 2 },
-      "belohnung": { "typ": "rabatt", "text": "3 Käufe je 2 🪙 billiger" }
+      "belohnung": { "typ": "rabatt", "text": "3 Käufe je 2 Gold billiger" }
     },
     {
       "id": "hirtin",
