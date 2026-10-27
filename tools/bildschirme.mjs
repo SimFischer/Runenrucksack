@@ -156,6 +156,10 @@ const BILDSCHIRME = [
       const { frageImSpiel } = await import(new URL('js/aufgaben/spiel.js', location.href).href);
       const items = [...document.querySelectorAll('#grid-bag .item')];
       frageImSpiel({ art: 'nomen', anker: items[0], beteiligt: items.slice(0, 2), nein: 'Nicht verbinden' }); await __s(700);` },
+  { name: 'aufgabe-satz', profil: PROFIL, ohneScroll: true, frei: ['#aufgabe .af-fenster', '#grid-bag'], schritte: `${LAUF}
+      const { frageImSpiel } = await import(new URL('js/aufgaben/spiel.js', location.href).href);
+      const items = [...document.querySelectorAll('#grid-bag .item')];
+      frageImSpiel({ art: 'verb', format: 'luecke', anker: items[0], beteiligt: items.slice(0, 2), nein: 'Nicht verbinden' }); await __s(700);` },
   { name: 'aufgabe-gross-neben', profil: PROFIL, ohneScroll: true, frei: ['#aufgabe .af-fenster', '#grid-bag'], schritte: `${LAUF}
       const { frageImSpiel } = await import(new URL('js/aufgaben/spiel.js', location.href).href);
       const items = [...document.querySelectorAll('#grid-bag .item')];

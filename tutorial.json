@@ -608,7 +608,7 @@
     {
       "id": "heldencode",
       "voraussetzung": "heldencode",
-      "text": "Mit deinem Heldencode nimmst du deinen Fortschritt mit. Tipp auf ☰ und dann auf „Heldencode“.",
+      "text": "Mit deinem Heldencode nimmst du deinen Rang mit. Tipp auf ☰ und dann auf „Heldencode“.",
       "tipp": "Das Menü ☰ ist oben rechts.",
       "ziel": [
         "menue",
@@ -625,14 +625,14 @@
       "hilfe": {
         "titel": "Heldencode",
         "animation": "pulsieren",
-        "text": "Am Ende jedes Laufs bekommst du einen Heldencode. Schreib ihn ab oder fotografiere ihn – mit „Heldencode eingeben“ holst du deinen Fortschritt zurück, auch auf einem anderen iPad.",
+        "text": "Am Ende jedes Laufs bekommst du einen Heldencode. Er hat nur 6 Zeichen – schreib ihn in dein Heft. Damit holst du deinen Rang, deine Figuren und Designs zurück, auch auf einem anderen iPad.",
         "symbol": "schloss"
       }
     },
     {
       "id": "heldencode-erklaerung",
       "voraussetzung": "heldencode",
-      "text": "Schreib den Code ins Heft oder fotografiere ihn. Damit spielst du nächstes Mal genau hier weiter!",
+      "text": "Schreib den Code in dein Heft. Damit holst du deinen Rang auch auf einem anderen iPad zurück!",
       "ziel": [
         "code-fenster"
       ],

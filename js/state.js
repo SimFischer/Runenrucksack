@@ -21,7 +21,7 @@ export const G = {
   EXERCISES: null,  // exercises.json
   TUTORIAL: null,   // tutorial.json
   ACH: null,        // achievements.json: Erfahrung, Ränge, Erfolge, Designs
-  REGISTRY: null,   // registry.json: feste Nummern für Helden- und Reisecodes
+  REGISTRY: null,   // registry.json: feste Nummern für alte, lange Codes und Klassen-Codes
   WORTSCHATZ: null, // wortschatz.json: Wörter für die Aufgaben
   THEMEN: null,     // themen.json: Themen und Stufen der Aufgaben
   LEHRKRAFT: null,  // lehrkraft.json: Code für den Bereich „Für Lehrkräfte“

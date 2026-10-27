@@ -212,12 +212,13 @@ Der stärkste Antrieb ist die Entdeckung: Unbekannte Kombinationen stehen als �
 
 ### Zwischen den Läufen
 
-- **Buch der Wörter:** Sammelalbum und persönliches Wörterbuch zugleich. Seiten: Komposita (Kraft + Träger), Sternstufen (★★ bis ★★★★), Steigerungen, Sätze (Verb + Subjekt, z. B. „Die Äxte schlagen.“) und Schätze. Jede mögliche Kombination steht von Anfang an im Buch – unentdeckt als dunkle Silhouette mit „???“, entdeckt mit Bild, Name, Artikel, Wirkung und Lernhinweis („Das Grundwort Axt bestimmt den Artikel → die Feueraxt“). Die Einträge entstehen automatisch aus den Inhalten. Neue Entdeckungen erscheinen kurz mit Glanz, ohne das Spiel anzuhalten; volle Seiten schalten Rucksack-Designs frei.
+- **Buch der Wörter:** Sammelalbum und persönliches Wörterbuch zugleich. Seiten: Komposita (Kraft + Träger), Sternstufen (★★ bis ★★★★), Steigerungen, Sätze (Verb + Subjekt, z. B. „Die Äxte schlagen.“) und Schätze. Jede mögliche Kombination steht von Anfang an im Buch – unentdeckt als dunkle Silhouette mit „???“, entdeckt mit Bild, Name, Artikel, Wirkung und Lernhinweis („Das Grundwort Axt bestimmt den Artikel → die Feueraxt“). Die Einträge entstehen automatisch aus den Inhalten. Neue Entdeckungen erscheinen kurz mit Glanz, ohne das Spiel anzuhalten. Das Buch liegt auf dem iPad, auf dem es entsteht.
 - **Erfahrung und Ränge:** Erfahrung am Ende jedes Laufs: pro Sieg, pro neuer Entdeckung und pro Grammatik-Frage beim ersten Versuch richtig. Ränge: Lehrling → Wanderer → Runenkundige → Wortmeister → Hüter der Sprache – Rang 2 nach etwa zwei Läufen, Rang 5 nach etwa 25–30 Läufen; der Aufstieg wird gefeiert.
-- **Neue Figuren:** Faelith die Bogenschützin (ab Rang Wanderer), Hauptmann Theron (nach 3 gewonnenen Läufen), Ritterin Ysolde (ab 25 Einträgen im Buch).
-- **Neue Items** im Laden erst nach Freischaltung, z. B. das Drachenfeuerschwert ab Rang Runenkundige.
-- **Rucksack-Designs** als kosmetische Belohnung: Leder, Zwergenstahl, Elbenseide, Reiterleder, Silberbanner – für volle Buchseiten und Erfolge. Die **Sammlung** zeigt alle Figuren, Designs und Erfolge, gesperrte mit einem Hinweis, wie man sie bekommt.
-- **Erfolge** (18), z. B. „Erstes Kompositum“, „Erste ★★★★“, „Fehlerjäger: 10 Ork-Fehler verbessert“, „Satzbauer“, „Ohne Fehlversuch gewonnen“, „Lauf mit jeder Figur gewonnen“, „Alle Feuer-Komposita entdeckt“.
+- **Alles Freischaltbare hängt nur an der Erfahrung** – so passt es in den kurzen Heldencode und ist auf jedem iPad sofort wieder da.
+- **Neue Figuren:** Faelith die Bogenschützin (ab Rang Wanderer), Hauptmann Theron (ab Runenkundige), Ritterin Ysolde (ab Wortmeister).
+- **Neue Items** im Laden erst ab einem Rang: Drachenfeuerschwert und Runenstein ab Runenkundige, Runenkrone ab Wortmeister.
+- **Rucksack-Designs** als kosmetische Belohnung, über die Ränge verteilt: Leder (von Anfang an), Zwergenstahl (Wanderer), Elbenseide (Runenkundige), Reiterleder (Wortmeister), Silberbanner (Hüter der Sprache). Die **Sammlung** zeigt alle Figuren, Designs und Erfolge, gesperrte mit einem Hinweis, wie man sie bekommt.
+- **Erfolge** (18, auf dem iPad gespeichert), z. B. „Erstes Kompositum“, „Erste ★★★★“, „Fehlerjäger: 10 Ork-Fehler verbessert“, „Satzbauer“, „Ohne Fehlversuch gewonnen“, „Lauf mit jeder Figur gewonnen“, „Alle Feuer-Komposita entdeckt“.
 - **Lernbericht** am Ende jedes Laufs, nur für das Kind: Siege, neue Entdeckungen, Rangfortschritt und „Das sitzt schon / Das üben wir noch“ mit einer kurzen Merkhilfe zu jeder Regel, bei der es Fehler gab – freundlich, ohne Noten und ohne Prozentzahlen.
 - **Neue Gebiete** auf der Karte (später).
 
@@ -240,21 +241,22 @@ Auf jedem Pfad gibt es zusätzlich die Stufen **leicht / normal / schwer**. Sie 
 
 ## Speichern per Code und Klassenarena
 
-Das Spiel erzeugt Codes, die die Kinder ins Heft schreiben oder fotografieren. So funktioniert es auch auf geteilten Geräten, ganz ohne Accounts. Maßgeblich ist der Code; der Browser merkt sich den letzten Stand nur als Komfort.
+Das Spiel erzeugt einen kurzen Heldencode, den die Kinder ins Heft schreiben. So funktioniert es auch auf geteilten Geräten, ganz ohne Accounts. Der Code trägt nur, was man zum Weiterspielen auf einem anderen iPad wirklich braucht; alles andere bleibt auf dem Gerät (localStorage, abgesichert für den privaten Modus).
 
-### Drei Codes
+### Codes
 
 | Code | Inhalt | Form | Beispiel |
 | --- | --- | --- | --- |
-| Heldencode | dauerhafter Fortschritt: Rang, Erfahrung, Figuren, Designs, Erfolge, Buch der Wörter, Statistik für Erfolge, Tutorial abgeschlossen, Lernstand je Thema, Regelkarten, Klassen-Einstellung | Fünfergruppen aus Großbuchstaben und Ziffern, wächst mit (Anfänger 35, voller Fortschritt etwa 150 Zeichen) | RWV6D-8AWXP-UXKUP-EQHE4-FGCHA-NM6U8-GK5PA |
-| Reisecode | Heldencode plus laufender Lauf: Figur, Unterklasse, Schicksalsrune, Tag, Herzen, Siege, Gold, Rucksack und Lager mit Positionen, Drehung und Stufen, Verb-Subjekt-Verbindungen, reservierte Ladenplätze, Rabatt, fällige Wiederholungen, Glanz | gleiches Format, länger, mit QR-Code | – |
-| Rucksack-Code | ein fertiger Rucksack für die Arena | mittellang | Code aus Buchstaben und Zahlen |
+| Heldencode | Erfahrung und „Tutorial geschafft“ – daraus folgen Rang, Figuren und Rucksack-Designs | genau 6 Zeichen in zwei Dreiergruppen | K7Q-M2X |
+| Klassen-Code | Themen und Höchststufen der Lehrkraft (auf dem Gerät gespeichert, nicht im Heldencode) | `THEMEN-` und wenige Zeichen | THEMEN-3DFTS-R8UD8 |
+| Rucksack-Code | ein fertiger Rucksack für die Arena (später) | mittellang | – |
 
-- **Zeichen:** Großbuchstaben und Ziffern ohne verwechselbare Zeichen (kein 0/O, 1/I/L), in Fünfergruppen mit Bindestrichen. Beim Eingeben sind Bindestriche optional, Kleinbuchstaben werden automatisch groß.
-- Ein **Prüfzeichen** am Ende erkennt jedes falsch abgeschriebene Zeichen und jeden Dreher und meldet es freundlich („Da hat sich ein Tippfehler eingeschlichen“, „Im Code gibt es kein O und keine Null“).
-- **Kompakt:** Versionsnummer, kleine Zahlen als Varint, Listen sortiert und als Abstände kodiert – oder als Bitfeld, wenn das kürzer ist. So ist der Code am Anfang kurz und wächst mit.
-- **Feste Nummern** für alle Inhalte in `registry.json`; neue Inhalte werden nur hinten angehängt, nie umnummeriert. So bleiben alte Codes gültig.
-- Am Ende jedes Laufs und im Menü erscheint der Code groß, darunter ein **QR-Code** (lokal erzeugt, keine externen Dienste) und ein Knopf „Kopieren“. Einlesen geht per Tastatur oder mit der iPad-Kamera; das Spiel erkennt selbst, ob es ein Helden- oder Reisecode ist.
+- **Aufbau:** 5 Inhaltszeichen aus 31 Zeichen (Version 2 Bit, Tutorial 1 Bit, Erfahrung 21 Bit – mehr Erfahrung wird gekappt, weit über dem höchsten Rang) und 1 Prüfzeichen.
+- **Zeichen:** Großbuchstaben und Ziffern ohne verwechselbare Zeichen (kein 0/O, 1/I/L). Beim Eingeben ist der Bindestrich optional, Kleinbuchstaben werden automatisch groß.
+- Das **Prüfzeichen** (Gewichte 1–6, Summe durch 31 teilbar) erkennt jedes einzelne falsch abgeschriebene Zeichen und jeden Dreher zweier Nachbarzeichen und meldet es freundlich („Da hat sich ein Tippfehler eingeschlichen – oder zwei Zeichen sind vertauscht“, „Im Code gibt es kein O und keine Null“).
+- **Nur auf dem Gerät:** Buch der Wörter, Erfolge, Regelkarten, Statistik, Lernstand, Klassen-Einstellung und ein unterbrochener Lauf („Lauf unterbrechen“ im Menü). Der Lernstand wird nach einem Gerätewechsel beim Laufstart kurz neu eingeschätzt.
+- Am Ende jedes Laufs und im Menü erscheint der Code groß in der Leseschrift mit dem Hinweis „Schreib ihn in dein Heft“ – ohne QR-Code.
+- **Alte, lange Codes** (Helden- und Reisecodes aus der ersten Version) werden weiter gelesen: Erfahrung und Tutorial werden übernommen. Dafür bleibt `registry.json` erhalten und wird nur hinten ergänzt.
 - „Neu beginnen“ im Menü löscht den Stand auf dem iPad (mit Sicherheitsabfrage).
 - Fälschen ist möglich, aber unwichtig: Es gibt nichts zu gewinnen außer Spaß.
 
@@ -280,16 +282,19 @@ Spaß hat Vorrang, aber eine Regel ist unverhandelbar: Eine grammatisch falsche 
 - **Lernstand je Thema:** zweimal gleich richtig → nächste Stufe. Statt „nach dreimal richtig nicht mehr fragen“ werden die Themen schwerer.
 - **Verteilte Wiederholung:** Ein Fehler kommt zwei bis vier Aufgaben später wieder – in anderer Form und mit anderem Wort. Jedes Wort höchstens einmal pro Thema und Lauf.
 - **Belohnung für Können:** Stufe 2 gleich richtig +1 Gold, Stufe 3 +2 Gold und Glanz (+10 % im nächsten Kampf). Regelkarten werden im Buch gesammelt.
+- **Sinnvolle Sätze:** Jedes Wort hat eigene, kindgerechte Sätze – Nomen eine Bedeutungsgruppe (Gegenstand, Essen, Tier, Person, Ort, Pflanze, Wetter und Natur, Zeit, Gefühl und Abstraktes), zwei Sätze und einen Mehrzahl-Satz; Verben Sätze mit wechselnden Personen in Präsens, Präteritum und Perfekt; Adjektive Sätze mit Grundform, Komparativ und Superlativ. Es gibt keine Schablonen, in die beliebige Wörter eingesetzt werden; ohne passenden Satz kommt die Aufgabe ohne Satz. Alle Sätze stehen in der Prüfliste.
+- **Lerninhalte in der Leseschrift:** Antworten, Sätze, Item-Namen, Buch und Heldencode stehen in Andika in normaler Groß- und Kleinschreibung – nie in Großbuchstaben oder Kapitälchen, damit die Schreibung sichtbar bleibt.
+- **Aufgabe und Rucksack zugleich sehen:** Das Aufgabenfenster liegt neben dem Rucksack; die beteiligten Items leuchten und sind mit einer Linie mit dem Fenster verbunden.
 - **Lernaufgaben bleiben kurz** und stecken im Aufbau (Laden, Begegnungen, Verbinden), nie mitten im Kampf.
 - **Lernbericht am Ende eines Laufs:** Sterne je geübtem Thema und ein Tipp, wo es noch hakt – keine Prozente, keine Noten, nur für das Kind sichtbar.
-- Der Lernstand reist im **Heldencode** mit (ältere Codes bleiben gültig).
+- Der **Lernstand bleibt auf dem Gerät.** Fehlt er (neues iPad), beginnt jedes Thema auf einer Stufe passend zum Rang; der erste Fehler senkt sie sofort, der erste Treffer bestätigt sie.
 
 ### Lehrkraft-Modus
 
 - **„Für Lehrkräfte“** im Startmenü, geschützt mit einem Lehrkraft-Code aus `lehrkraft.json` (kein Passwort, kein Server).
 - Themen an- und ausschalten und je Thema die **höchste Stufe** festlegen. Ohne Einstellung: alle Themen, Stufe 1–2.
-- Daraus entsteht ein **Klassen-Code** wie `THEMEN-3DFTS-R8UD8`. Die Kinder tippen ihn bei „Heldencode eingeben“ ein; er wird in ihrem Heldencode gespeichert und gilt so auch auf anderen iPads.
-- Alle Wörter und Themen stehen in **JSON-Dateien**. Neue Wörter, etwa aus dem aktuellen Lesetext, lassen sich ohne Programmieren ergänzen; `tools/pruefliste.mjs` erzeugt eine sortierbare Prüfliste zum Abhaken.
+- Daraus entsteht ein **Klassen-Code** wie `THEMEN-3DFTS-R8UD8`. Die Kinder tippen ihn bei „Heldencode eingeben“ ein; er wird auf dem iPad gespeichert (nicht im Heldencode) – auf einem anderen iPad tippt man ihn noch einmal ein.
+- Alle Wörter und Themen stehen in **JSON-Dateien**. Neue Wörter, etwa aus dem aktuellen Lesetext, lassen sich ohne Programmieren ergänzen; `tools/pruefliste.mjs` erzeugt eine sortierbare Prüfliste zum Abhaken, mit allen Sätzen (unsichere markiert).
 - Später denkbar: **Turniermodus** für die Klassenarena am Beamer, **Champion-Rucksack** per Code als festen Gegner.
 
 ### Offene Fragen

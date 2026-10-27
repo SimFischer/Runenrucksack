@@ -55,30 +55,31 @@ Nach Änderungen: `node --test` prüft, dass jeder Schritt erreichbar ist und h�
    - **Morgen:** Begegnung am Wegesrand (drei zur Wahl).
    - **Tag:** Laden mit 5 Items, Neu würfeln für 1 Gold, Reservieren, Verkaufen, Verschieben, Drehen. Alles Verbinden passiert sofort: zwei gleiche werden zur nächsten Sternstufe, ein Kristall neben einem Träger zum Kompositum. Das Abzeichen „1/2“ mit „= sofort ★★“ zeigt Items, von denen man schon eins hat.
    - **Nacht:** Automatischer Kampf. Vorher kann man den Fehler auf der Ork-Rüstung verbessern (ein Versuch, richtig: Ork startet mit 15 % weniger Leben).
-5. **Ende:** nach dem 10. Kampf („Reise geschafft“, mit Sternen nach Siegen) oder wenn alle 5 Herzen weg sind. Danach: Lernbericht, Erfahrung und Rang, neue Freischaltungen und Erfolge, der Heldencode mit QR-Code.
+5. **Ende:** nach dem 10. Kampf („Reise geschafft“, mit Sternen nach Siegen) oder wenn alle 5 Herzen weg sind. Danach: Lernbericht, Erfahrung und Rang, neue Freischaltungen und Erfolge, der Heldencode (6 Zeichen) zum Abschreiben ins Heft.
 
-Im Spielmenü kann man den **Lauf unterbrechen**: Das Spiel zeigt einen Reisecode, mit dem es später (auch auf einem anderen iPad) genau dort weitergeht.
+Im Spielmenü kann man den **Lauf unterbrechen**: Der Lauf bleibt auf diesem iPad gespeichert und geht im Startmenü mit „Weiterspielen“ genau dort weiter.
 
 ## Fortschritt zwischen den Läufen
 
 | Was | So funktioniert es |
 | --- | --- |
-| **Buch der Wörter** (📚 im Spiel, Startmenü, Menü) | Seiten Komposita, Sternstufen, Steigerungen, Sätze, Schätze – 317 Einträge, automatisch aus `items.json` und `recipes.json`. Unentdeckt: dunkle Silhouette mit „???“; entdeckt: Bild, Name, Artikel, Wirkung, Lernhinweis. Fortschrittsbalken pro Seite, volle Seiten schalten Rucksack-Designs frei. Neue Entdeckungen werden kurz eingeblendet. |
+| **Buch der Wörter** (📚 im Spiel, Startmenü, Menü) | Seiten Komposita, Sternstufen, Steigerungen, Sätze, Schätze – 317 Einträge, automatisch aus `items.json` und `recipes.json`. Unentdeckt: dunkle Silhouette mit „???“; entdeckt: Bild, Name, Artikel, Wirkung, Lernhinweis. Fortschrittsbalken pro Seite. Neue Entdeckungen werden kurz eingeblendet. Das Buch bleibt auf dem iPad. |
 | **Erfahrung und Ränge** | Am Ende jedes Laufs: 10 pro Sieg, 5 pro neuer Entdeckung, 2 pro Frage beim ersten Versuch richtig. Lehrling (0) → Wanderer (350) → Runenkundige (1200) → Wortmeister (2600) → Hüter der Sprache (4000). Laut Simulation Rang 2 nach 2 Läufen, Rang 5 nach etwa 26. |
-| **Freischaltungen** | Faelith die Bogenschützin (Rang Wanderer; Bogen-Komposita +30 %, sieht mögliche Komposita im Laden von Weitem), Hauptmann Theron (3 gewonnene Läufe; +3 Startblock für Nomen mit passendem Siegel), Ritterin Ysolde (25 Einträge; Runen wirken auf zwei Nomen). Drachenfeuerschwert, Runenstein und Runenkrone erst nach Freischaltung im Laden. |
-| **Rucksack-Designs** | Leder, Zwergenstahl (Seite Komposita), Elbenseide (Seite Steigerungen), Reiterleder (Seite Sätze), Silberbanner (Erfolg „Alle Helden“) – nur Optik, Auswahl in der **Sammlung** (Startmenü). |
+| **Freischaltungen** (nur über den Rang, damit sie im Heldencode stecken) | Faelith die Bogenschützin (Wanderer; Bogen-Komposita +30 %, sieht mögliche Komposita im Laden von Weitem), Hauptmann Theron (Runenkundige; +3 Startblock für Nomen mit passendem Siegel), Ritterin Ysolde (Wortmeister; Runen wirken auf zwei Nomen). Drachenfeuerschwert und Runenstein ab Runenkundige, Runenkrone ab Wortmeister. |
+| **Rucksack-Designs** | Leder, Zwergenstahl (Wanderer), Elbenseide (Runenkundige), Reiterleder (Wortmeister), Silberbanner (Hüter der Sprache) – nur Optik, Auswahl in der **Sammlung** (Startmenü). |
 | **Erfolge** | 18 Erfolge, z. B. „Erstes Kompositum“, „Erste ★★★★“, „Fehlerjäger“, „Satzbauer“, „Ohne Fehlversuch“, „Alle Helden“, „Feuermeister“. |
 | **Lernbericht** | Nur für das Kind: Siege, neue Entdeckungen, Rangfortschritt, „Das sitzt schon“ und „Das üben wir noch“ mit Merkhilfe – ohne Noten und Prozentzahlen. |
 
 Alle Werte stehen in `achievements.json` (Erfahrung, Ränge, Designs, Erfolge), `heroes.json` (Figuren mit `freischaltung`) und `items.json` (Items mit `freischaltung`).
 
-## Heldencode und Reisecode
+## Heldencode
 
-- **Heldencode:** gesamter Fortschritt (Rang, Erfahrung, Figuren, Designs, Erfolge, Buch der Wörter, Statistik, Tutorial, Lernstand je Thema, Regelkarten, Klassen-Einstellung). Erscheint am Ende jedes Laufs und im Menü – groß, mit QR-Code und Knopf „Kopieren“.
-- **Reisecode:** Heldencode plus laufender Lauf (Menü → „Lauf unterbrechen“).
-- **Eingeben:** Startmenü → „Heldencode eingeben“. Bindestriche sind optional, Kleinbuchstaben werden groß. Das Spiel erkennt selbst, ob es ein Helden-, Reise- oder Klassen-Code (`THEMEN-…`) ist, und meldet Tippfehler freundlich. Mit „📷 QR-Code scannen“ geht es auch über die iPad-Kamera.
-- **Format:** Großbuchstaben und Ziffern ohne 0/O und 1/I/L, Fünfergruppen, Prüfzeichen am Ende. Länge: Anfänger 35, Mittelstand etwa 125, voller Fortschritt (mit allen Regelkarten und vollem Lernstand) etwa 190 Zeichen; ein Reisecode ist länger (120–400 Zeichen). Lernstand, Regelkarten und Klasse stehen nur dann am Ende, wenn es sie gibt – ältere Codes bleiben gültig.
-- Der Browser merkt sich den letzten Stand zusätzlich (Komfort). „Neu beginnen“ im Menü löscht ihn nach einer Sicherheitsabfrage.
+- **Heldencode:** genau 6 Zeichen in zwei Dreiergruppen, z. B. `K7Q-M2X`. Er enthält Erfahrung und „Tutorial geschafft“; Rang, Figuren und Rucksack-Designs ergeben sich daraus. Er erscheint am Ende jedes Laufs und im Menü – groß in der Leseschrift, mit „Schreib ihn in dein Heft“ und Knopf „Kopieren“, ohne QR-Code.
+- **Prüfzeichen:** Das 6. Zeichen erkennt jeden einzelnen Tippfehler und jeden Dreher zweier Nachbarzeichen (die Tests prüfen das für Tausende Codes).
+- **Nur auf dem iPad** (localStorage): Buch der Wörter, Erfolge, Regelkarten, Statistik, Lernstand, Klassen-Einstellung und ein unterbrochener Lauf (Menü → „Lauf unterbrechen“, im Startmenü „Weiterspielen“). Nach dem Heldencode auf einem neuen iPad wird der Lernstand beim Laufstart kurz neu eingeschätzt.
+- **Eingeben:** Startmenü → „Heldencode“. Der Bindestrich ist optional, Kleinbuchstaben werden groß. Das Spiel erkennt auch den Klassen-Code (`THEMEN-…`) und meldet Tippfehler freundlich.
+- **Alte, lange Codes** (Helden- und Reisecodes der ersten Version) werden weiter gelesen und umgerechnet: Erfahrung und Tutorial werden übernommen.
+- „Neu beginnen“ im Menü löscht den Stand auf dem iPad nach einer Sicherheitsabfrage.
 
 ### Wichtige Regel: registry.json nur hinten ergänzen
 
@@ -88,7 +89,7 @@ Jeder Inhalt (Item, Figur, Erfolg, Buch-Eintrag …) hat in `registry.json` eine
 node tools/registry.mjs
 ```
 
-Das Werkzeug hängt neue Einträge **nur hinten an**. Nie Einträge umsortieren, umbenennen oder löschen – sonst passen alte Helden- und Reisecodes nicht mehr. Die Tests melden, wenn etwas in `registry.json` fehlt, und prüfen einen gespeicherten Code aus Version 1.
+Das Werkzeug hängt neue Einträge **nur hinten an**. Nie Einträge umsortieren, umbenennen oder löschen – sonst lassen sich alte, lange Codes nicht mehr umrechnen und Klassen-Codes passen nicht mehr. Die Tests melden, wenn etwas in `registry.json` fehlt, und prüfen einen gespeicherten Code aus Version 1.
 
 ## Grammatik im Spiel
 
@@ -106,19 +107,20 @@ Das Werkzeug hängt neue Einträge **nur hinten an**. Nie Einträge umsortieren,
 
 **Regel für alle Aufgaben:** Der erste Versuch ist kostenlos, jeder weitere kostet 1 Gold; nach jeder Antwort erscheint eine kurze Erklärung mit Merkhilfe. **Eine grammatisch falsche Kombination ist nie stärker als eine richtige** – die Tests prüfen das.
 
-**Verbinden ohne Bremse:** Kurze Aufgaben erscheinen als kleines Fenster direkt am Item, größere (Sortieren, Satz ordnen, Tastatur) in der Mitte. Mit „Nicht verbinden“ bleiben die Items getrennt.
+**Verbinden ohne Bremse:** Die Aufgabe erscheint neben dem Rucksack (über Lager und Infobereich), nie über den Rucksack-Feldern; die beteiligten Items leuchten und sind mit einer dünnen Linie mit dem Fenster verbunden. Mit „Nicht verbinden“ bleiben die Items getrennt.
 
 ## Aufgaben und Lernstand
 
-Die Aufgaben entstehen aus `wortschatz.json` (508 Nomen, 135 Verben, 93 Adjektive, 47 Komposita, 41 Wortfamilien, 44 Sätze, Wortfelder der Gebiete) und `themen.json` (15 Themen mit je drei Stufen und Regelkarten). Der Code dazu steht in `js/aufgaben/`.
+Die Aufgaben entstehen aus `wortschatz.json` (508 Nomen, 137 Verben, 93 Adjektive, 47 Komposita, 41 Wortfamilien, 44 Sätze, Wortfelder der Gebiete) und `themen.json` (15 Themen mit je drei Stufen und Regelkarten). Der Code dazu steht in `js/aufgaben/`.
 
 - **Das Item bestimmt das Thema, nicht das Wort:** Nomen → Mehrzahl oder Artikel, Komposita → Komposita, Verben → Personalformen oder Zeitformen, Runen → Steigerung, Ork-Rüstung → Rechtschreibung. Das Wort ist zufällig, bevorzugt aus dem Wortfeld des Gebiets.
 - **Die Item-Stufe bestimmt den Bereich:** ★★ = Stufe 1–2, ★★★ = Stufe 2–3, ★★★★ = Stufe 3 (ist Stufe 3 nicht erlaubt: zwei Aufgaben).
+- **Sinnvolle Sätze:** Jedes Wort hat eigene Sätze – Nomen eine Bedeutungsgruppe, zwei Sätze und einen Mehrzahl-Satz; Verben drei Satzrahmen mit wechselnden Personen (daraus Präsens, Präteritum, Perfekt) und einen Satz mit dem Verb als Nomen; Adjektive Sätze mit Grundform, Komparativ und Superlativ. Keine Schablonen mit beliebigen Wörtern; ohne passenden Satz (z. B. für eine Artikel-Lücke) kommt die Aufgabe ohne Satz. Die Sätze stehen in `tools/saetze/*.txt` (ein „?“ markiert unsichere); `node tools/saetze.mjs` prüft sie und trägt sie in `wortschatz.json` ein.
 - **Elf Formate:** Auswahl, Lückensatz, Buchstaben ergänzen (eigene Bildschirmtastatur), Eintippen (nur Stufe 3), Baukasten, Sortieren (Ziehen oder Antippen), Fehler finden, Satz ordnen, Passt nicht, Regel entdecken, Paare.
-- **Lernstand je Thema:** zweimal gleich beim ersten Versuch richtig → nächste Stufe. Ein Fehler kommt als zweite bis vierte Aufgabe danach wieder – in anderer Form, mit anderem Wort. Jedes Wort höchstens einmal pro Thema und Lauf. Der Lernstand steht im Heldencode; der Lernbericht zeigt Sterne je Thema, keine Prozente.
+- **Lernstand je Thema:** zweimal gleich beim ersten Versuch richtig → nächste Stufe. Ein Fehler kommt als zweite bis vierte Aufgabe danach wieder – in anderer Form, mit anderem Wort. Jedes Wort höchstens einmal pro Thema und Lauf. Der Lernstand bleibt auf dem iPad (auf einem neuen iPad: Startstufe nach Rang, der erste Fehler senkt sie, der erste Treffer bestätigt sie); der Lernbericht zeigt Sterne je Thema, keine Prozente.
 - **Belohnungen:** gleich richtig auf Stufe 2 → +1 Gold, auf Stufe 3 → +2 Gold, und beim Verbinden glänzt das neue Item (+10 % im nächsten Kampf). Jede richtig angewendete Regel wird eine Regelkarte im Buch (Seite „Regeln“).
-- **Für Lehrkräfte** (Startmenü, Code in `lehrkraft.json`): Themen an/aus und höchste Stufe je Thema. Daraus entsteht ein Klassen-Code wie `THEMEN-3DFTS-R8UD8`, den die Kinder bei „Heldencode eingeben“ eintippen; er wird im Heldencode gespeichert. Ohne Klassen-Code gelten alle Themen mit Stufe 1–2. Der Lehrkraft-Code liegt offen im Repository – er hält Kinder ab, ist aber kein echter Schutz.
-- **Prüfliste für Lehrkräfte:** `node tools/pruefliste.mjs` erzeugt `wortschatz-pruefliste.html` (sortierbar, mit Häkchen-Spalte, unsichere Einträge markiert).
+- **Für Lehrkräfte** (Startmenü, Code in `lehrkraft.json`): Themen an/aus und höchste Stufe je Thema. Daraus entsteht ein Klassen-Code wie `THEMEN-3DFTS-R8UD8`, den die Kinder bei „Heldencode“ eintippen; er wird auf dem iPad gespeichert (nicht im Heldencode). Ohne Klassen-Code gelten alle Themen mit Stufe 1–2. Der Lehrkraft-Code liegt offen im Repository – er hält Kinder ab, ist aber kein echter Schutz.
+- **Prüfliste für Lehrkräfte:** `node tools/pruefliste.mjs` erzeugt `wortschatz-pruefliste.html` (sortierbar, mit Häkchen-Spalte, Bedeutungsgruppen und allen Sätzen, unsichere Einträge und Sätze markiert).
 
 ## Inhalte ändern (ohne Programmieren)
 
@@ -138,7 +140,7 @@ Alle Inhalte stehen in JSON-Dateien. Jede Datei hat oben ein Feld `_hinweis`, da
 | `heroes.json` | Startfiguren mit Bonus, Start-Items und Unterklassen; die sechs Schicksalsrunen |
 | `tutorial.json` | Tutorial „Der erste Tag“: Schritte, Texte, Hilfe-Karten für „So geht's“, Erste-Mal-Tipps |
 | `achievements.json` | Erfahrung, Ränge, Rucksack-Designs, Erfolge |
-| `registry.json` | Feste Nummern für Helden- und Reisecodes (nur mit `node tools/registry.mjs` ergänzen) |
+| `registry.json` | Feste Nummern für alte, lange Codes und Klassen-Codes (nur mit `node tools/registry.mjs` ergänzen) |
 
 ### Beispiele
 
@@ -277,9 +279,9 @@ Aktuelle Balance (200 Läufe, einfache Kaufstrategie, Aufgaben zu 75 % richtig):
 | `js/fortschritt.js` | Fortschritt ohne Darstellung: Antworten merken, Erfahrung, Rang, Freischaltungen, Erfolge, Lernbericht |
 | `js/ende-ui.js` | Ende eines Laufs: Lernbericht, Erfahrung, Rang-Feier, Freischaltungen, Heldencode |
 | `js/sammlung-ui.js` | Sammlung: Figuren, Rucksack-Designs, Erfolge |
-| `js/code.js`, `js/code-ui.js` | Helden- und Reisecode: kodieren, prüfen, lesen; anzeigen mit QR-Code, eingeben, Kamera |
-| `js/vendor/qrcode.js` | QR-Code-Erzeugung (qrcode-generator von Kazuhiko Arase, MIT-Lizenz) |
-| `js/vendor/jsQR.js` | QR-Code lesen mit der Kamera (jsQR, Apache-2.0, siehe `js/vendor/jsQR-LICENSE.txt`) |
+| `js/code.js`, `js/code-ui.js` | Heldencode (6 Zeichen) und Klassen-Code: kodieren, prüfen, lesen, alte lange Codes umrechnen; anzeigen und eingeben |
+| `js/aufgaben/saetze.js` | Sätze je Wort: Lücken, Satzrahmen der Verben in Präsens, Präteritum und Perfekt |
+| `tools/saetze.mjs`, `tools/saetze/*.txt` | Sätze zu allen Wörtern: prüfen und in `wortschatz.json` eintragen |
 | `sw.js`, `manifest.webmanifest`, `icons/` | PWA (offline, Home-Bildschirm) |
 | `tools/serve.mjs` | lokaler Testserver |
 | `tools/zerschneide.mjs` | zerlegt Sprite-Sheets in Einzelbilder (WebP), schreibt Zuordnung und Vorschau |
@@ -288,4 +290,4 @@ Aktuelle Balance (200 Läufe, einfache Kaufstrategie, Aufgaben zu 75 % richtig):
 | `tools/tutorial-browsertest.mjs` | spielt das Tutorial im Browser per Touch durch |
 | `tools/registry.mjs` | hängt neue Inhalte hinten an `registry.json` an |
 
-Kein Server, keine Accounts, keine externen Dienste. Fortschritt und laufender Lauf werden nur im Browser gemerkt; maßgeblich sind Helden- und Reisecode.
+Kein Server, keine Accounts, keine externen Dienste. Fortschritt und laufender Lauf werden im Browser gemerkt; der 6-stellige Heldencode bringt Rang, Figuren und Designs auf ein anderes iPad.

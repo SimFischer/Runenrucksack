@@ -1,6 +1,6 @@
 // „Für Lehrkräfte“ im Startmenü: geschützt mit dem Code aus lehrkraft.json. Themen an/aus und die höchste
 // Stufe je Thema wählen; daraus entsteht ein Klassen-Code (THEMEN-…), den die Kinder bei „Heldencode eingeben“
-// eintippen. Die Einstellung steht danach im Profil und damit auch im Heldencode.
+// eintippen. Die Einstellung steht danach im Profil auf diesem Gerät (nicht im Heldencode).
 import { G, saveProfil } from './state.js';
 import { klassenCode, registryAus, saeubern } from './code.js';
 import { STANDARD_MAX } from './aufgaben/wahl.js';
@@ -66,7 +66,7 @@ function einstellungen() {
     const an = Object.values(themen).filter(Boolean).length;
     box.querySelector('.lk-code').innerHTML = `<p>Klassen-Code (${an} von ${G.THEMEN.themen.length} Themen an):</p>
       <div class="code-text lk-code-text">${code.split('-').map((g) => `<span>${g}</span>`).join('')}</div>
-      <p class="muted">Die Kinder tippen ihn bei „Heldencode eingeben“ ein. Er wird in ihrem Heldencode gespeichert.</p>`;
+      <p class="muted">Die Kinder tippen ihn im Startmenü bei „Heldencode“ ein. Er wird auf ihrem iPad gespeichert.</p>`;
     liste.querySelectorAll('[data-thema]').forEach((b) => {
       b.onclick = () => { themen[b.dataset.thema] = +b.dataset.stufe; zeichne(); };
     });

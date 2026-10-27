@@ -45,7 +45,7 @@ export function zeigeLaufende(run, abschluss, aktionen) {
       <div class="ende-spalten">
         <div>${berichtHtml(run, a)}</div>
         <div>${xp}${frei ? `<div class="frei-liste">${frei}</div>` : ''}
-          ${code ? `<div class="ende-code"><b>${sym('schloss')} Dein Heldencode</b><small>Schreib ihn ab oder fotografiere ihn – damit holst du deinen Fortschritt zurück.</small>${codeKasten(code, true)}</div>` : ''}</div>
+          ${code ? `<div class="ende-code"><b>${sym('schloss')} Dein Heldencode</b><small>Damit holst du deinen Rang, deine Figuren und Designs zurück.</small>${codeKasten(code, true)}</div>` : ''}</div>
       </div>
       <div class="row"><button class="btn primary big" data-act="neu">Neuer Lauf</button><button class="btn" data-act="home">Zum Start</button></div>`,
   { neu: aktionen.neu, home: aktionen.home }, 'wide ende');
