@@ -184,16 +184,6 @@ export function frageFuer(a, defs, rng = Math.random) {
   };
 }
 
-// Gekonnte Fragen: Wer dieselbe Frage (gleiches Wort, gleiche Art) in einem Lauf dreimal gleich beim
-// ersten Versuch richtig beantwortet hat, bekommt sie in diesem Lauf nicht mehr gestellt.
-export const GEKONNT_AB = 3;
-export const frageKey = (q) => `${q.art}|${q.ref}`; // ref = Item-id (für den Reisecode)
-export const istGekonnt = (run, q) => !!q && (run.gekonnt?.[frageKey(q)] || 0) >= GEKONNT_AB;
-export function merkeRichtig(run, q) {
-  run.gekonnt = { ...(run.gekonnt || {}) };
-  run.gekonnt[frageKey(q)] = (run.gekonnt[frageKey(q)] || 0) + 1;
-}
-
 // „Nicht verbinden“: Das neue Item bleibt, wo es liegt. Wartete es (kein Platz, auf ein gleiches gezogen),
 // kommt es in Rucksack oder Lager. Gibt false zurück, wenn es nirgends hinpasst – dann muss es weg
 // (beim Kauf: Gold zurück).

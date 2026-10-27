@@ -3,8 +3,11 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import {
-  newRun, growBag, bagGrid, pickEncounters, makeTask, tapTask, koboldTask, seededRng, addItem,
+  newRun, growBag, bagGrid, pickEncounters, seededRng, addItem, preisVon, RABATT,
 } from '../js/logic.js';
+import { FORMATE } from '../js/aufgaben/formate/index.js';
+import { mitRegeln, speisekarteInhalt, satzOrdnenInhalt, koboldInhalt } from '../js/aufgaben/themen.js';
+import { waehleAufgabe } from '../js/aufgaben/wahl.js';
 import { buildCompounds } from '../js/grammar.js';
 import { playerContext } from '../js/mods.js';
 import { makeFighter } from '../js/battle.js';
@@ -14,31 +17,52 @@ const ITEMS = json('items.json').items;
 const REGIONS = json('regions.json').gebiete;
 const ENC = json('encounters.json');
 const EX = json('exercises.json');
+const THEMEN = json('themen.json');
+const WS = mitRegeln(json('wortschatz.json'), THEMEN);
 const DEFS = Object.fromEntries(ITEMS.map((d) => [d.id, d]));
 for (const c of buildCompounds(DEFS, json('recipes.json'))) DEFS[c.id] = c;
 
-test('Mindestens sechs Begegnungen mit bekannten Aufgaben und Belohnungen', () => {
-  const typen = ['plural', 'artikel', 'speisekarte', 'personalform', 'kobold', 'tausch'];
+test('Mindestens sechs Begegnungen, jede mit eigenem Aufgabenformat und bekannter Belohnung', () => {
+  const belohnungen = ['feld', 'item', 'gold', 'mod', 'rabatt', 'kobold'];
   assert.ok(ENC.begegnungen.length >= 6);
   for (const b of ENC.begegnungen) {
-    assert.ok(typen.includes(b.aufgabe.typ), b.id);
+    assert.ok(['format', 'speisekarte', 'satzordnen', 'kobold'].includes(b.aufgabe.typ), b.id);
+    if (b.aufgabe.typ === 'format') assert.ok(FORMATE[b.aufgabe.format], `${b.id}: Format ${b.aufgabe.format}`);
+    assert.ok(belohnungen.includes(b.belohnung.typ), b.id);
     assert.ok(b.name && b.emoji && b.text && b.belohnung.text, b.id);
   }
-  for (const id of ['eule', 'zwerg', 'wirtin', 'haendler', 'hirtin', 'kobold']) assert.ok(ENC.begegnungen.find((b) => b.id === id), id);
+  const format = (id) => ENC.begegnungen.find((b) => b.id === id).aufgabe.format;
+  assert.equal(format('eule'), 'sortieren');
+  assert.equal(format('zwerg'), 'baukasten');
+  assert.equal(ENC.begegnungen.find((b) => b.id === 'hirtin').aufgabe.typ, 'satzordnen');
+  assert.equal(format('haendler'), 'passtnicht');
+  assert.equal(ENC.begegnungen.find((b) => b.id === 'haendler').belohnung.typ, 'rabatt');
+  assert.equal(ENC.begegnungen.find((b) => b.id === 'wirtin').aufgabe.typ, 'speisekarte');
+  assert.equal(ENC.begegnungen.find((b) => b.id === 'kobold').aufgabe.typ, 'kobold');
 });
 
-test('Aufgaben in exercises.json haben genau eine richtige Lösung', () => {
-  for (const q of [...EX.plural, ...EX.personalformen]) {
-    const opts = [q.richtig, ...q.falsch];
-    assert.equal(new Set(opts).size, opts.length, JSON.stringify(q));
-    assert.ok(q.regel);
+test('Begegnungs-Aufgaben lassen sich erzeugen und haben genau eine Lösung', () => {
+  const rng = seededRng(7);
+  for (const b of ENC.begegnungen.filter((x) => x.aufgabe.typ === 'format')) {
+    for (let k = 0; k < 20; k++) {
+      const run = {};
+      const a = waehleAufgabe({ themen: THEMEN, ws: WS, profil: { lernstand: {} }, einst: null, run, rng, format: b.aufgabe.format });
+      assert.equal(a.format, b.aufgabe.format, b.id);
+      assert.ok(FORMATE[a.format].pruefe(a, FORMATE[a.format].loesung(a)).richtig, `${b.id}: Lösung muss richtig sein`);
+    }
   }
-  for (const q of EX.artikel) assert.ok(['der', 'die', 'das'].includes(q.artikel), q.wort);
-  for (const k of EX.speisekarten) {
-    const errors = k.zeilen.join(' ').split(' ').filter((t) => t.includes('|'));
-    assert.equal(errors.length, 1, k.zeilen.join(' / '));
-    assert.ok(k.erklaerung);
+  for (let k = 0; k < 30; k++) {
+    const a = FORMATE.fehler.erzeuge(speisekarteInhalt({ ws: WS, rng, felder: [], benutzt: new Set() }), rng);
+    assert.ok(a.ziele.length >= 2 && a.ziele.length <= 3, 'Speisekarte: 2–3 Fehler');
+    assert.ok(FORMATE.fehler.pruefe(a, FORMATE.fehler.loesung(a)).richtig);
+    assert.ok(['verlaengerung', 'doppel', 'ie', 'tzck', 'ableitung'].includes(a.thema), a.thema);
+    const o = FORMATE.ordnen.erzeuge(satzOrdnenInhalt({ ws: WS, rng, felder: [], benutzt: new Set() }), rng);
+    assert.equal(o.modus, 'reihenfolge');
+    assert.ok(FORMATE.ordnen.pruefe(o, FORMATE.ordnen.loesung(o)).richtig);
   }
+});
+
+test('Kobold: Namen stimmen, die Lücke liegt genau am Fehler', () => {
   for (const k of EX.kobold) {
     const d = DEFS[k.item];
     assert.ok(d, `Kobold-Item ${k.item} fehlt`);
@@ -46,24 +70,21 @@ test('Aufgaben in exercises.json haben genau eine richtige Lösung', () => {
     assert.ok(k.fehler >= 0 && k.fehler < k.teile.length);
     assert.notEqual(k.teile.join(''), k.richtig);
     assert.equal(k.richtig, d.name, `${k.item}: richtig muss der Item-Name sein`);
+    const a = FORMATE.buchstaben.erzeuge(koboldInhalt(k, { rng: seededRng(1) }), seededRng(1));
+    assert.ok(a.luecken.length >= 2 && a.luecken.length <= 3, k.richtig);
+    // Mit den Lücken an den falschen Stellen wäre der falsche Name nicht mehr möglich
+    const rest = (w) => w.split('').filter((_, i) => !a.luecken.includes(i)).join('');
+    assert.notEqual(rest(k.richtig), k.richtig);
+    assert.ok(FORMATE.buchstaben.pruefe(a, FORMATE.buchstaben.loesung(a)).richtig);
   }
 });
 
-test('Aufgaben bauen: drei verschiedene Fragen, Lösung unter den Antworten', () => {
-  const rng = seededRng(7);
-  for (const typ of ['plural', 'artikel', 'personalform']) {
-    const qs = makeTask({ typ, anzahl: 3 }, EX, rng);
-    assert.equal(qs.length, 3);
-    assert.equal(new Set(qs.map((q) => q.prompt)).size, 3);
-    for (const q of qs) assert.ok(q.options.includes(q.correct));
-  }
-  const [karte] = makeTask({ typ: 'speisekarte' }, EX, rng);
-  assert.ok(karte.tap && karte.ziel);
-  assert.equal(karte.zeilen[karte.ziel.zeile][karte.ziel.wort], karte.ziel.falsch);
-  const t = tapTask([['Gemüse', 'aus', 'dem', 'Gahrten|Garten']], 'x');
-  assert.deepEqual(t.ziel, { zeile: 0, wort: 3, falsch: 'Gahrten', richtig: 'Garten' });
-  const k = koboldTask(EX.kobold[0]);
-  assert.equal(k.zeilen[0][k.ziel.wort], EX.kobold[0].teile[EX.kobold[0].fehler]);
+test('Händler-Rabatt: die nächsten Käufe billiger, mindestens 1 Gold, Taschen nicht', () => {
+  const run = { rabatt: RABATT.kaeufe };
+  assert.equal(preisVon(run, { preis: 5 }), 5 - RABATT.gold);
+  assert.equal(preisVon(run, { preis: 2 }), 1);
+  assert.equal(preisVon(run, { preis: 6, art: 'tasche' }), 6);
+  assert.equal(preisVon({ rabatt: 0 }, { preis: 5 }), 5);
 });
 
 test('Pferdehirtin nur in Hrossmark, keine doppelten Begegnungen', () => {

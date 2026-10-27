@@ -24,6 +24,9 @@ export const SAMMEL_GEWICHT = 2.5;
 
 // Wie viele gleiche ★-Items (Runen: Grundstufe) liegen schon in Rucksack und Lager?
 export const ownedCount = (run, id) => run.items.filter((p) => p.id === id && sternOf(p) === 1).length;
+// Rabatt vom Händler (Begegnung): die nächsten Käufe je 2 Gold billiger, mindestens 1 Gold.
+export const RABATT = { kaeufe: 3, gold: 2 };
+export const preisVon = (run, def) => (run?.rabatt > 0 && def.art !== 'tasche' ? Math.max(1, def.preis - RABATT.gold) : def.preis);
 export const sellValue = (def, stern = 1) => Math.max(1, Math.floor((def.preis * STERN_FAKTOR[stern]) / 2));
 
 // Gewichte der Seltenheiten im Laden, abhängig vom Tag.
@@ -397,49 +400,3 @@ export function pickEncounters(run, data, regions, rng = Math.random) {
   return fresh.slice(0, data.auswahl || 3).map((b) => b.id);
 }
 
-// Baut die Fragen einer Aufgabe aus exercises.json.
-// Auswahl-Fragen: { prompt, options, correct, explain }. Tipp-Aufgaben: { tap: true, zeilen, ziel, explain }.
-export function makeTask(aufgabe, ex, rng = Math.random) {
-  const n = aufgabe.anzahl || 3;
-  switch (aufgabe.typ) {
-    case 'plural':
-      return shuffle(ex.plural, rng).slice(0, n).map((q) => ({
-        prompt: `Mehrzahl von <b>„${q.wort}“</b>?`,
-        options: shuffle([q.richtig, ...q.falsch], rng), correct: q.richtig, explain: q.regel, regel: 'mehrzahl',
-      }));
-    case 'artikel':
-      return shuffle(ex.artikel, rng).slice(0, n).map((q) => ({
-        prompt: `<span class="blank">___</span> <b>${q.wort}</b>`,
-        options: ['der', 'die', 'das'], correct: q.artikel, explain: `Es heißt ${q.artikel} ${q.wort}.`, genus: true, regel: 'artikel',
-      }));
-    case 'personalform':
-      return shuffle(ex.personalformen, rng).slice(0, n).map((q) => ({
-        prompt: q.satz.replace('___', '<span class="blank">___</span>'),
-        options: shuffle([q.richtig, ...q.falsch], rng), correct: q.richtig, explain: q.regel, regel: 'personalform',
-      }));
-    case 'speisekarte': {
-      const k = pickOne(ex.speisekarten, rng);
-      return [tapTask(k.zeilen.map((z) => z.split(' ')), k.erklaerung)];
-    }
-    default:
-      return [];
-  }
-}
-
-// Tipp-Aufgabe: genau ein Wort hat die Form "falsch|richtig".
-export function tapTask(zeilen, explain) {
-  let ziel = null;
-  const clean = zeilen.map((tokens, li) => tokens.map((t, ti) => {
-    if (!t.includes('|')) return t;
-    const [falsch, richtig] = t.split('|');
-    ziel = { zeile: li, wort: ti, falsch, richtig };
-    return falsch;
-  }));
-  return { tap: true, zeilen: clean, ziel, explain, regel: 'rechtschreibung' };
-}
-
-// Kobold: Name in Wortteilen, ein Teil ist falsch geschrieben.
-export function koboldTask(entry) {
-  const tokens = entry.teile.map((t, i) => (i === entry.fehler ? `${t}|${entry.richtig}` : t));
-  return { ...tapTask([tokens], entry.erklaerung), item: entry.item, falscherName: entry.teile.join(''), richtig: entry.richtig };
-}

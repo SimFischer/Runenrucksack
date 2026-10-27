@@ -54,8 +54,15 @@ function bereit(ws) {
   return FORMEN;
 }
 const einfach = (ws) => ws.nomen.filter((n) => !n.mehrdeutig && !n.grundwort);
-const UNEINDEUTIG_FELD = new Set(['Fisch', 'Feuer', 'Kessel', 'Laterne', 'Stein', 'Edelstein', 'Kristall', 'Licht', 'Rad', 'Ei', 'Gans', 'Huhn', 'Hahn',
-  'Karotte', 'Zeit', 'Tag', 'Nacht', 'Glas', 'Fass', 'Boot', 'Schiff', 'Kugel', 'Kreis', 'Ring', 'Rolle', 'Wasser', 'Fall', 'Krug', 'Becher', 'Kraft', 'Muster']);
+// Wortfelder auf Stufe 1: eindeutige Kernwörter und Paare [Wortfeld, Feld des fremden Worts]
+const FELD_KERN = {
+  schmiede: ['Schmied', 'Hammer', 'Amboss', 'Zange', 'Säge', 'Nagel', 'Schraube', 'Feile', 'Werkzeug', 'Schwert', 'Axt'],
+  zauber: ['Zauber', 'Zauberer', 'Hexe', 'Rune', 'Buch', 'Seite', 'Buchstabe', 'Stift', 'Schrift'],
+  essen: ['Brot', 'Apfel', 'Birne', 'Kirsche', 'Kartoffel', 'Zwiebel', 'Kuchen', 'Keks', 'Suppe', 'Wurst', 'Gurke', 'Tomate', 'Salat', 'Banane', 'Brezel'],
+  natur: ['Wolke', 'Blitz', 'Sturm', 'Wind', 'Sonne', 'Himmel', 'Nebel', 'Regen', 'Flocke', 'Pfütze'],
+};
+const FELD_PAARE = [['schmiede', 'essen'], ['essen', 'schmiede'], ['schmiede', 'natur'], ['natur', 'schmiede'], ['essen', 'natur'],
+  ['zauber', 'essen'], ['essen', 'zauber'], ['zauber', 'schmiede'], ['schmiede', 'zauber'], ['natur', 'zauber']];
 
 // ---------- Themen ----------
 // Jede Funktion: (stufe, format, ctx) → Inhalt. ctx = { ws, rng, felder, benutzt, itemWort }
@@ -368,9 +375,9 @@ const THEMEN = {
   wortfelder(stufe, format, ctx) {
     const { ws, rng } = ctx;
     if (stufe === 1) {
-      const felder = ['schmiede', 'zauber', 'essen', 'natur'];
-      const [fa, fb] = nimm(felder, 2, rng);
-      const aus = (f) => ws.nomen.filter((n) => n.wortfeld === f && !UNEINDEUTIG_FELD.has(n.wort) && !n.grundwort && n.schwierigkeit === 1);
+      // Nur Kernwörter und nur Paare, bei denen das fremde Wort sicher nicht passt (Blitz und Mond könnten zaubern, Äpfel sind Natur)
+      const [fa, fb] = zufall(FELD_PAARE, rng);
+      const aus = (f) => ws.nomen.filter((n) => n.wortfeld === f && FELD_KERN[f].includes(n.wort));
       const drei = nimm(aus(fa), 3, rng);
       const fremd = zufall(aus(fb), rng);
       return { format: 'passtnicht', frage: `Welches Wort passt nicht zum Wortfeld „${ws.wortfelder[fa].name}“?`, woerter: mische([...drei.map((n) => n.wort), fremd.wort], rng),
@@ -502,4 +509,68 @@ export function erzeugeInhalt(themen, thema, stufe, ctx, format = null) {
   const f = format && erlaubt.includes(format) ? format : zufall(erlaubt, ctx.rng);
   const inhalt = THEMEN[thema](stufe, f, ctx);
   return { ...inhalt, thema, stufe };
+}
+
+// ---------- Besondere Aufgaben für Begegnungen und die Ork-Rüstung ----------
+
+// Rechtschreib-Phänomen → Thema und Regel (für Speisekarte und Lernstand)
+const PHAENOMEN_THEMA = {
+  'auslaut-d': ['verlaengerung', 'verlaengern'], 'auslaut-b': ['verlaengerung', 'verlaengern'], 'auslaut-g': ['verlaengerung', 'verlaengern'],
+  doppelkonsonant: ['doppel', 'doppel-kurz'], 'ß': ['doppel', 'doppel-kurz'], ie: ['ie', 'ie-lang'], 'dehnungs-h': ['ie', 'ie-lang'],
+  ck: ['tzck', 'tzck-kurz'], tz: ['tzck', 'tzck-kurz'], 'ä-ableitung': ['ableitung', 'ableiten'], 'äu-ableitung': ['ableitung', 'ableiten'],
+};
+
+// Auf der Speisekarte stehen nur Gerichte – keine Leute, kein Geschirr
+const KEIN_GERICHT = new Set(['Glas', 'Schüssel', 'Pfanne', 'Koch', 'Köchin', 'Bäcker', 'Bäckerei', 'Teig', 'Zeit', 'Fass', 'Wirt', 'Wirtin', 'Speise', 'Gans', 'Huhn', 'Hahn']);
+
+// Wirtin: Speisekarte mit 2–3 falsch geschriebenen Gerichten (alle antippen, dann „Fertig“).
+export function speisekarteInhalt(ctx) {
+  const { ws, rng } = ctx;
+  const formen = bereit(ws);
+  const essen = ws.nomen.filter((n) => n.wortfeld === 'essen' && !n.grundwort && n.wort.length >= 4 && !KEIN_GERICHT.has(n.wort));
+  const fehlerVon = (n) => n.phaenomene.find((p) => PHAENOMEN_THEMA[p] && sichererSchreibfehler(n.wort, p, formen));
+  const mitFehler = mische(essen.filter(fehlerVon), rng).slice(0, 2 + Math.floor(rng() * 2)).map((n) => ({ n, p: fehlerVon(n) }));
+  const rest = mische(essen.filter((n) => !mitFehler.some((m) => m.n === n)), rng).slice(0, 6 - mitFehler.length);
+  const gerichte = mische([...mitFehler.map(({ n, p }) => ({ n, falsch: sichererSchreibfehler(n.wort, p, formen) })), ...rest.map((n) => ({ n }))], rng);
+  const [thema, regel] = PHAENOMEN_THEMA[mitFehler[0].p];
+  const hilfen = [...new Set(mitFehler.map(({ n, p }) => merkhilfe(p, n)).filter(Boolean))];
+  return {
+    format: 'fehler', modus: 'markieren', frage: `Auf der Speisekarte sind ${mitFehler.length} Wörter falsch geschrieben. Tippe sie an.`,
+    woerter: gerichte.map((g) => g.falsch || g.n.wort), ziele: gerichte.map((g, i) => (g.falsch ? i : -1)).filter((i) => i >= 0),
+    wort: 'n:' + mitFehler[0].n.wort, regel, thema, stufe: 2, speisekarte: true,
+    merke: 'Richtig: ' + mitFehler.map(({ n }) => n.wort).join(', ') + '. ' + hilfen.join(' '),
+  };
+}
+
+// Pferdehirtin: Satzglieder in die richtige Reihenfolge bringen (3 Satzglieder: das großgeschriebene zuerst, das Verb an Stelle 2).
+export function satzOrdnenInhalt(ctx) {
+  const { ws } = ctx;
+  const drei = ws.saetze.filter((s) => s.glieder.length === 3 && s.glieder[1].rolle === 'praedikat');
+  const s = waehle(drei, (x) => 's:' + satzText(x), ctx);
+  const karten = s.glieder.map((g) => g.woerter.map((w) => w.wort).join(' '));
+  return { format: 'ordnen', modus: 'reihenfolge', frage: 'Bringe die Satzglieder in die richtige Reihenfolge.', karten, fest: 0, loesung: karten,
+    wort: 's:' + satzText(s), regel: 'satz-praedikat', thema: 'satzglieder', stufe: 2, merke: `${ws.regelText('satz-praedikat')} Richtig: ${satzText(s)}` };
+}
+
+// Kobold: Name des Geschenks mit fehlenden Buchstaben (dort, wo der Kobold den Fehler versteckt hat).
+export function koboldInhalt(eintrag, ctx) {
+  const richtig = eintrag.richtig, falsch = eintrag.teile.join('');
+  // Lücke genau an der Fehlerstelle: gleicher Anfang und gleiches Ende abziehen, zwei bis drei Buchstaben
+  let vorn = 0;
+  while (vorn < richtig.length && richtig[vorn] === falsch[vorn]) vorn++;
+  let hinten = 0;
+  while (hinten < Math.min(richtig.length, falsch.length) - vorn && richtig.at(-1 - hinten) === falsch.at(-1 - hinten)) hinten++;
+  let von = vorn, bis = richtig.length - hinten;
+  // Nur ein Buchstabe anders oder fehlend: den Nachbarn dazunehmen (bei Doppelbuchstaben beide: Ha-mm-er)
+  if (bis - von === 0 || (bis - von === 1 && richtig[von] === richtig[von - 1])) von = Math.max(0, von - 1);
+  if (bis - von < 2) bis = Math.min(richtig.length, von + 2);
+  const luecke = [];
+  for (let i = von; i < Math.min(bis, von + 3); i++) luecke.push(i);
+  return { format: 'buchstaben', frage: `Der Kobold hat den Namen verdreht. Ergänze die fehlenden Buchstaben.`, ziel: richtig, luecken: luecke,
+    tasten: tasten(luecke.map((i) => richtig[i]), ctx.rng), wort: 'k:' + richtig, regel: 'doppel-kurz', thema: 'doppel', stufe: 2, merke: `${eintrag.erklaerung} Richtig: ${richtig}.` };
+}
+
+// Ork-Rüstung: kurzer Satz mit einem Rechtschreibfehler (antippen und verbessern), passend zum Thema.
+export function orkInhalt(thema, stufe, ctx) {
+  return { ...THEMEN[thema](stufe, 'fehler', ctx), thema, stufe };
 }

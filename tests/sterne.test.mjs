@@ -185,23 +185,6 @@ test('„Nicht verbinden“: Das Item wird ohne Verbinden abgelegt (ins Lager, f
   assert.ok(!voll.items.includes(w));
 });
 
-test('Dreimal gleich richtig beantwortet: Die Frage kommt in diesem Lauf nicht mehr', async () => {
-  const { istGekonnt, merkeRichtig, GEKONNT_AB } = await import('../js/sterne.js');
-  const run = leererLauf([{ uid: 1, id: 'axt', area: 'bag', x: 0, y: 0, rot: 0 }, { uid: 2, id: 'axt', area: 'store', x: 0, y: 0, rot: 0 }]);
-  const q = frageFuer(findeVerbindung(run, DEFS, RECIPES, { uid: 2, paar: true }), DEFS);
-  assert.equal(GEKONNT_AB, 3);
-  for (let i = 0; i < 2; i++) merkeRichtig(run, q);
-  assert.equal(istGekonnt(run, q), false, 'nach zwei Mal noch nicht');
-  merkeRichtig(run, q);
-  assert.equal(istGekonnt(run, q), true);
-  assert.equal(q.kurz, 'die Äxte ✓');
-  // Anderes Wort oder andere Art bleibt eine Frage
-  const speer = { ...q, wort: 'Speer', ref: 'speer' };
-  assert.equal(istGekonnt(run, speer), false);
-  assert.equal(istGekonnt(run, { ...q, art: 'artikel' }), false);
-  assert.equal(istGekonnt(leererLauf([]), q), false, 'neuer Lauf: wieder fragen');
-});
-
 test('Falsch nie stärker: Ein verbundenes Item wirkt mehr als die zwei unverbundenen (ohne richtige Antwort)', async () => {
   const { EFFECT_KEYS } = await import('../js/grammar.js');
   const { canMerge: kann } = await import('../js/sterne.js');

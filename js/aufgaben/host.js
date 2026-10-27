@@ -3,14 +3,14 @@
 // kostet jeder 1 Gold (im Tutorial nicht). Ergebnis als Promise: { richtig, ersterVersuch, versuche, abgebrochen, trotzdem }.
 import { FORMATE } from './formate/index.js';
 
-const sterne = (s) => '★'.repeat(s) + '☆'.repeat(3 - s);
+const sterne = (s) => '★'.repeat(s) + `<i>${'☆'.repeat(3 - s)}</i>`;
 
 // opts: { anker, kopf, titel, stufe, zahle() → bool, gold() → Zahl, tutorial, nein (Text) , trotzdem (bool), onRegel(id) }
 export function stelleAufgabe(a, opts = {}) {
   const format = FORMATE[a.format];
   return new Promise((fertig) => {
     let versuche = 0, vorher = null, pleite = false;
-    const gross = format.gross(a);
+    const gross = format.gross(a) || !opts.anker; // ohne Item als Anker: in der Mitte
     document.getElementById('aufgabe')?.remove();
     const ebene = document.createElement('div');
     ebene.id = 'aufgabe';
@@ -26,7 +26,7 @@ export function stelleAufgabe(a, opts = {}) {
 
     const zeichne = () => {
       const extra = versuche > 0 && !opts.tutorial;
-      const kosten = opts.tutorial ? (versuche ? 'Probier es noch einmal!' : '') : extra ? `Nächster Versuch: 1 🪙 (du hast ${opts.gold?.() ?? 0})` : 'Erster Versuch frei';
+      const kosten = opts.einVersuch ? 'Nur ein Versuch!' : opts.tutorial ? (versuche ? 'Probier es noch einmal!' : '') : extra ? `Nächster Versuch: 1 🪙 (du hast ${opts.gold?.() ?? 0})` : 'Erster Versuch frei';
       karte.innerHTML = `
         <div class="af-kopf">${opts.kopf || ''}<span class="af-titel">${opts.titel || ''}${a.stufe ? ` <span class="af-stufe" title="Stufe ${a.stufe}">${sterne(a.stufe)}</span>` : ''}</span></div>
         <div class="af-frage">${a.frage}</div>
@@ -60,10 +60,22 @@ export function stelleAufgabe(a, opts = {}) {
       const r = format.pruefe(a, antwort);
       opts.onRegel?.(a.regel);
       if (r.richtig) { geschafft(); return; }
+      if (opts.einVersuch) { leiderNicht(); return; }
       vorher = { antwort, falsch: [...(vorher?.falsch || []), ...(r.falsch || [])] };
       if (a.format === 'sortieren' || a.format === 'paare') vorher.falsch = r.falsch || [];
       opts.onFalsch?.();
       zeichne();
+    };
+
+    // Nur ein Versuch (Ork-Rüstung): Erklärung zeigen, dann weiter.
+    const leiderNicht = () => {
+      karte.innerHTML = `
+        <div class="af-kopf">${opts.kopf || ''}<span class="af-titel">${opts.titel || ''}</span></div>
+        <p class="af-rueck falsch">✗ Leider nicht.</p>
+        <p class="af-merke">💡 ${a.merke}</p>
+        <div class="af-fuss"><button class="btn primary" data-weiter>Weiter</button></div>`;
+      platziere();
+      karte.querySelector('[data-weiter]').onclick = () => schliessen({ richtig: false, ersterVersuch: false, versuche });
     };
 
     const geschafft = () => {

@@ -5,6 +5,7 @@ import { analyze } from './grammar.js';
 import { G, itemsIn, gridOf, region, hero, playerCtx, emit, figurBild, gegnerBild } from './state.js';
 import { evaluateBag } from './mods.js';
 import { merkeAntwort, laufStand } from './fortschritt.js';
+import { frageImSpiel } from './aufgaben/spiel.js';
 import { $, fmt, buildGrid, drawItems, openModal, closeModal } from './ui.js';
 
 let battle = null, enemy = null, speed = 1, rafId = 0, lastFrame = 0, itemEls = {}, onDone = null;
@@ -36,7 +37,8 @@ export function startNight(done) {
   enemy = tut
     ? { ...tut, items: tut.ausruestung.map((a, i) => ({ uid: i + 1, rot: 0, ...a })) }
     : makeEnemy(run.day, foeDef, enemyPool(G.ITEMS, G.COMPOUNDS, run.day), G.DEFS);
-  armor = foeDef.fehler?.length ? { ...pickOne(foeDef.fehler), status: 'offen' } : null;
+  // Rüstung mit Fehler: im Tutorial ein festes Wort, sonst ein Satz mit einem Fehler (Aufgabenformat „Fehler finden“)
+  armor = !foeDef.fehler?.length ? null : tut ? { ...pickOne(foeDef.fehler), status: 'offen' } : { satz: true, status: 'offen' };
 
   const ctx = playerCtx();
   const bag = itemsIn('bag');
@@ -197,6 +199,12 @@ function showEvent(ev) {
 function armorHtml() {
   const who = enemy.boss ? 'Anführer der Orks' : 'Wirrwarr-Ork';
   if (!armor) return who;
+  if (armor.satz) {
+    if (armor.status === 'richtig') return `Rüstung: <b class="ok">${armor.richtig || 'Fehler'} ✓</b> · geschwächt!`;
+    if (armor.status === 'falsch') return `Rüstung: Fehler nicht gefunden${armor.richtig ? ` (richtig: ${armor.richtig})` : ''}`;
+    if (armor.status === 'vorbei') return 'Auf der Rüstung steht ein Satz mit einem Fehler.';
+    return '<button class="armor-word" id="armor-word" data-tut="ruestung">Satz mit Fehler 🔍</button>';
+  }
   if (armor.status === 'richtig') return `Rüstung: <s>${armor.falsch}</s> → <b class="ok">${armor.richtig}</b> · geschwächt!`;
   if (armor.status === 'falsch' || armor.status === 'vorbei') return `Auf der Rüstung steht: <b>${armor.falsch}</b>`;
   return `Auf der Rüstung steht: <button class="armor-word" id="armor-word" data-tut="ruestung">${armor.falsch} 🔍</button>`;
@@ -214,8 +222,31 @@ function bindArmor() {
 }
 
 // Ein Versuch pro Kampf: richtig → Gegner startet mit 15 % weniger Leben.
+function armorErgebnis(ok) {
+  if (ok) {
+    laufStand(G.run).orkFehler++;
+    const f = battle.sides.enemy;
+    f.hp = Math.round(f.maxHp * (1 - ARMOR_BONUS));
+    updateBattleUi();
+    floater($('fighter-enemy'), `-${Math.round(f.maxHp * ARMOR_BONUS)} Rüstung kaputt!`, 'schaden');
+  }
+}
+
 function openArmor() {
   const run = G.run;
+  if (armor.satz) {
+    frageImSpiel({ art: 'ork', format: 'fehler', einVersuch: true, nein: 'Lieber nicht',
+      kopf: `<span class="af-wer">${enemy.emoji} Rüstung · nur ein Versuch!</span>` }).then((r) => {
+      if (r.abgebrochen) return;
+      const a = r.aufgabe;
+      armor.richtig = Object.values(a.korrektur || {})[0] || '';
+      armor.status = r.richtig ? 'richtig' : 'falsch';
+      armorErgebnis(!!r.richtig);
+      refreshArmor();
+      emit('ruestungFertig', { ok: !!r.richtig });
+    });
+    return;
+  }
   const options = shuffle(armor.optionen);
   const card = openModal(`
     <div class="big-emoji">${enemy.emoji}</div>
@@ -230,13 +261,7 @@ function openArmor() {
       armor.status = ok ? 'richtig' : 'falsch';
       run.lernen[ok ? 'richtig' : 'falsch']++;
       merkeAntwort(run, 'rechtschreibung', ok, true);
-      if (ok) laufStand(run).orkFehler++;
-      if (ok) {
-        const f = battle.sides.enemy;
-        f.hp = Math.round(f.maxHp * (1 - ARMOR_BONUS));
-        updateBattleUi();
-        floater($('fighter-enemy'), `-${Math.round(f.maxHp * ARMOR_BONUS)} Rüstung kaputt!`, 'schaden');
-      }
+      armorErgebnis(ok);
       const res = openModal(ok ? `
         <div class="big-emoji">💥</div>
         <h2>Richtig: ${armor.richtig}</h2>

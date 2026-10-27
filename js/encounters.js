@@ -1,14 +1,17 @@
-// Morgen: Begegnungen am Wegesrand mit kurzen Grammatik-Aufgaben (Inhalte aus encounters.json und exercises.json).
-// Regeln für alle Aufgaben: erster Versuch kostenlos, jeder weitere 1 Gold, bei Fehlern eine kurze Erklärzeile.
+// Morgen: Begegnungen am Wegesrand. Jede Begegnung hat ihr eigenes Aufgabenformat (encounters.json):
+// Eule sortiert, Zwerg baut Wörter, Wirtin verbessert die Speisekarte, Hirtin ordnet Sätze, Händler fragt
+// „Was passt nicht?“ (Belohnung: Rabatt), Kobold verdreht einen Namen (Buchstaben ergänzen).
+// Regeln wie überall: erster Versuch kostenlos, jeder weitere 1 Gold, nach jeder Antwort eine Merkhilfe.
 import {
-  pickEncounters, makeTask, koboldTask, growBag, shopPool, rarityWeights, pickWeighted, pickOne,
-  canPlace, bagGrid, STORE_GRID,
+  pickEncounters, growBag, shopPool, pickOne, RABATT,
 } from './logic.js';
 import { GENUS } from './grammar.js';
 import { placeNew } from './sterne.js';
 import { G, save, region, emit } from './state.js';
 import { merkeAntwort } from './fortschritt.js';
 import { openModal, closeModal, toast, bump, fullName, nameAkk, iconHtml } from './ui.js';
+import { frageImSpiel, wortschatz } from './aufgaben/spiel.js';
+import { speisekarteInhalt, satzOrdnenInhalt, koboldInhalt } from './aufgaben/themen.js';
 
 let done = null, rerender = null;
 const findEnc = (id) => G.ENCOUNTERS.begegnungen.find((b) => b.id === id);
@@ -65,7 +68,7 @@ function intro(enc, los = null) {
     <p class="enc-reward-line">🎁 Belohnung: <b>${enc.belohnung.text}</b></p>
     <div class="row">
       <button class="btn" data-back>Zurück</button>
-      <button class="btn primary big" data-go>${enc.aufgabe.typ === 'tausch' ? 'Angebote ansehen' : 'Los geht’s'}</button>
+      <button class="btn primary big" data-go>Los geht’s</button>
     </div>`);
   const back = card.querySelector('[data-back]');
   if (los) back.remove();
@@ -74,17 +77,27 @@ function intro(enc, los = null) {
 }
 
 function startTask(enc) {
-  const typ = enc.aufgabe.typ;
-  if (typ === 'tausch') { trade(enc); return; }
-  if (typ === 'kobold') { kobold(enc); return; }
-  const tasks = makeTask(enc.aufgabe, G.EXERCISES);
-  runTasks(enc, tasks, (ok) => (ok ? reward(enc) : giveUp(enc)));
+  const a = enc.aufgabe;
+  if (a.typ === 'kobold') { kobold(enc); return; }
+  closeModal();
+  const ctx = { ws: wortschatz(), rng: Math.random, felder: [], benutzt: new Set() };
+  const n = a.anzahl || 1;
+  (async () => {
+    for (let i = 0; i < n; i++) {
+      const kopf = `<span class="af-wer">${enc.emoji} ${enc.name}${n > 1 ? ` · ${i + 1}/${n}` : ''}</span>`;
+      const inhalt = a.typ === 'speisekarte' ? speisekarteInhalt(ctx) : a.typ === 'satzordnen' ? satzOrdnenInhalt(ctx) : null;
+      const r = await frageImSpiel(inhalt ? { inhalt, kopf, nein: 'Aufgeben' } : { format: a.format, kopf, nein: 'Aufgeben' });
+      if (inhalt) ctx.benutzt.add(inhalt.wort);
+      if (!r.richtig) { giveUp(enc); return; }
+    }
+    reward(enc);
+  })();
 }
 
 // ---------- Aufgaben ----------
 
-// Arbeitet die Aufgaben nacheinander ab. end(true) wenn alle gelöst, end(false) beim Aufgeben.
-function runTasks(enc, tasks, end, opts = {}) {
+// Feste Auswahl-Fragen (nur im Tutorial): nacheinander abarbeiten. end(true) wenn alle gelöst, end(false) beim Aufgeben.
+function runTasks(enc, tasks, end) {
   const run = G.run;
   let qi = 0, tries = 0, feedback = '', solved = false;
   let wrong = new Set();
@@ -93,21 +106,18 @@ function runTasks(enc, tasks, end, opts = {}) {
     const q = tasks[qi];
     const paid = tries > 0 && !run.tutorial;
     const broke = paid && run.gold < 1 && !solved;
-    const body = q.tap ? drawTap(q, wrong, solved) : drawChoice(q, wrong, solved, broke);
+    const body = drawChoice(q, wrong, solved, broke);
     const card = openModal(`
       <div class="enc-mini">${enc.emoji} ${enc.name}</div>
       ${tasks.length > 1 ? `<p class="enc-progress">Aufgabe ${qi + 1} von ${tasks.length}</p>` : ''}
-      ${opts.vorher || ''}
-      ${q.tap ? `<p class="enc-hint">${opts.tapHint || 'Tippe auf das falsch geschriebene Wort.'}</p>` : ''}
       ${body}
       <p class="cost">${solved ? '' : paid ? `Jeder weitere Versuch kostet 1 🪙 · du hast ${run.gold} 🪙` : 'Erster Versuch kostenlos'}</p>
       ${feedback ? `<p class="feedback ${solved ? 'good' : ''}">${feedback}</p>` : ''}
       ${broke ? '<p class="feedback">Kein Gold für einen weiteren Versuch.</p>' : ''}
       <div class="row">${solved
         ? `<button class="btn primary big" data-next>${qi + 1 < tasks.length ? 'Nächste Aufgabe' : 'Weiter'}</button>`
-        : `<button class="btn small" data-give>${opts.giveText || 'Aufgeben'}</button>`}</div>`);
+        : `<button class="btn small" data-give>Aufgeben</button>`}</div>`);
     card.querySelectorAll('[data-i]').forEach((b) => { b.onclick = () => answer(+b.dataset.i); });
-    card.querySelectorAll('[data-tok]').forEach((b) => { b.onclick = () => answer(b.dataset.tok); });
     card.querySelector('[data-give]')?.addEventListener('click', () => end(false));
     card.querySelector('[data-next]')?.addEventListener('click', () => {
       qi++;
@@ -126,23 +136,16 @@ function runTasks(enc, tasks, end, opts = {}) {
       bump('stat-gold');
     }
     tries++;
-    const right = q.tap ? a === `${q.ziel.zeile}:${q.ziel.wort}` : q.options[a] === q.correct;
-    merkeAntwort(run, q.regel || 'rechtschreibung', right, tries === 1);
+    const right = q.options[a] === q.correct;
+    merkeAntwort(run, 'artikel', right, tries === 1);
     if (right) {
       run.lernen.richtig++;
       solved = true;
-      feedback = q.tap
-        ? `✓ Richtig! „${q.ziel.falsch}“ schreibt man „${q.ziel.richtig}“. ${q.explain}`
-        : `✓ Richtig!${tries > 1 ? '' : ' Gleich beim ersten Versuch.'}`;
+      feedback = `✓ Richtig!${tries > 1 ? '' : ' Gleich beim ersten Versuch.'}`;
     } else {
       run.lernen.falsch++;
       wrong.add(a);
-      if (q.tap) {
-        const [li, ti] = String(a).split(':').map(Number);
-        feedback = `✗ „${q.zeilen[li][ti]}“ ist richtig geschrieben. Such weiter!`;
-      } else {
-        feedback = `✗ ${q.explain}`;
-      }
+      feedback = `✗ ${q.explain}`;
     }
     save();
     draw();
@@ -160,16 +163,6 @@ function drawChoice(q, wrong, solved, broke) {
       const mark = solved && o === q.correct ? ' right' : '';
       return `<button class="btn ${cls}${mark}" data-i="${i}" ${style} ${wrong.has(i) || broke || solved ? 'disabled' : ''}>${o}</button>`;
     }).join('')}</div>`;
-}
-
-function drawTap(q, wrong, solved) {
-  return `<div class="tap-card ${q.zeilen.length === 1 ? 'one-word' : ''}">${q.zeilen.map((tokens, li) => `
-    <div class="tap-line">${tokens.map((t, ti) => {
-      const key = `${li}:${ti}`;
-      const isZiel = solved && li === q.ziel.zeile && ti === q.ziel.wort;
-      return `<button class="tap-word${wrong.has(key) ? ' wrong' : ''}${isZiel ? ' right' : ''}" data-tok="${key}" ${solved ? 'disabled' : ''}>${isZiel ? q.ziel.richtig : t}</button>`;
-    }).join(q.zeilen.length === 1 ? '<span class="tap-join">·</span>' : ' ')}</div>`).join('')}
-  </div>`;
 }
 
 function giveUp(enc) {
@@ -207,6 +200,9 @@ function reward(enc) {
   } else if (b.typ === 'gold') {
     run.gold += b.menge;
     text = `Du bekommst ${b.menge} 🪙!`;
+  } else if (b.typ === 'rabatt') {
+    run.rabatt = (run.rabatt || 0) + RABATT.kaeufe;
+    text = `Die nächsten ${RABATT.kaeufe} Käufe im Laden sind je ${RABATT.gold} 🪙 billiger! 🏷️`;
   } else if (b.typ === 'mod') {
     run.mods.push(b.mod);
     text = `${b.mod.text}.`;
@@ -227,76 +223,6 @@ function showReward(enc, text) {
   card.querySelector('[data-ok]').onclick = () => finish(enc.id);
 }
 
-// ---------- Fahrender Händler ----------
-
-function trade(enc) {
-  const run = G.run;
-  if (!run.begegnung.angebote) {
-    const pool = shopPool(run, G.ITEMS, G.REGIONS).filter((d) => d.art !== 'tasche');
-    const w = rarityWeights(run.day + 2);
-    run.begegnung.angebote = [];
-    while (run.begegnung.angebote.length < (enc.aufgabe.angebote || 3)) {
-      const rar = pickWeighted(Object.entries(w).filter(([r]) => pool.some((d) => d.seltenheit === r)));
-      const def = pickOne(pool.filter((d) => d.seltenheit === rar && !run.begegnung.angebote.includes(d.id)));
-      if (def) run.begegnung.angebote.push(def.id);
-    }
-    save();
-  }
-  const offers = run.begegnung.angebote.map((id) => G.DEFS[id]);
-  const card = openModal(`
-    <div class="enc-mini">${enc.emoji} ${enc.name}</div>
-    <h2>Welches Angebot möchtest du?</h2>
-    <div class="enc-choices">${offers.map((d) => `
-      <button class="enc-choice" data-id="${d.id}">
-        <span class="enc-emoji">${iconHtml(d)}</span><b>${fullName(d)}</b>
-        <span class="enc-reward" style="color:${G.RAR[d.seltenheit]?.farbe}">${G.RAR[d.seltenheit]?.name} · ${d.w}×${d.h}</span>
-      </button>`).join('')}
-    </div>
-    <div class="row"><button class="btn small" data-no>Doch nicht tauschen</button></div>`, 'wide');
-  card.querySelectorAll('[data-id]').forEach((b) => { b.onclick = () => chooseOwn(enc, G.DEFS[b.dataset.id]); });
-  card.querySelector('[data-no]').onclick = () => finish(enc.id);
-}
-
-function chooseOwn(enc, newDef) {
-  const own = G.run.items;
-  const card = openModal(`
-    <div class="enc-mini">${enc.emoji} ${enc.name}</div>
-    <h2>Was gibst du dafür?</h2>
-    <p>Du bekommst ${nameAkk(newDef)} ${newDef.emoji}.</p>
-    <div class="own-items">${own.length ? own.map((p) => {
-      const d = G.DEFS[p.id];
-      return `<button class="own-item" data-uid="${p.uid}">${iconHtml(d, 'ic small') || '🔷'} ${d.art === 'siegel' ? `Siegel „${d.name}“` : d.name}<small>${p.area === 'bag' ? 'Rucksack' : 'Lager'}</small></button>`;
-    }).join('') : '<p class="muted">Du hast noch keine Items zum Tauschen.</p>'}</div>
-    <div class="row"><button class="btn small" data-back>Zurück</button></div>`, 'wide');
-  card.querySelectorAll('[data-uid]').forEach((b) => { b.onclick = () => swap(enc, +b.dataset.uid, newDef); });
-  card.querySelector('[data-back]').onclick = () => trade(enc);
-}
-
-function swap(enc, uid, newDef) {
-  const run = G.run;
-  const old = run.items.find((p) => p.uid === uid);
-  const oldDef = G.DEFS[old.id];
-  run.items = run.items.filter((p) => p !== old);
-  const grid = old.area === 'bag' ? bagGrid(run) : STORE_GRID;
-  const same = run.items.filter((p) => p.area === old.area);
-  let placed = null;
-  for (const rot of [old.rot || 0, 0, 1]) {
-    if (canPlace(same, G.DEFS, newDef, old.x, old.y, rot, grid)) {
-      placed = { uid: run.nextUid++, id: newDef.id, area: old.area, x: old.x, y: old.y, rot };
-      run.items.push(placed);
-      emit('neuesItem', { uid: placed.uid });
-      break;
-    }
-  }
-  if (!placed) placed = gewinn(newDef.id);
-  if (!placed) {
-    run.items.push(old);
-    toast('Dafür ist kein Platz – wähle ein größeres Item zum Tauschen.');
-    return;
-  }
-  showReward(enc, `Du hast ${nameAkk(oldDef)} gegen ${nameAkk(newDef)} ${newDef.emoji} getauscht.`);
-}
-
 // ---------- Zwielichtiger Kobold ----------
 
 function kobold(enc) {
@@ -305,23 +231,25 @@ function kobold(enc) {
   if (!run.begegnung.kobold) { run.begegnung.kobold = pickOne(entries).item; save(); }
   const entry = entries.find((e) => e.item === run.begegnung.kobold) || entries[0];
   const def = G.DEFS[entry.item];
-  const task = koboldTask(entry);
-  const vorher = `<div class="kobold-gift"><span class="big-emoji glowing" style="--glow:#a259d9">${iconHtml(def, 'ic big')}${def.abzeichen ? `<em>${def.abzeichen}</em>` : ''}</span></div>`;
-  runTasks(enc, [task], (ok) => {
-    const p = gewinn(def.id, ok ? {} : { fluch: task.falscherName });
+  const falscherName = entry.teile.join('');
+  closeModal();
+  const kopf = `<span class="af-wer">${enc.emoji} ${enc.name}</span><span class="glowing" style="--glow:#a259d9">${iconHtml(def, 'ic small')}</span>`;
+  frageImSpiel({ inhalt: koboldInhalt(entry, { rng: Math.random }), kopf, nein: 'Ich finde ihn nicht' }).then((r) => {
+    const ok = !!r.richtig;
+    const p = gewinn(def.id, ok ? {} : { fluch: falscherName });
     if (!p) { toast('Kein Platz im Rucksack – der Kobold zieht beleidigt ab.'); finish(enc.id); return; }
-    if (ok) showReward(enc, `Fehler gefunden! ${fullName(def)} ${def.emoji} ist jetzt ganz normal stark.`);
+    if (ok) showReward(enc, `Name repariert! ${fullName(def)} ${def.emoji} ist jetzt ganz normal stark.`);
     else {
       save();
       rerender();
       const card = openModal(`
         <div class="big-emoji">😈</div>
         <h2>Hihi!</h2>
-        <p>Du bekommst „${task.falscherName}“ ${def.emoji} – aber der Fehler im Namen macht es frech:
+        <p>Du bekommst „${falscherName}“ ${def.emoji} – aber der Fehler im Namen macht es frech:
         Es kostet dich zu Beginn jedes Kampfes 2 Leben, solange es im Rucksack liegt.</p>
-        <p class="feedback">Richtig wäre: ${task.richtig}. ${task.explain}</p>
+        <p class="feedback">Richtig wäre: ${entry.richtig}. ${entry.erklaerung}</p>
         <div class="row"><button class="btn primary" data-ok>Weiter</button></div>`);
       card.querySelector('[data-ok]').onclick = () => finish(enc.id);
     }
-  }, { vorher, tapHint: 'In welchem Wortteil steckt der Fehler? Tippe ihn an.', giveText: 'Ich finde ihn nicht' });
+  });
 }

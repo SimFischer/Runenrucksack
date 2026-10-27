@@ -1077,29 +1077,6 @@ body {
 .quick-foot .btn.small { min-height: 34px; padding: 4px 10px; font-size: 14px; }
 .quick-no { background: transparent; box-shadow: none; border-color: transparent; color: var(--ink-soft); text-decoration: underline; }
 .preview.merge { background: rgba(255, 214, 90, .45); outline: 4px solid #ffd23f; box-shadow: 0 0 22px #ffb800; }
-.item-hint {
-  position: fixed;
-  z-index: 480;
-  transform: translate(-50%, -100%);
-  background: #2f7d32;
-  color: #fff;
-  font-weight: 900;
-  font-size: 17px;
-  padding: 4px 12px;
-  border-radius: 999px;
-  border: 2px solid #fff;
-  box-shadow: 0 4px 12px rgba(0,0,0,.4);
-  pointer-events: none;
-  white-space: nowrap;
-  animation: hintUp 1.8s ease-out forwards;
-}
-@keyframes hintUp {
-  0% { opacity: 0; margin-top: 10px; }
-  15% { opacity: 1; margin-top: 0; }
-  80% { opacity: 1; margin-top: -14px; }
-  100% { opacity: 0; margin-top: -22px; }
-}
-
 /* ---------- Verbinden: Belohnung ---------- */
 .merge-fly { width: 56px; height: 56px; display: flex; align-items: center; justify-content: center; }
 .merge-fly .fly-img { width: 56px; height: 56px; object-fit: contain; }
@@ -1416,3 +1393,7 @@ body[data-design="silberbanner"] #grid-bag { border-color: #c9d4ea; }
 .af-paar { min-width: 200px; min-height: 54px; font-size: 20px; }
 .af-paar.gewaehlt { outline: 4px solid #e0a526; }
 .af-paar.verbunden { background: var(--paar); color: #fff; text-shadow: 0 1px 0 rgba(0,0,0,.4); }
+
+.af-wer { color: var(--ink); font-weight: 900; }
+.price-tag.rabatt { color: #2f7d32; }
+.af-stufe i { font-style: normal; opacity: .35; }

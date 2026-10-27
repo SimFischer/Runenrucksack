@@ -1,13 +1,13 @@
 // Runenrucksack – Ablauf eines Laufs, Laden, Rucksack (Ziehen und Drehen) und Info-Feld.
 import {
   CFG, income, baseHp, sellValue, newRun, reroll, finishBattle,
-  canPlace, overlapping, findSpot, sizeOf, shuffle, attachTasche, ownedCount, MAX_STERN, STERN_FAKTOR,
+  canPlace, overlapping, findSpot, sizeOf, shuffle, attachTasche, ownedCount, MAX_STERN, STERN_FAKTOR, preisVon,
 } from './logic.js';
 import {
   GENUS, SIEGEL_BONUS, findFusions, wrongOrderNeighbor, canRotate, nextRot, isNoun, isRune, isVerb, runeBase, starDef,
 } from './grammar.js';
 import {
-  canMerge, compoundPartner, placeNew, findeVerbindung, fuehreAus, frageFuer, sameKind, istGekonnt, merkeRichtig, nichtVerbinden,
+  canMerge, compoundPartner, placeNew, findeVerbindung, fuehreAus, frageFuer, sameKind, nichtVerbinden,
 } from './sterne.js';
 import {
   G, loadData, save, loadRun, placedOf, itemsIn, gridOf, region, hero, playerCtx, emit, onEvent, figurBild, hintergrundBild, setPref, saveProfil,
@@ -15,9 +15,11 @@ import {
 import { evaluateBag } from './mods.js';
 import {
   $, fmt, fullName, genusChip, toast, bump, openModal, closeModal, modal, itemEl, buildGrid, drawItems, mergeAnimation, syncGold, iconHtml,
-  openQuick, closeQuick, sternVon, hinweisAm, klangAn,
+  openQuick, closeQuick, sternVon, klangAn,
 } from './ui.js';
 import { startNight } from './battle-ui.js';
+import { frageImSpiel } from './aufgaben/spiel.js';
+import { stufenBereich } from './aufgaben/wahl.js';
 import { runEncounter } from './encounters.js';
 import { initTutorial, startTutorial, tutorialDone, showHelp, tipsOn, setTips } from './tutorial.js';
 import { entdeckungenIn } from './buch.js';
@@ -380,7 +382,8 @@ function renderShop() {
     it.dataset.slot = i;
     it.dataset.tut = 'laden-' + def.id;
     if (sameRef(selected, { src: 'shop', slot: i })) it.classList.add('selected');
-    if (run.gold < def.preis) it.classList.add('cant');
+    const preis = preisVon(run, def);
+    if (run.gold < preis) it.classList.add('cant');
     holder.append(it);
     // Abzeichen sitzen an der Ecke des Items (Größe für CSS)
     holder.style.setProperty('--iw', `${def.w * mini}px`);
@@ -414,11 +417,11 @@ function renderShop() {
     }
 
     const price = document.createElement('div');
-    price.className = 'price-tag' + (run.gold < def.preis ? ' cant' : '');
-    price.textContent = `${def.preis} 🪙`;
+    price.className = 'price-tag' + (run.gold < preis ? ' cant' : '') + (preis < def.preis ? ' rabatt' : '');
+    price.textContent = `${preis < def.preis ? '🏷️ ' : ''}${preis} 🪙`;
     if (n > 0) {
       price.classList.add('merge-hint');
-      price.innerHTML = `${def.preis} 🪙 <small>= sofort ★★</small>`;
+      price.innerHTML = `${preis < def.preis ? '🏷️ ' : ''}${preis} 🪙 <small>= sofort ★★</small>`;
       price.title = 'Kaufen = sofort ★★';
     }
 
@@ -536,7 +539,8 @@ function renderInfo() {
   };
   if (selected.src === 'shop') {
     const slot = selected.slot;
-    btn(`Kaufen <span class="price">${base.preis} 🪙</span>`, () => buyAuto(slot), 'primary').disabled = G.run.gold < base.preis;
+    const preis = preisVon(G.run, base);
+    btn(`Kaufen <span class="price">${preis} 🪙</span>`, () => buyAuto(slot), 'primary').disabled = G.run.gold < preis;
   } else {
     const uid = selected.uid;
     if (canRotate(base)) btn(isRune(base) || isVerb(base) ? '⟳ Pfeil drehen' : '⟳ Drehen', () => rotateInPlace(uid));
@@ -726,7 +730,7 @@ function onReroll() {
 
 function buyAuto(slot) {
   const def = G.DEFS[G.run.shop[slot].id];
-  if (G.run.gold < def.preis) { toast('Zu wenig Gold'); return; }
+  if (G.run.gold < preisVon(G.run, def)) { toast('Zu wenig Gold'); return; }
   if (def.art === 'tasche') { buyTasche(slot); return; }
   // Rucksack, sonst Lager – und ist alles voll, aber ein gleiches da, wird es trotzdem sofort verbunden.
   const p = placeNew(G.run, G.DEFS, def.id);
@@ -745,12 +749,14 @@ function buy(slot, area, spot, mit = null) {
 function paid(slot, p, mit = null) {
   const run = G.run;
   const def = G.DEFS[p.id];
-  run.gold -= def.preis;
+  const preis = preisVon(run, def), rabatt = preis < def.preis;
+  run.gold -= preis;
+  if (rabatt) run.rabatt--;
   run.shop[slot] = null;
   selected = run.tutorial || p.area === 'neu' ? null : { src: p.area, uid: p.uid }; // im Tutorial zeigt erst das Antippen die Infos
   bump('stat-gold');
   // Gibt es schon ein gleiches? Dann verbinden sie sich sofort.
-  pruefe(mit ? { uid: p.uid, mit, kauf: { slot, id: def.id, preis: def.preis } } : { uid: p.uid, paar: true, kauf: { slot, id: def.id, preis: def.preis } });
+  pruefe(mit ? { uid: p.uid, mit, kauf: { slot, id: def.id, preis, rabatt } } : { uid: p.uid, paar: true, kauf: { slot, id: def.id, preis, rabatt } });
   render();
 }
 
@@ -937,14 +943,14 @@ function quiz(opts) {
   draw();
 }
 
-// Zwei gleiche oder Kristall + Träger gefunden: Frage stellen, bei richtiger Antwort sofort verbinden.
-// Gekonnte Fragen (dreimal gleich richtig) werden übersprungen – dann nur ein kleiner Hinweis („die Äxte ✓“).
+// Zwei gleiche oder Kristall + Träger gefunden: Aufgabe stellen, bei richtiger Antwort sofort verbinden.
+// Das Item bestimmt das Thema (Nomen, Kompositum, Verb, Rune), die Ziel-Stufe den Bereich der Aufgabenstufe.
+// Im Tutorial bleibt die feste Frage zum Item-Wort.
 function askMerge(a, c) {
   const run = G.run;
   const q = frageFuer(a, G.DEFS);
   if (a.typ === 'paar') emit('tipp', { key: isRune(G.DEFS[a.alt.id]) ? 'steigerung' : 'sterne' });
   if (!q) { doMerge(a); return; } // Superlativ → Krone: ohne neue Frage
-  if (istGekonnt(run, q)) { doMerge(a, q.kurz); return; }
   let kopf;
   if (a.typ === 'kompositum') {
     const kd = G.DEFS[a.kraft.id], td = G.DEFS[a.traeger.id], cd = G.DEFS[a.id];
@@ -953,15 +959,22 @@ function askMerge(a, c) {
     const d = G.DEFS[a.alt.id];
     kopf = `<span class="quick-eq">${iconHtml(d, 'ic small')}<b>+</b>${iconHtml(d, 'ic small')}<b>=</b><em class="goal-stars">${'★'.repeat(sternVon(a.alt) + 1)}</em></span>`;
   }
-  quiz({
-    q,
-    regel: q.art,
-    anchor: itemNode(a.typ === 'kompositum' ? a.traeger.uid : a.alt.uid),
-    kopf,
-    richtig: (ersterVersuch) => { if (ersterVersuch) merkeRichtig(run, q); doMerge(a); },
-    trotzdem: () => doMerge(a),
-    nein: run.tutorial ? null : () => dontMerge(a, c),
-  });
+  const anchor = itemNode(a.typ === 'kompositum' ? a.traeger.uid : a.alt.uid);
+  if (run.tutorial) {
+    quiz({ q, regel: q.art, anchor, kopf, richtig: () => doMerge(a), trotzdem: () => doMerge(a), nein: null });
+    return;
+  }
+  const d = G.DEFS[a.typ === 'kompositum' ? a.traeger.id : a.alt.id];
+  const art = a.typ === 'kompositum' ? 'kompositum' : isRune(d) ? 'rune' : d.art === 'verb' ? 'verb' : 'nomen';
+  const ziel = a.typ === 'kompositum' ? 2 : sternVon(a.alt) + 1;
+  const frage = () => frageImSpiel({ art, bereich: stufenBereich(ziel), anker: anchor, kopf, itemWort: art === 'nomen' ? d.name : null, nein: 'Nicht verbinden', trotzdem: true });
+  (async () => {
+    let r = await frage();
+    // ★★★★: Stufe 3 – oder zwei Aufgaben, wenn die Stufe 3 (noch) nicht erlaubt ist
+    if (ziel >= 4 && r.richtig && r.aufgabe.stufe < 3) r = await frage();
+    if (r.abgebrochen) { dontMerge(a, c); return; }
+    doMerge(a);
+  })();
 }
 
 // „Nicht verbinden“: Das Item wird ohne Verbinden abgelegt (beim Kaufen ins Lager, falls kein Platz).
@@ -972,6 +985,7 @@ function dontMerge(a, c) {
     if (c?.kauf) {
       // Nirgends Platz: Kauf zurücknehmen
       run.gold += c.kauf.preis;
+      if (c.kauf.rabatt) run.rabatt = (run.rabatt || 0) + 1;
       if (!run.shop[c.kauf.slot]) run.shop[c.kauf.slot] = { id: c.kauf.id, locked: false };
       toast('Kein Platz – der Kauf wurde zurückgenommen.');
     } else toast('Kein Platz – das Item bleibt beim Händler.');
@@ -1001,7 +1015,7 @@ function gewinnText(a, p) {
   return `+${pct} % ${k ? k[1] : 'Wirkung'}`;
 }
 
-function doMerge(a, kurz = null) {
+function doMerge(a) {
   const run = G.run;
   const teile = a.typ === 'kompositum' ? [a.kraft, a.traeger] : [a.neu, a.alt];
   const from = teile.map((p) => itemNode(p.uid)?.getBoundingClientRect()).filter(Boolean);
@@ -1017,8 +1031,7 @@ function doMerge(a, kurz = null) {
   if (gross) laufStand(run).sterne4++;
   mergeAnimation(from, itemNode(p.uid), { icon, sterne: a.typ === 'kompositum' ? 0 : st, gewinn: gewinnText(a, p), gross });
   if (gross) toast(isRune(nd) ? `👑 ${nd.name}! Die Rune trägt jetzt die Krone.` : `★★★★ ${nd.name} – legendär!`);
-  if (kurz) hinweisAm(itemNode(p.uid), kurz);
-  else if (gross) { /* Feier-Toast steht oben */ } else if (a.typ === 'kompositum') toast(`${fullName(nd)} ist entstanden!`);
+  if (gross) { /* Feier-Toast steht oben */ } else if (a.typ === 'kompositum') toast(`${fullName(nd)} ist entstanden!`);
   else toast(isRune(nd) ? `Rune gesteigert: ${nd.name}${nd.krone ? ' 👑' : ''}!` : `${'★'.repeat(p.stern)} ${nd.name}: jetzt viel stärker!`);
   emit('verschmolzen', { id: p.id, stern: sternVon(p), art: a.typ });
   // Kette: Gibt es zum neuen Item wieder ein gleiches? Erst nach der Animation weiter.
@@ -1062,7 +1075,7 @@ function onDown(e) {
     }
     return;
   }
-  if ($('game').hidden || !$('modal').hidden || $('quick')) return;
+  if ($('game').hidden || !$('modal').hidden || $('quick') || $('aufgabe')) return;
   const el = e.target.closest('.item[data-src]');
   if (!el) {
     if (selected && e.target.closest('.board') && !e.target.closest('.info-panel, .btn, .lock')) {
@@ -1189,7 +1202,7 @@ function updateTarget() {
 // im Rucksack werden andere überdeckte Items ins Lager geschoben.
 function evaluate(area, x, y, s) {
   const selfUid = drag.ref.uid;
-  if (drag.ref.src === 'shop' && G.run.gold < drag.def.preis) return { status: 'bad', reason: 'gold' };
+  if (drag.ref.src === 'shop' && G.run.gold < preisVon(G.run, drag.def)) return { status: 'bad', reason: 'gold' };
   if (drag.def.art === 'tasche') return area === 'bag' ? { status: 'ok' } : { status: 'bad' };
   const grid = gridOf(area);
   const list = itemsIn(area, selfUid);

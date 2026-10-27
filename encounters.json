@@ -1,28 +1,28 @@
 {
-  "_hinweis": "Begegnungen am Morgen. Nach jedem Kampf (außer dem letzten) stehen 'auswahl' zufällige Begegnungen zur Wahl. gebiete: nur in diesen Gebieten (fehlt = überall). aufgabe.typ: plural, artikel, speisekarte, personalform, kobold, tausch – die Wörter dazu stehen in exercises.json. belohnung.typ: feld, item, gold, mod, kobold, tausch.",
+  "_hinweis": "Begegnungen am Morgen. Nach jedem Kampf (außer dem letzten) stehen 'auswahl' zufällige Begegnungen zur Wahl. gebiete: nur in diesen Gebieten (fehlt = überall). aufgabe.typ: format (aufgabe.format = Aufgabenformat aus js/aufgaben/formate, anzahl Aufgaben; Thema und Stufe nach Lernstand), speisekarte (Fehler finden mit 2–3 Fehlern), satzordnen (Satzglieder in die richtige Reihenfolge), kobold (Buchstaben ergänzen, Namen aus exercises.json). belohnung.typ: feld, item, gold, mod, rabatt (die nächsten Käufe billiger), kobold.",
   "auswahl": 3,
   "begegnungen": [
     {
       "id": "eule",
       "name": "Eulenbibliothekarin",
       "emoji": "🦉",
-      "text": "„Huhu! Meine Bücher sind durcheinander. Hilfst du mir mit der Mehrzahl? Dann nähe ich dir eine neue Ecke an deinen Rucksack.“",
-      "aufgabe": { "typ": "plural", "anzahl": 3 },
+      "text": "„Huhu! Meine Bücher sind durcheinander. Hilfst du mir beim Sortieren? Dann nähe ich dir eine neue Ecke an deinen Rucksack.“",
+      "aufgabe": { "typ": "format", "format": "sortieren", "anzahl": 1 },
       "belohnung": { "typ": "feld", "text": "Rucksack +1 Feld" }
     },
     {
       "id": "zwerg",
       "name": "Rätselzwerg",
       "emoji": "⛏️",
-      "text": "„Drei Rätsel, drei Wörter! Sag mir den richtigen Artikel, dann gebe ich dir etwas Seltenes aus meiner Truhe.“",
-      "aufgabe": { "typ": "artikel", "anzahl": 3 },
+      "text": "„Zwei Rätsel aus meiner Werkstatt! Bau mir die richtigen Wörter zusammen, dann gebe ich dir etwas Seltenes aus meiner Truhe.“",
+      "aufgabe": { "typ": "format", "format": "baukasten", "anzahl": 2 },
       "belohnung": { "typ": "item", "seltenheit": "selten", "text": "ein seltenes Item" }
     },
     {
       "id": "wirtin",
       "name": "Wirtin vom „Krummen Kessel“",
       "emoji": "🍲",
-      "text": "„Auf meiner Speisekarte hat sich ein Fehler versteckt! Findest du ihn? Dann gibt es Trinkgeld.“",
+      "text": "„Auf meiner Speisekarte haben sich Fehler versteckt – zwei oder drei! Findest du sie alle? Dann gibt es Trinkgeld.“",
       "aufgabe": { "typ": "speisekarte" },
       "belohnung": { "typ": "gold", "menge": 4, "text": "4 Gold" }
     },
@@ -30,17 +30,17 @@
       "id": "haendler",
       "name": "Fahrender Händler",
       "emoji": "🐫",
-      "text": "„Tauschen, tauschen! Gib mir ein Item aus deinem Gepäck, und du bekommst eines meiner Schätze.“",
-      "aufgabe": { "typ": "tausch", "angebote": 3 },
-      "belohnung": { "typ": "tausch", "text": "ein Item tauschen" }
+      "text": "„Was passt hier nicht dazu? Löse meine zwei Rätsel, dann mache ich dir einen Sonderpreis im Laden!“",
+      "aufgabe": { "typ": "format", "format": "passtnicht", "anzahl": 2 },
+      "belohnung": { "typ": "rabatt", "text": "3 Käufe je 2 🪙 billiger" }
     },
     {
       "id": "hirtin",
       "name": "Pferdehirtin",
       "emoji": "🐴",
       "gebiete": ["hrossmark"],
-      "text": "„Meine Pferde verstehen nur richtige Verbformen. Hilf mir beim Zurufen, dann zeige ich dir, wie man schneller liest!“",
-      "aufgabe": { "typ": "personalform", "anzahl": 3 },
+      "text": "„Meine Pferde verstehen nur ordentliche Sätze. Bring meine Wortkarten in die richtige Reihenfolge, dann zeige ich dir, wie man schneller liest!“",
+      "aufgabe": { "typ": "satzordnen", "anzahl": 2 },
       "belohnung": {
         "typ": "mod",
         "mod": { "filter": { "art": "verb" }, "abklingzeit": -15, "text": "Pferdehirtin: Schriftrollen laden 15 % schneller" },
@@ -51,7 +51,7 @@
       "id": "kobold",
       "name": "Zwielichtiger Kobold",
       "emoji": "😈",
-      "text": "„Ein Geschenk für dich, hihi! Ein episches Item … aber in seinem Namen steckt ein Fehler. Findest du ihn nicht, beißt es dich!“",
+      "text": "„Ein Geschenk für dich, hihi! Ein episches Item … aber ich habe seinen Namen verdreht. Ergänzt du ihn nicht richtig, beißt es dich!“",
       "aufgabe": { "typ": "kobold" },
       "belohnung": { "typ": "kobold", "text": "ein episches Item (mit Haken)" }
     }
