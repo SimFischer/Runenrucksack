@@ -236,6 +236,7 @@ export function reroll(run, items, regions, rng = Math.random) {
 // Nach einem Kampf: Ergebnis buchen, nächsten Tag vorbereiten.
 export function finishBattle(run, items, regions, won, enemyName, rng = Math.random) {
   run.history.push({ day: run.day, won, enemy: enemyName });
+  for (const p of run.items) delete p.glanz; // Glanz gilt nur für einen Kampf
   if (won) run.wins++;
   else { run.hearts--; run.losses++; }
   if (run.hearts <= 0) { run.over = 'lost'; return; }

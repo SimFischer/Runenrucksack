@@ -12,7 +12,7 @@ import {
 import {
   G, loadData, save, loadRun, placedOf, itemsIn, gridOf, region, hero, playerCtx, emit, onEvent, figurBild, hintergrundBild, setPref, saveProfil,
 } from './state.js';
-import { evaluateBag } from './mods.js';
+import { evaluateBag, GLANZ_BONUS } from './mods.js';
 import {
   $, fmt, fullName, genusChip, toast, bump, openModal, closeModal, modal, itemEl, buildGrid, drawItems, mergeAnimation, syncGold, iconHtml,
   openQuick, closeQuick, sternVon, klangAn,
@@ -975,7 +975,7 @@ function askMerge(a, c) {
     // ★★★★: Stufe 3 – oder zwei Aufgaben, wenn die Stufe 3 (noch) nicht erlaubt ist
     if (ziel >= 4 && r.richtig && r.aufgabe.stufe < 3) r = await frage();
     if (r.abgebrochen) { dontMerge(a, c); return; }
-    doMerge(a);
+    doMerge(a, r.glanz);
   })();
 }
 
@@ -1017,13 +1017,14 @@ function gewinnText(a, p) {
   return `+${pct} % ${k ? k[1] : 'Wirkung'}`;
 }
 
-function doMerge(a) {
+function doMerge(a, glanz = false) {
   const run = G.run;
   const teile = a.typ === 'kompositum' ? [a.kraft, a.traeger] : [a.neu, a.alt];
   const from = teile.map((p) => itemNode(p.uid)?.getBoundingClientRect()).filter(Boolean);
   const icon = iconHtml(G.DEFS[teile[0].id], 'fly-img');
   closeQuick();
   const p = fuehreAus(run, a, G.DEFS);
+  if (glanz) p.glanz = 1;
   selected = run.tutorial ? null : { src: p.area, uid: p.uid };
   render();
   const nd = G.DEFS[p.id];
@@ -1035,6 +1036,7 @@ function doMerge(a) {
   if (gross) toast(isRune(nd) ? `👑 ${nd.name}! Die Rune trägt jetzt die Krone.` : `★★★★ ${nd.name} – legendär!`);
   if (gross) { /* Feier-Toast steht oben */ } else if (a.typ === 'kompositum') toast(`${fullName(nd)} ist entstanden!`);
   else toast(isRune(nd) ? `Rune gesteigert: ${nd.name}${nd.krone ? ' 👑' : ''}!` : `${'★'.repeat(p.stern)} ${nd.name}: jetzt viel stärker!`);
+  if (glanz) setTimeout(() => toast(`✨ ${nd.name} glänzt: +${GLANZ_BONUS} % im nächsten Kampf!`), 1300);
   emit('verschmolzen', { id: p.id, stern: sternVon(p), art: a.typ });
   // Kette: Gibt es zum neuen Item wieder ein gleiches? Erst nach der Animation weiter.
   pending.unshift({ uid: p.uid, paar: true });

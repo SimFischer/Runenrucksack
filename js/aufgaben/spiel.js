@@ -3,10 +3,11 @@
 import { G, saveProfil, emit, region } from '../state.js';
 import { mitRegeln } from './themen.js';
 import { FORMATE } from './formate/index.js';
-import { waehleAufgabe, verbucheAufgabe, lernstandVon, maxStufe } from './wahl.js';
+import { waehleAufgabe, verbucheAufgabe, lernstandVon, maxStufe, GOLD_FUER_STUFE } from './wahl.js';
 import { stelleAufgabe } from './host.js';
 import { merkeAntwort } from '../fortschritt.js';
 import { bump, toast } from '../ui.js';
+import { meldeRegel } from '../buch-ui.js';
 
 let WS = null;
 export const wortschatz = () => (WS ||= mitRegeln(G.WORTSCHATZ, G.THEMEN));
@@ -59,10 +60,21 @@ export async function frageImSpiel(opts) {
     if (v.aufgestiegen && v.stufe <= maxStufe(einstellungen(), aufgabe.thema)) {
       toast(`${t.emoji} ${t.name}: Du kannst das schon sicher – jetzt kommt Stufe ${'★'.repeat(v.stufe)}!`);
     }
+    if (ergebnis.richtig && ergebnis.ersterVersuch && !run.tutorial) {
+      const gold = GOLD_FUER_STUFE[aufgabe.stufe] || 0;
+      if (gold) { run.gold += gold; bump('stat-gold'); toast(`Gleich richtig auf Stufe ${aufgabe.stufe}: +${gold} 🪙`); }
+    }
+    // Regelkarte fürs Buch: jede Regel, die richtig angewendet wurde
+    G.PROFIL.regeln ||= [];
+    if (ergebnis.richtig && aufgabe.regel && !G.PROFIL.regeln.includes(aufgabe.regel) && t?.regeln.some((r) => r.id === aufgabe.regel)) {
+      G.PROFIL.regeln.push(aufgabe.regel);
+      meldeRegel(t, t.regeln.find((r) => r.id === aufgabe.regel));
+    }
     saveProfil();
     emit('aufgabeFertig', { thema: aufgabe.thema, stufe: aufgabe.stufe, richtig: !!ergebnis.richtig, ersterVersuch: !!ergebnis.ersterVersuch });
   }
-  return { ...ergebnis, aufgabe };
+  // Glanz fürs verbundene Item: Stufe 3 gleich beim ersten Versuch richtig
+  return { ...ergebnis, aufgabe, glanz: !!(ergebnis.richtig && ergebnis.ersterVersuch && aufgabe.stufe === 3 && !run.tutorial) };
 }
 
 export { lernstandVon };

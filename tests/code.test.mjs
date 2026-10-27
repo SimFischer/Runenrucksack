@@ -137,7 +137,7 @@ function vollerLauf() {
   attachTasche(run, DEFS.satteltasche);
   run.lernen = { richtig: 30, falsch: 4 };
   const bag = [
-    ['feuer+speer', 0, 0, 0, { stern: 3, kraftStern: 2 }], ['stuermen', 1, 0, 1, {}], ['schild', 2, 0, 0, { stern: 2 }],
+    ['feuer+speer', 0, 0, 0, { stern: 3, kraftStern: 2 }], ['stuermen', 1, 0, 1, {}], ['schild', 2, 0, 0, { stern: 2, glanz: 1 }],
     ['rune-scharf@4', 4, 0, 2, {}], ['siegel-der', 4, 1, 0, {}], ['dolch', 4, 2, 0, { stern: 4 }],
     ['eis+bogen', 0, 2, 1, {}], ['apfel', 2, 2, 0, {}], ['brot', 3, 2, 0, {}],
     ['honig', 0, 3, 0, {}], ['karotte', 1, 3, 0, {}], ['hafer', 2, 3, 0, { stern: 2 }], ['zaumzeug', 3, 3, 0, {}], ['horn', 4, 3, 0, {}],

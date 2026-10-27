@@ -5,15 +5,22 @@ import { iconHtml, genusChip } from './ui.js';
 
 let seiteAktiv = 'komposita';
 
+// Seite „Regeln“: Regelkarten aus den Aufgaben (themen.json), gesammelt in G.PROFIL.regeln – zählt nicht zu den Buch-Einträgen.
+const regelSeite = () => ({
+  id: 'regeln', emoji: '📜', titel: 'Regeln', text: 'Regelkarten: Jede Regel, die du beim Lösen einer Aufgabe richtig angewendet hast, landet hier.',
+  eintraege: G.THEMEN.themen.flatMap((t) => t.regeln.map((r) => ({ id: `regel:${r.id}`, regel: r, thema: t }))),
+});
+
 export function zeigeBuch(zurueck = null) {
   document.getElementById('buch-layer')?.remove();
   const box = document.createElement('div');
   box.id = 'buch-layer';
   document.body.append(box);
   const zeichne = () => {
-    const entdeckt = new Set(G.PROFIL.buch);
+    const entdeckt = new Set([...G.PROFIL.buch, ...(G.PROFIL.regeln || []).map((id) => `regel:${id}`)]);
     const gesamt = G.BUCH.eintraege.length;
-    const seite = { ...G.BUCH.seiten.find((s) => s.id === seiteAktiv) };
+    const seiten = [...G.BUCH.seiten, regelSeite()];
+    const seite = { ...seiten.find((s) => s.id === seiteAktiv) };
     const lohn = G.ACH.designs.find((d) => d.freischaltung?.seite === seite.id);
     if (lohn) seite.belohnung = `Rucksack-Design „${lohn.name}“ ${lohn.emoji}`;
     const stand = seitenStand(seite, entdeckt);
@@ -21,10 +28,10 @@ export function zeigeBuch(zurueck = null) {
       <div class="buch-card" data-tut="buch-fenster">
         <header class="buch-head">
           <h2>📚 Buch der Wörter</h2>
-          <span class="buch-total">${G.PROFIL.buch.length} von ${gesamt} entdeckt</span>
+          <span class="buch-total">${G.PROFIL.buch.length} von ${gesamt} entdeckt · 📜 ${(G.PROFIL.regeln || []).length} Regeln</span>
           <button class="btn primary" data-close>Schließen</button>
         </header>
-        <nav class="buch-tabs">${G.BUCH.seiten.map((s) => {
+        <nav class="buch-tabs">${seiten.map((s) => {
           const st = seitenStand(s, entdeckt);
           return `<button class="buch-tab${s.id === seiteAktiv ? ' on' : ''}${st.voll ? ' voll' : ''}" data-seite="${s.id}">
             <span>${s.emoji} ${s.titel}</span>
@@ -42,6 +49,10 @@ export function zeigeBuch(zurueck = null) {
 }
 
 function karte(e, da) {
+  if (e.regel) {
+    return da ? `<div class="buch-eintrag regel-karte"><span class="regel-emoji">${e.thema.emoji}</span><b>${e.thema.name}</b><small>${e.regel.text}</small></div>`
+      : `<div class="buch-eintrag regel-karte dunkel"><span class="regel-emoji">📜</span><b>???</b><small>${e.thema.name}</small></div>`;
+  }
   const sterne = e.stern && e.seite === 'stufen' ? `<em class="buch-sterne">${'★'.repeat(e.stern)}</em>` : '';
   const bild = e.seite === 'saetze'
     ? `<span class="buch-pair">${iconHtml(e.subjekt, 'buch-img')}<b>+</b>${iconHtml(e.def, 'buch-img')}</span>`
@@ -54,6 +65,11 @@ function karte(e, da) {
 }
 
 // Neuer Erfolg während des Laufs: dieselbe Einblendung, nur golden beschriftet.
+export function meldeRegel(thema, regel) {
+  warteschlange.push({ regel: { thema, regel } });
+  if (!zeigt) naechste();
+}
+
 export function meldeErfolg(e) {
   if (!e) return;
   warteschlange.push({ erfolg: e });
@@ -77,7 +93,8 @@ function naechste() {
   zeigt = true;
   const n = document.createElement('div');
   n.className = 'buch-neu';
-  if (e.erfolg) n.innerHTML = `<span class="buch-neu-pic">${e.erfolg.emoji}</span><span><small>🏆 Neuer Erfolg!</small><b>${e.erfolg.name}</b></span>`;
+  if (e.regel) n.innerHTML = `<span class="buch-neu-pic">📜</span><span><small>Neue Regelkarte im Buch!</small><b>${e.regel.thema.emoji} ${e.regel.thema.name}</b></span>`;
+  else if (e.erfolg) n.innerHTML = `<span class="buch-neu-pic">${e.erfolg.emoji}</span><span><small>🏆 Neuer Erfolg!</small><b>${e.erfolg.name}</b></span>`;
   else n.innerHTML = `<span class="buch-neu-pic">${iconHtml(e.def, 'buch-img')}</span>
     <span><small>📚 Neu im Buch der Wörter!</small><b>${e.seite === 'stufen' ? '★'.repeat(e.stern) + ' ' : ''}${e.artikel ? e.artikel + ' ' : ''}${e.name}</b></span>`;
   document.body.append(n);

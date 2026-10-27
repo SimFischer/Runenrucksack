@@ -44,6 +44,21 @@ test('Ein Lauf endet nach Tag 10 oder ohne Herzen; Übergang an Tag 6', () => {
   assert.equal(lost.over, 'lost');
 });
 
+test('Glanz: +10 % im nächsten Kampf, danach erlischt er', async () => {
+  const { evaluateBag, GLANZ_BONUS } = await import('../js/mods.js');
+  const DEFS = Object.fromEntries(ITEMS.map((d) => [d.id, d]));
+  const axt = { uid: 1, id: 'axt', area: 'bag', x: 0, y: 0, rot: 0 };
+  const ohne = evaluateBag([axt], DEFS).get(1).def.schaden;
+  const mit = evaluateBag([{ ...axt, glanz: 1 }], DEFS).get(1);
+  assert.equal(GLANZ_BONUS, 10);
+  assert.ok(mit.def.schaden > ohne, `${mit.def.schaden} > ${ohne}`);
+  assert.ok(mit.boni.some((b) => b.includes('Glanz')));
+  const run = newRun(ITEMS, REGIONS);
+  run.items.push({ ...axt, uid: 99, glanz: 1 });
+  finishBattle(run, ITEMS, REGIONS, true, 'Ork');
+  assert.ok(run.items.every((p) => !p.glanz));
+});
+
 test('Startfiguren: Start-Items und Boni', async () => {
   const { playerContext, evaluateBag } = await import('../js/mods.js');
   const { buildCompounds } = await import('../js/grammar.js');

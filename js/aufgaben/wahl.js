@@ -17,6 +17,9 @@ export const ITEM_THEMEN = {
 // Stufen-Bereich für die Ziel-Stufe eines Items (★★ … ★★★★); Komposita entstehen mit Bereich 1–2.
 export const stufenBereich = (stern) => ({ 2: [1, 2], 3: [2, 3], 4: [3, 3] }[stern] || [1, 2]);
 
+// Belohnung für „gleich beim ersten Versuch richtig“: Stufe 2 → 1 Gold, Stufe 3 → 2 Gold (und Glanz beim Verbinden).
+export const GOLD_FUER_STUFE = { 2: 1, 3: 2 };
+
 // Standard ohne Klassen-Code: alle Themen der Stufe 1–2.
 export const STANDARD_MAX = 2;
 

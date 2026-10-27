@@ -2,6 +2,8 @@
 // evaluateBag() liefert für jedes Item die wirksamen Werte (wie grammar.analyze) plus eine Liste der Boni.
 import { analyze, EFFECT_KEYS } from './grammar.js';
 
+export const GLANZ_BONUS = 10; // Prozent
+
 // Ein Modifikator: { filter, prozent, abklingzeit, text }.
 // filter: { art, id, kraft, traeger, wortfeld } – alle angegebenen Bedingungen müssen passen.
 export function matches(filter = {}, def) {
@@ -83,6 +85,11 @@ export function evaluateBag(placed, defs, ctx = {}) {
       if (!matches(mod.filter, i.base)) continue;
       i.def = applyMod(i.def, mod);
       if (mod.text) i.boni.push(mod.text);
+    }
+    // Glanz (Aufgabe der Stufe 3 gleich richtig): +10 % im nächsten Kampf.
+    if (p.glanz) {
+      i.def = applyMod(i.def, { prozent: GLANZ_BONUS });
+      i.boni.push(`✨ Glanz: +${GLANZ_BONUS} % im nächsten Kampf`);
     }
     // Wortfeld-Tasche: passende Items darin werden stärker.
     const t = tascheOf(p, defs, ctx.taschenFelder);

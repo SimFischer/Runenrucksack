@@ -1419,3 +1419,9 @@ body[data-design="silberbanner"] #grid-bag { border-color: #c9d4ea; }
 .lk-themen { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
 .lk-themen span { background: #fff8e8; border: 1px solid var(--line); border-radius: 8px; padding: 2px 8px; }
 .lk-themen b { color: #e0a526; }
+.regel-karte { justify-content: flex-start; text-align: center; gap: 4px; padding: 10px 8px; }
+.regel-karte .regel-emoji { font-family: var(--emoji); font-size: 30px; }
+.regel-karte small { font-size: 13px; line-height: 1.3; color: var(--ink); }
+.regel-karte.dunkel small { color: var(--ink-soft); }
+.item.glanz { box-shadow: 0 0 0 3px #fff6b0, 0 0 16px 4px #ffd23f; }
+.item.glanz::after { content: '✨'; position: absolute; top: -8px; left: -6px; font-size: 18px; font-family: var(--emoji); pointer-events: none; }

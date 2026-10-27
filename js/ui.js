@@ -301,6 +301,7 @@ export function drawItems(gridEl, grid, placed, size, info, area) {
     const def = G.DEFS[p.id];
     const it = itemEl(def, p.rot, size, sternVon(p));
     it.dataset.tut = 'item-' + p.id;
+    if (p.glanz) it.classList.add('glanz');
     it.style.left = p.x * size + 'px';
     it.style.top = p.y * size + 'px';
     const i = info?.get(p.uid);

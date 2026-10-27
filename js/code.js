@@ -236,7 +236,7 @@ function schreibeLauf(w, run, reg, data) {
     const s = p.satz;
     w.uint(reg.nr(`item:${p.id}`));
     w.uint(p.x | (p.y << 3) | ((p.rot || 0) << 6) | (((p.stern || 1) - 1) << 8) | (((p.kraftStern || 1) - 1) << 10)
-      | ((p.area === 'store' ? 1 : 0) << 12) | ((p.fluch ? 1 : 0) << 13) | ((s ? 1 : 0) << 14) | ((s?.ok ? 1 : 0) << 15));
+      | ((p.area === 'store' ? 1 : 0) << 12) | ((p.fluch ? 1 : 0) << 13) | ((s ? 1 : 0) << 14) | ((s?.ok ? 1 : 0) << 15) | ((p.glanz ? 1 : 0) << 16));
     if (s) {
       w.uint(items.findIndex((q) => q.uid === s.uid) + 1);
       w.uint(reg.nr(`item:${s.id}`));
@@ -294,6 +294,7 @@ function leseLauf(r, reg, data) {
     if (stern > 1) p.stern = stern;
     if (ks > 1) p.kraftStern = ks;
     if ((v >> 13) & 1) p.fluch = fluchName(itemId, data);
+    if ((v >> 16) & 1) p.glanz = 1;
     if ((v >> 14) & 1) {
       const subj = r.uint(), sid = id(r.uint(), 'item:'), sst = r.uint();
       saetze.push([p, { uid: subj || -1, id: sid, stern: sst, ok: ((v >> 15) & 1) === 1 }]);

@@ -6,7 +6,7 @@ import { readFileSync } from 'node:fs';
 import { seededRng } from '../js/logic.js';
 import { mitRegeln } from '../js/aufgaben/themen.js';
 import {
-  ITEM_THEMEN, stufenBereich, waehleAufgabe, verbucheAufgabe, stufeFuer, maxStufe, STANDARD_MAX, themenBericht,
+  ITEM_THEMEN, stufenBereich, waehleAufgabe, verbucheAufgabe, stufeFuer, maxStufe, STANDARD_MAX, themenBericht, GOLD_FUER_STUFE,
 } from '../js/aufgaben/wahl.js';
 
 const json = (f) => JSON.parse(readFileSync(new URL('../' + f, import.meta.url)));
@@ -102,4 +102,8 @@ test('Lernbericht: Sterne je geübtem Thema, keine Prozente, Themen mit Fehlern 
   assert.deepEqual(b.map((t) => [t.id, t.stufe, t.fehler]), [['ie', 1, 1], ['artikel', 2, 0]]);
   assert.ok(b[0].tipp.length > 10);
   assert.ok(!JSON.stringify(b).includes('%'));
+});
+
+test('Belohnung: Stufe 1 nichts, Stufe 2 ein Gold, Stufe 3 zwei Gold', () => {
+  assert.deepEqual([1, 2, 3].map((s) => GOLD_FUER_STUFE[s] || 0), [0, 1, 2]);
 });
