@@ -11,7 +11,7 @@ const H = json('heroes.json');
 const data = prepareData({
   items: json('items.json').items, recipes: json('recipes.json'), regions: json('regions.json').gebiete,
   enemies: json('enemies.json').gegner, heroes: H.helden, fates: H.schicksalsrunen,
-  encounters: json('encounters.json'), exercises: json('exercises.json'), begleiter: json('begleiter.json').begleiter,
+  encounters: json('encounters.json'), exercises: json('exercises.json'), begleiter: json('begleiter.json').begleiter, botschaften: json('botschaften.json').briefe,
 });
 
 test('200 Zufallsläufe: Siegquote pro Tag, Siege und Spielzeit', (t) => {

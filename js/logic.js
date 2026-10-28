@@ -10,6 +10,11 @@ export const CFG = {
 };
 
 export const income = (day) => 8 + day;
+// Botschaften lesen: An manchen Morgen kommt statt der Begegnung ein Brief – frühestens ab abTag, nie an zwei Tagen
+// hintereinander. Mit chance 0,5 und dieser Sperre kommt im Schnitt etwa jeden dritten Tag ein Brief.
+export const BRIEF = { abTag: 2, chance: 0.5 };
+export const briefAmMorgen = (run, rng = Math.random) => run.day >= BRIEF.abTag && run.briefTag !== run.day - 1 && rng() < BRIEF.chance;
+
 // Neu würfeln: die ersten Würfe pro Tag sind billig, jeder weitere teurer. Der Zähler beginnt jeden Tag neu.
 export const WUERFEL = { billig: 3, preis: 1, teuer: 2 };
 // Kostenlose Würfe (Begleiter Fuchs) kommen zuerst und zählen nicht zu den billigen.
@@ -320,7 +325,7 @@ export function finishBattle(run, items, regions, won, enemyName, rng = Math.ran
   if (isRegionStart(run.day, regions)) run.queue.push('gebiet');
   // Ankunft im zweiten Gebiet: Unterklasse wählen
   if (regions[1] && run.day === regions[1].tage[0]) run.queue.push('unterklasse');
-  run.queue.push('begegnung');
+  if (briefAmMorgen(run, rng)) { run.queue.push('brief'); run.briefTag = run.day; } else run.queue.push('begegnung');
 }
 
 // ---------- Gegner ----------

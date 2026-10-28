@@ -568,3 +568,23 @@ h2 .amboss { width: 40px; height: 26px; margin-right: 6px; }
 .af-rabe img, .af-eule img, [data-eule] img { height: 34px; width: auto; }
 .af-eule { background: rgba(232, 178, 58, .18); border: 2px solid var(--gold); border-radius: 12px; padding: 6px 10px; margin: 6px 0; text-align: left; }
 .sam-bild img { object-fit: contain; }
+
+/* ---------- Botschaften lesen ---------- */
+#brief-layer { position: fixed; inset: 0; z-index: 210; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(10, 6, 3, .6); }
+.brief-zu { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; padding: 6px 28px; }
+.brief-zu h2 { font-size: 30px; margin: 0; color: var(--tinte); }
+.brief-umschlag { background: none; border: none; padding: 0; cursor: pointer; animation: brief-wackeln 2.4s ease-in-out infinite; }
+.brief-umschlag img { width: min(320px, 34vw); filter: drop-shadow(0 10px 20px rgba(0, 0, 0, .6)); }
+@keyframes brief-wackeln { 0%, 100% { transform: rotate(-2deg); } 50% { transform: rotate(2deg) translateY(-4px); } }
+.brief-von { font-weight: 700; margin: 0; }
+.brief-offen { display: flex; gap: 16px; align-items: stretch; width: min(1180px, 100%); max-height: calc(var(--hoehe) - 32px); }
+.brief-text { flex: 1.25; padding: 20px 24px; font-size: 19px; line-height: 1.55; overflow-y: auto; }
+.brief-text .brief-von { color: var(--gold-dunkel); margin-bottom: 6px; }
+.brief-text mark { background: #ffe08a; color: inherit; border-radius: 4px; padding: 0 2px; box-shadow: 0 0 0 2px #e0a526; }
+.brief-fragen { flex: 1; display: flex; flex-direction: column; gap: 10px; justify-content: center; text-align: center; }
+.brief-zahl { margin: 0; color: var(--gold-dunkel); font-weight: 700; }
+.brief-frage { font-family: var(--font); font-size: 21px; margin: 0; }
+.brief-antworten { display: flex; flex-direction: column; gap: 8px; }
+.brief-antworten .btn { white-space: normal; text-align: center; }
+@media (max-width: 1100px) { .brief-text { font-size: 17px; padding: 16px 18px; } .brief-frage { font-size: 19px; } }
+.brief-antworten .opt-btn.right:disabled { filter: none; opacity: 1; background: linear-gradient(180deg, #6fa84a, #3f7a2a); color: #fff; }

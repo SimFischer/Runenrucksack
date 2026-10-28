@@ -592,6 +592,10 @@
   "regel:satz-umstellen",
   "thema:wortfelder",
   "regel:wortfeld",
-  "regel:wortfamilie"
+  "regel:wortfamilie",
+  "thema:lesen",
+  "regel:lesen-finden",
+  "regel:lesen-wort",
+  "regel:lesen-schliessen"
  ]
 }

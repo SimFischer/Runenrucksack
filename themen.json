@@ -1,5 +1,5 @@
 {
-  "_hinweis": "Themen der Aufgaben mit je drei Stufen (leicht → schwer). stufen: Beschreibung und die Aufgabenformate, die auf dieser Stufe vorkommen. regeln: die Regelkarten (Merkhilfen), die ein Kind nach einer Aufgabe sieht und im Buch der Wörter sammelt – neue nur hinten anhängen. Formate: auswahl, luecke, buchstaben, eintippen, baukasten, sortieren, fehler, ordnen, passtnicht, regel, paare.",
+  "_hinweis": "Themen der Aufgaben mit je drei Stufen (leicht → schwer). stufen: Beschreibung und die Aufgabenformate, die auf dieser Stufe vorkommen. regeln: die Regelkarten (Merkhilfen), die ein Kind nach einer Aufgabe sieht und im Buch der Wörter sammelt – neue nur hinten anhängen. Formate: auswahl, luecke, buchstaben, eintippen, baukasten, sortieren, fehler, ordnen, passtnicht, regel, paare. spiel: Thema mit eigenem Spiel statt Aufgaben (botschaften: Briefe lesen) – ohne Formate, aber mit Lernstand und Klassen-Einstellung.",
   "themen": [
     { "id": "artikel", "name": "Artikel und Genus", "emoji": "🟢", "stufen": [
         { "text": "häufige Alltagsnomen", "formate": ["auswahl", "luecke", "sortieren"] },
@@ -117,6 +117,14 @@
         { "text": "Wortfamilie mit ähnlichen Wörtern", "formate": ["passtnicht"] } ],
       "regeln": [
         { "id": "wortfeld", "text": "Ein Wortfeld sind Wörter zu einem Thema: Stall, Sattel, Huf und Zügel gehören zum Wortfeld Pferd." },
-        { "id": "wortfamilie", "text": "Eine Wortfamilie hat denselben Wortstamm: fahr- in fahren, Fahrer, Fahrt und Fahrrad." } ] }
+        { "id": "wortfamilie", "text": "Eine Wortfamilie hat denselben Wortstamm: fahr- in fahren, Fahrer, Fahrt und Fahrrad." } ] },
+    { "id": "lesen", "name": "Leseverständnis", "emoji": "📜", "spiel": "botschaften", "stufen": [
+        { "text": "Briefe mit Informationen zum Finden", "formate": [] },
+        { "text": "Briefe mit Wortbedeutungen aus dem Zusammenhang", "formate": [] },
+        { "text": "Briefe mit Schlussfolgerungen", "formate": [] } ],
+      "regeln": [
+        { "id": "lesen-finden", "text": "Die Antwort steht im Text: Such die Stelle, an der die Wörter aus der Frage vorkommen." },
+        { "id": "lesen-wort", "text": "Ein unbekanntes Wort verstehst du oft aus den Sätzen davor und danach." },
+        { "id": "lesen-schliessen", "text": "Manchmal steht die Antwort nicht wörtlich da. Dann verbindest du zwei Hinweise aus dem Text." } ] }
   ]
 }

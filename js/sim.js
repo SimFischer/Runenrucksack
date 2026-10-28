@@ -15,6 +15,7 @@ import { baueBuch, entdeckungenIn } from './buch.js';
 import { neuesProfil, entdecke, merkeAntwort, laufStand, laufAbschluss, rangVon } from './fortschritt.js';
 import { Battle, makeFighter, runToEnd } from './battle.js';
 import { begleiterDefs } from './begleiter.js';
+import { waehleBrief, werteAus } from './botschaften.js';
 
 export function prepareData(raw) {
   const defs = {};
@@ -128,6 +129,19 @@ function morning(run, data, rng, skill) {
     if (step === 'unterklasse') {
       const h = data.heroes.find((x) => x.id === run.hero);
       run.unterklasse = pickOne(h.unterklassen, rng).id;
+    }
+    // Brief: jede Frage mit der Wahrscheinlichkeit skill richtig; Belohnungen wie im Spiel
+    if (step === 'brief' && data.botschaften?.length) {
+      const brief = waehleBrief(data.botschaften, { gebiet: data.regions.find((g) => run.day >= g.tage[0] && run.day <= g.tage[1]).id, stufe: 1, gelesen: run.gelesen || [], rng });
+      if (brief) {
+        run.gelesen = [...(run.gelesen || []), brief.id];
+        const r = werteAus(brief, brief.fragen.map((q) => (rng() < skill ? q.richtig : null)));
+        for (const b of r.belohnungen) {
+          merkeAntwort(run, 'lesen', r.alleRichtig, true);
+          if (b.typ === 'gold') run.gold += b.menge;
+          else verbinde(run, data, rng, skill, placeNew(run, defs, b.id));
+        }
+      }
     }
     if (step === 'begegnung') {
       const id = pickOne(pickEncounters(run, data.encounters, data.regions, rng), rng);

@@ -58,6 +58,7 @@ test('Jedes Thema hat drei Stufen und einen Erzeuger', () => {
   assert.ok(THEMEN.themen.length >= 14);
   for (const t of THEMEN.themen) {
     assert.equal(t.stufen.length, 3, t.id);
+    if (t.spiel) continue; // eigenes Spiel (z. B. Briefe), keine Aufgaben-Erzeuger
     assert.ok(THEMA_IDS.includes(t.id), `Erzeuger für ${t.id}`);
     assert.ok(t.regeln.length >= 1, t.id);
   }

@@ -67,7 +67,8 @@ export function aufgabenStand(run) {
 export function waehleAufgabe(opts) {
   const { themen, ws, profil, einst, run, rng } = opts;
   const stand = aufgabenStand(run);
-  const alle = themen.themen.map((t) => t.id);
+  // Themen mit eigenem Spiel (Briefe, Satzschmiede) haben keine Aufgaben-Erzeuger
+  const alle = themen.themen.filter((t) => !t.spiel).map((t) => t.id);
   let kandidaten = opts.kandidaten || themenFuer(opts.art, einst, alle);
   kandidaten = kandidaten.filter((t) => themaAn(einst, t));
   if (!kandidaten.length) kandidaten = alle.filter((t) => themaAn(einst, t));

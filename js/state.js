@@ -36,10 +36,10 @@ const SAVE_KEY = 'runenrucksack.lauf.v2';
 
 export async function loadData() {
   const get = (f) => fetch(f).then((r) => r.json());
-  const [itemData, enemyData, recipes, regions, heroes, encounters, exercises, tutorial, ach, registry, wortschatz, themen, lehrkraft, bilder, begleiterJson] = await Promise.all([
+  const [itemData, enemyData, recipes, regions, heroes, encounters, exercises, tutorial, ach, registry, wortschatz, themen, lehrkraft, bilder, begleiterJson, botschaften] = await Promise.all([
     get('items.json'), get('enemies.json'), get('recipes.json'), get('regions.json'), get('heroes.json'),
     get('encounters.json'), get('exercises.json'), get('tutorial.json'), get('achievements.json'), get('registry.json'), get('wortschatz.json'), get('themen.json'), get('lehrkraft.json').catch(() => ({})),
-    get('assets/zuordnung.json').catch(() => null), get('begleiter.json').catch(() => ({ begleiter: [] })),
+    get('assets/zuordnung.json').catch(() => null), get('begleiter.json').catch(() => ({ begleiter: [] })), get('botschaften.json').catch(() => ({ briefe: [] })),
   ]);
   G.ITEMS = itemData.items;
   G.RAR = itemData.seltenheiten;
@@ -50,6 +50,7 @@ export async function loadData() {
   for (const d of G.COMPOUNDS) G.DEFS[d.id] = d;
   for (const d of buildRuneLevels(G.DEFS)) G.DEFS[d.id] = d;
   G.BEGLEITER = begleiterJson.begleiter;
+  G.BOTSCHAFTEN = botschaften.briefe;
   for (const d of begleiterDefs(G.BEGLEITER)) G.DEFS[d.id] = d;
   G.ENEMIES = enemyData.gegner;
   G.REGIONS = regions.gebiete;

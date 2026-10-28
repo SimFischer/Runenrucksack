@@ -38,6 +38,7 @@ export const REGELN = {
   praeteritum: 'Präteritum (gestern schlug er)',
   steigerung: 'Steigerung (schärfer, am schärfsten)',
   rechtschreibung: 'Rechtschreibung',
+  lesen: 'Leseverständnis (Briefe)',
 };
 
 export function laufStand(run) {
@@ -190,6 +191,7 @@ export const TIPPS = {
   praeteritum: 'Viele Verben ändern im Präteritum ihren Vokal: schlagen → schlug, stechen → stach.',
   steigerung: 'Steigern geht so: scharf → schärfer → am schärfsten. Oft kommt ein Umlaut dazu.',
   rechtschreibung: 'Sprich das Wort langsam in Silben und achte auf doppelte Buchstaben: Ham-mer, Schup-pe.',
+  lesen: 'Lies die Frage genau und such die Stelle im Brief, an der die Antwort steht. Unbekannte Wörter verstehst du oft aus den Sätzen drumherum.',
 };
 
 // Welche Regeln saßen, welche üben wir noch? (aus den Antworten des Laufs)

@@ -157,6 +157,20 @@ const BILDSCHIRME = [
       const it = document.querySelector('#grid-bag .item[data-uid="990"]'), rr = it.getBoundingClientRect();
       for (const t of ['pointerdown', 'pointerup']) it.dispatchEvent(new PointerEvent(t, { bubbles: true, clientX: rr.x + 12, clientY: rr.y + 12, pointerId: 1, isPrimary: true, pointerType: 'touch' }));
       await __s(400);` },
+  { name: 'brief-zu', profil: PROFIL, ohneScroll: true, schritte: `${LAUF}
+      const { zeigeBrief } = await import(new URL('js/brief-ui.js', location.href).href);
+      __G.run.day = 3; zeigeBrief(() => {}, () => 0.05); await __s(500);` },
+  { name: 'brief-frage', profil: PROFIL, ohneScroll: true, frei: ['.brief-text', '.brief-fragen'], schritte: `${LAUF}
+      const { zeigeBrief } = await import(new URL('js/brief-ui.js', location.href).href);
+      __G.run.day = 3; zeigeBrief(() => {}, () => 0.05); await __s(500);
+      await __klick('#brief-layer .btn[data-oeffnen]', 500);` },
+  { name: 'brief-falsch', profil: PROFIL, ohneScroll: true, frei: ['.brief-text', '.brief-fragen'], schritte: `${LAUF}
+      const { zeigeBrief } = await import(new URL('js/brief-ui.js', location.href).href);
+      __G.run.day = 3; zeigeBrief(() => {}, () => 0.05); await __s(500);
+      await __klick('#brief-layer .btn[data-oeffnen]', 500);
+      const brief = __G.BOTSCHAFTEN.find((b) => b.id === __G.run.brief.id);
+      const falsch = [...document.querySelectorAll('#brief-layer [data-a]')].find((b) => b.textContent !== brief.fragen[0].richtig);
+      falsch.click(); await __s(500);` },
   { name: 'kampf', profil: PROFIL, ohneScroll: true, frei: ['#btn-start-battle', '#armor-word', '#fighter-player .f-figur', '#fighter-enemy .f-figur', '#fighter-player .f-rucksack', '#fighter-enemy .f-rucksack', '#fighter-player .f-band', '#fighter-enemy .f-band', '#battle .vs'], schritte: `${KAMPF(true)} await __s(300);` },
   { name: 'kampf-gross', profil: PROFIL, ohneScroll: true, frei: ['#btn-start-battle', '#armor-word', '#fighter-player .f-figur', '#fighter-enemy .f-figur', '#fighter-player .f-rucksack', '#fighter-enemy .f-rucksack', '#fighter-player .f-band', '#fighter-enemy .f-band', '#battle .vs'], schritte: `${LAUF}
       // größter Rucksack: 5×4 und beide Taschen

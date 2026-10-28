@@ -23,7 +23,8 @@ import {
 import { startNight, zeigeKampfErgebnis } from './battle-ui.js';
 import { frageImSpiel, wortschatz, einstellungen } from './aufgaben/spiel.js';
 import { BEGLEITER_PREFIX, begleiterFrei, istBegleiter } from './begleiter.js';
-import { stufenBereich, stufeFuer, aufgabenStand, schaetzeLernstand } from './aufgaben/wahl.js';
+import { stufenBereich, stufeFuer, aufgabenStand, schaetzeLernstand, themaAn } from './aufgaben/wahl.js';
+import { zeigeBrief } from './brief-ui.js';
 import { verbSatz, verbSatzInhalt, PERSONEN_FOLGE, kurzName } from './aufgaben/verbsatz.js';
 import { runEncounter } from './encounters.js';
 import { initTutorial, startTutorial, tutorialDone, showHelp, tipsOn, setTips, tutorialDarf, tutorialAbgebrochen } from './tutorial.js';
@@ -289,6 +290,8 @@ function continueFlow() {
   else if (step === 'schicksal') showFate(next);
   else if (step === 'unterklasse') chooseSubclass(next);
   else if (step === 'begegnung') runEncounter(next, render);
+  // Brief statt Begegnung – hat die Lehrkraft das Leseverständnis ausgeschaltet, kommt doch eine Begegnung
+  else if (step === 'brief') (themaAn(einstellungen(), 'lesen') && G.BOTSCHAFTEN?.length ? zeigeBrief(next) : runEncounter(next, render));
   else next(); // z. B. „verschmelzen“ aus älteren Spielständen – Komposita entstehen jetzt sofort
 }
 

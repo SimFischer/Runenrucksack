@@ -1,0 +1,767 @@
+{
+  "_hinweis": "Briefe für „Botschaften lesen“ (Thema Leseverständnis). Ein Brief kommt an manchen Morgen statt der Begegnung (etwa jeder dritte Tag, nie zwei Tage hintereinander). gebiet: in welchem Gebiet er kommt. schwierigkeit 1–3 (passend zum Lernstand im Thema lesen). text: 60–120 Wörter, kurze Sätze, Klasse 5. fragen: 1–2 Fragen, art finden (Information im Text), schliessen (Schlussfolgerung), wort (Wortbedeutung aus dem Zusammenhang); antworten 3–4, richtig = genau eine davon, textstelle = wörtliche Stelle im Text, die die Antwort belegt (wird bei einer falschen Antwort markiert); belohnung bei richtiger Antwort: { typ: item, id } oder { typ: gold, menge }. trost: kleine Belohnung, wenn eine Antwort falsch war.",
+  "briefe": [
+    {
+      "id": "kw-mila-garten",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 1,
+      "absender": "Mila aus Kleinwurzel",
+      "text": "Liebe Heldin, lieber Held! Ich heiße Mila und wohne in Kleinwurzel. Heute Nacht war ein Ork in unserem Garten. Er hat alle Kürbisse zertreten. Nur ein Kürbis ist heil geblieben. Er lag gut versteckt unter den großen Blättern. Mama sagt, ich soll ihn dir schenken. Du brauchst Kraft für deine Reise. Bitte pass auf dich auf! Die Orks kommen immer dann, wenn der Mond hinter den Wolken verschwindet. Viele Grüße, deine Mila",
+      "fragen": [
+        {
+          "art": "finden",
+          "frage": "Wo lag der Kürbis, der heil geblieben ist?",
+          "antworten": ["unter den großen Blättern", "im Keller", "auf dem Dach", "neben dem Brunnen"],
+          "richtig": "unter den großen Blättern",
+          "textstelle": "Er lag gut versteckt unter den großen Blättern.",
+          "belohnung": { "typ": "item", "id": "kuerbis" }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "kw-wirtin-honig",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 1,
+      "absender": "die Wirtin vom „Krummen Kessel“",
+      "text": "Hallo, du tapferes Kind! Hier schreibt die Wirtin vom „Krummen Kessel“. Gestern kam ein müder Bote in mein Gasthaus. Er erzählte von Orks auf der alten Mühlenstraße. Darum nimm bitte den Weg am Bach entlang. Der ist zwar länger, aber sicherer. Ich habe dir ein Glas Honig eingepackt. Honig gibt neue Kraft, wenn man erschöpft ist. Komm danach auf eine warme Suppe vorbei. Ich halte dir einen Platz am Kamin frei. Deine Wirtin",
+      "fragen": [
+        {
+          "art": "finden",
+          "frage": "Welchen Weg soll das Kind nehmen?",
+          "antworten": ["den Weg am Bach entlang", "die alte Mühlenstraße", "den Weg durch den Wald", "den Pfad über den Berg"],
+          "richtig": "den Weg am Bach entlang",
+          "textstelle": "Darum nimm bitte den Weg am Bach entlang.",
+          "belohnung": { "typ": "item", "id": "honig" }
+        },
+        {
+          "art": "wort",
+          "frage": "Was bedeutet „erschöpft“ in diesem Brief?",
+          "antworten": ["sehr müde", "sehr hungrig", "sehr fröhlich"],
+          "richtig": "sehr müde",
+          "textstelle": "Honig gibt neue Kraft, wenn man erschöpft ist.",
+          "belohnung": { "typ": "gold", "menge": 2 }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "kw-eule-buch",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 1,
+      "absender": "die Eulenbibliothekarin",
+      "text": "Uhu, junge Heldin, junger Held! In meiner Bibliothek fehlt ein Buch. Es ist dick und hat einen roten Einband. Darin stehen alte Runen. Ein frecher Kobold hat es gestern geholt. Ich habe ihn am Fenster gesehen. Er ist zum Brunnen gelaufen. Dort versteckt er gern seine Schätze. Kannst du nachsehen, wenn du vorbeikommst? Als Dank bekommst du eine Rune aus meiner Sammlung. Sie macht Waffen schärfer. Mit leisen Flügelschlägen, deine Eule",
+      "fragen": [
+        {
+          "art": "finden",
+          "frage": "Wohin ist der Kobold mit dem Buch gelaufen?",
+          "antworten": ["zum Brunnen", "zur Mühle", "in den Wald", "zum Gasthaus"],
+          "richtig": "zum Brunnen",
+          "textstelle": "Er ist zum Brunnen gelaufen.",
+          "belohnung": { "typ": "item", "id": "rune-scharf" }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "kw-baecker-brot",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 1,
+      "absender": "Bäcker Anton",
+      "text": "Guten Morgen! Ich bin Anton, der Bäcker von Kleinwurzel. Jeden Morgen stehe ich um vier Uhr auf. Dann knete ich den Teig und heize den Ofen. Heute habe ich ein besonders großes Brot gebacken. Es ist für dich, denn du beschützt unser Dorf. Ein Brot hält lange satt. So hast du auf der Reise immer etwas zu essen. Pass auf, dass die Raben es nicht stibitzen! Die mögen frisches Brot fast so gern wie ich. Dein Bäcker Anton",
+      "fragen": [
+        {
+          "art": "finden",
+          "frage": "Um wie viel Uhr steht Anton jeden Morgen auf?",
+          "antworten": ["um vier Uhr", "um sechs Uhr", "um acht Uhr", "um zehn Uhr"],
+          "richtig": "um vier Uhr",
+          "textstelle": "Jeden Morgen stehe ich um vier Uhr auf.",
+          "belohnung": { "typ": "item", "id": "brot" }
+        },
+        {
+          "art": "wort",
+          "frage": "Was bedeutet „stibitzen“?",
+          "antworten": ["heimlich wegnehmen", "laut rufen", "schnell backen"],
+          "richtig": "heimlich wegnehmen",
+          "textstelle": "Pass auf, dass die Raben es nicht stibitzen!",
+          "belohnung": { "typ": "gold", "menge": 2 }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "kw-gaertner-apfel",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 1,
+      "absender": "Gärtner Bodo",
+      "text": "Hallo! Hier schreibt Bodo, der Gärtner. Mein Apfelbaum trägt in diesem Jahr so viele Äpfel wie noch nie. Die Äste biegen sich schon. Leider kommen in der Nacht oft Wildschweine. Sie fressen die Äpfel, die ins Gras fallen. Darum pflücke ich jeden Abend alle reifen Äpfel. Den schönsten Apfel lege ich dir vor die Tür. Ein Apfel am Tag hält gesund, sagt meine Großmutter. Ich hoffe, er schmeckt dir. Herzliche Grüße, Bodo",
+      "fragen": [
+        {
+          "art": "finden",
+          "frage": "Wer frisst in der Nacht die Äpfel im Gras?",
+          "antworten": ["Wildschweine", "Orks", "Raben", "Hasen"],
+          "richtig": "Wildschweine",
+          "textstelle": "Leider kommen in der Nacht oft Wildschweine.",
+          "belohnung": { "typ": "item", "id": "apfel" }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "kw-schmiedin-helm",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 2,
+      "absender": "Grete, die Schmiedin",
+      "text": "Sei gegrüßt! Ich bin Grete, die Schmiedin am Dorfrand. Seit drei Tagen höre ich nachts ein Klopfen im Wald. Zuerst dachte ich an einen Specht. Aber Spechte klopfen nicht im Dunkeln. Gestern habe ich nachgesehen. Die Orks bauen dort eine Brücke über den Bach! Bald können sie leicht ins Dorf kommen. Ich habe dir einen Helm geschmiedet, damit dein Kopf geschützt ist. Bitte sag den Wachen Bescheid, bevor die Brücke fertig ist. Mit festem Hammerschlag, Grete",
+      "fragen": [
+        {
+          "art": "schliessen",
+          "frage": "Warum ist Grete sicher, dass kein Specht klopft?",
+          "antworten": ["Spechte klopfen nicht im Dunkeln.", "Im Wald gibt es keine Bäume.", "Grete mag keine Vögel.", "Der Specht ist krank."],
+          "richtig": "Spechte klopfen nicht im Dunkeln.",
+          "textstelle": "Aber Spechte klopfen nicht im Dunkeln.",
+          "belohnung": { "typ": "item", "id": "helm" }
+        },
+        {
+          "art": "finden",
+          "frage": "Was bauen die Orks im Wald?",
+          "antworten": ["eine Brücke über den Bach", "einen Turm", "eine Mauer", "ein Boot"],
+          "richtig": "eine Brücke über den Bach",
+          "textstelle": "Die Orks bauen dort eine Brücke über den Bach!",
+          "belohnung": { "typ": "gold", "menge": 3 }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "kw-mila-eis",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 2,
+      "absender": "Mila aus Kleinwurzel",
+      "text": "Hallo, ich bin es wieder, Mila! Ich habe heute etwas Wichtiges beobachtet. Ein Ork wollte über den zugefrorenen Teich laufen. Als das Eis knackte, ist er schreiend weggerannt. Mein Opa sagt, alle Orks fürchten Eis und Kälte. In ihren Höhlen ist es nämlich immer warm. Ich habe am Teich einen Eis-Kristall gefunden. Er glitzert blau und ist ganz kalt. Vielleicht hilft er dir im Kampf. Ich drücke dir beide Daumen! Deine Mila",
+      "fragen": [
+        {
+          "art": "finden",
+          "frage": "Was fürchten alle Orks laut Milas Opa?",
+          "antworten": ["Eis und Kälte", "Feuer und Rauch", "Wasser und Regen", "Licht und Sonne"],
+          "richtig": "Eis und Kälte",
+          "textstelle": "Mein Opa sagt, alle Orks fürchten Eis und Kälte.",
+          "belohnung": { "typ": "item", "id": "eis" }
+        },
+        {
+          "art": "schliessen",
+          "frage": "Warum ist der Ork weggerannt?",
+          "antworten": ["Das Eis hat geknackt.", "Mila hat ihn gerufen.", "Er war müde.", "Es hat geregnet."],
+          "richtig": "Das Eis hat geknackt.",
+          "textstelle": "Als das Eis knackte, ist er schreiend weggerannt.",
+          "belohnung": { "typ": "gold", "menge": 2 }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "kw-wache-laterne",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 2,
+      "absender": "Ida, die Dorfwache",
+      "text": "An die Heldin oder den Helden im Gasthaus! Ich bin Ida und halte nachts Wache am Dorftor. Die Orks schleichen meistens kurz nach Mitternacht heran. Dann ist es stockfinster, und man sieht kaum die eigene Hand. Deshalb trage ich immer eine Laterne. Ihr Licht blendet die Orks, denn ihre Augen sind an die Dunkelheit gewöhnt. Ich habe noch eine zweite Laterne. Die gebe ich dir gern. Sie kann dir den Weg zeigen und die Feinde verwirren. Gute Wacht, Ida",
+      "fragen": [
+        {
+          "art": "wort",
+          "frage": "Was bedeutet „stockfinster“?",
+          "antworten": ["ganz dunkel", "sehr kalt", "sehr laut", "ganz still"],
+          "richtig": "ganz dunkel",
+          "textstelle": "Dann ist es stockfinster, und man sieht kaum die eigene Hand.",
+          "belohnung": { "typ": "item", "id": "laterne" }
+        },
+        {
+          "art": "schliessen",
+          "frage": "Warum blendet das Licht die Orks?",
+          "antworten": ["Ihre Augen sind an die Dunkelheit gewöhnt.", "Die Laterne ist aus Gold.", "Die Orks schlafen gerade.", "Ida ruft dabei laut."],
+          "richtig": "Ihre Augen sind an die Dunkelheit gewöhnt.",
+          "textstelle": "Ihr Licht blendet die Orks, denn ihre Augen sind an die Dunkelheit gewöhnt.",
+          "belohnung": { "typ": "gold", "menge": 2 }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "kw-eule-gift",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 2,
+      "absender": "die Eulenbibliothekarin",
+      "text": "Uhu, hier schreibt wieder die Eule! Ich habe in einem alten Buch über Orks gelesen. Dort steht: Der Schamane der Orks braut Tränke aus Pilzen. Wer davon trinkt, wird stark, aber auch langsam. Gegen Gift sind die Schamanen aber empfindlich. Schon ein kleiner Tropfen macht sie schwach. Darum schicke ich dir einen Gift-Kristall. Leg ihn neben eine Waffe, dann wird sie giftig. Vorsicht: Fass den Kristall nie mit der Zunge an! Weise Grüße, deine Eule",
+      "fragen": [
+        {
+          "art": "wort",
+          "frage": "Was bedeutet „empfindlich“ hier?",
+          "antworten": ["leicht zu verletzen", "sehr mutig", "schnell beleidigt"],
+          "richtig": "leicht zu verletzen",
+          "textstelle": "Gegen Gift sind die Schamanen aber empfindlich. Schon ein kleiner Tropfen macht sie schwach.",
+          "belohnung": { "typ": "item", "id": "gift" }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "kw-kind-schild",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 2,
+      "absender": "Paul aus Kleinwurzel",
+      "text": "Hallo! Ich heiße Paul und bin zehn Jahre alt. Mein großer Bruder war früher Wächter. Sein alter Schild hängt bei uns über dem Kamin. Er hat eine tiefe Delle, weil ein Ork mit der Keule zugeschlagen hat. Trotzdem ist er noch stabil. Mein Bruder sagt, ein guter Schild ist wichtiger als ein scharfes Schwert. Wer sich schützt, bleibt länger im Kampf. Er braucht den Schild nicht mehr. Deshalb darfst du ihn haben! Dein Paul",
+      "fragen": [
+        {
+          "art": "finden",
+          "frage": "Warum hat der Schild eine Delle?",
+          "antworten": ["Ein Ork hat mit der Keule zugeschlagen.", "Er ist vom Kamin gefallen.", "Paul hat damit gespielt.", "Ein Pferd ist darauf getreten."],
+          "richtig": "Ein Ork hat mit der Keule zugeschlagen.",
+          "textstelle": "Er hat eine tiefe Delle, weil ein Ork mit der Keule zugeschlagen hat.",
+          "belohnung": { "typ": "item", "id": "schild" }
+        },
+        {
+          "art": "wort",
+          "frage": "Was bedeutet „stabil“?",
+          "antworten": ["fest und haltbar", "leicht und dünn", "neu und glänzend"],
+          "richtig": "fest und haltbar",
+          "textstelle": "Trotzdem ist er noch stabil.",
+          "belohnung": { "typ": "gold", "menge": 2 }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "kw-fenwick-blitz",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 3,
+      "absender": "Meister Fenwick",
+      "text": "Liebe Schülerin, lieber Schüler! Gestern zog ein Gewitter über Kleinwurzel. Ein Blitz schlug in die alte Eiche am Marktplatz. Seitdem knistert ihre Rinde, sobald man sie berührt. Die Dorfkinder trauen sich nicht mehr in ihre Nähe. Ich dagegen habe einen Splitter der Rinde mitgenommen. Daraus ist ein Blitz-Kristall geworden. Er ist launisch: Manchmal funkelt er hell, manchmal bleibt er stumm. Im Kampf aber trifft er zuverlässig. Bewahre ihn trocken auf! Dein Meister Fenwick",
+      "fragen": [
+        {
+          "art": "schliessen",
+          "frage": "Warum trauen sich die Kinder nicht mehr zur Eiche?",
+          "antworten": ["Die Rinde knistert, wenn man sie berührt.", "Die Eiche ist umgefallen.", "Ein Ork wohnt in der Eiche.", "Fenwick hat es verboten."],
+          "richtig": "Die Rinde knistert, wenn man sie berührt.",
+          "textstelle": "Seitdem knistert ihre Rinde, sobald man sie berührt. Die Dorfkinder trauen sich nicht mehr in ihre Nähe.",
+          "belohnung": { "typ": "item", "id": "blitz" }
+        },
+        {
+          "art": "wort",
+          "frage": "Was bedeutet „launisch“ hier?",
+          "antworten": ["mal so, mal anders", "immer gleich stark", "sehr gefährlich", "ganz leise"],
+          "richtig": "mal so, mal anders",
+          "textstelle": "Er ist launisch: Manchmal funkelt er hell, manchmal bleibt er stumm.",
+          "belohnung": { "typ": "gold", "menge": 3 }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "kw-wirtin-feuer",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 3,
+      "absender": "die Wirtin vom „Krummen Kessel“",
+      "text": "Ach, du liebes Kind! In meiner Küche ist etwas Merkwürdiges passiert. Das Feuer im Herd wollte nicht ausgehen, obwohl ich kein Holz mehr nachgelegt hatte. Es brannte die ganze Nacht weiter. Am Morgen lag in der Asche ein glühender Stein. Fenwick meint, es sei ein Feuer-Kristall. Ich koche lieber mit gewöhnlichem Holz, denn der Kristall hat meinen besten Topf geschmolzen. Nimm ihn also mit. Bei dir bringt er hoffentlich mehr Nutzen als Schaden. Deine Wirtin",
+      "fragen": [
+        {
+          "art": "schliessen",
+          "frage": "Warum gibt die Wirtin den Kristall weg?",
+          "antworten": ["Er hat ihren besten Topf geschmolzen.", "Er ist zu klein.", "Sie hat zu viele Kristalle.", "Fenwick wollte ihn haben."],
+          "richtig": "Er hat ihren besten Topf geschmolzen.",
+          "textstelle": "Ich koche lieber mit gewöhnlichem Holz, denn der Kristall hat meinen besten Topf geschmolzen.",
+          "belohnung": { "typ": "item", "id": "feuer" }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "kw-mueller-sturm",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 3,
+      "absender": "Müller Hannes",
+      "text": "Werte Heldin, werter Held! Meine Mühle steht still. Die Orks haben die Flügel zerbrochen, als sie nachts vorbeizogen. Ohne Wind kann ich kein Korn mahlen, und ohne Mehl gibt es kein Brot. Gestern fegte jedoch ein heftiger Sturm über die Felder. Danach fand ich zwischen den Säcken einen grauen Kristall, in dem es heult und braust. Ich vermute, der Sturm hat ihn zurückgelassen. Vielleicht verleiht er dir im Kampf Schwung. Bis die Mühle repariert ist, bleibt das Dorf leider ohne frisches Brot. Dein Müller Hannes",
+      "fragen": [
+        {
+          "art": "schliessen",
+          "frage": "Warum bleibt das Dorf ohne frisches Brot?",
+          "antworten": ["Die Mühle kann kein Korn mahlen.", "Der Bäcker ist krank.", "Es gibt kein Wasser.", "Die Orks haben alles Brot gegessen."],
+          "richtig": "Die Mühle kann kein Korn mahlen.",
+          "textstelle": "Ohne Wind kann ich kein Korn mahlen, und ohne Mehl gibt es kein Brot.",
+          "belohnung": { "typ": "item", "id": "sturm" }
+        },
+        {
+          "art": "wort",
+          "frage": "Was bedeutet „ich vermute“?",
+          "antworten": ["ich glaube es, weiß es aber nicht sicher", "ich weiß es ganz genau", "ich habe es selbst gesehen"],
+          "richtig": "ich glaube es, weiß es aber nicht sicher",
+          "textstelle": "Ich vermute, der Sturm hat ihn zurückgelassen.",
+          "belohnung": { "typ": "gold", "menge": 3 }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "kw-heilerin-trank",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 3,
+      "absender": "Lene, die Heilerin",
+      "text": "Hallo, ich bin Lene, die Heilerin von Kleinwurzel. Nach jedem Angriff der Orks kommen Verletzte zu mir. Meistens sind es nur Kratzer und blaue Flecken. Doch gestern brachte man mir einen Wächter mit einer tiefen Wunde. Ich gab ihm meinen letzten Heiltrank, und schon nach einer Stunde konnte er wieder lachen. Heute habe ich neue Kräuter gesammelt und zwei Tränke gebraut. Einen davon schenke ich dir. Benutze ihn nicht leichtsinnig, denn die Kräuter wachsen nur im Frühling. Alles Gute, Lene",
+      "fragen": [
+        {
+          "art": "wort",
+          "frage": "Was bedeutet „leichtsinnig“?",
+          "antworten": ["ohne gut nachzudenken", "mit viel Kraft", "ganz langsam", "sehr leise"],
+          "richtig": "ohne gut nachzudenken",
+          "textstelle": "Benutze ihn nicht leichtsinnig, denn die Kräuter wachsen nur im Frühling.",
+          "belohnung": { "typ": "item", "id": "heiltrank" }
+        },
+        {
+          "art": "schliessen",
+          "frage": "Woran merkt man, dass der Heiltrank gewirkt hat?",
+          "antworten": ["Der Wächter konnte nach einer Stunde wieder lachen.", "Lene hat neue Kräuter gesammelt.", "Die Orks sind geflohen.", "Der Trank war blau."],
+          "richtig": "Der Wächter konnte nach einer Stunde wieder lachen.",
+          "textstelle": "Ich gab ihm meinen letzten Heiltrank, und schon nach einer Stunde konnte er wieder lachen.",
+          "belohnung": { "typ": "gold", "menge": 3 }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "kw-kobold-gold",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 2,
+      "absender": "ein Kobold (mit krakeliger Schrift)",
+      "text": "Hihi, hallo Held! Ich bin ein Kobold, aber ein netter. Die Orks haben mir meine Goldmünzen geklaut. Jetzt bin ich wütend! Ich verrate dir ein Geheimnis. Die Orks haben ihre Beute unter der krummen Weide am Bach vergraben. Dort liegt viel Gold. Ich bin zu klein, um zu graben. Wenn du die Münzen findest, darfst du ein paar behalten. Aber bring mir den Rest zurück! Versprochen ist versprochen. Dein Kobold",
+      "fragen": [
+        {
+          "art": "finden",
+          "frage": "Wo haben die Orks ihre Beute vergraben?",
+          "antworten": ["unter der krummen Weide am Bach", "im Keller des Gasthauses", "hinter der Mühle", "in einer Höhle"],
+          "richtig": "unter der krummen Weide am Bach",
+          "textstelle": "Die Orks haben ihre Beute unter der krummen Weide am Bach vergraben.",
+          "belohnung": { "typ": "gold", "menge": 5 }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "kw-oma-stiefel",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 1,
+      "absender": "Oma Rosa",
+      "text": "Mein liebes Kind! Ich habe gehört, dass du jeden Tag weit laufen musst. Deine Schuhe sind bestimmt schon ganz kaputt. Darum habe ich dir neue Stiefel gekauft. Sie sind aus festem Leder und halten das Wasser draußen. So bekommst du keine nassen Füße. Ich habe innen noch warme Wolle hineingenäht. Die Wolle ist von meinen eigenen Schafen. Zieh die Stiefel an, bevor es kalt wird! Deine Oma Rosa",
+      "fragen": [
+        {
+          "art": "finden",
+          "frage": "Woher stammt die Wolle in den Stiefeln?",
+          "antworten": ["von Omas eigenen Schafen", "vom Markt in der Stadt", "von einem Händler", "aus der Bibliothek"],
+          "richtig": "von Omas eigenen Schafen",
+          "textstelle": "Die Wolle ist von meinen eigenen Schafen.",
+          "belohnung": { "typ": "item", "id": "stiefel" }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "hm-hauptmann-lager",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 1,
+      "absender": "der Hauptmann der Weißen Feste",
+      "text": "Sei gegrüßt, junge Heldin, junger Held! Ich bin der Hauptmann der Weißen Feste. Unsere Späher haben das Lager der Orks gefunden. Es liegt hinter dem großen Hügel im Norden. Dort brennen jede Nacht viele Feuer. Wir haben zu wenige Soldaten für einen Angriff. Darum bitte ich dich um Hilfe. Nimm diesen Speer aus unserer Waffenkammer. Er hat schon viele Kämpfe überstanden. Mit Ehre, der Hauptmann",
+      "fragen": [
+        {
+          "art": "finden",
+          "frage": "Wo liegt das Lager der Orks?",
+          "antworten": ["hinter dem großen Hügel im Norden", "am Fluss im Süden", "in der Weißen Feste", "im Dorf Kleinwurzel"],
+          "richtig": "hinter dem großen Hügel im Norden",
+          "textstelle": "Es liegt hinter dem großen Hügel im Norden.",
+          "belohnung": { "typ": "item", "id": "speer" }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "hm-hirtin-karotten",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 1,
+      "absender": "Asta, die Pferdehirtin",
+      "text": "Hallo! Ich bin Asta und hüte die Pferde von Hrossmark. Gestern ist ein Fohlen weggelaufen. Es hatte Angst vor den Wölfen der Orks. Ich habe es den ganzen Tag gesucht. Am Abend stand es endlich am Bach und trank Wasser. Ich habe es mit Karotten zurückgelockt. Pferde lieben Karotten! Ein paar sind noch übrig. Die schenke ich dir. Vielleicht freut sich auch ein Pferd auf deiner Reise darüber. Viele Grüße, Asta",
+      "fragen": [
+        {
+          "art": "finden",
+          "frage": "Wo hat Asta das Fohlen gefunden?",
+          "antworten": ["am Bach", "im Stall", "auf dem Hügel", "im Wald"],
+          "richtig": "am Bach",
+          "textstelle": "Am Abend stand es endlich am Bach und trank Wasser.",
+          "belohnung": { "typ": "item", "id": "karotte" }
+        },
+        {
+          "art": "schliessen",
+          "frage": "Warum ist das Fohlen weggelaufen?",
+          "antworten": ["Es hatte Angst vor den Wölfen.", "Es wollte Karotten suchen.", "Es war durstig.", "Asta hat es gerufen."],
+          "richtig": "Es hatte Angst vor den Wölfen.",
+          "textstelle": "Es hatte Angst vor den Wölfen der Orks.",
+          "belohnung": { "typ": "gold", "menge": 2 }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "hm-hufschmied-hammer",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 1,
+      "absender": "Ragnar, der Hufschmied",
+      "text": "Heda! Hier schreibt Ragnar, der Hufschmied. Jeden Tag beschlage ich zwanzig Pferde mit neuen Hufeisen. Dafür brauche ich einen schweren Hammer. Gestern habe ich mir einen neuen gekauft. Mein alter Hammer ist aber noch gut. Er ist nur ein bisschen zu klein für meine großen Hände. Du kannst ihn sicher gebrauchen. Mit einem Hammer schlägst du kräftig zu. Komm doch mal in meine Schmiede am Marktplatz! Dein Ragnar",
+      "fragen": [
+        {
+          "art": "finden",
+          "frage": "Wie viele Pferde beschlägt Ragnar jeden Tag?",
+          "antworten": ["zwanzig", "zehn", "fünf", "hundert"],
+          "richtig": "zwanzig",
+          "textstelle": "Jeden Tag beschlage ich zwanzig Pferde mit neuen Hufeisen.",
+          "belohnung": { "typ": "item", "id": "hammer" }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "hm-kind-hafer",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 1,
+      "absender": "Jonas aus Hrossmark",
+      "text": "Hallo, ich bin Jonas! Ich wohne auf einem Hof in Hrossmark. Wir haben fünf Pferde, zwei Kühe und viele Hühner. Mein Lieblingspferd heißt Blitz. Es ist schwarz und rennt schneller als alle anderen. Jeden Morgen gebe ich Blitz eine Schüssel Hafer. Davon wird es stark. Papa sagt, du kämpfst gegen die Orks. Darum schicke ich dir einen Sack Hafer. Er macht auch Menschen kräftig! Dein Jonas",
+      "fragen": [
+        {
+          "art": "finden",
+          "frage": "Wie heißt Jonas' Lieblingspferd?",
+          "antworten": ["Blitz", "Donner", "Sturm", "Wolke"],
+          "richtig": "Blitz",
+          "textstelle": "Mein Lieblingspferd heißt Blitz.",
+          "belohnung": { "typ": "item", "id": "hafer" }
+        },
+        {
+          "art": "finden",
+          "frage": "Welche Farbe hat Blitz?",
+          "antworten": ["schwarz", "weiß", "braun"],
+          "richtig": "schwarz",
+          "textstelle": "Es ist schwarz und rennt schneller als alle anderen.",
+          "belohnung": { "typ": "gold", "menge": 2 }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "hm-waechterin-horn",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 1,
+      "absender": "Wächterin Merle",
+      "text": "Hallo! Ich bin Merle und stehe Wache auf dem Turm der Weißen Feste. Von hier oben sehe ich weit über das Land. Wenn Orks kommen, blase ich in mein Horn. Dann wissen alle Bauern, dass sie sich verstecken müssen. Das Horn ist sehr laut. Man hört es bis zum Fluss. Ich habe noch ein zweites Horn. Das schenke ich dir. Blas hinein, wenn du Hilfe brauchst! Deine Merle",
+      "fragen": [
+        {
+          "art": "finden",
+          "frage": "Was tun die Bauern, wenn sie das Horn hören?",
+          "antworten": ["Sie verstecken sich.", "Sie singen ein Lied.", "Sie füttern die Pferde.", "Sie gehen schlafen."],
+          "richtig": "Sie verstecken sich.",
+          "textstelle": "Dann wissen alle Bauern, dass sie sich verstecken müssen.",
+          "belohnung": { "typ": "item", "id": "horn" }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "hm-hauptmann-angst",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 2,
+      "absender": "der Hauptmann der Weißen Feste",
+      "text": "An die Heldin oder den Helden! Ich muss dir etwas gestehen. Ich habe Angst. Nicht vor den Orks, sondern vor ihrem Häuptling. Er reitet einen riesigen Wolf. Seine Rüstung ist so dick, dass unsere Pfeile einfach abprallen. Nur mit sehr scharfen Waffen kann man ihn verletzen. Darum schicke ich dir eine Rune aus unserem Schatz. Sie macht jede Klinge schärfer. Leg sie neben deine beste Waffe. Mit Hoffnung, dein Hauptmann",
+      "fragen": [
+        {
+          "art": "schliessen",
+          "frage": "Warum hat der Hauptmann Angst vor dem Häuptling?",
+          "antworten": ["Pfeile prallen an seiner Rüstung ab.", "Der Häuptling ist sein Bruder.", "Der Häuptling kann fliegen.", "Er hat keine Soldaten mehr."],
+          "richtig": "Pfeile prallen an seiner Rüstung ab.",
+          "textstelle": "Seine Rüstung ist so dick, dass unsere Pfeile einfach abprallen.",
+          "belohnung": { "typ": "item", "id": "rune-scharf" }
+        },
+        {
+          "art": "wort",
+          "frage": "Was bedeutet „gestehen“?",
+          "antworten": ["ehrlich etwas sagen", "etwas verstecken", "laut lachen"],
+          "richtig": "ehrlich etwas sagen",
+          "textstelle": "Ich muss dir etwas gestehen. Ich habe Angst.",
+          "belohnung": { "typ": "gold", "menge": 3 }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "hm-hirtin-zaumzeug",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 2,
+      "absender": "Asta, die Pferdehirtin",
+      "text": "Hallo, hier ist wieder Asta! Heute hat mir eine Stute geholfen, einen Wolf zu vertreiben. Sie hat laut gewiehert und ist auf ihn zugerannt. Der Wolf ist sofort geflohen. Mutige Pferde sind wertvoller als Gold, sagt man in Hrossmark. Damit ein Pferd dir gehorcht, brauchst du ein gutes Zaumzeug. Ich habe dir eins aus weichem Leder genäht. Es drückt nicht und hält trotzdem fest. Viel Glück auf deinem Ritt! Deine Asta",
+      "fragen": [
+        {
+          "art": "finden",
+          "frage": "Wie hat die Stute den Wolf vertrieben?",
+          "antworten": ["Sie hat laut gewiehert und ist auf ihn zugerannt.", "Sie hat sich versteckt.", "Sie hat ihn gebissen.", "Sie ist weggelaufen."],
+          "richtig": "Sie hat laut gewiehert und ist auf ihn zugerannt.",
+          "textstelle": "Sie hat laut gewiehert und ist auf ihn zugerannt.",
+          "belohnung": { "typ": "item", "id": "zaumzeug" }
+        },
+        {
+          "art": "wort",
+          "frage": "Was bedeutet „gehorcht“?",
+          "antworten": ["tut, was man sagt", "schnell rennt", "laut wiehert"],
+          "richtig": "tut, was man sagt",
+          "textstelle": "Damit ein Pferd dir gehorcht, brauchst du ein gutes Zaumzeug.",
+          "belohnung": { "typ": "gold", "menge": 2 }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "hm-spaeher-mond",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 2,
+      "absender": "Finn, der Späher",
+      "text": "Hallo! Ich bin Finn, ein Späher der Weißen Feste. Ich schleiche nachts um das Lager der Orks und beobachte sie. Dabei habe ich etwas Seltsames bemerkt. Bei Vollmond bleiben die Orks in ihren Zelten. Sie fürchten das helle Licht des Mondes. Nur bei Neumond, wenn der Himmel ganz dunkel ist, greifen sie an. Gestern fand ich am Lagerrand einen silbernen Kristall. Er leuchtet wie der Mond. Vielleicht nützt er dir! Dein Finn",
+      "fragen": [
+        {
+          "art": "finden",
+          "frage": "Wann bleiben die Orks in ihren Zelten?",
+          "antworten": ["bei Vollmond", "bei Neumond", "bei Regen", "am Mittag"],
+          "richtig": "bei Vollmond",
+          "textstelle": "Bei Vollmond bleiben die Orks in ihren Zelten.",
+          "belohnung": { "typ": "item", "id": "mond" }
+        },
+        {
+          "art": "wort",
+          "frage": "Was macht ein Späher?",
+          "antworten": ["Er beobachtet heimlich.", "Er baut Häuser.", "Er backt Brot.", "Er heilt Wunden."],
+          "richtig": "Er beobachtet heimlich.",
+          "textstelle": "Ich schleiche nachts um das Lager der Orks und beobachte sie.",
+          "belohnung": { "typ": "gold", "menge": 2 }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "hm-bogenmacherin-bogen",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 2,
+      "absender": "Svea, die Bogenmacherin",
+      "text": "Liebe Heldin, lieber Held! Ich baue Bögen aus dem Holz der Eibe. Eibenholz ist biegsam und bricht nicht so leicht. Für einen guten Bogen brauche ich drei Wochen. Zuerst muss das Holz trocknen. Dann schnitze ich es in die richtige Form. Zum Schluss spanne ich die Sehne. Ein guter Bogen schießt weit und trifft genau. Diesen hier habe ich für dich gemacht. Übe jeden Tag, dann triffst du bald jedes Ziel. Deine Svea",
+      "fragen": [
+        {
+          "art": "finden",
+          "frage": "Was macht Svea zuerst, wenn sie einen Bogen baut?",
+          "antworten": ["Sie lässt das Holz trocknen.", "Sie spannt die Sehne.", "Sie schnitzt das Holz.", "Sie übt das Schießen."],
+          "richtig": "Sie lässt das Holz trocknen.",
+          "textstelle": "Zuerst muss das Holz trocknen.",
+          "belohnung": { "typ": "item", "id": "bogen" }
+        },
+        {
+          "art": "wort",
+          "frage": "Was bedeutet „biegsam“?",
+          "antworten": ["lässt sich biegen", "ist sehr schwer", "ist ganz glatt"],
+          "richtig": "lässt sich biegen",
+          "textstelle": "Eibenholz ist biegsam und bricht nicht so leicht.",
+          "belohnung": { "typ": "gold", "menge": 2 }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "hm-koch-pfanne",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 2,
+      "absender": "Koch Bertram aus der Weißen Feste",
+      "text": "Grüß dich! Ich bin Bertram, der Koch der Weißen Feste. Hundert Soldaten wollen jeden Tag satt werden. Das ist harte Arbeit! Neulich hat ein Ork unsere Küche überfallen. Ich hatte nur meine Bratpfanne zur Hand. Bong! Damit habe ich ihn in die Flucht geschlagen. Seitdem lachen alle Soldaten über die Geschichte. Ich habe jetzt eine neue Pfanne. Die alte, berühmte Pfanne schenke ich dir. Sie ist schwer und hart. Dein Koch Bertram",
+      "fragen": [
+        {
+          "art": "finden",
+          "frage": "Womit hat Bertram den Ork vertrieben?",
+          "antworten": ["mit seiner Bratpfanne", "mit einem Schwert", "mit einem Löffel", "mit heißer Suppe"],
+          "richtig": "mit seiner Bratpfanne",
+          "textstelle": "Ich hatte nur meine Bratpfanne zur Hand.",
+          "belohnung": { "typ": "gold", "menge": 3 }
+        },
+        {
+          "art": "wort",
+          "frage": "Was bedeutet „in die Flucht geschlagen“?",
+          "antworten": ["vertrieben", "eingeladen", "gefangen", "geheilt"],
+          "richtig": "vertrieben",
+          "textstelle": "Bong! Damit habe ich ihn in die Flucht geschlagen.",
+          "belohnung": { "typ": "gold", "menge": 2 }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "hm-hauptmann-mauer",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 3,
+      "absender": "der Hauptmann der Weißen Feste",
+      "text": "Werte Heldin, werter Held! Die Orks haben in der Nacht versucht, unsere Mauer zu erklimmen. Sie lehnten lange Leitern an die Steine, doch die Mauer ist glatt und hoch. Oben warteten meine Soldaten mit Schilden. Keiner der Orks kam hinüber. Allerdings haben sie die Tränke vor dem Tor vergiftet. Jetzt müssen wir das Wasser vom fernen Fluss holen, was viel Zeit kostet. Ich schicke dir zum Dank für deine Hilfe einen Beutel Gold. Kaufe dir davon gute Ausrüstung. Dein Hauptmann",
+      "fragen": [
+        {
+          "art": "schliessen",
+          "frage": "Warum müssen die Soldaten jetzt Wasser vom Fluss holen?",
+          "antworten": ["Die Orks haben die Tränke vergiftet.", "Der Fluss ist näher.", "Die Mauer ist eingestürzt.", "Es hat lange nicht geregnet."],
+          "richtig": "Die Orks haben die Tränke vergiftet.",
+          "textstelle": "Allerdings haben sie die Tränke vor dem Tor vergiftet.",
+          "belohnung": { "typ": "gold", "menge": 5 }
+        },
+        {
+          "art": "wort",
+          "frage": "Was bedeutet „erklimmen“?",
+          "antworten": ["hinaufklettern", "zerstören", "bewachen", "bemalen"],
+          "richtig": "hinaufklettern",
+          "textstelle": "Die Orks haben in der Nacht versucht, unsere Mauer zu erklimmen. Sie lehnten lange Leitern an die Steine",
+          "belohnung": { "typ": "gold", "menge": 3 }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "hm-hirtin-drachenschuppe",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 3,
+      "absender": "Asta, die Pferdehirtin",
+      "text": "Hallo, hier schreibt Asta! Etwas Unglaubliches ist geschehen. Gestern verdunkelte ein riesiger Schatten die Weide. Die Pferde rannten panisch durcheinander. Als ich nach oben blickte, sah ich einen Drachen, der nach Westen flog. Er hat uns zum Glück nicht beachtet. Am Abend fand ich im Gras eine Schuppe, so groß wie mein Handteller. Sie schimmert rot und ist härter als Stahl. Die Alten sagen, eine Drachenschuppe schützt vor Feuer. Ich glaube, du brauchst sie dringender als ich. Deine Asta",
+      "fragen": [
+        {
+          "art": "schliessen",
+          "frage": "Woher stammt die Schuppe, die Asta gefunden hat?",
+          "antworten": ["von dem Drachen, der über die Weide flog", "von einem Fisch aus dem Bach", "aus der Schmiede", "von einem Ork"],
+          "richtig": "von dem Drachen, der über die Weide flog",
+          "textstelle": "Als ich nach oben blickte, sah ich einen Drachen, der nach Westen flog.",
+          "belohnung": { "typ": "item", "id": "drachenschuppe" }
+        },
+        {
+          "art": "wort",
+          "frage": "Was bedeutet „panisch“?",
+          "antworten": ["voller großer Angst", "ganz ruhig", "sehr hungrig", "fröhlich"],
+          "richtig": "voller großer Angst",
+          "textstelle": "Die Pferde rannten panisch durcheinander.",
+          "belohnung": { "typ": "gold", "menge": 3 }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "hm-schmied-kettenhemd",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 3,
+      "absender": "Ragnar, der Hufschmied",
+      "text": "Heda, hier ist wieder Ragnar! Normalerweise schmiede ich nur Hufeisen. Doch der Hauptmann hat mich gebeten, Kettenhemden für seine Soldaten zu fertigen. Ein Kettenhemd besteht aus Tausenden kleiner Eisenringe. Jeder Ring muss einzeln gebogen und mit den anderen verbunden werden. Für ein einziges Hemd brauche ich fast einen ganzen Monat. Dafür hält es Schwerthiebe ab und ist trotzdem beweglich. Eines ist mir etwas zu klein geraten. Einem Kind wie dir passt es bestimmt. Dein Ragnar",
+      "fragen": [
+        {
+          "art": "schliessen",
+          "frage": "Warum dauert es so lange, ein Kettenhemd zu machen?",
+          "antworten": ["Jeder der Tausenden Ringe muss einzeln gebogen werden.", "Ragnar arbeitet nur sonntags.", "Das Eisen muss erst wachsen.", "Der Hauptmann will es so."],
+          "richtig": "Jeder der Tausenden Ringe muss einzeln gebogen werden.",
+          "textstelle": "Ein Kettenhemd besteht aus Tausenden kleiner Eisenringe. Jeder Ring muss einzeln gebogen und mit den anderen verbunden werden.",
+          "belohnung": { "typ": "item", "id": "kettenhemd" }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "hm-bibliothek-stab",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 3,
+      "absender": "die Eulenbibliothekarin",
+      "text": "Uhu! Die Eule schreibt dir diesmal aus Hrossmark. Ich bin hierher geflogen, weil die Bibliothek der Weißen Feste in Unordnung geraten ist. Ein Windstoß hat die Bücher aus den Regalen gefegt. Nun liegen Märchen neben Kochbüchern und Landkarten neben Gedichten. Beim Aufräumen entdeckte ich einen alten Zauberstab, der hinter den Regalen verborgen war. Niemand weiß, wem er gehört. Er summt leise, wenn man ihn hält. Bewahre ihn gut auf, vielleicht steckt mehr in ihm, als man ahnt. Deine Eule",
+      "fragen": [
+        {
+          "art": "wort",
+          "frage": "Was bedeutet „verborgen“?",
+          "antworten": ["versteckt", "zerbrochen", "verzaubert", "verkauft"],
+          "richtig": "versteckt",
+          "textstelle": "Beim Aufräumen entdeckte ich einen alten Zauberstab, der hinter den Regalen verborgen war.",
+          "belohnung": { "typ": "item", "id": "stab" }
+        },
+        {
+          "art": "schliessen",
+          "frage": "Warum liegen Märchen neben Kochbüchern?",
+          "antworten": ["Ein Windstoß hat die Bücher aus den Regalen gefegt.", "Die Eule sortiert gern so.", "Die Orks haben Bücher gestohlen.", "Es gibt zu wenige Regale."],
+          "richtig": "Ein Windstoß hat die Bücher aus den Regalen gefegt.",
+          "textstelle": "Ein Windstoß hat die Bücher aus den Regalen gefegt.",
+          "belohnung": { "typ": "gold", "menge": 3 }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "hm-kind-satteltasche",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 2,
+      "absender": "Lotta aus Hrossmark",
+      "text": "Hallo! Ich heiße Lotta und bin elf Jahre alt. Ich darf schon allein zum Markt reiten. Dafür hat mir mein Vater eine Satteltasche genäht. In die Tasche passen viele Sachen: Äpfel, eine Decke und sogar ein Buch. Inzwischen bin ich gewachsen, und Papa hat mir eine größere Tasche gemacht. Die alte schicke ich dir. Sie hat zwei Fächer und einen festen Riemen. So kannst du mehr Ausrüstung mitnehmen. Deine Lotta",
+      "fragen": [
+        {
+          "art": "finden",
+          "frage": "Wer hat Lotta die Satteltasche genäht?",
+          "antworten": ["ihr Vater", "ihre Oma", "der Schmied", "die Hirtin"],
+          "richtig": "ihr Vater",
+          "textstelle": "Dafür hat mir mein Vater eine Satteltasche genäht.",
+          "belohnung": { "typ": "item", "id": "satteltasche" }
+        },
+        {
+          "art": "schliessen",
+          "frage": "Warum braucht Lotta die alte Tasche nicht mehr?",
+          "antworten": ["Sie hat eine größere bekommen.", "Die Tasche ist kaputt.", "Sie reitet nicht mehr.", "Die Tasche ist zu schwer."],
+          "richtig": "Sie hat eine größere bekommen.",
+          "textstelle": "Inzwischen bin ich gewachsen, und Papa hat mir eine größere Tasche gemacht.",
+          "belohnung": { "typ": "gold", "menge": 2 }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "hm-wirt-gold",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 1,
+      "absender": "Wirt Olaf vom Gasthaus „Zum wiehernden Fohlen“",
+      "text": "Grüß dich! Ich bin Olaf, der Wirt vom Gasthaus „Zum wiehernden Fohlen“. Gestern Abend saßen drei Reiter an meinem Tisch. Sie erzählten von einer Heldin und einem Helden, die gegen Orks kämpfen. Das bist doch du! Die Reiter haben für dich gesammelt. Jeder hat ein paar Münzen in meinen Krug geworfen. Hier ist das Geld. Kauf dir etwas Gutes dafür! Und komm bald vorbei, bei mir gibt es den besten Eintopf. Dein Olaf",
+      "fragen": [
+        {
+          "art": "finden",
+          "frage": "Wie viele Reiter saßen an Olafs Tisch?",
+          "antworten": ["drei", "zwei", "fünf", "zehn"],
+          "richtig": "drei",
+          "textstelle": "Gestern Abend saßen drei Reiter an meinem Tisch.",
+          "belohnung": { "typ": "gold", "menge": 4 }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "hm-heilerin-heilen",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 3,
+      "absender": "Marit, die Heilerin der Weißen Feste",
+      "text": "Liebe Heldin, lieber Held! Ich bin Marit und versorge die Verwundeten der Weißen Feste. Viele Soldaten glauben, dass nur Tränke heilen können. Doch auch Worte haben Kraft. Ein Heilspruch, laut und deutlich gesprochen, kann eine Wunde schneller schließen lassen. Allerdings wirkt er nur, wenn man ihn richtig betont. Ich habe dir einen solchen Spruch auf eine Schriftrolle geschrieben. Lies ihn, wenn du verletzt bist, und übe ihn vorher ein paar Mal. Gute Besserung schon im Voraus! Deine Marit",
+      "fragen": [
+        {
+          "art": "schliessen",
+          "frage": "Warum soll man den Spruch vorher üben?",
+          "antworten": ["Er wirkt nur, wenn man ihn richtig betont.", "Er ist sehr lang.", "Marit will es kontrollieren.", "Die Schriftrolle ist alt."],
+          "richtig": "Er wirkt nur, wenn man ihn richtig betont.",
+          "textstelle": "Allerdings wirkt er nur, wenn man ihn richtig betont.",
+          "belohnung": { "typ": "item", "id": "heilen" }
+        },
+        {
+          "art": "wort",
+          "frage": "Was bedeutet „versorgen“ hier?",
+          "antworten": ["sich um jemanden kümmern", "jemanden einsperren", "jemanden suchen"],
+          "richtig": "sich um jemanden kümmern",
+          "textstelle": "Ich bin Marit und versorge die Verwundeten der Weißen Feste.",
+          "belohnung": { "typ": "gold", "menge": 3 }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    }
+  ]
+}

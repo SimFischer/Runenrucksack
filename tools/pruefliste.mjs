@@ -6,6 +6,9 @@ import { readFileSync, writeFileSync } from 'node:fs';
 import { rahmenSatz } from '../js/aufgaben/saetze.js';
 
 const ws = JSON.parse(readFileSync('wortschatz.json', 'utf8'));
+const briefe = JSON.parse(readFileSync('botschaften.json', 'utf8')).briefe;
+const ITEMS = Object.fromEntries(JSON.parse(readFileSync('items.json', 'utf8')).items.map((d) => [d.id, d]));
+const lohn = (b) => (b.typ === 'gold' ? b.menge + ' Gold' : (ITEMS[b.id] ? ITEMS[b.id].artikel + ' ' + ITEMS[b.id].name : b.id));
 const esc = (s) => String(s ?? '').replace(/&/g, '&amp;').replace(/</g, '&lt;');
 // Sätze eines Eintrags, unsichere mit ⚠ davor; dazu der Hinweis für die Zeile
 const saetze = (liste, e) => liste.map((s) => (e.satzUnsicher?.includes(s) ? '⚠ ' + s : s)).join(' / ');
@@ -38,6 +41,10 @@ const teile = [
     ws.wortfamilien.map((f) => ({ key: f.wort, zellen: [f.woerter.join(' – '), f.falle] }))),
   tabelle('saetze', 'Sätze', ['Satz', 'Satzglieder'],
     ws.saetze.map((s, i) => ({ key: String(i), zellen: [s.glieder.map((g) => g.woerter.map((w) => w.wort).join(' ')).join(' ') + '.', s.glieder.map((g) => `${g.woerter.map((w) => w.wort).join(' ')} (${g.rolle})`).join(' | ')] }))),
+  // Briefe (Botschaften lesen): eine Zeile je Frage, der Brieftext steht bei der ersten Frage
+  tabelle('briefe', 'Briefe (Leseverständnis)', ['Brief', 'Gebiet', 'Stufe', 'Absender', 'Text', 'Frage (Art)', 'Antworten', 'Richtig', 'Beleg im Text', 'Belohnung'],
+    briefe.flatMap((b) => b.fragen.map((q, i) => ({ key: b.id + ':' + i,
+      zellen: [b.id, b.gebiet, b.schwierigkeit, i ? '' : b.absender, i ? '' : b.text, `${q.frage} (${q.art})`, q.antworten.join(' / '), q.richtig, q.textstelle, lohn(q.belohnung)] })))),
 ];
 
 const html = `<!doctype html><html lang="de"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
@@ -78,4 +85,4 @@ document.querySelectorAll('table.sort th').forEach((th, i) => {
 stand();
 </script></body></html>`;
 writeFileSync('wortschatz-pruefliste.html', html);
-console.log(`wortschatz-pruefliste.html: ${ws.nomen.length} Nomen, ${ws.verben.length} Verben, ${ws.adjektive.length} Adjektive, ${ws.komposita.length} Komposita, ${ws.wortfamilien.length} Wortfamilien, ${ws.saetze.length} Sätze`);
+console.log(`wortschatz-pruefliste.html: ${ws.nomen.length} Nomen, ${ws.verben.length} Verben, ${ws.adjektive.length} Adjektive, ${ws.komposita.length} Komposita, ${ws.wortfamilien.length} Wortfamilien, ${ws.saetze.length} Sätze, ${briefe.length} Briefe`);
