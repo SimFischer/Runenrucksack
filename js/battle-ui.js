@@ -58,7 +58,7 @@ export function startNight(done) {
     ersterAngriffDoppelt: ctx.ersterAngriffDoppelt,
   });
   selfHit = ctx.selbstschaden;
-  const foe = makeFighter(enemy.name, enemy.items, G.DEFS, run.day, { rng });
+  const foe = makeFighter(enemy.name, enemy.items, G.DEFS, run.day, { rng, klug: enemy.klug, faehigkeit: bossFaehigkeit(enemy, run.day) });
   battle = new Battle(player, foe);
   itemEls = { player: {}, enemy: {} };
 
@@ -227,6 +227,13 @@ function wackeln(side) {
   p.classList.remove('hit'); void p.offsetWidth; p.classList.add('hit');
 }
 
+// Boss-Fähigkeit für den Kampf (eigene Kopie, damit „erledigt“ nicht im Gegner hängen bleibt)
+export function bossFaehigkeit(enemy, day) {
+  const f = enemy.faehigkeit;
+  if (!f) return null;
+  return f.typ === 'wolf' ? { ...f, schaden: Math.round(f.schaden + (f.schadenProTag || 0) * day) } : { ...f };
+}
+
 function showEvent(ev) {
   const box = $('fighter-' + ev.side);
   let text = '', cls = '';
@@ -246,6 +253,10 @@ function showEvent(ev) {
   } else if (ev.type === 'block') { text = `+${ev.amount} Block`; cls = 'block'; }
   else if (ev.type === 'heal') { text = `+${ev.amount}`; cls = 'heal'; }
   else if (ev.type === 'falke') { text = 'Falke: doppelter Treffer!'; cls = 'glueck'; }
+  else if (ev.type === 'stehlen') {
+    floater($('fighter-player'), 'Gestohlen!', 'schaden');
+    text = 'Der Plünderer stiehlt die Wirkung!'; cls = 'glueck';
+  } else if (ev.type === 'wolf') { text = 'Ein Wolf greift mit an!'; cls = 'schaden'; }
   else if (ev.type === 'status') {
     const secs = ev.kind === 'kaelte' || ev.kind === 'betaeubung';
     text = `+${secs ? fmt(ev.amount) + ' s' : ev.amount}`;

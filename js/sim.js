@@ -1,23 +1,25 @@
 // Simulation ganzer Läufe mit einer einfachen Kaufstrategie – für die Balance (siehe tests/balance.test.mjs).
 // Annahmen über das Kind: löst Aufgaben meist richtig, kauft das Beste, was es sich leisten kann.
-// Strategien: „einfach“ würfelt bis zu dreimal am Tag neu und verkauft Schwaches für Besseres; „vorsichtig“ würfelt
-// höchstens einmal und kauft nur, was noch Platz hat oder sich verbindet (so sammelt sich Gold wie bei vielen Kindern).
+// Strategien: „zufall“ (Standard) kauft irgendetwas, das es sich leisten kann, würfelt bis zu dreimal neu und verkauft
+// Schwaches für Besseres; „gut“ sammelt gleiche Gegenstände, setzt Siegel und Runen in die Sockel und investiert in den
+// Händler; „vorsichtig“ würfelt höchstens einmal und kauft nur, was noch Platz hat oder sich verbindet.
 // Händler-Vertrauen und Schmied lassen sich für den Vergleich abschalten (opts.haendler, opts.schmied, opts.wuerfelAlt).
 import {
   CFG, newRun, finishBattle, rollShop, pickEnemy, makeEnemy, findSpot, bagGrid, STORE_GRID,
   growBag, attachTasche, enemyPool, shopPool, pickEncounters, pickOne, sellValue, seededRng, ARMOR_BONUS, reroll, wuerfelPreis,
-  HAENDLER, haendlerStufe, vertrauenKosten, vertrauenErhoehen, STERN_FAKTOR,
+  HAENDLER, haendlerStufe, vertrauenKosten, vertrauenErhoehen, STERN_FAKTOR, canPlace,
 } from './logic.js';
-import { buildCompounds, buildRuneLevels } from './grammar.js';
-import { partnerOf, placeNew, verbindeAlles, schmiedZiel, schmiedPreis, schmiedSperre, schmiedAufwerten } from './sterne.js';
+import { buildCompounds, buildRuneLevels, isVerb, isNoun, verbTargetCell } from './grammar.js';
+import { partnerOf, compoundPartner, placeNew, verbindeAlles, schmiedZiel, schmiedPreis, schmiedSperre, schmiedAufwerten } from './sterne.js';
 import { playerContext, evaluateBag } from './mods.js';
 import { baueBuch, entdeckungenIn } from './buch.js';
 import { neuesProfil, entdecke, merkeAntwort, laufStand, laufAbschluss, rangVon } from './fortschritt.js';
 import { Battle, makeFighter, runToEnd } from './battle.js';
 import { begleiterDefs } from './begleiter.js';
 import { waehleBrief, werteAus } from './botschaften.js';
-import { karten, pruefeSatz, spruchWerte, schmiedeVerben, schmiedeStern, SPRUCH_DEF } from './satzschmiede.js';
+import { karten, pruefeSatz, spruchWerte, schmiedeVerben, schmiedeStern, schmiedeOffen, SPRUCH_DEF } from './satzschmiede.js';
 import { applyMod } from './mods.js';
+import { istSockelTeil, kannEinsetzen, einsetzen } from './sockel.js';
 
 export function prepareData(raw) {
   const defs = {};
@@ -44,10 +46,57 @@ function worth(d) {
 
 // Händler-Vertrauen erhöhen mit Gold, das nach dem Einkaufen übrig ist (bis Tag 8 – danach lohnt es kaum).
 const HAENDLER_RESERVE = 3;
-function haendlerKaufen(run) {
+function haendlerKaufen(run, gut = false) {
   const k = vertrauenKosten(run);
-  if (k && run.day <= 8 && run.gold >= k + HAENDLER_RESERVE) vertrauenErhoehen(run);
+  if (k && run.day <= (gut ? 9 : 8) && run.gold >= k + (gut ? 0 : HAENDLER_RESERVE)) vertrauenErhoehen(run);
 }
+
+// Gute Strategie: Siegel und Runen aus dem Laden in den stärksten passenden Gegenstand einsetzen
+function sockelKaufen(run, data, rng, skill) {
+  const { defs } = data;
+  const hosts = run.items.filter((p) => p.area === 'bag').sort((a, b) => worth(starDefOf(b, defs)) - worth(starDefOf(a, defs)));
+  run.shop.forEach((s, i) => {
+    if (!s || !istSockelTeil(defs[s.id]) || defs[s.id].preis > run.gold) return;
+    const host = hosts.find((h) => kannEinsetzen(h, defs, s.id).ok && worth(starDefOf(h, defs)) > 0);
+    if (!host) return;
+    run.gold -= defs[s.id].preis;
+    run.shop[i] = null;
+    if (rng() > skill) run.gold = Math.max(0, run.gold - 1);
+    einsetzen(run, host, { uid: -1, id: s.id }, defs);
+  });
+}
+// Gute Strategie: Verb-Rollen so drehen, dass der Pfeil auf ein Nomen zeigt (Satz meist richtig gebildet)
+function verbenRichten(run, defs, rng, skill) {
+  const bag = run.items.filter((p) => p.area === 'bag');
+  const at = (x, y) => bag.find((q) => { const d = defs[q.id], w = q.rot % 2 ? d.h : d.w, h = q.rot % 2 ? d.w : d.h; return x >= q.x && x < q.x + w && y >= q.y && y < q.y + h; });
+  for (const p of bag) {
+    const d = defs[p.id];
+    if (!isVerb(d) || !d.formen) continue;
+    const ziel = at(...Object.values(verbTargetCell(p, d)));
+    if (ziel && isNoun(defs[ziel.id]) && p.satz?.uid === ziel.uid) continue;
+    for (let rot = 0; rot < 4; rot++) {
+      if (!canPlace(bag, defs, d, p.x, p.y, rot, bagGrid(run), [p.uid])) continue;
+      const t = at(...Object.values(verbTargetCell({ ...p, rot }, d)));
+      if (t && t !== p && isNoun(defs[t.id])) { p.rot = rot; p.satz = { uid: t.uid, ok: rng() < skill + 0.15 }; break; }
+    }
+  }
+}
+// Gute Strategie: Kristall gezielt links neben oder über einen Träger legen (und umgekehrt) – sofort ein Kompositum
+function kompositumSpot(run, data, d) {
+  const { defs, recipes } = data;
+  const bag = run.items.filter((p) => p.area === 'bag');
+  const grid = bagGrid(run);
+  const k = recipes.komposita;
+  const versuche = [];
+  if (d.art === 'kraft' && k.kraefte[d.id]) {
+    for (const t of bag.filter((p) => k.traeger.includes(p.id))) versuche.push({ x: t.x - 1, y: t.y }, { x: t.x, y: t.y - 1 });
+  } else if (k.traeger.includes(d.id)) {
+    for (const c of bag.filter((p) => defs[p.id].art === 'kraft' && k.kraefte[p.id])) versuche.push({ x: c.x + 1, y: c.y }, { x: c.x, y: c.y + 1 });
+  }
+  for (const v of versuche) for (const rot of d.w === d.h ? [0] : [0, 1]) if (canPlace(bag, defs, d, v.x, v.y, rot, grid)) return { ...v, rot };
+  return null;
+}
+const starDefOf = (p, defs) => ({ ...defVon(p, defs), ...(p.stern > 1 ? { schaden: (defs[p.id].schaden || 0) * STERN_FAKTOR[p.stern], block: (defs[p.id].block || 0) * STERN_FAKTOR[p.stern], heilung: (defs[p.id].heilung || 0) * STERN_FAKTOR[p.stern] } : {}) });
 
 // Schmied: der Gegenstand mit dem meisten Gewinn pro Gold (eine falsche erste Antwort kostet 1 Gold, wie beim Verbinden).
 function schmiedNutzen(run, data, rng, skill) {
@@ -67,9 +116,14 @@ function schmiedNutzen(run, data, rng, skill) {
 function shop(run, data, rng, skill, opts = {}) {
   const { defs, items, regions } = data;
   const vorsichtig = opts.strategie === 'vorsichtig';
+  const gut = opts.strategie === 'gut';
+  const zufall = !gut && !vorsichtig;
   // Ein gleiches besitzt man schon: Kaufen verbindet sofort (braucht keinen Platz, spart sogar welchen).
-  const value = (d) => worth(d) * (partnerOf(run.items, defs, { uid: -1, id: d.id }) ? 1.3 : 1);
+  // Die gute Strategie sammelt gezielt; die Zufallsstrategie kauft irgendetwas Bezahlbares.
+  const value = (d) => (zufall ? rng() : worth(d) * (partnerOf(run.items, defs, { uid: -1, id: d.id }) ? (gut ? 2.5 : 1.3) : 1)
+    * (gut && compoundPartner(d, run.items.filter((p) => p.area === 'bag'), defs, data.recipes) ? 2 : 1));
   for (let round = 0; round < 3; round++) {
+    if (gut) sockelKaufen(run, data, rng, skill);
     let bought = true;
     while (bought) {
       bought = false;
@@ -86,12 +140,12 @@ function shop(run, data, rng, skill, opts = {}) {
           break;
         }
         const bag = run.items.filter((p) => p.area === 'bag');
-        let spot = findSpot(bag, defs, o.d, bagGrid(run));
-        if (!spot && vorsichtig) continue;
+        let spot = (gut && kompositumSpot(run, data, o.d)) || findSpot(bag, defs, o.d, bagGrid(run));
+        if (!spot && (vorsichtig || zufall)) continue;
         if (!spot) {
           // Rucksack voll: schwächstes Item verkaufen, wenn das neue besser ist
           const weakest = bag.filter((p) => !p.fluch).sort((a, b) => worth(defVon(a, defs)) - worth(defVon(b, defs)))[0];
-          if (!weakest || worth(defVon(weakest, defs)) * 1.3 >= worth(o.d)) continue;
+          if (!weakest || worth(defVon(weakest, defs)) * (gut ? 1.1 : 1.3) >= worth(o.d)) continue;
           run.items = run.items.filter((p) => p !== weakest);
           run.gold += sellValue(defs[weakest.id], weakest.stern || 1);
           spot = findSpot(run.items.filter((p) => p.area === 'bag'), defs, o.d, bagGrid(run));
@@ -106,9 +160,10 @@ function shop(run, data, rng, skill, opts = {}) {
         break;
       }
     }
-    if (opts.schmied !== false) schmiedNutzen(run, data, rng, skill);
-    if (opts.haendler !== false) haendlerKaufen(run);
-    if (vorsichtig && round > 0) break;
+    if (gut) verbenRichten(run, defs, rng, skill);
+    if (opts.schmied !== false && !zufall) schmiedNutzen(run, data, rng, skill);
+    if (opts.haendler !== false && !zufall) haendlerKaufen(run, gut);
+    if ((vorsichtig || zufall) && round > 0) break;
     if (run.gold >= wuerfelPreis(run) + 3) {
       reroll(run, items, regions, rng);
       run.wuerfeTag = (run.wuerfeTag || 0) + 1;
@@ -118,15 +173,19 @@ function shop(run, data, rng, skill, opts = {}) {
 }
 
 // Zwei gleiche sofort verbinden, auch als Kette (eine falsche erste Antwort kostet 1 Gold).
+// Gleich beim ersten Versuch richtig: Das neue Item glänzt (+10 % im nächsten Kampf), wie im Spiel.
 function verbinde(run, data, rng, skill, p) {
   if (!p) return;
-  verbindeAlles(run, data.defs, data.recipes, [{ uid: p.uid, paar: true }], (a, q) => {
+  let erster = true;
+  const log = verbindeAlles(run, data.defs, data.recipes, [{ uid: p.uid, paar: true }], (a, q) => {
     if (!q) return 'richtig';
-    const erster = rng() <= skill;
+    erster = rng() <= skill;
     if (!erster) { run.gold = Math.max(0, run.gold - 1); merkeAntwort(run, q.art, false); }
     merkeAntwort(run, q.art, true, erster);
     return 'richtig';
   });
+  const letzt = log.at(-1) && run.items.find((q) => q.uid === log.at(-1).uid);
+  if (letzt && erster) letzt.glanz = 1;
 }
 
 function morning(run, data, rng, skill, opts = {}) {
@@ -149,10 +208,15 @@ function morning(run, data, rng, skill, opts = {}) {
         }
       }
     }
-    // Satzschmiede (opts.satzschmiede, Stufe 1–3): Figur + Prädikat, ab Stufe 2 mit Objekt, ab Stufe 3 mit
-    // Zeit-Adverbiale und Umstellprobe. Mit Wahrscheinlichkeit skill gelingt der Satz.
-    if (step === 'satzschmiede' && data.satzschmiede && data.wortschatz && opts.satzschmiede && rng() < skill) {
-      const daten = data.satzschmiede, stufe = opts.satzschmiede;
+    // Satzschmiede statt Begegnung (opts.satzschmiede, Stufe 1–3; 3 Gold): Figur + Prädikat, ab Stufe 2 mit Objekt,
+    // ab Stufe 3 mit Zeit-Adverbiale und Umstellprobe. Mit Wahrscheinlichkeit skill gelingt der Satz.
+    const daten = data.satzschmiede;
+    if (step === 'begegnung' && daten && data.wortschatz && opts.satzschmiede && schmiedeOffen(run, daten) && run.gold >= daten.besuch.preis) {
+      run.gold -= daten.besuch.preis;
+      run.satzschmiedeTag = run.day;
+      run.satzschmiedeBesuche = (run.satzschmiedeBesuche || 0) + 1;
+      if (rng() >= skill) continue;
+      const stufe = opts.satzschmiede;
       const inf = pickOne(schmiedeVerben(run, defs, daten), rng);
       const pool = karten({ daten, ws: data.wortschatz, figur: { kurz: 'Figur' }, verben: [inf], stufe });
       const v = data.wortschatz.verben.find((x) => x.infinitiv === inf);
@@ -163,10 +227,15 @@ function morning(run, data, rng, skill, opts = {}) {
       if (r.gueltig) {
         const w = spruchWerte(r, { daten, verbDef: defs[daten.verben[inf].item], stern: schmiedeStern(run, defs, inf, daten), applyMod, umgestellt: stufe >= 3 });
         placeNew(run, defs, 'spruchrolle', null, { spruch: { satz: r.satz, werte: w.werte, zeilen: w.zeilen }, stern: w.stufe });
+        run.gold += 2; // Lohn für die Bestellung
       }
+      continue;
     }
     if (step === 'begegnung') {
-      const id = pickOne(pickEncounters(run, data.encounters, data.regions, rng), rng);
+      // Die gute Strategie wählt die Begegnung mit der besten Belohnung (Rucksack-Feld vor Item, Rabatt, Gold)
+      const wahl = pickEncounters(run, data.encounters, data.regions, rng);
+      const rangOf = (eid) => ['feld', 'item', 'mod', 'rabatt', 'gold', 'kobold'].indexOf(data.encounters.begegnungen.find((b) => b.id === eid).belohnung.typ);
+      const id = opts.strategie === 'gut' ? [...wahl].sort((a, b) => rangOf(a) - rangOf(b))[0] : pickOne(wahl, rng);
       const enc = data.encounters.begegnungen.find((b) => b.id === id);
       const ok = rng() < skill;
       if (!ok) run.gold = Math.max(0, run.gold - 1);
@@ -193,7 +262,8 @@ function morning(run, data, rng, skill, opts = {}) {
 
 // Spielt einen ganzen Lauf. Gibt Siege, Tage und Kampfzeiten zurück.
 export function simulateRun(data, rng, opts = {}) {
-  const skill = opts.skill ?? 0.75;
+  // Die gute Strategie löst auch die Aufgaben sicherer (Rüstungsfehler, Verbinden ohne Fehlversuch)
+  const skill = opts.skill ?? (opts.strategie === 'gut' ? 0.95 : 0.75);
   const hero = pickOne(data.heroes, rng);
   // Begleiter: zufällig (ohne begleiter.json im Datensatz keiner)
   const begleiter = data.begleiter?.length ? data.defs['begleiter-' + pickOne(data.begleiter, rng).id] : null;
@@ -216,7 +286,9 @@ export function simulateRun(data, rng, opts = {}) {
     merkeAntwort(run, 'rechtschreibung', armor, true);
     if (armor) laufStand(run).orkFehler++;
     if (opts.profil) laufStand(run).neu.push(...entdecke(opts.profil, entdeckungenIn(run, data.defs, data.buch)));
-    const foe = makeFighter('e', enemy.items, data.defs, run.day, { startHp: armor ? 1 - ARMOR_BONUS : 1, rng });
+    const f = enemy.faehigkeit;
+    const faehigkeit = f ? (f.typ === 'wolf' ? { ...f, schaden: Math.round(f.schaden + (f.schadenProTag || 0) * run.day) } : { ...f }) : null;
+    const foe = makeFighter('e', enemy.items, data.defs, run.day, { startHp: armor ? 1 - ARMOR_BONUS : 1, rng, klug: enemy.klug, faehigkeit });
     const battle = new Battle(player, foe);
     const won = runToEnd(battle) === 'win';
     days.push({ day: run.day, won, time: battle.time, boss: !!foeDef.boss,
@@ -270,7 +342,8 @@ export function summarize(results) {
     schmiedProTag: jeTag('schmied', 2), // Anteil der Läufe, die an diesem Tag den Schmied nutzen
     wuerfeProTag: jeTag('wuerfe'),      // Würfe pro Tag
     siegeDurchschnitt: avg((r) => r.wins),
-    reiseGeschafft: Math.round(100 * avg((r) => (r.won ? 1 : 0))),
+    // Reise geschafft: bis zum Ende durchgehalten und den Endboss besiegt
+    reiseGeschafft: Math.round(100 * avg((r) => (r.won && r.days.at(-1)?.won ? 1 : 0))),
     minutenDurchschnitt: avg((r) => estimateMinutes(r.days)),
     kampfSekunden: avg((r) => r.days.reduce((s, d) => s + d.time, 0) / r.days.length),
   };

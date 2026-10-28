@@ -16,12 +16,13 @@ export const ADVERBIAL = ['zeit', 'art', 'ort'];
 export const GLIED_NAME = { subjekt: 'Subjekt', praedikat: 'Prädikat', objekt: 'Objekt', zeit: 'Adverbiale der Zeit', art: 'Adverbiale der Art und Weise', ort: 'Adverbiale des Ortes' };
 export const GLIED_FRAGE = { subjekt: 'Wer?', praedikat: 'Was tut?', objekt: 'Wen?', zeit: 'Wann?', art: 'Wie?', ort: 'Wo?' };
 
-const PERSONEN = ['er', 'ich', 'wir'];
+const PERSONEN = ['er', 'ich', 'wir', 'sie'];
 const gross = (t) => t.charAt(0).toUpperCase() + t.slice(1);
 
 // Karten für die Schmiede. verben: Infinitive der Verb-Rollen im Rucksack (die zur Schmiede passen), höchstens zwei.
 // figur: { kurz }, begleiter: { id, name, artikel } oder null. stufe 1–3 bestimmt, welche Satzglieder vorkommen.
-export function karten({ daten, ws, figur, begleiter = null, verben, stufe = 1 }) {
+// weitere: auch die zusätzlichen Subjekte (daten.weitereSubjekte: der Zwerg, die Ritter …).
+export function karten({ daten, ws, figur, begleiter = null, verben, stufe = 1, weitere = false }) {
   const glieder = daten.stufen[stufe].glieder;
   const out = [];
   let n = 0;
@@ -31,6 +32,7 @@ export function karten({ daten, ws, figur, begleiter = null, verben, stufe = 1 }
   neu({ glied: 'subjekt', text: 'ich', person: 'ich', wer: 'ich' });
   neu({ glied: 'subjekt', text: 'wir', person: 'wir', wer: 'wir' });
   if (begleiter) neu({ glied: 'subjekt', text: `${begleiter.artikel} ${begleiter.name}`, person: 'er', wer: 'begleiter', begleiter: begleiter.id });
+  if (weitere) for (const w of daten.weitereSubjekte || []) neu({ glied: 'subjekt', text: w.text, person: w.person, wer: 'andere', bonus: w.bonus });
   // Prädikate: je Verb die Formen für er, ich, wir – dazu eine falsche Personalform (du), wenn es sie gibt
   for (const inf of verben) {
     const v = ws.verben.find((x) => x.infinitiv === inf);
@@ -106,7 +108,7 @@ export function istUmstellung(alt, neu, ctx) {
 // Rucksack (so wächst die Spruchrolle mit dem Lauf). Die Umstellprobe macht sie eine Sternstufe stärker.
 // Ergebnis: { werte (wie bei einem Gegenstand: schaden, block, heilung, abklingzeit, startblock, glueck, sofort,
 //   verzoegerung), zeilen (Erklärung je Satzglied), stufe (Sternstufe der Spruchrolle) }
-export function spruchWerte(r, { daten, verbDef, stern = 1, umgestellt = false, applyMod }) {
+export function spruchWerte(r, { daten, verbDef, stern = 1, umgestellt = false, applyMod, bestellung = null }) {
   let prozent = 0, abk = 0, startblock = 0, glueck = 0, sofort = false, verzoegerung = 0;
   const zeilen = [`Prädikat „${r.verb}“: ${verbDef.schaden ? 'Schaden' : verbDef.heilung ? 'Heilung' : 'Block'} wie die Rolle „${verbDef.name}“ ${'★'.repeat(Math.min(MAX_STERN, stern))}`];
   const nimm = (w, text) => {
@@ -115,13 +117,14 @@ export function spruchWerte(r, { daten, verbDef, stern = 1, umgestellt = false, 
     verzoegerung = Math.max(verzoegerung, w.verzoegerung || 0);
     zeilen.push(text);
   };
-  const sb = r.subjekt.wer === 'begleiter' ? daten.subjektBonus.begleiter[r.subjekt.begleiter] : daten.subjektBonus[r.subjekt.wer];
+  const sb = r.subjekt.bonus || (r.subjekt.wer === 'begleiter' ? daten.subjektBonus.begleiter[r.subjekt.begleiter] : daten.subjektBonus[r.subjekt.wer]);
   if (sb) nimm(sb, `Subjekt „${r.subjekt.text}“: ${sb.text}`);
   if (r.objekt) nimm(daten.objektBonus, `Objekt „${r.objekt}“: ${daten.objektBonus.text}`);
   for (const typ of ADVERBIAL) {
     const a = r.adverbiale[typ];
     if (a) nimm(daten.adverbiale[a].wirkung, `${GLIED_NAME[typ]} „${a}“: ${daten.adverbiale[a].text}`);
   }
+  if (bestellung) nimm(bestellung.wirkung, `Bestellung erfüllt: ${wirkungText(bestellung.wirkung)}`);
   const stufe = Math.min(MAX_STERN, stern + (umgestellt ? 1 : 0));
   if (umgestellt) zeilen.push(daten.umstellBonus.text);
   const sd = starDef(verbDef, stufe);
@@ -133,6 +136,75 @@ export function spruchWerte(r, { daten, verbDef, stern = 1, umgestellt = false, 
   if (sofort) werte.sofort = true;
   if (verzoegerung) werte.verzoegerung = verzoegerung;
   return { werte, zeilen, stufe };
+}
+
+const wirkungText = (w) => [w.prozent && `+${w.prozent} %`, w.abklingzeit && `${-w.abklingzeit} % schneller`].filter(Boolean).join(', ');
+
+// ---------- Besuch mit Bestellung ----------
+
+// Darf die Schmiede heute unter den Begegnungen sein? Ab Tag 2, höchstens alle drei Tage, höchstens dreimal im Lauf.
+export function schmiedeOffen(run, daten) {
+  const b = daten.besuch;
+  if (run.day < b.abTag || (run.satzschmiedeBesuche || 0) >= b.hoechstens) return false;
+  return run.satzschmiedeTag == null || run.day - run.satzschmiedeTag >= b.abstand;
+}
+
+// Eine Bestellung passend zur Stufe, möglichst eine, die es in diesem Lauf noch nicht gab
+export function waehleBestellung(daten, stufe, run, rng = Math.random) {
+  const moeglich = daten.bestellungen.filter((b) => b.stufe <= stufe && (!b.bedingung.begleiter || run.begleiter));
+  const neu = moeglich.filter((b) => !(run.bestellungen || []).includes(b.id));
+  const liste = neu.length ? neu : moeglich;
+  // höhere Stufen bevorzugt: Bestellungen der eigenen Stufe doppelt so oft
+  const gewichtet = liste.flatMap((b) => (b.stufe === stufe ? [b, b] : [b]));
+  return gewichtet[Math.floor(rng() * gewichtet.length)];
+}
+
+const PLURAL_OBJEKTE = ['die Orks', 'auf die Orks'];
+const SCHADEN_VERBEN = ['schlagen', 'stechen', 'schießen', 'stürmen'];
+
+// Erfüllt der (gültige) Satz die Bestellung? umgestellt: die Umstellprobe ist bestanden.
+export function erfuellt(bestellung, r, leiste, umgestellt = false) {
+  const b = bestellung.bedingung;
+  if (b.nichtFigur && r.subjekt.wer === 'figur') return false;
+  if (b.begleiter && r.subjekt.wer !== 'begleiter') return false;
+  if (b.subjekt && r.subjekt.text !== b.subjekt) return false;
+  if (b.mehrzahl && !['wir', 'sie'].includes(r.subjekt.person)) return false;
+  if (b.wirkung === 'schaden' && !SCHADEN_VERBEN.includes(r.verb)) return false;
+  if (b.wirkung === 'schutz' && SCHADEN_VERBEN.includes(r.verb)) return false;
+  if (b.objekt && !r.objekt) return false;
+  if (b.objektPlural && !PLURAL_OBJEKTE.includes(r.objekt)) return false;
+  if (b.objektText && r.objekt !== b.objektText) return false;
+  if (b.glied && !r.adverbiale[b.glied]) return false;
+  if (b.adverbialVorn && !ADVERBIAL.includes(leiste[0]?.glied)) return false;
+  if (b.mindestens && leiste.length < b.mindestens) return false;
+  if (b.umstellung && !umgestellt) return false;
+  return true;
+}
+
+// Karten für einen Besuch ziehen: aus dem großen Vorrat eine wechselnde Auswahl, die zur Bestellung passt.
+// Die Figur, ein passendes Prädikat und (wenn nötig) passende Objekte und Adverbiale sind immer dabei.
+export function zieheKarten(pool, bestellung, rng = Math.random) {
+  const misch = (l) => l.map((x) => [rng(), x]).sort((a, b) => a[0] - b[0]).map((x) => x[1]);
+  const von = (g) => pool.filter((k) => k.glied === g);
+  const b = bestellung?.bedingung || {};
+  const subj = von('subjekt');
+  const pflicht = subj.filter((k) => k.wer === 'figur' || (b.begleiter && k.wer === 'begleiter') || (b.subjekt && k.text === b.subjekt));
+  const mehr = b.mehrzahl ? misch(subj.filter((k) => ['wir', 'sie'].includes(k.person))).slice(0, 1) : [];
+  const subjekte = [...new Set([...pflicht, ...mehr, ...misch(subj)])].slice(0, 5);
+  const out = [...subjekte];
+  // Prädikate: alle Formen der Verben (die Personalformen der gezogenen Subjekte sind so sicher dabei)
+  out.push(...von('praedikat'));
+  const obj = von('objekt');
+  if (obj.length) {
+    const richtig = obj.filter((k) => !k.falsch), falsch = obj.filter((k) => k.falsch);
+    const muss = richtig.filter((k) => (b.objektPlural && PLURAL_OBJEKTE.includes(k.text)) || (b.objektText && k.text === b.objektText));
+    out.push(...new Set([...muss, ...misch(richtig)].slice(0, Math.max(4, muss.length))), ...misch(falsch).slice(0, 2));
+  }
+  for (const typ of ADVERBIAL) {
+    const a = von(typ);
+    if (a.length) out.push(...misch(a).slice(0, 2));
+  }
+  return out;
 }
 
 // Lernstand im Thema Satzglieder: zweimal gleich ein gültiger Satz → nächste Stufe (wie bei den Aufgaben)

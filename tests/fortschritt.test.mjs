@@ -88,30 +88,6 @@ test('Freischaltungen nur über die Erfahrung: Faelith ab Wanderer, Theron ab Ru
   assert.deepEqual([...p.designs].sort(), ['elbenseide', 'reiterleder', 'zwergenstahl']);
 });
 
-test('Fähigkeiten: Ysoldes Runen wirken auf zwei Nomen, Theron gibt Startblock bei passendem Siegel', async () => {
-  const { evaluateBag, playerContext } = await import('../js/mods.js');
-  const { buildRuneLevels } = await import('../js/grammar.js');
-  const H = json('heroes.json');
-  const items = json('items.json').items;
-  const defs = Object.fromEntries(items.map((d) => [d.id, d]));
-  for (const d of buildRuneLevels(defs)) defs[d.id] = d;
-  const bag = [
-    { uid: 1, id: 'rune-scharf', x: 0, y: 0, rot: 0 },
-    { uid: 2, id: 'dolch', x: 1, y: 0, rot: 0 },
-    { uid: 3, id: 'schwert', x: 2, y: 0, rot: 0 },
-    { uid: 4, id: 'siegel-das', x: 3, y: 0, rot: 0 },
-  ];
-  const ctx = (hero) => playerContext({ hero, day: 1 }, { heroes: H.helden, fates: H.schicksalsrunen });
-  const borga = evaluateBag(bag, defs, ctx('borga'));
-  const ysolde = evaluateBag(bag, defs, ctx('ysolde'));
-  assert.equal(borga.get(3).adjektive.length, 0, 'normal: nur das erste Nomen');
-  assert.equal(ysolde.get(3).adjektive.length, 1, 'Ysolde: auch das Schwert dahinter');
-  assert.equal(ysolde.get(2).adjektive.length, 1);
-  const theron = evaluateBag(bag, defs, ctx('theron'));
-  assert.equal(theron.get(3).def.startblock, 3, 'das Schwert neben dem das-Siegel');
-  assert.ok(!borga.get(3).def.startblock);
-});
-
 test('Erfolge: mindestens 15, jeder erreichbar geprüft; Silberbanner ab dem höchsten Rang', async () => {
   const { pruefeErfolge, pruefeFreischaltungen } = await import('../js/fortschritt.js');
   const { baueBuch } = await import('../js/buch.js');

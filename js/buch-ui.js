@@ -45,7 +45,7 @@ export function zeigeBuch(zurueck = null) {
         }).join('')}</nav>
         <p class="buch-intro">${seite.text}</p>
         <div class="buch-grid${seite.id === 'sprueche' ? ' sprueche' : ''}">${seite.eintraege.map((e) => karte(e, entdeckt.has(e.id))).join('')
-          || (seite.id === 'sprueche' ? '<p class="buch-leer">Noch keine Sprüche. Ab Tag 2 hat die Satzschmiede jeden Morgen geöffnet.</p>' : '')}</div>
+          || (seite.id === 'sprueche' ? '<p class="buch-leer">Noch keine Sprüche. Die Satzschmiede findest du manchmal bei den Begegnungen am Morgen.</p>' : '')}</div>
       </div>`;
     box.querySelector('[data-close]').onclick = () => { box.remove(); emit('buchZu'); zurueck?.(); };
     box.querySelectorAll('[data-seite]').forEach((b) => { b.onclick = () => { seiteAktiv = b.dataset.seite; zeichne(); }; });

@@ -13,7 +13,6 @@ export const income = (day) => 8 + day;
 // Botschaften lesen: An manchen Morgen kommt statt der Begegnung ein Brief – frühestens ab abTag, nie an zwei Tagen
 // hintereinander. Mit chance 0,5 und dieser Sperre kommt im Schnitt etwa jeden dritten Tag ein Brief.
 export const BRIEF = { abTag: 2, chance: 0.5 };
-export const SATZSCHMIEDE_AB = 2;
 export const briefAmMorgen = (run, rng = Math.random) => run.day >= BRIEF.abTag && run.briefTag !== run.day - 1 && rng() < BRIEF.chance;
 
 // Neu würfeln: die ersten Würfe pro Tag sind billig, jeder weitere teurer. Der Zähler beginnt jeden Tag neu.
@@ -345,13 +344,13 @@ export function finishBattle(run, items, regions, won, enemyName, rng = null) {
   // Ankunft im zweiten Gebiet: Unterklasse wählen
   if (regions[1] && run.day === regions[1].tage[0]) run.queue.push('unterklasse');
   if (briefAmMorgen(run, rng)) { run.queue.push('brief'); run.briefTag = run.day; } else run.queue.push('begegnung');
-  // Satzschmiede: jeden Morgen ab Tag 2 (freiwillig, höchstens eine Spruchrolle am Tag)
-  if (run.day >= SATZSCHMIEDE_AB) run.queue.push('satzschmiede');
 }
 
 // ---------- Gegner ----------
 
 export const COMPOUNDS_FROM_DAY = 4; // ab diesem Tag bringen Orks auch Komposita mit
+// Kluge Gegner (ab abTag): mehr Gold, passende Siegel und Runen in den Sockeln, Verb-Rollen wirken voll.
+export const GEGNER_KLUG = { abTag: 4, budgetProTag: 0.04, sockelChance: 0.55, sockelProTag: 0.08, bossPlus: -10, endbossPlus: -8 };
 
 export function enemyPool(items, compounds, day) {
   const base = items.filter((d) => d.art !== 'siegel' && d.art !== 'rune' && d.art !== 'tasche');
@@ -368,7 +367,8 @@ export function pickEnemy(day, regions, enemies, rng = Math.random) {
 export function enemyBudget(day, boss) {
   // Gegner bekommen anfangs fast so viel Gold wie du (plus Start-Items), später anteilig weniger:
   // Du verbesserst deinen Rucksack mit Grammatik (Komposita, Siegel, Runen), die Orks nicht.
-  return Math.floor((cumulativeGold(day) + 8) * (0.92 - 0.035 * (day - 1))) + (boss ? 3 : 0);
+  const klug = day >= GEGNER_KLUG.abTag ? 1 + GEGNER_KLUG.budgetProTag * (day - GEGNER_KLUG.abTag + 1) : 1;
+  return Math.floor((cumulativeGold(day) + 8) * (0.92 - 0.035 * (day - 1)) * klug) + (boss ? (day >= CFG.lastDay ? GEGNER_KLUG.endbossPlus : GEGNER_KLUG.bossPlus) : 0);
 }
 
 // Ab diesen Tagen bringen Orks auch Gegenstände mit Sternstufe mit (★★ ab Tag 3, ★★★ ab Tag 6);
@@ -438,7 +438,28 @@ export function makeEnemy(day, enemy, items, defs, rng = Math.random) {
       }
     }
   }
-  return { ...enemy, items: placed };
+  const klug = day >= GEGNER_KLUG.abTag;
+  if (klug) gegnerSockel(placed, defs, day, rng);
+  return { ...enemy, items: placed, klug };
+}
+
+// Kluge Gegner setzen passende Siegel und Runen ein (ab Tag 7 auch gesteigerte Runen)
+function gegnerSockel(placed, defs, day, rng) {
+  const runen = Object.values(defs).filter((d) => d.art === 'rune' && !d.stufe);
+  // Mit jedem Tag setzen sie mehr Sockel-Teile ein
+  const chance = Math.min(GEGNER_KLUG.sockelChance, GEGNER_KLUG.sockelProTag * (day - GEGNER_KLUG.abTag + 1));
+  for (const p of placed) {
+    const d = defs[p.id];
+    if (!d.artikel || ['siegel', 'rune', 'begleiter', 'spruch', 'verb'].includes(d.art)) continue;
+    const sockel = { siegel: null, runen: [] };
+    if (rng() < chance && defs[`siegel-${d.artikel}`]) sockel.siegel = `siegel-${d.artikel}`;
+    const passt = runen.filter((r) => r.adjektiv.passt === 'nomen' || (r.adjektiv.passt === 'abklingzeit' ? d.abklingzeit > 0 : (d[r.adjektiv.passt] || 0) > 0));
+    if (passt.length && rng() < chance) {
+      const r = pickOne(passt, rng);
+      sockel.runen.push(day >= 7 && defs[`${r.id}@2`] ? `${r.id}@2` : r.id);
+    }
+    if (sockel.siegel || sockel.runen.length) p.sockel = sockel;
+  }
 }
 
 function randomSpot(placed, defs, def, grid, rng) {

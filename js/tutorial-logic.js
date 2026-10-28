@@ -181,7 +181,7 @@ export function checkStep(step, run, defs, recipes, ev = null) {
       break;
     case 'siegel': {
       const z = find(run, a.ziel, 'bag');
-      ok = !!z && analyze(bagItems(run), defs).get(z.uid).siegel.some((s) => s.ok && defs[find(run, a.siegel, 'bag')?.id]?.genus === s.genus);
+      ok = !!z && z.sockel?.siegel === a.siegel;
       break;
     }
     case 'rune': {
@@ -235,6 +235,7 @@ export function targetCell(run, defs, spec) {
   }
   const free = (x, y) => x >= 0 && y >= 0 && x < grid.cols && y < grid.rows && grid.mask.has(`${x},${y}`) && !occupied.has(`${x},${y}`);
   const cands = [];
+  if (art === 'auf') return { x: t.x, y: t.y };
   if (art === 'links-von') for (let dy = 0; dy < s.h; dy++) cands.push([t.x - 1, t.y + dy]);
   if (art === 'neben') {
     for (let dy = 0; dy < s.h; dy++) cands.push([t.x - 1, t.y + dy], [t.x + s.w, t.y + dy]);

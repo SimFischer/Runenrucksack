@@ -1,5 +1,5 @@
 {
-  "_hinweis": "Satzschmiede: Aus Satzglied-Karten wird ein Satz, der zu einer Spruchrolle wird. verben: Verb-Rollen, aus denen man Sprüche schmieden kann (nur solche, die zu einer Person passen) – je Verb die passenden Objekte (im richtigen Fall) und Adverbiale. Nur diese Kombinationen sind gültig, so entstehen keine unsinnigen Sätze. falscherFall: Karten mit dem falschen Fall (Nominativ statt Akkusativ). adverbiale: Art (zeit, art, ort) und Wirkung. subjektBonus: was das Subjekt dem Spruch gibt (Figur, ich, wir, Begleiter). sternAbTag: Sternstufe, die eine Spruchrolle mindestens hat (ab Tag …) – sonst die der Verb-Rolle im Rucksack; die Umstellprobe gibt einen Stern dazu. stufen: welche Satzglieder auf welcher Stufe des Themas Satzglieder vorkommen.",
+  "_hinweis": "Satzschmiede: Aus Satzglied-Karten wird ein Satz, der zu einer Spruchrolle wird. verben: Verb-Rollen, aus denen man Sprüche schmieden kann (nur solche, die zu einer Person passen) – je Verb die passenden Objekte (im richtigen Fall) und Adverbiale. Nur diese Kombinationen sind gültig, so entstehen keine unsinnigen Sätze. falscherFall: Karten mit dem falschen Fall (Nominativ statt Akkusativ). adverbiale: Art (zeit, art, ort) und Wirkung. subjektBonus: was das Subjekt dem Spruch gibt (Figur, ich, wir, Begleiter). sternAbTag: Sternstufe, die eine Spruchrolle mindestens hat (ab Tag …) – sonst die der Verb-Rolle im Rucksack; die Umstellprobe gibt einen Stern dazu. stufen: welche Satzglieder auf welcher Stufe des Themas Satzglieder vorkommen. besuch: Die Schmiede ist eine Wahl bei den Begegnungen (ab Tag, Abstand in Tagen, höchstens so oft im Lauf, Preis in Gold). weitereSubjekte: Subjekte, die zusätzlich gezogen werden können. bestellungen: Jeder Besuch hat einen Auftrag (stufe: ab welcher Satzglieder-Stufe; bedingung: was der Satz enthalten muss; wirkung: Extra für die Spruchrolle; belohnung: Gold dazu).",
   "verben": {
     "schlagen": { "item": "schlagen", "objekte": ["den Ork", "die Orks", "den Schild-Ork"], "zeit": ["sofort", "in der dritten Runde", "am Ende des Kampfes"], "art": ["mit voller Kraft", "blitzschnell"], "ort": ["am Waldrand", "auf der Brücke"] },
     "stechen": { "item": "stechen", "objekte": ["den Ork", "die Orks", "den Schild-Ork"], "zeit": ["sofort", "in der dritten Runde", "am Ende des Kampfes"], "art": ["blitzschnell", "vorsichtig"], "ort": ["am Waldrand", "auf der Brücke"] },
@@ -37,6 +37,30 @@
   },
   "sternAbTag": { "2": 2, "6": 3 },
   "umstellBonus": { "text": "Umstellprobe bestanden: eine Sternstufe stärker" },
+  "besuch": { "abTag": 2, "abstand": 3, "hoechstens": 3, "preis": 3 },
+  "weitereSubjekte": [
+    { "text": "der Zwerg", "person": "er", "bonus": { "text": "der starke Zwerg: +10 %", "prozent": 10 } },
+    { "text": "die Hirtin", "person": "er", "bonus": { "text": "die flinke Hirtin: 10 % schneller", "abklingzeit": -10 } },
+    { "text": "die Ritter", "person": "sie", "bonus": { "text": "viele Ritter zusammen: +15 %", "prozent": 15 } },
+    { "text": "die Elben", "person": "sie", "bonus": { "text": "die Elben mit ihrem Glück: +10 % Glück", "glueck": 10 } }
+  ],
+  "bestellungen": [
+    { "id": "jemand-anders", "stufe": 1, "text": "Diesmal soll nicht deine Figur handeln, sondern jemand anderes.", "bedingung": { "nichtFigur": true }, "wirkung": { "prozent": 10 }, "belohnung": { "gold": 2 } },
+    { "id": "begleiter", "stufe": 1, "text": "Dein Begleiter soll im Spruch die Hauptrolle spielen.", "bedingung": { "begleiter": true }, "wirkung": { "prozent": 15 }, "belohnung": { "gold": 2 } },
+    { "id": "wir", "stufe": 1, "text": "Ein Spruch für alle: Das Subjekt heißt „wir“.", "bedingung": { "subjekt": "wir" }, "wirkung": { "abklingzeit": -10 }, "belohnung": { "gold": 2 } },
+    { "id": "mehrere", "stufe": 1, "text": "Mehrere sollen handeln – such ein Subjekt in der Mehrzahl.", "bedingung": { "mehrzahl": true }, "wirkung": { "prozent": 15 }, "belohnung": { "gold": 2 } },
+    { "id": "schutz", "stufe": 1, "text": "Die Schmiede braucht einen Spruch, der schützt oder heilt.", "bedingung": { "wirkung": "schutz" }, "wirkung": { "prozent": 20 }, "belohnung": { "gold": 2 } },
+    { "id": "angriff", "stufe": 1, "text": "Bestellt ist ein Angriffsspruch: Das Prädikat soll Schaden machen.", "bedingung": { "wirkung": "schaden" }, "wirkung": { "prozent": 15 }, "belohnung": { "gold": 2 } },
+    { "id": "objekt", "stufe": 2, "text": "Der Spruch braucht ein Ziel: Bau ein Objekt ein.", "bedingung": { "objekt": true }, "wirkung": { "prozent": 10 }, "belohnung": { "gold": 3 } },
+    { "id": "objekt-plural", "stufe": 2, "text": "Gegen viele Gegner: Das Objekt soll in der Mehrzahl stehen.", "bedingung": { "objektPlural": true }, "wirkung": { "prozent": 20 }, "belohnung": { "gold": 3 } },
+    { "id": "uns", "stufe": 2, "text": "Ein Spruch, der alle schützt oder heilt: Das Objekt heißt „uns“.", "bedingung": { "objektText": "uns" }, "wirkung": { "prozent": 20 }, "belohnung": { "gold": 3 } },
+    { "id": "zeit", "stufe": 3, "text": "Der Spruch soll sagen, wann er wirkt: mit einer Adverbiale der Zeit.", "bedingung": { "glied": "zeit" }, "wirkung": { "prozent": 15 }, "belohnung": { "gold": 3 } },
+    { "id": "art", "stufe": 3, "text": "Sag, wie es geschieht: mit einer Adverbiale der Art und Weise.", "bedingung": { "glied": "art" }, "wirkung": { "prozent": 15 }, "belohnung": { "gold": 3 } },
+    { "id": "ort", "stufe": 3, "text": "Sag, wo es geschieht: mit einer Adverbiale des Ortes.", "bedingung": { "glied": "ort" }, "wirkung": { "prozent": 20 }, "belohnung": { "gold": 3 } },
+    { "id": "vorn", "stufe": 3, "text": "Ein besonderer Anfang: Der Satz soll mit einer Adverbiale beginnen.", "bedingung": { "adverbialVorn": true }, "wirkung": { "prozent": 20 }, "belohnung": { "gold": 4 } },
+    { "id": "lang", "stufe": 3, "text": "Ein langer Spruch: mindestens vier Satzglieder.", "bedingung": { "mindestens": 4 }, "wirkung": { "prozent": 20 }, "belohnung": { "gold": 4 } },
+    { "id": "umstellen", "stufe": 3, "text": "Ein Meisterspruch: Er muss auch nach der Umstellprobe noch stimmen.", "bedingung": { "umstellung": true }, "wirkung": { "prozent": 10 }, "belohnung": { "gold": 4 } }
+  ],
   "stufen": {
     "1": { "glieder": ["subjekt", "praedikat"], "text": "Subjekt und Prädikat" },
     "2": { "glieder": ["subjekt", "praedikat", "objekt"], "text": "dazu ein Objekt" },

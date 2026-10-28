@@ -1,6 +1,7 @@
 // Gemeinsame Bausteine der Oberfläche: Fenster, Hinweise, Item-Kacheln und Raster.
 import { sizeOf } from './logic.js';
-import { GENUS, findFusions, isRune, isVerb, runeTargetCell, verbTargetCell } from './grammar.js';
+import { GENUS, findFusions, isRune, isVerb, isNoun, verbTargetCell, phraseFor, runeFits } from './grammar.js';
+import { sockelPlaetze, sockelVon } from './sockel.js';
 import { G, bildFuer, getPref } from './state.js';
 import { sym } from './symbole.js';
 
@@ -291,11 +292,6 @@ export function itemEl(def, rot, size, stern = 1) {
   if (isRune(def)) {
     el.classList.add('rune');
     em.style.fontSize = Math.round(size * 0.34) + 'px';
-    const a = document.createElement('span');
-    a.className = `arrow d${(rot || 0) % 4}`;
-    a.textContent = '➤';
-    a.style.fontSize = Math.round(size * 0.24) + 'px';
-    el.append(a);
   }
   if (isVerb(def) && def.formen) {
     // Verb-Rolle: Pfeil zeigt auf das Subjekt (0 ↑, 1 →, 2 ↓, 3 ←)
@@ -367,23 +363,8 @@ export function drawItems(gridEl, grid, placed, size, info, area) {
     it.style.left = p.x * size + 'px';
     it.style.top = p.y * size + 'px';
     const i = info?.get(p.uid);
-    if (i) {
-      const seal = i.siegel.find((s) => s.ok);
-      if (seal) {
-        const m = document.createElement('span');
-        m.className = 'mark-siegel';
-        m.style.setProperty('--genus', GENUS[seal.genus].farbe);
-        it.append(m);
-      }
-      if (i.adjektive.length) {
-        const m = document.createElement('span');
-        m.className = 'mark-rune';
-        m.textContent = '✦';
-        it.append(m);
-      }
-      const idle = (def.art === 'siegel' && !i.ziele.some((z) => z.ok)) || (isRune(def) && !i.ziel?.ok) || (i.verb && i.verb.status !== 'ok');
-      if (idle) it.classList.add('idle');
-    }
+    if (i?.verb && i.verb.status !== 'ok') it.classList.add('idle');
+    if (isNoun(def)) sockelZeichnen(it, p, def, size);
     if (fusing.has(p.uid)) it.classList.add('fuses');
     if (p.fluch) {
       it.classList.add('cursed');
@@ -402,15 +383,37 @@ export function drawItems(gridEl, grid, placed, size, info, area) {
   return els;
 }
 
+// Sockel eines Nomens: kleine Mulden unten am Gegenstand (Artikel rund, Adjektive eckig); die Nominalgruppe
+// („das scharfe Feuerschwert“) steht als Beschriftung darauf.
+export function sockelZeichnen(it, p, def, size, extraRunen = 0) {
+  const s = sockelVon(p), pl = sockelPlaetze(def, p.stern || 1, extraRunen);
+  const leiste = document.createElement('span');
+  leiste.className = 'sockel-leiste';
+  leiste.style.setProperty('--mulde', Math.max(12, Math.round(size * 0.2)) + 'px');
+  const a = document.createElement('span');
+  a.className = 'mulde artikel' + (s.siegel ? ' voll' : '');
+  if (s.siegel) { a.style.setProperty('--genus', GENUS[G.DEFS[s.siegel].genus].farbe); a.textContent = G.DEFS[s.siegel].genus; }
+  leiste.append(a);
+  for (let k = 0; k < Math.max(pl.runen, s.runen.length); k++) {
+    const r = document.createElement('span');
+    r.className = 'mulde adjektiv' + (s.runen[k] ? ' voll' : '');
+    if (s.runen[k]) r.textContent = '✦';
+    leiste.append(r);
+  }
+  it.append(leiste);
+  const adjs = s.runen.map((id) => G.DEFS[id]).filter((r) => runeFits(r, def));
+  const phrase = phraseFor(adjs, def, !!s.siegel);
+  const l = it.querySelector('.label');
+  if (phrase && l) { l.textContent = phrase; l.classList.add('phrase'); }
+  if (phrase) it.title = phrase;
+}
+
 function drawRuneLines(gridEl, grid, placed, size, info) {
   const lines = [];
   for (const p of placed) {
     const i = info.get(p.uid);
     const d = G.DEFS[p.id];
-    if (isRune(d) && i?.ziel?.ok) {
-      const t = runeTargetCell(p);
-      lines.push([(p.x + 0.5) * size, (p.y + 0.5) * size, (t.x + 0.5) * size, (t.y + 0.5) * size]);
-    } else if (isVerb(d) && i?.verb?.status === 'ok') {
+    if (isVerb(d) && i?.verb?.status === 'ok') {
       // Linie von der Spitze der Rolle zum Subjekt
       const t = verbTargetCell(p, d);
       const dir = (p.rot || 0) % 4;

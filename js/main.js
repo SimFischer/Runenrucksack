@@ -15,6 +15,7 @@ import {
   G, loadData, save, loadRun, placedOf, itemsIn, gridOf, region, hero, playerCtx, emit, onEvent, figurBild, hintergrundBild, setPref, saveProfil,
 } from './state.js';
 import { evaluateBag, GLANZ_BONUS } from './mods.js';
+import { istSockelTeil, kannEinsetzen, einsetzen, herausnehmen, sockelVon } from './sockel.js';
 import { sym } from './symbole.js';
 import {
   $, fmt, fullName, genusChip, toast, bump, openModal, closeModal, modal, itemEl, buildGrid, drawItems, mergeAnimation, syncGold, iconHtml,
@@ -25,7 +26,6 @@ import { frageImSpiel, wortschatz, einstellungen } from './aufgaben/spiel.js';
 import { BEGLEITER_PREFIX, begleiterFrei, istBegleiter } from './begleiter.js';
 import { stufenBereich, stufeFuer, aufgabenStand, schaetzeLernstand, themaAn } from './aufgaben/wahl.js';
 import { zeigeBrief } from './brief-ui.js';
-import { zeigeSatzschmiede } from './satzschmiede-ui.js';
 import { wochenKnopfHtml, zeigeWochenStart, zeigeWochenErgebnis } from './wochenrune-ui.js';
 import { verbSatz, verbSatzInhalt, PERSONEN_FOLGE, kurzName } from './aufgaben/verbsatz.js';
 import { runEncounter } from './encounters.js';
@@ -307,8 +307,6 @@ function continueFlow() {
   else if (step === 'begegnung') runEncounter(next, render);
   // Brief statt Begegnung – hat die Lehrkraft das Leseverständnis ausgeschaltet, kommt doch eine Begegnung
   else if (step === 'brief') (themaAn(einstellungen(), 'lesen') && G.BOTSCHAFTEN?.length ? zeigeBrief(next, laufRng(G.run, 'brief')) : runEncounter(next, render));
-  // Satzschmiede: nur wenn das Thema Satzglieder eingeschaltet ist, einmal am Tag
-  else if (step === 'satzschmiede') (themaAn(einstellungen(), 'satzglieder') && G.SATZSCHMIEDE && !G.run.tutorial && G.run.satzschmiedeTag !== G.run.day ? zeigeSatzschmiede(next, render) : next());
   else next(); // z. B. „verschmelzen“ aus älteren Spielständen – Komposita entstehen jetzt sofort
 }
 
@@ -650,9 +648,12 @@ function renderInfo() {
     btn(`Kaufen <span class="price">${preis} ${sym('gold')}</span>`, () => buyAuto(slot), 'primary').disabled = G.run.gold < preis;
   } else {
     const uid = selected.uid;
-    if (canRotate(base)) btn(isRune(base) || isVerb(base) ? '⟳ Pfeil drehen' : '⟳ Drehen', () => rotateInPlace(uid));
+    if (canRotate(base)) btn(isVerb(base) ? '⟳ Pfeil drehen' : '⟳ Drehen', () => rotateInPlace(uid));
     if (selected.src === 'bag') btn(`${sym('truhe')} Ins Lager`, () => moveAuto(uid, 'store'));
-    else btn('In den Rucksack', () => moveAuto(uid, 'bag'));
+    else if (!istSockelTeil(base)) btn('In den Rucksack', () => moveAuto(uid, 'bag'));
+    const sk = sockelVon(placedOf(uid));
+    if (sk.siegel) btn(`Siegel „${G.DEFS[sk.siegel].genus}“ herausnehmen`, () => nimmHeraus(uid, 'siegel'));
+    sk.runen.forEach((id, k) => btn(`Rune „${G.DEFS[id].name}“ herausnehmen`, () => nimmHeraus(uid, k)));
     if (!istBegleiter(base)) btn(`Verkaufen <span class="price">+${sellValue(G.DEFS[placedOf(uid).id], placedOf(uid).stern || 1)} ${sym('gold')}</span>`, () => sell(uid), 'danger');
     if (schmiedZiel(placedOf(uid), G.DEFS) && !G.run.tutorial) btn('<span class="amboss klein"></span> Schmied', () => zeigeSchmied(uid));
   }
@@ -738,13 +739,7 @@ function grammarNotes(base, ana, ref) {
   }
   if (base.art === 'siegel') {
     const bonus = Math.round((playerCtx().siegelBonus ?? SIEGEL_BONUS) * 100);
-    out.push({ html: `Gibt einem Nomen daneben +${bonus} % Wirkung – aber nur, wenn es „${base.genus}“ heißt${where}.` });
-    for (const z of ana?.ziele || []) {
-      out.push(z.ok
-        ? { cls: 'ok', html: `✓ ${fullName(z.def)}: passt, +${bonus} %` }
-        : { cls: 'bad', html: `✗ ${z.def.name}: Es heißt „${fullName(z.def)}“ (${GENUS[z.def.artikel].name}). Dazu passt nur das Siegel ${genusChip(z.def.artikel)}.` });
-    }
-    if (ana && !ana.ziele.length) out.push({ cls: 'bad', html: 'Kein Nomen direkt daneben.' });
+    out.push({ html: `Zieh es auf ein Nomen, das „${base.genus}“ heißt: Im Artikel-Sockel gibt es +${bonus} % Wirkung.` });
   }
   if (isRune(base)) {
     const parts = Object.entries(base.adjektiv.bonus || {}).map(([k, v]) => {
@@ -752,36 +747,17 @@ function grammarNotes(base, ana, ref) {
       return k === 'tempo' ? `+${fmt(v)} % ${label}` : `+${fmt(v)} ${label}`;
     });
     if (base.adjektiv.bonusProzent) parts.push(`alle Wirkungen +${base.adjektiv.bonusProzent} %`);
-    out.push({ html: `Der Pfeil muss auf ein passendes Nomen zeigen: ${base.adjektiv.passtText}. Wirkung: ${parts.join(', ')}${where}.` });
+    out.push({ html: `Zieh sie auf ein passendes Nomen (${base.adjektiv.passtText}) – sie kommt in den Adjektiv-Sockel. Wirkung: ${parts.join(', ')}.` });
     const b0 = G.DEFS[runeBase(base)];
     if (b0.steigerung) {
       const lv = base.stufe || 1;
       out.push({ html: `Steigerung: ${b0.name} → ${b0.steigerung.komparativ} → ${b0.steigerung.superlativ}. ${lv >= 4 ? 'Das ist die höchste Stufe: der Superlativ mit Krone.' : lv === 3 ? 'Superlativ! Noch eine gleiche Rune, dann bekommt sie die Krone.' : 'Zwei gleiche Runen werden sofort gesteigert.'}` });
     }
-    const z = ana?.ziel;
-    if (ana && !z) out.push({ cls: 'bad', html: '✗ Der Pfeil zeigt auf kein Item. Tippe nochmal, um ihn zu drehen.' });
-    else if (z?.ok) {
-      const phrase = bagInfo.get(z.uid)?.phrase || z.def.name;
-      out.push({ cls: 'ok', html: `✓ Zeigt auf ${fullName(z.def)} → <b>${phrase}</b>` });
-    } else if (z) {
-      out.push({
-        cls: 'bad',
-        html: isNoun(z.def)
-          ? `✗ Zeigt auf ${fullName(z.def)}. „${base.name}“ passt nur zu ${base.adjektiv.passtText}.`
-          : `✗ Zeigt auf „${z.def.name}“ – das ist kein Nomen.`,
-      });
-    }
   }
   if (ana && isNoun(base)) {
-    for (const sg of ana.siegel) {
-      out.push(sg.ok
-        ? { cls: 'ok', html: `✓ Siegel ${genusChip(sg.genus)} daneben: mehr Wirkung` }
-        : { cls: 'bad', html: `✗ Siegel ${genusChip(sg.genus)} daneben wirkt nicht: Es heißt „${fullName(base)}“.` });
-    }
-    for (const r of ana.runen) {
-      if (r.ok) out.push({ cls: 'ok', html: `✓ Rune „${r.def.name}“ zeigt hierher: ${ana.phrase}` });
-      else out.push({ cls: 'bad', html: `✗ Rune „${r.def.name}“ zeigt hierher, passt aber nur zu ${r.def.adjektiv.passtText}.` });
-    }
+    if (ana.siegel.some((s) => s.ok)) out.push({ cls: 'ok', html: `✓ Siegel ${genusChip(base.artikel)} im Sockel: mehr Wirkung` });
+    if (ana.adjektive.length) out.push({ cls: 'ok', html: `✓ Im Sockel: <b>${ana.phrase}</b>` });
+    if (!ana.siegel.length || !ana.runen.length) out.push({ html: 'Freie Sockel: Zieh ein passendes Siegel oder eine Rune auf diesen Gegenstand.' });
   }
   return out;
 }
@@ -1027,10 +1003,59 @@ function buyTasche(slot) {
   render();
 }
 
+// Ritterin Ysolde: ein Adjektiv-Sockel mehr
+const extraRunen = () => ((playerCtx().runenZiele || 1) >= 2 ? 1 : 0);
+
+// Siegel oder Rune (aus Laden oder Lager) in ein Nomen einsetzen. Vorher die Aufgabe wie beim Verbinden;
+// beim ersten Versuch richtig glänzt der Gegenstand. Abbrechen: nichts passiert (ein Kauf wird nicht bezahlt).
+async function setzeEin(ref, hostUid) {
+  const run = G.run, host = placedOf(hostUid);
+  const id = ref.src === 'shop' ? run.shop[ref.slot].id : placedOf(ref.uid).id;
+  const d = G.DEFS[id], hd = G.DEFS[host.id];
+  if (!run.tutorial) {
+    const kopf = `<span class="quick-eq">${iconHtml(d, 'ic small')}<b>➜</b>${iconHtml(hd, 'ic small')}</span>`;
+    const r = await frageImSpiel({ art: d.art === 'siegel' ? 'siegel' : 'rune', bereich: stufenBereich(sternVon(host) + 1), anker: itemNode(hostUid),
+      beteiligt: [itemNode(hostUid)], kopf, itemWort: null, nein: 'Nicht einsetzen' });
+    if (r.abgebrochen) { render(); return; }
+    if (r.glanz) host.glanz = 1;
+  }
+  let teil;
+  if (ref.src === 'shop') {
+    const preis = preisVon(run, d);
+    if (run.gold < preis) { toast('Zu wenig Gold'); render(); return; }
+    run.gold -= preis;
+    if (preis < d.preis) run.rabatt--;
+    run.shop[ref.slot] = null;
+    bump('stat-gold');
+    teil = { uid: -1, id };
+  } else teil = placedOf(ref.uid);
+  einsetzen(run, host, teil, G.DEFS);
+  selected = { src: host.area, uid: hostUid };
+  render();
+  itemNode(hostUid)?.classList.add('pulse');
+  const phrase = bagInfo.get(hostUid)?.phrase;
+  toast(phrase ? `Eingesetzt: ${phrase}` : `${d.name} eingesetzt`);
+  emit('eingesetzt', { id, ziel: host.id });
+}
+
+// Siegel oder Rune aus dem Sockel ins Lager zurücklegen
+function nimmHeraus(uid, wo) {
+  const run = G.run, host = placedOf(uid);
+  const id = sockelVon(host)[wo === 'siegel' ? 'siegel' : 'runen'][wo === 'siegel' ? 0 : wo];
+  const spot = findSpot(itemsIn('store'), G.DEFS, G.DEFS[id || sockelVon(host).siegel], gridOf('store'));
+  if (!spot) { toast('Kein Platz im Lager'); return; }
+  const raus = herausnehmen(host, wo);
+  run.items.push({ uid: run.nextUid++, id: raus, area: 'store', ...spot, rot: 0 });
+  render();
+}
+
 function sell(uid) {
   const p = placedOf(uid);
   const def = G.DEFS[p.id];
   if (istBegleiter(def)) { toast(`${fullName(def)} bleibt bei dir – Begleiter verkauft man nicht.`); render(); return; }
+  // Eingesetzte Siegel und Runen bleiben: Sie kommen ins Lager (ohne Platz gehen sie mit)
+  const s = sockelVon(p);
+  for (const id of [s.siegel, ...s.runen].filter(Boolean)) placeNew(G.run, G.DEFS, id);
   const wert = sellValue(def, p.stern || 1);
   G.run.items = G.run.items.filter((i) => i !== p);
   G.run.gold += wert;
@@ -1045,7 +1070,6 @@ function moveAuto(uid, area) {
   const spot = findSpot(itemsIn(area), G.DEFS, G.DEFS[p.id], gridOf(area));
   if (!spot) { toast(area === 'bag' ? 'Kein Platz im Rucksack' : 'Kein Platz im Lager'); return; }
   Object.assign(p, { area, ...spot });
-  if (isRune(G.DEFS[p.id])) p.rot = 0;
   selected = { src: area, uid };
   pruefe({ uid });
   render();
@@ -1056,7 +1080,6 @@ function rotateInPlace(uid) {
   const def = G.DEFS[p.id];
   if (!canRotate(def)) return;
   const rot = nextRot(def, p.rot || 0);
-  if (isRune(def)) { p.rot = rot; render(); emit('drehen', { id: p.id }); return; }
   pruefe({ uid }); // gedreht kann ein Kristall jetzt richtig an einem Träger liegen
   const grid = gridOf(p.area);
   const others = itemsIn(p.area, uid);
@@ -1497,6 +1520,14 @@ function evaluate(area, x, y, s) {
   const hit = overlapping(list, G.DEFS, x, y, s.w, s.h);
   const me = selfUid ? placedOf(selfUid) : { id: drag.def.id };
   if (hit.length === 1 && sameKind(hit[0], me) && canMerge(drag.def, sternVon(me))) return { status: 'merge', mit: hit[0].uid };
+  // Siegel und Runen: auf ein Nomen ziehen und dort einsetzen – im Rucksack belegen sie kein Feld
+  if (istSockelTeil(drag.def)) {
+    if (hit.length === 1) {
+      const k = kannEinsetzen(hit[0], G.DEFS, drag.def.id, extraRunen());
+      return k.ok ? { status: 'sockel', host: hit[0].uid } : { status: 'bad', reason: 'sockel', text: k.text };
+    }
+    if (area === 'bag') return { status: 'bad', reason: 'sockel', text: 'Zieh es direkt auf ein Nomen – dort hat es einen Sockel.' };
+  }
   if (canPlace(list, G.DEFS, drag.def, x, y, drag.rot, grid)) return { status: 'ok' };
   if (area !== 'bag') return { status: 'bad' };
   // Felder müssen trotzdem zum Rucksack gehören.
@@ -1531,9 +1562,11 @@ function drop(d) {
   if (d.def.art === 'tasche') { buyTasche(d.ref.slot); return; }
   if (t.status === 'bad') {
     if (t.reason === 'gold') toast('Zu wenig Gold');
+    if (t.reason === 'sockel') toast(t.text);
     render();
     return;
   }
+  if (t.status === 'sockel') { setzeEin(d.ref, t.host); return; }
   if (t.status === 'merge') {
     // Direkt auf ein gleiches Item gelegt: beide verbinden sich.
     if (d.ref.src === 'shop') { buy(d.ref.slot, null, null, t.mit); return; }

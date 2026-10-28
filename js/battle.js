@@ -13,7 +13,7 @@ const MAX_TIME = 60;
 // selbstschaden (zu Kampfbeginn), ersterAngriffDoppelt (Begleiter Falke), rng.
 export function makeFighter(name, placed, defs, day, opts = {}) {
   const rng = opts.rng || Math.random;
-  const info = opts.info || analyze(placed, defs);
+  const info = opts.info || analyze(placed, defs, { verbVoll: !!opts.klug });
   // Spruchrolle: „sofort“ löst gleich aus, „in der dritten Runde“ / „am Ende des Kampfes“ beginnt später
   const items = placed.map((p) => {
     const def = info.get(p.uid).def;
@@ -38,7 +38,27 @@ export function makeFighter(name, placed, defs, day, opts = {}) {
     gift: 0, brand: 0, kaelte: 0, betaeubt: 0, regeneration: 0,
     items: items.filter((i) => i.def.abklingzeit > 0),
     ersterAngriffDoppelt: !!opts.ersterAngriffDoppelt,
+    faehigkeit: opts.faehigkeit || null, // Bosse: { typ: 'stehlen' | 'wolf', … } aus enemies.json
   };
+}
+
+// Stärkster Gegenstand einer Seite (für den Plünderer)
+const wirkungsWert = (d) => ((d.schaden || 0) + (d.block || 0) + (d.heilung || 0) + 2 * (d.gift || 0) + 2 * (d.brand || 0)) / d.abklingzeit;
+function staerkstes(side) {
+  side.staerkstes ??= [...side.items].sort((a, b) => wirkungsWert(b.def) - wirkungsWert(a.def))[0]?.uid ?? null;
+  return side.staerkstes;
+}
+
+// Boss-Fähigkeit des Häuptlings: Bei halbem Leben ruft er einen Wolf als zweiten Angriff.
+// (Der Plünderer stiehlt in trigger() einmal die Wirkung deines stärksten Gegenstands.)
+function bossFaehigkeit(battle, key, me, foe, ev) {
+  const f = me.faehigkeit;
+  if (!f || f.erledigt) return;
+  if (f.typ === 'wolf' && me.hp <= me.maxHp / 2) {
+    f.erledigt = true;
+    me.items.push({ uid: 'wolf', def: { schaden: f.schaden, abklingzeit: f.abklingzeit }, t: 0 });
+    ev.push({ type: 'wolf', side: key });
+  }
 }
 
 export class Battle {
@@ -71,6 +91,7 @@ export class Battle {
       const speed = stunned ? 0 : (1 + me.tempo) * (me.kaelte > 0 ? COLD_SLOW : 1);
       me.kaelte = Math.max(0, me.kaelte - h);
       me.betaeubt = Math.max(0, me.betaeubt - h);
+      bossFaehigkeit(this, key, me, foe, ev);
       for (const it of me.items) {
         it.t += h * speed * (1 + (it.def.tempo || 0) / 100);
         if (it.t >= it.def.abklingzeit) {
@@ -107,6 +128,14 @@ export class Battle {
 
   trigger(key, me, foeKey, foe, it, ev, alsSubjekt = false) {
     const d = it.def;
+    // Plünderer: Löst dein stärkster Gegenstand zum ersten Mal aus, stiehlt er die Wirkung – sie wirkt für ihn.
+    const dieb = foe.faehigkeit;
+    if (dieb?.typ === 'stehlen' && !dieb.erledigt && !alsSubjekt && it.uid === staerkstes(me)) {
+      dieb.erledigt = true;
+      ev.push({ type: 'stehlen', side: foeKey, uid: it.uid });
+      this.trigger(foeKey, foe, key, me, { uid: 'beute', def: { ...d, subjektUid: null } }, ev, true);
+      return;
+    }
     // Glück: Chance, dass das Item doppelt wirkt.
     const luck = me.glueck + (d.glueck || 0) / 100;
     const m = luck > 0 && me.rng() < luck ? 2 : 1;

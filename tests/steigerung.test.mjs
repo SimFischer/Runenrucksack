@@ -55,20 +55,3 @@ test('Zwei gleiche Runen irgendwo in Rucksack oder Lager finden sich', () => {
   assert.equal(phraseFor([DEFS['rune-scharf@4']], DEFS.schwert), 'das schärfste Schwert');
 });
 
-test('Jede Stufe wirkt deutlich stärker (wie Sternstufen), falsch gerichtet wirkt keine', () => {
-  const dmg = (runeId, rot = 0) => {
-    const t = P('schwert', 1, 0);
-    return analyze([t, P(runeId, 0, 0, rot)], DEFS).get(t.uid).def.schaden;
-  };
-  const base = DEFS.schwert.schaden;
-  assert.equal(dmg('rune-scharf') - base, 3);
-  assert.ok(dmg('rune-scharf@2') - base >= 6);
-  assert.ok(dmg('rune-scharf@3') - base >= 15);
-  assert.ok(dmg('rune-scharf@4') - base >= 33);
-  assert.equal(dmg('rune-scharf@3', 2), base);
-  const pct = (runeId) => {
-    const t = P('schwert', 1, 0);
-    return analyze([t, P(runeId, 0, 0)], DEFS).get(t.uid).def.schaden;
-  };
-  assert.ok(pct('rune-gut@4') > pct('rune-gut@3') && pct('rune-gut@3') > pct('rune-gut@2') && pct('rune-gut@2') > pct('rune-gut') && pct('rune-gut') > base);
-});

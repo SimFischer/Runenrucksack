@@ -83,6 +83,7 @@ const SATZ = `
       const satzKarte = async (t) => {
         const el = [...document.querySelectorAll('#satz-layer .satz-karte')].find((k) => k.textContent.trim() === t && !k.classList.contains('benutzt')
           && (!document.querySelector('.satz-hinweis') || k.closest('.satz-leiste')));
+        if (!el) return; // Karten werden je Besuch neu gezogen
         const r = el.getBoundingClientRect(), o = { bubbles: true, clientX: r.x + 8, clientY: r.y + 8, pointerId: 1, isPrimary: true };
         el.dispatchEvent(new PointerEvent('pointerdown', o)); window.dispatchEvent(new PointerEvent('pointerup', o)); await __s(150);
       };`;
@@ -197,18 +198,6 @@ const BILDSCHIRME = [
   { name: 'satz-ergebnis', profil: PROFIL_SATZ, ohneScroll: true, schritte: `${LAUF}${SATZ}
       await __klick('#satz-layer [data-rein]', 400); for (const t of ['Eadrun', 'schlägt', 'den Ork', 'sofort']) await satzKarte(t);
       await __klick('#satz-layer [data-schmieden]', 400);` },
-  { name: 'satz-umstellen', profil: PROFIL_SATZ, ohneScroll: true, schritte: `${LAUF}${SATZ}
-      await __klick('#satz-layer [data-rein]', 400); for (const t of ['Eadrun', 'schlägt', 'den Ork', 'sofort']) await satzKarte(t);
-      await __klick('#satz-layer [data-schmieden]', 400); await __klick('#satz-layer [data-umstellen]', 400);
-      for (const t of ['sofort', 'sofort', 'sofort', 'schlägt']) await satzKarte(t);
-      await __klick('#satz-layer [data-pruefen]', 400);` },
-  { name: 'satz-rolle', profil: PROFIL_SATZ, ohneScroll: true, schritte: `${LAUF}${SATZ}
-      await __klick('#satz-layer [data-rein]', 400); for (const t of ['Eadrun', 'schlägt', 'den Ork', 'sofort']) await satzKarte(t);
-      await __klick('#satz-layer [data-schmieden]', 400); await __klick('#satz-layer [data-nehmen]', 600);
-      await __klick('#btn-reroll', 300); const p = __G.run.items.find((q) => q.id === 'spruchrolle');
-      const it = document.querySelector(\`.item[data-uid="\${p.uid}"]\`), rr = it.getBoundingClientRect();
-      for (const t of ['pointerdown', 'pointerup']) it.dispatchEvent(new PointerEvent(t, { bubbles: true, clientX: rr.x + 12, clientY: rr.y + 12, pointerId: 1, isPrimary: true, pointerType: 'touch' }));
-      await __s(400); document.title = JSON.stringify({ area: p.area, satz: p.spruch.satz });` },
   { name: 'buch-sprueche', profil: PROFIL_SATZ, ohneScroll: true, schritte: `await __klick('#btn-known'); await __klick('#btn-buch', 500); await __klick('.buch-tab[data-seite="sprueche"]', 300);` },
   { name: 'woche-start', profil: PROFIL, ohneScroll: true, schritte: `await __klick('#btn-known'); await __klick('#btn-woche', 500);` },
   { name: 'woche-lauf', profil: PROFIL, ohneScroll: true, schritte: `await __klick('#btn-known'); await __klick('#btn-woche', 500); await __klick('#woche-layer [data-los]', 900);

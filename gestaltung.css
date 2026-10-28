@@ -684,3 +684,17 @@ h2 .amboss { width: 40px; height: 26px; margin-right: 6px; }
 .hilfe-bild.brief { background-image: url("assets/ui/satzschmiede/brief.webp"); }
 .hilfe-bild.spruchrolle { background-image: url("assets/ui/satzschmiede/spruchrolle.webp"); }
 .hilfe-bild.wochenrune { background-image: url("assets/ui/satzschmiede/wochenrune.webp"); }
+
+/* ---------- Sockel: Mulden für Artikel-Siegel und Adjektiv-Runen ---------- */
+.sockel-leiste { position: absolute; left: 4px; top: 4px; display: flex; gap: 3px; z-index: 3; pointer-events: none; }
+.mulde { width: var(--mulde); height: var(--mulde); display: grid; place-items: center; font-family: var(--font); font-weight: 700;
+  font-size: calc(var(--mulde) * .55); line-height: 1; color: #fff; background: rgba(40, 24, 10, .55);
+  box-shadow: inset 0 2px 3px rgba(0, 0, 0, .6), 0 1px 0 rgba(255, 255, 255, .35); }
+.mulde.artikel { border-radius: 50%; }
+.mulde.adjektiv { border-radius: 3px; }
+.mulde.artikel.voll { background: var(--genus); box-shadow: 0 0 6px var(--genus), inset 0 -2px 0 rgba(0, 0, 0, .25); font-size: calc(var(--mulde) * .42); }
+.mulde.adjektiv.voll { background: linear-gradient(180deg, #ffe58a, #d49a1c); color: #6b3c00; box-shadow: 0 0 6px #ffb800; }
+.item .label.phrase { white-space: normal; line-height: 1.05; font-size: 11px; }
+.preview.sockel { background: rgba(255, 214, 90, .35); border-color: var(--gold-hell); }
+.satz-bestellung { margin: 0; font-size: 17px; line-height: 1.35; padding: 6px 12px; border-radius: 10px; background: #fbf2dc; border-left: 4px solid var(--gold); }
+.satz-bestellung small { color: var(--gold-dunkel); font-weight: 700; white-space: nowrap; }

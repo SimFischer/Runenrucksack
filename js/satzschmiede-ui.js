@@ -1,14 +1,17 @@
-// Satzschmiede: Am Morgen (nach Begegnung bzw. Brief) kann das Kind einmal am Tag hineingehen. Satzglied-Karten
+// Satzschmiede: eine Wahl bei den Begegnungen (höchstens alle drei Tage, dreimal im Lauf, 3 Gold). Jeder Besuch
+// hat eine Bestellung, die den Satz vorgibt; die Karten werden jedes Mal neu gezogen. Satzglied-Karten
 // (farbig, mit Form-Zeichen) werden angetippt oder in die Satzleiste gezogen. Ist der Satz richtig, entsteht eine
 // Spruchrolle (2×1) mit Werten aus den Satzgliedern. Auf Stufe 3 folgt die Umstellprobe: Wer den Satz gültig
 // umstellt, macht die Rolle eine Stufe stärker. Logik und Prüfung: js/satzschmiede.js.
 import { G, save, region, emit, saveProfil, hero } from './state.js';
+import { laufRng } from './logic.js';
 import { placeNew } from './sterne.js';
 import { merkeAntwort } from './fortschritt.js';
 import { aufgabenStand, lernstandVon, maxStufe } from './aufgaben/wahl.js';
 import { einstellungen } from './aufgaben/spiel.js';
 import {
   karten, pruefeSatz, spruchWerte, istUmstellung, verbucheSatz, schmiedeVerben, schmiedeStern, THEMA_SATZ, GLIED_NAME, GLIED_FRAGE,
+  waehleBestellung, erfuellt, zieheKarten,
 } from './satzschmiede.js';
 import { applyMod } from './mods.js';
 import { toast, bump } from './ui.js';
@@ -34,9 +37,10 @@ function werteText(w) {
   return teile.join(' · ');
 }
 
-// fertig: weiter im Ablauf am Morgen; render: Spielfeld neu zeichnen (Spruchrolle sichtbar)
-export function zeigeSatzschmiede(fertig, render = () => {}) {
+// fertig: weiter im Ablauf am Morgen; render: Spielfeld neu zeichnen (Spruchrolle sichtbar); zurueck: zur Auswahl
+export function zeigeSatzschmiede(fertig, render = () => {}, zurueck = fertig) {
   const daten = G.SATZSCHMIEDE;
+  const preis = daten.besuch.preis;
   const erstesMal = !G.PROFIL.satzschmiedeGesehen;
   emit('tipp', { key: 'satzschmiede' });
   const box = document.createElement('div');
@@ -49,15 +53,23 @@ export function zeigeSatzschmiede(fertig, render = () => {}) {
       ${erstesMal
         ? `<p class="satz-erklaer">Hier baust du aus Satzglied-Karten einen Satz. Ist er richtig, schmiedet die Schmiedin daraus eine
            <b>Spruchrolle</b> für deinen Rucksack. Jedes Satzglied gibt ihr eine eigene Kraft.</p>`
-        : '<p class="satz-erklaer">Heute schon einen Spruch geschmiedet? Ein richtiger Satz wird zur Spruchrolle.</p>'}
+        : '<p class="satz-erklaer">Die Schmiedin hat eine neue Bestellung. Ein richtiger Satz, der dazu passt, wird zur Spruchrolle.</p>'}
       <div class="row">
-        <button class="btn primary big" data-rein>Hineingehen</button>
-        <button class="btn" data-nein>Heute nicht</button>
+        <button class="btn primary big" data-rein ${G.run.gold < preis ? 'disabled' : ''}>Hineingehen · ${preis} ${sym('gold', 'klein')}</button>
+        <button class="btn" data-nein>Zurück</button>
       </div>
+      ${G.run.gold < preis ? `<p class="satz-erklaer">Dir fehlen noch ${preis - G.run.gold} Gold.</p>` : ''}
     </div>`;
   document.body.append(box);
-  box.querySelector('[data-nein]').onclick = () => { box.remove(); fertig(); };
+  box.querySelector('[data-nein]').onclick = () => { box.remove(); zurueck(); };
   box.querySelector('[data-rein]').onclick = () => {
+    const run = G.run;
+    if (run.gold < preis) return;
+    run.gold -= preis;
+    bump('stat-gold');
+    run.satzschmiedeTag = run.day;
+    run.satzschmiedeBesuche = (run.satzschmiedeBesuche || 0) + 1;
+    save();
     if (erstesMal) { G.PROFIL.satzschmiedeGesehen = true; saveProfil(); }
     schmiede(box, daten, fertig, render);
   };
@@ -68,8 +80,17 @@ function schmiede(box, daten, fertig, render) {
   const stufe = Math.max(1, Math.min(lernstandVon(G.PROFIL, THEMA_SATZ).stufe, maxStufe(einstellungen(), THEMA_SATZ)));
   const h = hero();
   const bDef = G.BEGLEITER?.find((b) => b.id === run.begleiter) || null;
-  const verben = schmiedeVerben(run, G.DEFS, daten);
-  const pool = karten({ daten, ws: G.WORTSCHATZ, figur: { kurz: h?.kurz || h?.name || 'Ich' }, begleiter: bDef, verben, stufe });
+  const rng = laufRng(run, 'satzschmiede');
+  const bestellung = waehleBestellung(daten, stufe, run, rng);
+  run.bestellungen = [...(run.bestellungen || []), bestellung.id];
+  // Verben: die Rollen aus dem Rucksack, dazu wechselnde andere – die Bestellung muss erfüllbar sein
+  const alle = Object.keys(daten.verben);
+  const schutz = ['schützen', 'heilen'];
+  let verben = [...new Set([...schmiedeVerben(run, G.DEFS, daten), ...mische(alle)])].slice(0, 3);
+  const b = bestellung.bedingung;
+  if (b.wirkung === 'schutz' || b.objektText === 'uns') verben = [mische(schutz)[0], ...verben.filter((v) => !schutz.includes(v))].slice(0, 3);
+  if (b.wirkung === 'schaden' || b.objektPlural) verben = [mische(alle.filter((v) => !schutz.includes(v)))[0], ...verben].filter((v, i, l) => l.indexOf(v) === i).slice(0, 3);
+  const pool = zieheKarten(karten({ daten, ws: G.WORTSCHATZ, figur: { kurz: h?.kurz || h?.name || 'Ich' }, begleiter: bDef, verben, stufe, weitere: true }), bestellung, rng);
   const reihe = Object.fromEntries(GLIEDER.map((g) => [g, mische(pool.filter((k) => k.glied === g))]));
   const ctx = { daten, ws: G.WORTSCHATZ };
   let leiste = [];
@@ -96,8 +117,9 @@ function schmiede(box, daten, fertig, render) {
             <p class="satz-stufe">Stufe ${'★'.repeat(stufe)}${'☆'.repeat(3 - stufe)}: ${daten.stufen[stufe].text}</p></div>
           ${ergebnis ? '' : `<button class="btn" data-leeren ${leiste.length ? '' : 'disabled'}>Leeren</button>
           <button class="btn primary big" data-schmieden ${leiste.length >= 2 ? '' : 'disabled'}>Schmieden</button>
-          <button class="btn" data-nein>Heute nicht</button>`}
+          <button class="btn" data-nein>Gehen</button>`}
         </header>
+        <p class="satz-bestellung"><b>Bestellung:</b> ${esc(bestellung.text)} <small>Lohn: +${bestellung.belohnung.gold} ${sym('gold', 'klein')}</small></p>
         ${umstellen ? `<p class="satz-hinweis"><b>Umstellprobe:</b> Satzglieder kann man umstellen – das Prädikat bleibt an zweiter Stelle.
           Tippe eine Karte an, dann rückt sie eine Stelle nach vorn. Oder zieh sie an ihren neuen Platz.</p>` : ''}
         <div class="satz-leiste${ergebnis && !umstellen ? ' fertig' : ''}" data-leiste data-tut="satz-leiste">${satzKarten}</div>
@@ -116,6 +138,7 @@ function schmiede(box, daten, fertig, render) {
   const ergebnisHtml = () => {
     const w = werteVon(ergebnis);
     const kannUmstellen = stufe >= 3 && !ergebnis.umgestellt;
+    const mussUmstellen = bestellung.bedingung.umstellung && !ergebnis.umgestellt;
     return `
       <div class="satz-ergebnis">
         <img class="satz-rolle" src="${BILD}spruchrolle.webp" alt="">
@@ -126,14 +149,15 @@ function schmiede(box, daten, fertig, render) {
       </div>
       <div class="row satz-knoepfe">
         ${umstellen
-          ? '<button class="btn" data-nehmen>Ohne Umstellprobe nehmen</button><button class="btn primary big" data-pruefen>Umstellung prüfen</button>'
-          : `${kannUmstellen ? '<button class="btn" data-umstellen>Umstellprobe wagen</button>' : ''}<button class="btn primary big" data-nehmen>Spruchrolle nehmen</button>`}
+          ? `${mussUmstellen ? '' : '<button class="btn" data-nehmen>Ohne Umstellprobe nehmen</button>'}<button class="btn primary big" data-pruefen>Umstellung prüfen</button>`
+          : `${kannUmstellen ? `<button class="btn${mussUmstellen ? ' primary big' : ''}" data-umstellen>Umstellprobe wagen</button>` : ''}${mussUmstellen ? '' : '<button class="btn primary big" data-nehmen>Spruchrolle nehmen</button>'}`}
       </div>`;
   };
 
   // Werte der Spruchrolle: Sternstufe der Verb-Rolle im Rucksack, Umstellprobe +1 Stern
   const werteVon = (e) => spruchWerte(e.r, {
     daten, verbDef: G.DEFS[daten.verben[e.r.verb].item], stern: schmiedeStern(run, G.DEFS, e.r.verb, daten), applyMod, umgestellt: e.umgestellt,
+    bestellung: e.bestellt ? bestellung : null,
   });
 
   // Antippen: aus dem Vorrat ans Ende der Leiste, aus der Leiste zurück (Umstellprobe: eine Stelle nach vorn)
@@ -198,6 +222,18 @@ function schmiede(box, daten, fertig, render) {
       zeichne();
       return;
     }
+    // Derselbe Satz zweimal im Lauf: abgelehnt
+    if ((run.sprueche || []).includes(r.satz)) {
+      meldung = '<p class="af-rueck falsch satz-meldung">Diesen Spruch kennt die Schmiede schon. Bau einen anderen Satz.</p>';
+      zeichne();
+      return;
+    }
+    // Die Umstellprobe-Bestellung prüft erst nach dem Umstellen, alle anderen gleich
+    if (!bestellung.bedingung.umstellung && !erfuellt(bestellung, r, leiste)) {
+      meldung = `<p class="af-rueck falsch satz-meldung">Der Satz stimmt – aber er passt noch nicht zur Bestellung. ${esc(bestellung.text)}</p>`;
+      zeichne();
+      return;
+    }
     // Lernstand: nur der erste Versuch zählt als „gleich richtig“
     const gleich = versuche === 1;
     merkeAntwort(run, THEMA_SATZ, true, gleich);
@@ -206,14 +242,14 @@ function schmiede(box, daten, fertig, render) {
     const v = verbucheSatz(G.PROFIL, gleich);
     saveProfil();
     if (v.aufgestiegen) toast(`Satzglieder: Jetzt kommen Karten der Stufe ${'★'.repeat(v.stufe)}!`);
-    ergebnis = { r, leiste: [...leiste], umgestellt: false };
+    ergebnis = { r, leiste: [...leiste], umgestellt: false, bestellt: !bestellung.bedingung.umstellung };
     meldung = `<p class="af-rueck richtig satz-meldung">✓ Ein richtiger Satz! Die Schmiedin macht daraus eine Spruchrolle.</p>`;
     zeichne();
   };
 
   const pruefeUmstellung = () => {
     if (istUmstellung(ergebnis.leiste, leiste, ctx)) {
-      ergebnis = { r: pruefeSatz(leiste, ctx), leiste: [...leiste], umgestellt: true };
+      ergebnis = { r: pruefeSatz(leiste, ctx), leiste: [...leiste], umgestellt: true, bestellt: true };
       umstellen = false;
       meldung = `<p class="af-rueck richtig satz-meldung">✓ Umstellprobe bestanden! Das Prädikat steht noch an zweiter Stelle – die Spruchrolle bekommt einen Stern mehr.</p>`;
     } else {
@@ -233,12 +269,14 @@ function schmiede(box, daten, fertig, render) {
     const p = placeNew(run, G.DEFS, 'spruchrolle', null, w.stufe > 1 ? { spruch, stern: w.stufe } : { spruch });
     if (p) emit('neuesItem', { uid: p.uid });
     else { run.gold += 2; bump('stat-gold'); }
-    run.satzschmiedeTag = run.day;
+    run.sprueche = [...(run.sprueche || []), r.satz];
+    const lohn = ergebnis.bestellt ? bestellung.belohnung.gold : 0;
+    if (lohn) { run.gold += lohn; bump('stat-gold'); }
     G.PROFIL.sprueche = [...(G.PROFIL.sprueche || []), { satz: r.satz, verb: r.verb, umgestellt: ergebnis.umgestellt, werte: werteText(w.werte) }];
     saveProfil();
     save();
     box.remove();
-    toast(p ? `Neue Spruchrolle: „${r.satz}“` : `Kein Platz für die Spruchrolle – dafür 2 Gold.`);
+    toast(p ? `Neue Spruchrolle: „${r.satz}“${lohn ? ` – und ${lohn} Gold für die Bestellung` : ''}` : `Kein Platz für die Spruchrolle – dafür 2 Gold.`);
     emit('spruchFertig', { satz: r.satz });
     render();
     fertig();

@@ -63,6 +63,13 @@ function bereit(ws) {
   return FORMEN;
 }
 const einfach = (ws) => ws.nomen.filter((n) => !n.mehrdeutig && !n.grundwort);
+// Nomen nach Stufe: 1 häufige, 2 seltenere, 3 die seltensten und langen Wörter (genug Auswahl bleibt immer)
+function schwerer(liste, stufe) {
+  if (stufe === 1) return liste.filter((n) => n.schwierigkeit === 1);
+  if (stufe === 2) return liste.filter((n) => n.schwierigkeit >= 2);
+  const schwer = liste.filter((n) => n.schwierigkeit === 3 || (n.schwierigkeit === 2 && n.wort.length >= 8));
+  return schwer.length >= 8 ? schwer : liste.filter((n) => n.schwierigkeit >= 2);
+}
 // Wortfelder auf Stufe 1: eindeutige Kernwörter und Paare [Wortfeld, Feld des fremden Worts]
 const FELD_KERN = {
   schmiede: ['Schmied', 'Hammer', 'Amboss', 'Zange', 'Säge', 'Nagel', 'Schraube', 'Feile', 'Werkzeug', 'Schwert', 'Axt'],
@@ -102,7 +109,7 @@ const THEMEN = {
         merke: `Das letzte Wort bestimmt den Artikel: ${gwArt(k)} ${k.grundwort} → ${k.artikel} ${k.wort}.`,
       };
     }
-    const quelle = einfach(ws).filter((n) => (stufe === 1 ? n.schwierigkeit === 1 : n.schwierigkeit >= 2));
+    const quelle = schwerer(einfach(ws), stufe);
     if (format === 'sortieren') return artikelSortieren(quelle, ctx, 'artikel-lernen', (n) => `Lerne Nomen mit Artikel: ${n.artikel} ${n.wort}.`);
     const n = ctx.itemNomen && ctx.rng() < 0.2 ? ctx.itemNomen : waehle(quelle, (x) => 'n:' + x.wort, ctx);
     const basis = { wort: 'n:' + n.wort, regel: 'artikel-lernen', richtig: n.artikel, merke: `Es heißt ${n.artikel} ${n.wort}. Lerne Nomen immer mit Artikel.` };
@@ -115,7 +122,10 @@ const THEMEN = {
     const { ws, rng } = ctx;
     const formen = bereit(ws);
     const muster = MEHRZAHL_STUFE[stufe];
-    const quelle = ws.nomen.filter((n) => !n.mehrdeutig && muster.includes(n.pluralmuster) && falschePlurale(n, formen).length >= 2);
+    const alle = ws.nomen.filter((n) => !n.mehrdeutig && muster.includes(n.pluralmuster) && falschePlurale(n, formen).length >= 2);
+    // Stufe 3: seltene Wörter bevorzugt
+    const selten = stufe === 3 ? alle.filter((n) => n.schwierigkeit >= 2) : alle;
+    const quelle = selten.length >= 8 ? selten : alle;
     if (format === 'regel') {
       const m = zufall(muster.filter((x) => quelle.filter((n) => n.pluralmuster === x).length >= 3), rng);
       const bsp = nimmFrisch(quelle.filter((n) => n.pluralmuster === m), ctx, 3);

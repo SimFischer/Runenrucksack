@@ -6,6 +6,7 @@
 // Vorher eine Grammatik-Frage: Kompositum → Artikel, Nomen → Mehrzahl, Verben → Präteritum, Runen → Steigerung.
 import { MAX_STERN, sternOf, bagGrid, STORE_GRID, findSpot, shuffle, SCHMIED, schmiedKosten } from './logic.js';
 import { isRune, runeBase, nextLevelId, pluralOf, findFusions } from './grammar.js';
+import { istSockelTeil, sockelUebertragen } from './sockel.js';
 import { rahmenSatz } from './aufgaben/saetze.js';
 
 export { pluralOf };
@@ -25,6 +26,7 @@ export function compoundPartner(def, bag, defs, recipes) {
 }
 
 // Kann dieser Gegenstand durch ein gleiches aufsteigen? Siegel und Taschen verbinden sich nie.
+// (Runen nur, solange sie lose im Lager liegen – eingesetzte stecken im Sockel.)
 export function canMerge(def, stern = 1) {
   if (!def || def.art === 'siegel' || def.art === 'tasche' || def.art === 'begleiter' || def.art === 'spruch') return false;
   if (isRune(def)) return !!def.steigerung && !!nextLevelId(def);
@@ -50,7 +52,9 @@ export function placeNew(run, defs, id, wunsch = null, extra = {}) {
   const p = { uid: run.nextUid++, id, rot: 0, ...extra };
   if (wunsch) Object.assign(p, wunsch);
   else {
-    for (const [area, grid] of [['bag', bagGrid(run)], ['store', STORE_GRID]]) {
+    // Siegel und Runen liegen nie im Rucksack: Sie warten im Lager, bis man sie in ein Nomen einsetzt.
+    const bereiche = istSockelTeil(defs[id]) ? [['store', STORE_GRID]] : [['bag', bagGrid(run)], ['store', STORE_GRID]];
+    for (const [area, grid] of bereiche) {
       const spot = findSpot(run.items.filter((q) => q.area === area), defs, defs[id], grid);
       if (spot) { Object.assign(p, { area, ...spot }); break; }
     }
@@ -128,17 +132,26 @@ export function mergePair(run, neu, alt, defs) {
   if (satz) p.satz = satz;
   for (const q of run.items) if (q.satz && (q.satz.uid === neu.uid || q.satz.uid === alt.uid)) q.satz = { ...q.satz, uid: p.uid };
   run.items.push(p);
+  sockelBehalten(run, p, [alt, neu], defs);
   return p;
+}
+
+// Sockel-Teile gehen beim Verbinden nicht verloren: Was nicht mehr passt, kommt ins Lager.
+function sockelBehalten(run, ziel, quellen, defs) {
+  if (!quellen.some((q) => q.sockel)) return;
+  for (const id of sockelUebertragen(ziel, quellen, defs)) placeNew(run, defs, id);
 }
 
 // Kristall + Träger → Kompositum. Es behält Platz und Sternstufe des Trägers; ein höherstufiger Kristall
 // gibt eine stärkere Kraftwirkung (kraftStern).
-export function applyFusion(run, a) {
+export function applyFusion(run, a, defs = null) {
   run.items = run.items.filter((p) => p.uid !== a.kraft.uid);
   const t = a.traeger;
+  const vorher = { ...t };
   t.id = a.id;
   const ks = sternOf(a.kraft);
   if (ks > 1) t.kraftStern = Math.max(ks, t.kraftStern || 1);
+  if (defs) sockelBehalten(run, t, [vorher, a.kraft], defs);
   return t;
 }
 
@@ -163,7 +176,7 @@ export function findeVerbindung(run, defs, recipes, check) {
 }
 
 export function fuehreAus(run, a, defs) {
-  return a.typ === 'kompositum' ? applyFusion(run, a) : mergePair(run, a.neu, a.alt, defs);
+  return a.typ === 'kompositum' ? applyFusion(run, a, defs) : mergePair(run, a.neu, a.alt, defs);
 }
 
 const hasNewUmlaut = (sg, pl) => [...'äöüÄÖÜ'].some((u) => pl.includes(u) && !sg.includes(u));

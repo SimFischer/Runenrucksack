@@ -80,8 +80,8 @@ export async function frageImSpiel(opts) {
     saveProfil();
     emit('aufgabeFertig', { thema: aufgabe.thema, stufe: aufgabe.stufe, richtig: !!ergebnis.richtig, ersterVersuch: !!ergebnis.ersterVersuch });
   }
-  // Glanz fürs verbundene Item: Stufe 3 gleich beim ersten Versuch richtig
-  return { ...ergebnis, aufgabe, glanz: !!(ergebnis.richtig && ergebnis.ersterVersuch && aufgabe.stufe === 3 && !run.tutorial) };
+  // Glanz fürs verbundene Item: gleich beim ersten Versuch richtig (nach einem Fehler: kein Glanz, kein Gold)
+  return { ...ergebnis, aufgabe, glanz: !!(ergebnis.richtig && ergebnis.ersterVersuch && !run.tutorial) };
 }
 
 export { lernstandVon };

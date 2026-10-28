@@ -25,9 +25,9 @@ export const DIRS = [[1, 0], [0, 1], [-1, 0], [0, -1]];
 export const isNoun = (d) => !!d.artikel && d.art !== 'siegel' && d.art !== 'rune' && d.art !== 'begleiter' && d.art !== 'spruch';
 export const isRune = (d) => d.art === 'rune';
 export const isVerb = (d) => d.art === 'verb';
-// Runen und Verben drehen ihren Pfeil in vier Richtungen, andere längliche Items legen sich quer.
-export const canRotate = (d) => isRune(d) || isVerb(d) || d.w !== d.h;
-export const nextRot = (d, rot) => (isRune(d) || isVerb(d) ? (rot + 1) % 4 : d.w !== d.h ? (rot ? 0 : 1) : rot);
+// Verben drehen ihren Pfeil in vier Richtungen, andere längliche Items legen sich quer.
+export const canRotate = (d) => isVerb(d) || (d.w !== d.h && !isRune(d));
+export const nextRot = (d, rot) => (isVerb(d) ? (rot + 1) % 4 : d.w !== d.h ? (rot ? 0 : 1) : rot);
 
 const lowerFirst = (s) => s.charAt(0).toLowerCase() + s.slice(1);
 
@@ -231,9 +231,10 @@ export function adjectiveForm(rd, artikel, schwach = false) {
   return stamm + ({ der: 'er', die: 'e', das: 'es' }[artikel] || 'e');
 }
 
-export function phraseFor(adjs, def) {
-  if (!adjs.length) return null;
-  const sup = adjs.some((a) => a.stufe >= 3);
+// Nominalgruppe auf dem Gegenstand: mit Artikel-Siegel „das scharfe Feuerschwert“, ohne „scharfes Feuerschwert“
+export function phraseFor(adjs, def, mitArtikel = false) {
+  if (!adjs.length) return mitArtikel ? `${def.artikel} ${def.name}` : null;
+  const sup = mitArtikel || adjs.some((a) => a.stufe >= 3);
   const words = adjs.map((a) => adjectiveForm(a, def.artikel, sup)).join(', ');
   return sup ? `${def.artikel} ${words} ${def.name}` : `${words} ${def.name}`;
 }
@@ -280,7 +281,9 @@ export function buildRuneLevels(defs) {
 export const nextLevelId = (d) => ((d.stufe || 1) >= MAX_RUNENSTUFE ? null : `${runeBase(d)}@${(d.stufe || 1) + 1}`);
 
 // Wertet einen Rucksack aus: wirksame Werte jedes Items und Erklärungen für das Info-Feld.
-// Ergebnis: Map uid → { def, siegel: [{uid, genus, ok}], runen: [{uid, def, ok}], phrase, ziele }
+// Siegel und Runen stecken in den Sockeln der Nomen (p.sockel, js/sockel.js). opts.verbVoll: Verb-Rollen wirken
+// auch ohne Subjekt voll (kluge Gegner ab Tag 4).
+// Ergebnis: Map uid → { def, siegel: [{genus, ok}], runen: [{def, ok}], phrase }
 export function analyze(placed, defs, opts = {}) {
   const siegelBonus = opts.siegelBonus ?? SIEGEL_BONUS;
   const runeMult = opts.runeMult ?? 1;
@@ -290,35 +293,12 @@ export function analyze(placed, defs, opts = {}) {
 
   for (const p of placed) {
     const d = defs[p.id];
-    if (d.art === 'siegel') {
-      for (const n of neighbors(p, defs, map)) {
-        const nd = defs[n.id];
-        if (!isNoun(nd)) continue;
-        const ok = nd.artikel === d.genus;
-        info.get(n.uid).siegel.push({ uid: p.uid, genus: d.genus, ok });
-        info.get(p.uid).ziele.push({ uid: n.uid, def: nd, ok });
-      }
-    } else if (isRune(d)) {
-      const c = runeTargetCell(p);
-      const t = map.get(`${c.x},${c.y}`);
-      if (!t) continue;
-      const td = defs[t.id];
-      const ok = runeFits(d, td);
-      info.get(p.uid).ziel = { uid: t.uid, def: td, ok };
-      info.get(t.uid).runen.push({ uid: p.uid, def: d, ok });
-      // Ritterin Ysolde: Die Rune wirkt auch auf das nächste Nomen dahinter (in Pfeilrichtung).
-      if ((opts.runenZiele || 1) >= 2) {
-        const [dx, dy] = DIRS[(p.rot || 0) % 4];
-        let x = c.x, y = c.y;
-        while (map.get(`${x},${y}`) === t) { x += dx; y += dy; }
-        const t2 = map.get(`${x},${y}`);
-        if (t2 && t2 !== p) {
-          const ok2 = runeFits(d, defs[t2.id]);
-          info.get(p.uid).ziel2 = { uid: t2.uid, def: defs[t2.id], ok: ok2 };
-          info.get(t2.uid).runen.push({ uid: p.uid, def: d, ok: ok2 });
-        }
-      }
-    } else if (isVerb(d) && d.formen) {
+    if (p.sockel) {
+      const i = info.get(p.uid);
+      if (p.sockel.siegel) i.siegel.push({ genus: defs[p.sockel.siegel].genus, ok: defs[p.sockel.siegel].genus === d.artikel });
+      for (const id of p.sockel.runen || []) i.runen.push({ def: defs[id], ok: runeFits(defs[id], d) });
+    }
+    if (isVerb(d) && d.formen) {
       const c = verbTargetCell(p, d);
       const t = map.get(`${c.x},${c.y}`);
       const vi = info.get(p.uid);
@@ -366,7 +346,7 @@ export function analyze(placed, defs, opts = {}) {
     }
     i.def = eff;
     i.adjektive = adjs;
-    i.phrase = phraseFor(adjs, eff);
+    i.phrase = phraseFor(adjs, eff, i.siegel.some((s) => s.ok));
   }
 
   // Verb-Rollen: mit richtigem Subjekt volle Wirkung und das Subjekt schlägt mit,
@@ -384,7 +364,7 @@ export function analyze(placed, defs, opts = {}) {
         const sub = info.get(v.subjekt.uid);
         for (const [k, val] of Object.entries(bonus.plus || {})) sub.def[k] = (sub.def[k] || 0) + val;
       }
-    } else {
+    } else if (!opts.verbVoll) {
       for (const k of EFFECT_KEYS) {
         if (!i.def[k]) continue;
         const half = i.def[k] * ROLLE_OHNE_SUBJEKT;

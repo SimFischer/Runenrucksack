@@ -139,12 +139,12 @@ try {
   check((await ev(`document.querySelector('#quick .quick-fb')?.textContent || ''`)).includes('Das letzte Wort'), 'Erklärung nach falschem Artikel');
   await tap('#quick [data-k="2"]'); await expect('Siegel'); // „das“
   check(await ev(`!!document.querySelector('#grid-bag [data-tut="item-feuer+schwert"]')`), 'Feuerschwert ist sofort entstanden');
-  let p = await freeNextTo('#grid-bag [data-tut="item-feuer+schwert"]');
-  await drag('[data-tut="laden-siegel-das"]', p[0], p[1]); await expect('Rune');
-  p = await freeNextTo('#grid-bag [data-tut="item-feuer+schwert"]');
-  await drag('[data-tut="laden-rune-scharf"]', p[0], p[1]);
-  for (let i = 0; i < 5 && !(await bubble()).includes('Zum Kampf'); i++) await tap('#grid-bag [data-tut="item-rune-scharf"]');
+  // Siegel und Rune werden direkt auf das Feuerschwert gezogen (Sockel)
+  const fs1 = await rect('#grid-bag [data-tut="item-feuer+schwert"]');
+  await drag('[data-tut="laden-siegel-das"]', fs1.left + c / 2, fs1.top + c / 2); await expect('Rune');
+  await drag('[data-tut="laden-rune-scharf"]', fs1.left + c / 2, fs1.top + c / 2);
   await expect('Zum Kampf');
+  check((await ev(`document.querySelector('#grid-bag [data-tut="item-feuer+schwert"]')?.title || ''`)) === 'das scharfe Feuerschwert', 'Nominalgruppe auf dem Gegenstand');
   await tap('#btn-fight'); await sleep(2400); await expect('kämpft von allein');
   await tap('#tut-next');
   for (let i = 0; i < 60 && (await ev('document.getElementById("modal").hidden')); i++) await sleep(500);

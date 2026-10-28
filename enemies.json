@@ -1,5 +1,5 @@
 {
-  "_hinweis": "Computer-Gegner. uebung: nur im Tutorial, mit festen Gegenständen (ausruestung). vorliebe gewichtet, welche Wirkungen der Gegner beim Packen bevorzugt. boss: Anführer am letzten Tag eines Gebiets (siehe regions.json). fehler: falsch geschriebene Wörter auf der Rüstung – vor jedem Kampf wird eines zufällig gewählt. optionen enthält genau eine richtige Schreibung (richtig).",
+  "_hinweis": "Computer-Gegner. uebung: nur im Tutorial, mit festen Gegenständen (ausruestung). vorliebe gewichtet, welche Wirkungen der Gegner beim Packen bevorzugt. faehigkeit: Boss-Fähigkeit (stehlen: nimmt einmal die Wirkung des stärksten Gegenstands; wolf: bei halbem Leben ein zusätzlicher Angriff). boss: Anführer am letzten Tag eines Gebiets (siehe regions.json). fehler: falsch geschriebene Wörter auf der Rüstung – vor jedem Kampf wird eines zufällig gewählt. optionen enthält genau eine richtige Schreibung (richtig).",
   "gegner": [
     {
       "id": "spaeher",
@@ -212,6 +212,7 @@
     },
     {
       "id": "pluenderer",
+      "faehigkeit": { "typ": "stehlen", "nach": 2, "text": "Stiehlt einmal die Wirkung deines stärksten Gegenstands." },
       "name": "Ork-Plünderer",
       "emoji": "👿",
       "boss": true,
@@ -275,6 +276,7 @@
     },
     {
       "id": "haeuptling",
+      "faehigkeit": { "typ": "wolf", "schaden": 2, "schadenProTag": 0.8, "abklingzeit": 1.6, "text": "Ruft bei halbem Leben einen Wolf als zweiten Angriff." },
       "name": "Wolfsreiter-Häuptling",
       "emoji": "🐺👑",
       "boss": true,

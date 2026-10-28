@@ -13,6 +13,10 @@ import { merkeAntwort } from './fortschritt.js';
 import { openModal, closeModal, toast, bump, fullName, nameAkk, iconHtml } from './ui.js';
 import { frageImSpiel, wortschatz } from './aufgaben/spiel.js';
 import { speisekarteInhalt, satzOrdnenInhalt, koboldInhalt } from './aufgaben/themen.js';
+import { themaAn } from './aufgaben/wahl.js';
+import { einstellungen } from './aufgaben/spiel.js';
+import { schmiedeOffen } from './satzschmiede.js';
+import { zeigeSatzschmiede } from './satzschmiede-ui.js';
 
 let done = null, rerender = null;
 // Bild der Begegnungsfigur (assets/ui/begegnung/), sonst ein Symbol als Ersatz
@@ -42,18 +46,28 @@ export function runEncounter(fertig, neuZeichnen, erzwungen = null) {
     save();
   }
   const list = run.begegnung.ids.map(findEnc).filter(Boolean);
+  // Die Satzschmiede ist manchmal eine der Wahlmöglichkeiten (höchstens alle drei Tage, dreimal im Lauf)
+  const d = G.SATZSCHMIEDE;
+  const schmiede = d && !run.tutorial && themaAn(einstellungen(), 'satzglieder') && schmiedeOffen(run, d);
+  if (schmiede) list.push({ id: 'satzschmiede', name: 'Die Satzschmiede', belohnung: { text: `Spruchrolle nach Bestellung · kostet ${d.besuch.preis} Gold` } });
   const card = openModal(`
     <div class="enc-top">${sym('tag')} Morgen in ${region().name}</div>
     <h2>Wen triffst du am Wegesrand?</h2>
     <div class="enc-choices">${list.map((b) => `
       <button class="enc-choice" data-id="${b.id}">
-        <span class="enc-emoji">${figur(b.id, 'enc-figur')}</span>
+        <span class="enc-emoji">${b.id === 'satzschmiede' ? '<img class="enc-figur" src="assets/ui/satzschmiede/amboss.webp" alt="">' : figur(b.id, 'enc-figur')}</span>
         <b>${b.name}</b>
         <span class="enc-reward">${sym('truhe')} ${b.belohnung.text}</span>
       </button>`).join('')}
     </div>
     <div class="row"><button class="btn small" data-skip>Weiterziehen</button></div>`, 'wide');
-  card.querySelectorAll('[data-id]').forEach((b) => { b.onclick = () => intro(findEnc(b.dataset.id)); });
+  card.querySelectorAll('[data-id]').forEach((b) => {
+    b.onclick = () => {
+      if (b.dataset.id !== 'satzschmiede') { intro(findEnc(b.dataset.id)); return; }
+      closeModal();
+      zeigeSatzschmiede(() => finish('satzschmiede'), rerender, () => runEncounter(done, rerender));
+    };
+  });
   card.querySelector('[data-skip]').onclick = () => finish(null);
 }
 

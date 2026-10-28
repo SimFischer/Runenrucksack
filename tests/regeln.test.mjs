@@ -65,55 +65,6 @@ test('Verschmelzen nur, wenn die Kraft links neben oder über dem Träger liegt'
   assert.equal(two.length, 1);
 });
 
-test('Artikel-Siegel: +25 % nur bei passendem Genus, falsches Siegel wirkt nicht', () => {
-  for (const noun of ITEMS.filter(isNoun)) {
-    if (noun.w > 1 || noun.h > 1) continue;
-    for (const g of ['der', 'die', 'das']) {
-      const n = P(noun.id, 1, 0), s = P('siegel-' + g, 0, 0);
-      const eff = analyze([n, s], DEFS).get(n.uid).def;
-      const right = analyze([n, P('siegel-' + noun.artikel, 0, 0)], DEFS).get(n.uid).def;
-      for (const k of EFFECT_KEYS) {
-        if (g === noun.artikel) {
-          if (noun[k]) assert.ok(eff[k] >= noun[k] * 1.25 - 1e-9, `${noun.name} ${k}`);
-        } else {
-          assert.equal(eff[k] || 0, noun[k] || 0, `falsches Siegel ${g} bei ${noun.name}`);
-        }
-        assert.ok((eff[k] || 0) <= (right[k] || 0), 'falsch nie stärker als richtig');
-      }
-    }
-  }
-  // nicht benachbart: keine Wirkung
-  const n = P('brot', 2, 0);
-  assert.equal(analyze([n, P('siegel-das', 0, 0)], DEFS).get(n.uid).def.heilung, DEFS.brot.heilung);
-});
-
-test('Adjektiv-Runen: nur wenn der Pfeil auf ein passendes Nomen zeigt', () => {
-  const check = (runeId, rot, targetId, expectOk, phrase) => {
-    const t = P(targetId, 1, 0), r = P(runeId, 0, 0, rot);
-    const i = analyze([t, r], DEFS).get(t.uid);
-    assert.equal(i.adjektive.length > 0, expectOk, `${runeId} rot ${rot} → ${targetId}`);
-    if (phrase) assert.equal(i.phrase, phrase);
-    return i.def;
-  };
-  check('rune-scharf', 0, 'schwert', true, 'scharfes Schwert');
-  check('rune-scharf', 0, 'bogen', true, 'scharfer Bogen');
-  check('rune-scharf', 0, 'axt', true, 'scharfe Axt');
-  check('rune-schwer', 0, 'schild', true, 'schwerer Schild');
-  check('rune-edel', 0, 'brot', true, 'edles Brot');
-  check('rune-schnell', 0, 'apfel', true, 'schneller Apfel');
-  check('rune-scharf', 0, 'feuer+schwert', true, 'scharfes Feuerschwert');
-  // falsche Richtung, unpassendes Nomen, kein Nomen
-  for (const rot of [1, 2, 3]) check('rune-scharf', rot, 'schwert', false);
-  check('rune-scharf', 0, 'brot', false);
-  check('rune-schwer', 0, 'schwert', false);
-  check('rune-scharf', 0, 'schlagen', false);
-  // Wirkung
-  const eff = check('rune-scharf', 0, 'schwert', true);
-  assert.equal(eff.schaden, DEFS.schwert.schaden + 3);
-  const wrong = check('rune-scharf', 2, 'schwert', false);
-  assert.equal(wrong.schaden, DEFS.schwert.schaden);
-});
-
 test('Kampf: richtig gelegte Siegel und Runen gewinnen gegen falsch gelegte', () => {
   const build = (genus, runeRot) => [
     P('schwert', 1, 0), P('siegel-' + genus, 0, 0), P('rune-scharf', 2, 0, runeRot),

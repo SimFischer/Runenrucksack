@@ -11,6 +11,7 @@ export const ITEM_THEMEN = {
   kompositum: ['komposita'],
   verb: ['personalformen', 'zeitformen'],
   rune: ['steigerung'],
+  siegel: ['artikel'],
   ork: ['verlaengerung', 'ableitung', 'doppel', 'ie', 'tzck'],
 };
 
@@ -118,11 +119,9 @@ export function verbucheAufgabe({ run, profil, aufgabe, ergebnis, rng }) {
     else { l.stufe = Math.max(1, l.stufe - 1); if (l.stufe === 1) delete l.geschaetzt; }
   }
   if (ergebnis.richtig && ergebnis.ersterVersuch) {
-    if (aufgabe.stufe >= l.stufe) {
-      l.sicher++;
-      // Zwei richtige auf einer Stufe beim ersten Versuch → nächste Stufe
-      if (l.sicher >= 2 && l.stufe < 3) { l.stufe++; l.sicher = 0; aufgestiegen = true; } else if (l.stufe === 3) l.sicher = Math.min(l.sicher, 3);
-    }
+    // Zwei richtige in Folge (beim ersten Versuch) → nächste Stufe, auch wenn das Item eine niedrigere Stufe fragte
+    l.sicher++;
+    if (l.sicher >= 2 && l.stufe < 3) { l.stufe++; l.sicher = 0; aufgestiegen = true; } else if (l.stufe === 3) l.sicher = Math.min(l.sicher, 3);
   } else {
     l.sicher = 0;
     // Ein Fehler: kommt als zweite, dritte oder vierte Aufgabe danach zurück – in anderer Form und mit anderem Wort

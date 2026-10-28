@@ -202,8 +202,8 @@
     },
     {
       "id": "siegel",
-      "text": "Leg das grüne das-Siegel direkt neben dein Feuerschwert. Passt der Artikel, wird es stärker.",
-      "tipp": "Zieh das Siegel auf ein Feld, das das Feuerschwert berührt.",
+      "text": "Zieh das grüne das-Siegel auf dein Feuerschwert. Passt der Artikel, wird es stärker.",
+      "tipp": "Das Siegel kommt in die runde Mulde am Feuerschwert: Zieh es direkt darauf.",
       "ziel": [
         "laden-siegel-das",
         "rucksack"
@@ -219,7 +219,7 @@
       "hand": {
         "typ": "ziehen",
         "von": "laden-siegel-das",
-        "nach": "neben:feuer+schwert"
+        "nach": "auf:feuer+schwert"
       },
       "falsch": [
         {
@@ -227,28 +227,20 @@
             "item": "siegel-das",
             "bereich": "store"
           },
-          "text": "Fast! Das Siegel wirkt nur im Rucksack.",
-          "zuruecksetzen": true
-        },
-        {
-          "wenn": {
-            "item": "siegel-das",
-            "bereich": "bag"
-          },
-          "text": "Fast! Das Siegel muss das Feuerschwert berühren."
+          "text": "Fast! Das Siegel liegt im Lager. Zieh es von dort auf dein Feuerschwert."
         }
       ],
       "hilfe": {
         "titel": "Artikel-Siegel",
         "animation": "pulsieren",
-        "text": "Ein Siegel mit dem richtigen Artikel neben einem Nomen macht es 25 % stärker.",
+        "text": "Jedes Nomen hat einen Artikel-Sockel. Ein Siegel mit dem richtigen Artikel darin macht es 25 % stärker.",
         "symbol": "schloss"
       }
     },
     {
       "id": "rune",
-      "text": "Leg die Rune „scharf“ so, dass ihr Pfeil auf das Feuerschwert zeigt. Dann hast du ein scharfes Feuerschwert!",
-      "tipp": "Tipp die Rune zweimal an – so dreht sich ihr Pfeil.",
+      "text": "Zieh die Rune „scharf“ auf dein Feuerschwert. Dann hast du das scharfe Feuerschwert!",
+      "tipp": "Die Rune kommt in die eckige Mulde am Feuerschwert: Zieh sie direkt darauf.",
       "ziel": [
         "laden-rune-scharf",
         "rucksack"
@@ -264,7 +256,7 @@
       "hand": {
         "typ": "ziehen",
         "von": "laden-rune-scharf",
-        "nach": "neben:feuer+schwert"
+        "nach": "auf:feuer+schwert"
       },
       "falsch": [
         {
@@ -272,21 +264,13 @@
             "item": "rune-scharf",
             "bereich": "store"
           },
-          "text": "Fast! Die Rune wirkt nur im Rucksack.",
-          "zuruecksetzen": true
-        },
-        {
-          "wenn": {
-            "item": "rune-scharf",
-            "bereich": "bag"
-          },
-          "text": "Fast! Tipp die Rune zweimal an, bis der Pfeil auf das Feuerschwert zeigt."
+          "text": "Fast! Die Rune liegt im Lager. Zieh sie von dort auf dein Feuerschwert."
         }
       ],
       "hilfe": {
         "titel": "Adjektiv-Runen",
-        "animation": "drehen",
-        "text": "Der Pfeil einer Rune muss auf ein passendes Nomen zeigen: scharfes Schwert.",
+        "animation": "pulsieren",
+        "text": "Jedes Nomen hat einen Adjektiv-Sockel, ab ★★★ zwei. Eine passende Rune darin: das scharfe Schwert.",
         "symbol": "tempo"
       }
     },
@@ -723,7 +707,7 @@
       "nach": "sammeln",
       "titel": "Satzschmiede",
       "animation": "pulsieren",
-      "text": "Ab Tag 2 hat jeden Morgen die Satzschmiede geöffnet. Bau aus Satzglied-Karten einen richtigen Satz: Das Prädikat steht an zweiter Stelle. Daraus wird eine Spruchrolle – einmal am Tag.",
+      "text": "Manchmal steht die Satzschmiede bei den Begegnungen zur Wahl (3 Gold). Die Schmiedin hat eine Bestellung: Bau aus Satzglied-Karten einen passenden Satz – das Prädikat steht an zweiter Stelle. Daraus wird eine Spruchrolle.",
       "symbol": "css:hilfe-bild spruchrolle"
     },
     {

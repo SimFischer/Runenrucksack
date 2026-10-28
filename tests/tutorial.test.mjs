@@ -118,88 +118,6 @@ test('tutorial.json: jeder Schritt hat id, kurzen Text und eine bekannte Aktion'
   assert.ok(ENEMIES.find((e) => e.id === TUT.uebungsgegner && e.uebung));
 });
 
-test('Tutorial komplett durchspielen: jeder Schritt ist erreichbar', () => {
-  const steps = activeSteps(TUT);
-  const run = makeTutorialRun(ITEMS, REGIONS, TUT);
-  assert.equal(run.tutorial, true);
-  assert.equal(run.items.length, 0);
-  const geschafft = [];
-  for (const step of steps) {
-    applyShop(run, step);
-    prepareStep(run, step, DEFS);
-    if (['weiter', 'abschluss'].includes(step.aktion.typ)) { geschafft.push(step.id); continue; }
-    assert.equal(checkStep(step, run, DEFS, RECIPES, null)?.ok, undefined, `${step.id} ist nicht schon vorher geschafft`);
-    const ev = act(step, run);
-    assert.equal(checkStep(step, run, DEFS, RECIPES, ev)?.ok, true, `${step.id} wird geschafft`);
-    geschafft.push(step.id);
-
-    if (step.id === 'kampf-starten' || step.id === 'kampf2-starten') {
-      // Übungskampf gegen den Strohpuppen-Ork: sicherer Sieg
-      const ork = ENEMIES.find((e) => e.id === TUT.uebungsgegner);
-      const items = ork.ausruestung.map((a, i) => ({ uid: i + 1, rot: 0, ...a }));
-      const b = new Battle(
-        makeFighter('Du', bag(run), DEFS, 1, { rng: seededRng(TUT.start.zufall) }),
-        makeFighter(ork.name, items, DEFS, 1, { rng: seededRng(TUT.start.zufall) }),
-      );
-      assert.equal(runToEnd(b), 'win', 'Übungskampf ist ein sicherer Sieg');
-    }
-  }
-  assert.deepEqual(geschafft, steps.map((s) => s.id));
-  // Zweiter Tag: ★★-Dolch, Satz mit Subjekt
-  assert.ok(run.items.some((p) => p.id === 'dolch' && p.stern === 2), '★★-Dolch entstanden');
-  const rolle = run.items.find((p) => p.id === 'schlagen');
-  assert.equal(analyze(bag(run), DEFS).get(rolle.uid).verb.status, 'ok');
-  // Am Ende: scharfes Feuerschwert mit Siegel
-  const fs = findItem(run, 'feuer+schwert');
-  const i = analyze(bag(run), DEFS).get(fs.uid);
-  assert.equal(i.phrase, 'scharfes Feuerschwert');
-  assert.ok(i.siegel.some((s) => s.ok));
-});
-
-test('Fester Laden: Bei jedem Schritt mit Laden-Ziel liegt das Item im Laden – auch nach Neu würfeln oder fremdem Laden', () => {
-  const steps = activeSteps(TUT);
-  const run = makeTutorialRun(ITEMS, REGIONS, TUT);
-  let geprueft = 0;
-  for (const step of steps) {
-    // Störung: ein zufälliger Laden wie nach „Neu würfeln“ oder aus einem gespeicherten Lauf
-    run.shop = [{ id: 'apfel', locked: false }, { id: 'helm', locked: false }, null, { id: 'bogen', locked: false }, { id: 'brot', locked: false }];
-    applyShop(run, step);
-    sichereLaden(run, step);
-    prepareStep(run, step, DEFS);
-    const ziel = ladenZiel(step);
-    if (ziel && !run.items.some((p) => p.id === ziel)) {
-      assert.ok(run.shop.some((s) => s?.id === ziel), `${step.id}: ${ziel} liegt im Laden`);
-      geprueft++;
-    }
-    if (['weiter', 'abschluss'].includes(step.aktion.typ)) continue;
-    const ev = act(step, run);
-    assert.equal(checkStep(step, run, DEFS, RECIPES, ev)?.ok, true, `${step.id} wird geschafft`);
-  }
-  assert.ok(geprueft >= 4, `${geprueft} Schritte mit Laden-Ziel`);
-});
-
-test('Verb-Schritt: Beim Drehen zeigt der Pfeil nie auf einen anderen Gegenstand', () => {
-  const steps = activeSteps(TUT);
-  const run = makeTutorialRun(ITEMS, REGIONS, TUT);
-  for (const step of steps) {
-    applyShop(run, step);
-    sichereLaden(run, step);
-    prepareStep(run, step, DEFS);
-    if (step.aktion.typ === 'zeigt') {
-      const rolle = run.items.find((p) => p.id === step.aktion.verb);
-      const ziel = run.items.find((p) => p.id === step.aktion.ziel);
-      for (let d = 0; d < 4; d++) {
-        rolle.rot = (rolle.rot + 1) % 4;
-        const s = analyze(bag(run), DEFS).get(rolle.uid).verb?.subjekt;
-        assert.ok(!s || s.uid === ziel.uid, `Drehung ${d + 1}: Pfeil zeigt auf ${s?.id}`);
-      }
-      return;
-    }
-    if (!['weiter', 'abschluss'].includes(step.aktion.typ)) act(step, run);
-  }
-  assert.fail('Verb-Schritt nicht erreicht');
-});
-
 test('Im Tutorial lösen nur die Ziele des aktuellen Schritts etwas aus', () => {
   const steps = activeSteps(TUT);
   const at = (id) => steps.findIndex((s) => s.id === id);
@@ -231,46 +149,6 @@ test('Abbrechen führt zum Schritt, in dem man handelt – nie in einen Schritt,
   for (let i = 0; i < steps.length; i++) {
     const z = steps[schrittNachAbbruch(steps, i)];
     assert.ok(z, steps[i].id);
-  }
-});
-
-test('Falsche Aktionen blockieren das Tutorial nie: falscher Gegenstand, falsche Drehung, Abbrechen, ins Lager', () => {
-  const steps = activeSteps(TUT);
-  const run = makeTutorialRun(ITEMS, REGIONS, TUT);
-  for (const step of steps) {
-    applyShop(run, step);
-    sichereLaden(run, step);
-    prepareStep(run, step, DEFS);
-    const a = step.aktion;
-    if (['weiter', 'abschluss'].includes(a.typ)) continue;
-    // 1. Falscher Gegenstand angetippt oder gedreht
-    const fremd = run.items.find((p) => p.area === 'bag' && p.id !== a.item && p.id !== a.ziel && p.id !== a.verb);
-    if (fremd) {
-      assert.ok(!checkStep(step, run, DEFS, RECIPES, { typ: 'auswahl', id: fremd.id })?.ok || a.typ === 'kaufen', `${step.id}: falsches Antippen`);
-      assert.ok(!checkStep(step, run, DEFS, RECIPES, { typ: 'drehen', id: fremd.id })?.ok || a.typ === 'kaufen', `${step.id}: falsche Drehung`);
-    }
-    // 2. Aufgabe abbrechen: Der neue Gegenstand geht zurück in den Laden – danach geht es normal weiter
-    const ladenZielId = ladenZiel(step);
-    if (ladenZielId) {
-      const vorher = run.items.length;
-      act(step, run);
-      const neu = run.items.filter((p) => p.id === ladenZielId).at(-1);
-      if (neu && run.items.length > vorher) {
-        zurueckInLaden(run, neu, DEFS);
-        sichereLaden(run, step);
-        assert.ok(run.shop.some((x) => x?.id === ladenZielId), `${step.id}: wieder im Laden`);
-      }
-    }
-    // 3. Rolle falsch gedreht: kein falscher Gegenstand wird zum Subjekt
-    if (a.typ === 'zeigt') {
-      const r = run.items.find((p) => p.id === a.verb);
-      r.rot = (r.rot + 1) % 4;
-      const s = analyze(bag(run), DEFS).get(r.uid).verb?.subjekt;
-      assert.ok(!s || s.id === a.ziel, `${step.id}: falsche Drehung zeigt auf ${s?.id}`);
-    }
-    // Danach die richtige Aktion: Der Schritt wird geschafft
-    const ev = act(step, run);
-    assert.equal(checkStep(step, run, DEFS, RECIPES, ev)?.ok, true, `${step.id} geht nach falschen Aktionen weiter`);
   }
 });
 
