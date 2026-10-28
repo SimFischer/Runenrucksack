@@ -6,6 +6,7 @@ import { klassenCode, registryAus, saeubern } from './code.js';
 import { STANDARD_MAX } from './aufgaben/wahl.js';
 import { toast } from './ui.js';
 import { sym } from './symbole.js';
+import { zeigeSiegelPruefung } from './wochenrune-ui.js';
 
 const reg = () => registryAus(G.REGISTRY);
 
@@ -51,6 +52,7 @@ function einstellungen() {
       <button class="btn primary" data-uebernehmen>Auf diesem iPad übernehmen</button>
       <button class="btn" data-standard>Standard</button>
       <button class="btn" data-ohne>Ohne Klasse</button>
+      <button class="btn" data-woche>Rune der Woche prüfen</button>
       <button class="btn" data-zu>Schließen</button>
     </div>`);
   const liste = box.querySelector('.lk-liste');
@@ -73,6 +75,7 @@ function einstellungen() {
   };
   zeichne();
   box.querySelector('[data-standard]').onclick = () => { Object.assign(themen, standard()); zeichne(); };
+  box.querySelector('[data-woche]').onclick = () => zeigeSiegelPruefung(einstellungen);
   box.querySelector('[data-uebernehmen]').onclick = () => {
     G.PROFIL.klasse = { themen: { ...themen } };
     saveProfil();

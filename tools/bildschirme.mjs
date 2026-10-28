@@ -171,6 +171,22 @@ const BILDSCHIRME = [
       const brief = __G.BOTSCHAFTEN.find((b) => b.id === __G.run.brief.id);
       const falsch = [...document.querySelectorAll('#brief-layer [data-a]')].find((b) => b.textContent !== brief.fragen[0].richtig);
       falsch.click(); await __s(500);` },
+  { name: 'woche-start', profil: PROFIL, ohneScroll: true, schritte: `await __klick('#btn-known'); await __klick('#btn-woche', 500);` },
+  { name: 'woche-lauf', profil: PROFIL, ohneScroll: true, schritte: `await __klick('#btn-known'); await __klick('#btn-woche', 500); await __klick('#woche-layer [data-los]', 900);
+      for (let i = 0; i < 4; i++) { const b = [...document.querySelectorAll('#modal:not([hidden]) button, .enc-choice')].find((x) => x.offsetParent); if (!b) break; b.click(); await __s(500); }
+      document.title = JSON.stringify({ woche: __G.run.woche?.woche, held: __G.run.hero, begleiter: __G.run.begleiter });` },
+  { name: 'woche-ergebnis', profil: PROFIL, ohneScroll: true, schritte: `await __klick('#btn-known');
+      const { zeigeWochenErgebnis } = await import(new URL('js/wochenrune-ui.js', location.href).href);
+      zeigeWochenErgebnis({ wins: 7, hearts: 2, day: 10, prog: { erster: 23 }, woche: { jahr: 2026, woche: 44, seed: 1 } }, () => {}); await __s(500);` },
+  { name: 'woche-pruefen', profil: PROFIL, ohneScroll: true, schritte: `await __klick('#btn-known');
+      const { zeigeSiegelPruefung } = await import(new URL('js/wochenrune-ui.js', location.href).href);
+      const { ergebnisSiegel } = await import(new URL('js/wochenrune.js', location.href).href);
+      zeigeSiegelPruefung(); await __s(300);
+      const werte = [['AB', ergebnisSiegel(44, 1135)], ['MK', ergebnisSiegel(44, 1420)], ['LT', 'K7QZ']];
+      const kuerzel = [...document.querySelectorAll('.woche-kuerzel')], siegel = [...document.querySelectorAll('.woche-siegel-ein')];
+      werte.forEach(([k, s], i) => { kuerzel[i].value = k; kuerzel[i].dispatchEvent(new Event('change')); });
+      for (const [i, [, s]] of werte.entries()) { const e = [...document.querySelectorAll('.woche-siegel-ein')].find((x) => +x.dataset.i === i); e.value = s; e.dispatchEvent(new Event('change')); }
+      await __s(300);` },
   { name: 'kampf', profil: PROFIL, ohneScroll: true, frei: ['#btn-start-battle', '#armor-word', '#fighter-player .f-figur', '#fighter-enemy .f-figur', '#fighter-player .f-rucksack', '#fighter-enemy .f-rucksack', '#fighter-player .f-band', '#fighter-enemy .f-band', '#battle .vs'], schritte: `${KAMPF(true)} await __s(300);` },
   { name: 'kampf-gross', profil: PROFIL, ohneScroll: true, frei: ['#btn-start-battle', '#armor-word', '#fighter-player .f-figur', '#fighter-enemy .f-figur', '#fighter-player .f-rucksack', '#fighter-enemy .f-rucksack', '#fighter-player .f-band', '#fighter-enemy .f-band', '#battle .vs'], schritte: `${LAUF}
       // größter Rucksack: 5×4 und beide Taschen

@@ -121,6 +121,19 @@ export function pickWeighted(entries, rng = Math.random) {
 export const pickOne = (list, rng = Math.random) => list[Math.floor(rng() * list.length)];
 
 // Wiederholbarer Zufall für Tests und Simulationen.
+// Zahl aus einem Text (FNV-1a) – für feste Startwerte
+export function hashText(t) {
+  let h = 2166136261;
+  for (const c of String(t)) { h ^= c.codePointAt(0); h = Math.imul(h, 16777619) >>> 0; }
+  return h >>> 0;
+}
+
+// Zufall für einen Lauf: In der Rune der Woche (run.woche) fest – aus Startwert, Tag, Zweck und Zähler –, sonst Math.random.
+// So bekommen alle in derselben Woche (und Klasse) dieselben Läden, Gegner, Kämpfe, Begegnungen und Briefe.
+export function laufRng(run, zweck, n = 0) {
+  return run?.woche ? seededRng(hashText(`${run.woche.seed}|${run.day}|${zweck}|${n}`)) : Math.random;
+}
+
 export function seededRng(seed = 1) {
   let s = seed >>> 0;
   return () => {
@@ -272,18 +285,20 @@ export function rollShop(run, items, regions, force = false, rng = Math.random) 
   const pool = shopPool(run, items, regions);
   const weights = rarityWeights(run.day, haendlerStufe(run));
   const slots = run.shopSlots || CFG.shopSlots;
+  // Rune der Woche: Angebote hängen nur von Woche, Tag und Wurf ab – nicht davon, was jemand schon besitzt
+  const sammeln = run.woche ? null : run;
   const next = [];
   for (let i = 0; i < slots; i++) {
     const old = run.shop[i];
     if (!force && old && old.locked) { next.push(old); continue; }
-    next.push({ id: randomShopItem(pool, weights, rng, run).id, locked: false });
+    next.push({ id: randomShopItem(pool, weights, rng, sammeln).id, locked: false });
   }
   // Mindestens eine Waffe im Angebot, damit man nie ganz ohne Schaden dasteht.
   const hasWeapon = next.some((s) => s && pool.find((d) => d.id === s.id)?.schaden);
   const free = next.map((s, i) => (s && !s.locked ? i : -1)).filter((i) => i >= 0);
   if (!hasWeapon && free.length) {
     const weapons = pool.filter((d) => d.schaden);
-    next[pickOne(free, rng)] = { id: randomShopItem(weapons, weights, rng, run).id, locked: false };
+    next[pickOne(free, rng)] = { id: randomShopItem(weapons, weights, rng, sammeln).id, locked: false };
   }
   run.shop = next;
 }
@@ -298,9 +313,11 @@ export function randomShopItem(items, weights, rng = Math.random, run = null) {
   return pickWeighted(list.map((d) => [d, owned.has(d.id) ? SAMMEL_GEWICHT : 1]), rng);
 }
 
-export function reroll(run, items, regions, rng = Math.random) {
+export function reroll(run, items, regions, rng = null) {
   const preis = wuerfelPreis(run);
   if (run.gold < preis) return false;
+  run.ladenZug = (run.ladenZug || 0) + 1; // der wievielte Wurf im Lauf (für den festen Zufall der Rune der Woche)
+  rng ||= laufRng(run, 'laden', run.ladenZug);
   if (run.freiWuerfe > 0) run.freiWuerfe--;
   else { run.gold -= preis; run.wuerfe = (run.wuerfe || 0) + 1; }
   rollShop(run, items, regions, false, rng);
@@ -308,7 +325,8 @@ export function reroll(run, items, regions, rng = Math.random) {
 }
 
 // Nach einem Kampf: Ergebnis buchen, nächsten Tag vorbereiten.
-export function finishBattle(run, items, regions, won, enemyName, rng = Math.random) {
+export function finishBattle(run, items, regions, won, enemyName, rng = null) {
+  rng ||= laufRng({ ...run, day: run.day + 1 }, 'tag');
   run.history.push({ day: run.day, won, enemy: enemyName });
   for (const p of run.items) delete p.glanz; // Glanz gilt nur für einen Kampf
   if (won) { run.wins++; run.gold += run.siegGold || 0; } // Begleiter Rabe: Gold je Sieg

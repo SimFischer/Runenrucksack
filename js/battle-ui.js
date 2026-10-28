@@ -1,5 +1,5 @@
 // Nacht: Kampfanzeige mit Lebensbalken, Abklingzeiten und Schadenszahlen.
-import { CFG, makeEnemy, pickEnemy, rectGrid, pickOne, shuffle, ARMOR_BONUS, enemyPool, seededRng } from './logic.js';
+import { CFG, makeEnemy, pickEnemy, rectGrid, pickOne, shuffle, ARMOR_BONUS, enemyPool, seededRng, laufRng } from './logic.js';
 import { Battle, makeFighter, runToEnd } from './battle.js';
 import { analyze } from './grammar.js';
 import { G, itemsIn, gridOf, region, hero, playerCtx, emit, figurBild, gegnerBild } from './state.js';
@@ -42,11 +42,12 @@ export function startNight(done) {
   const reg = region();
   // Im Tutorial: schwacher Übungsgegner mit festen Gegenständen und festem Zufall.
   const tut = run.tutorial && G.ENEMIES.find((e) => e.id === G.TUTORIAL.uebungsgegner);
-  const rng = tut ? seededRng(G.TUTORIAL.start.zufall) : Math.random;
-  const foeDef = tut || pickEnemy(run.day, G.REGIONS, G.ENEMIES);
+  // Rune der Woche: fester Zufall für Gegner und Kampf (laufRng), sonst Math.random
+  const rng = tut ? seededRng(G.TUTORIAL.start.zufall) : laufRng(run, 'kampf');
+  const foeDef = tut || pickEnemy(run.day, G.REGIONS, G.ENEMIES, laufRng(run, 'gegner'));
   enemy = tut
     ? { ...tut, items: tut.ausruestung.map((a, i) => ({ uid: i + 1, rot: 0, ...a })) }
-    : makeEnemy(run.day, foeDef, enemyPool(G.ITEMS, G.COMPOUNDS, run.day), G.DEFS);
+    : makeEnemy(run.day, foeDef, enemyPool(G.ITEMS, G.COMPOUNDS, run.day), G.DEFS, laufRng(run, 'gegner-rucksack'));
   // Rüstung mit Fehler: im Tutorial ein festes Wort, sonst ein Satz mit einem Fehler (Aufgabenformat „Fehler finden“)
   armor = !foeDef.fehler?.length ? null : tut ? { ...pickOne(foeDef.fehler), status: 'offen' } : { satz: true, status: 'offen' };
 

@@ -1,7 +1,7 @@
 // Runenrucksack – Ablauf eines Laufs, Laden, Rucksack (Ziehen und Drehen) und Info-Feld.
 import {
   CFG, income, baseHp, sellValue, newRun, reroll, finishBattle, wuerfelPreis, WUERFEL,
-  HAENDLER, haendlerStufe, vertrauenKosten, vertrauenSperre, vertrauenErhoehen, SCHMIED,
+  HAENDLER, haendlerStufe, vertrauenKosten, vertrauenSperre, vertrauenErhoehen, SCHMIED, laufRng, seededRng, hashText,
   canPlace, overlapping, findSpot, sizeOf, shuffle, attachTasche, ownedCount, MAX_STERN, STERN_FAKTOR, preisVon,
 } from './logic.js';
 import {
@@ -25,6 +25,7 @@ import { frageImSpiel, wortschatz, einstellungen } from './aufgaben/spiel.js';
 import { BEGLEITER_PREFIX, begleiterFrei, istBegleiter } from './begleiter.js';
 import { stufenBereich, stufeFuer, aufgabenStand, schaetzeLernstand, themaAn } from './aufgaben/wahl.js';
 import { zeigeBrief } from './brief-ui.js';
+import { wochenKnopfHtml, zeigeWochenStart, zeigeWochenErgebnis } from './wochenrune-ui.js';
 import { verbSatz, verbSatzInhalt, PERSONEN_FOLGE, kurzName } from './aufgaben/verbsatz.js';
 import { runEncounter } from './encounters.js';
 import { initTutorial, startTutorial, tutorialDone, showHelp, tipsOn, setTips, tutorialDarf, tutorialAbgebrochen } from './tutorial.js';
@@ -62,6 +63,7 @@ async function boot() {
   $('btn-help').onclick = () => showHelp();
   $('btn-buch').onclick = () => zeigeBuch();
   $('btn-sammlung').onclick = () => zeigeSammlung();
+  $('btn-woche').onclick = () => zeigeWochenStart(startWochenrune);
   $('btn-code-ein').onclick = () => zeigeEingabe({ geladen: codeGeladen, zurueck: showStart });
   $('btn-lehrkraft').onclick = () => zeigeLehrkraft();
   $('btn-neu-beginnen').onclick = () => neuBeginnen(() => { wendeDesignAn(); showAsk(); });
@@ -133,6 +135,7 @@ function showStart() {
   $('start-ask').hidden = true;
   $('start-menu').hidden = false;
   $('btn-continue').hidden = !G.run;
+  $('btn-woche').innerHTML = wochenKnopfHtml();
   $('btn-new').classList.toggle('primary', !G.run);
   zeigeRang();
 }
@@ -254,10 +257,21 @@ function zeigeBegleiter(h, b, frei) {
   tafel.querySelector('[data-zurueck]').onclick = showHeroes;
 }
 
-function startNewRun(h, b = null) {
+// Rune der Woche: Figur, Begleiter und aller Zufall des Laufs stehen fest (laufRng). Alle Items mit Freischaltung
+// sind im Laden möglich, damit alle Kinder dieselben Angebote bekommen.
+function startWochenrune(l) {
+  startNewRun(l.held, l.begleiter, {
+    freieItems: G.ITEMS.filter((d) => d.freischaltung).map((d) => d.id),
+    rng: seededRng(hashText(`${l.seed}|start`)),
+    woche: { jahr: l.jahr, woche: l.woche, seed: l.seed },
+  });
+}
+
+function startNewRun(h, b = null, extra = {}) {
   if (!h?.id) { showHeroes(); return; }
-  G.run = newRun(G.ITEMS, G.REGIONS, { hero: h, fates: G.FATES, freieItems: freieItems(G.PROFIL, G.ITEMS, fortschrittCtx()),
-    begleiter: b ? G.DEFS[BEGLEITER_PREFIX + b.id] : null });
+  G.run = newRun(G.ITEMS, G.REGIONS, { hero: h, fates: G.FATES, freieItems: extra.freieItems || freieItems(G.PROFIL, G.ITEMS, fortschrittCtx()),
+    begleiter: b ? G.DEFS[BEGLEITER_PREFIX + b.id] : null, rng: extra.rng });
+  if (extra.woche) G.run.woche = extra.woche;
   schaetzeLernstand(G.PROFIL, rangVon(G.PROFIL.xp, G.ACH.raenge).nr, G.THEMEN.themen.map((t) => t.id));
   selected = null;
   showGame();
@@ -291,7 +305,7 @@ function continueFlow() {
   else if (step === 'unterklasse') chooseSubclass(next);
   else if (step === 'begegnung') runEncounter(next, render);
   // Brief statt Begegnung – hat die Lehrkraft das Leseverständnis ausgeschaltet, kommt doch eine Begegnung
-  else if (step === 'brief') (themaAn(einstellungen(), 'lesen') && G.BOTSCHAFTEN?.length ? zeigeBrief(next) : runEncounter(next, render));
+  else if (step === 'brief') (themaAn(einstellungen(), 'lesen') && G.BOTSCHAFTEN?.length ? zeigeBrief(next, laufRng(G.run, 'brief')) : runEncounter(next, render));
   else next(); // z. B. „verschmelzen“ aus älteren Spielständen – Komposita entstehen jetzt sofort
 }
 
@@ -1567,6 +1581,8 @@ function afterBattle() {
 }
 
 function showRunEnd() {
+  // Rune der Woche: zuerst Punkte und Ergebnis-Siegel, danach der normale Abschluss
+  if (G.run.woche && !G.run.wocheGezeigt) { G.run.wocheGezeigt = true; zeigeWochenErgebnis(G.run, showRunEnd); return; }
   zeigeLaufende(G.run, G.abschluss, {
     neu: showHeroes,
     home: () => {

@@ -94,6 +94,8 @@ const FILES = [
   'js/begleiter.js',
   'js/botschaften.js',
   'js/brief-ui.js',
+  'js/wochenrune.js',
+  'js/wochenrune-ui.js',
   'js/battle-ui.js',
   'js/encounters.js',
   'js/tutorial.js',

@@ -3,7 +3,7 @@
 // „Was passt nicht?“ (Belohnung: Rabatt), Kobold verdreht einen Namen (Buchstaben ergänzen).
 // Regeln wie überall: erster Versuch kostenlos, jeder weitere 1 Gold, nach jeder Antwort eine Merkhilfe.
 import {
-  pickEncounters, growBag, shopPool, pickOne, RABATT,
+  pickEncounters, growBag, shopPool, pickOne, RABATT, laufRng,
 } from './logic.js';
 import { sym } from './symbole.js';
 import { GENUS } from './grammar.js';
@@ -38,7 +38,7 @@ export function runEncounter(fertig, neuZeichnen, erzwungen = null) {
     return;
   }
   if (!run.begegnung || run.begegnung.tag !== run.day) {
-    run.begegnung = { tag: run.day, ids: pickEncounters(run, G.ENCOUNTERS, G.REGIONS) };
+    run.begegnung = { tag: run.day, ids: pickEncounters(run, G.ENCOUNTERS, G.REGIONS, laufRng(run, 'begegnung')) };
     save();
   }
   const list = run.begegnung.ids.map(findEnc).filter(Boolean);

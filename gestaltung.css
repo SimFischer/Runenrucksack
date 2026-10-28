@@ -588,3 +588,30 @@ h2 .amboss { width: 40px; height: 26px; margin-right: 6px; }
 .brief-antworten .btn { white-space: normal; text-align: center; }
 @media (max-width: 1100px) { .brief-text { font-size: 17px; padding: 16px 18px; } .brief-frage { font-size: 19px; } }
 .brief-antworten .opt-btn.right:disabled { filter: none; opacity: 1; background: linear-gradient(180deg, #6fa84a, #3f7a2a); color: #fff; }
+
+/* ---------- Rune der Woche ---------- */
+.woche-knopf { display: inline-flex; align-items: center; gap: 12px; padding: 6px 18px 6px 8px; min-height: 64px; cursor: pointer;
+  background: linear-gradient(180deg, rgba(40, 70, 90, .85), rgba(20, 35, 50, .9)); border: 2px solid #6fd6e8; border-radius: 16px;
+  color: #eaffff; box-shadow: 0 0 18px rgba(80, 220, 240, .35), 0 4px 0 rgba(0, 0, 0, .4); text-align: left; }
+.woche-knopf img { height: 54px; width: auto; filter: drop-shadow(0 0 6px rgba(80, 220, 240, .8)); }
+.woche-knopf b { display: block; font-family: var(--titel); font-size: 20px; }
+.woche-knopf small { display: block; font-size: 14px; opacity: .9; }
+.woche-card { text-align: center; max-width: 640px; }
+.woche-card .woche-rune { height: 96px; width: auto; filter: drop-shadow(0 0 10px rgba(80, 220, 240, .7)); }
+.woche-team { display: flex; justify-content: center; gap: 28px; margin: 8px 0; }
+.woche-team span { display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.woche-team img { height: 96px; width: auto; object-fit: contain; }
+.woche-punkte { font-family: var(--titel); font-weight: 900; font-size: 72px; line-height: 1; color: var(--gold-dunkel); }
+.woche-punkte small { display: block; font-size: 18px; color: var(--tinte); }
+.woche-neu { color: #3f7a2a; font-weight: 700; margin: 4px 0; }
+.woche-rechnung { list-style: none; padding: 0; margin: 6px 0; display: grid; grid-template-columns: 1fr 1fr; gap: 2px 18px; text-align: left; }
+.woche-card.ergebnis .woche-rune { height: 70px; }
+.woche-card.ergebnis h2 { margin: 2px 0; }
+.woche-siegel { font-size: 52px; letter-spacing: .3em; }
+.woche-liste { display: flex; flex-direction: column; gap: 6px; max-height: 50vh; overflow-y: auto; }
+.woche-zeile { display: grid; grid-template-columns: 110px 140px 1fr; gap: 8px; align-items: center; }
+.woche-zeile.kopf { font-weight: 700; color: var(--gold-dunkel); }
+.woche-zeile input { font-family: var(--font); font-size: 22px; padding: 6px 8px; border: 2px solid #8a6438; border-radius: 10px; background: #fbf2dc; color: var(--tinte); width: 100%; }
+.woche-siegel-ein { letter-spacing: .2em; text-transform: none; }
+.woche-ergebnis.ungueltig { color: #8e2c20; font-size: 14px; }
+@media (max-height: 800px) { .woche-card .woche-rune { height: 64px; } .woche-team img { height: 72px; } .woche-punkte { font-size: 56px; } .woche-siegel { font-size: 40px; } }
