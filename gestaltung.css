@@ -615,3 +615,72 @@ h2 .amboss { width: 40px; height: 26px; margin-right: 6px; }
 .woche-siegel-ein { letter-spacing: .2em; text-transform: none; }
 .woche-ergebnis.ungueltig { color: #8e2c20; font-size: 14px; }
 @media (max-height: 800px) { .woche-card .woche-rune { height: 64px; } .woche-team img { height: 72px; } .woche-punkte { font-size: 56px; } .woche-siegel { font-size: 40px; } }
+
+/* ---------- Satzschmiede ---------- */
+#satz-layer { position: fixed; inset: 0; z-index: 210; display: flex; align-items: center; justify-content: center; padding: 12px; background: rgba(10, 6, 3, .6); }
+.satz-tuer { display: flex; flex-direction: column; align-items: center; gap: 6px; text-align: center; padding: 6px 28px; max-width: 560px; }
+.satz-tuer h2 { font-size: 30px; margin: 0; color: var(--tinte); }
+.satz-tuer-bild { width: min(220px, 26vw); filter: drop-shadow(0 8px 16px rgba(0, 0, 0, .5)); }
+.satz-erklaer { margin: 0 0 6px; font-size: 18px; line-height: 1.45; }
+.satz-card { width: min(1120px, 100%); max-height: calc(var(--hoehe) - 24px); display: flex; flex-direction: column; gap: 8px; padding: 10px 22px; }
+.satz-kopf { display: flex; align-items: center; gap: 12px; }
+.satz-kopf .btn.big { min-width: 170px; }
+.satz-kopf img { height: 58px; width: auto; }
+.satz-kopf > div { flex: 1; }
+.satz-kopf h2 { margin: 0; font-size: 26px; color: var(--tinte); }
+.satz-stufe { margin: 0; color: var(--gold-dunkel); font-weight: 700; font-size: 15px; }
+.satz-hinweis { margin: 0; font-size: 16px; line-height: 1.4; background: rgba(255, 224, 138, .35); border-radius: 10px; padding: 6px 12px; }
+.satz-leiste { min-height: 68px; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 8px 12px; border-radius: 14px;
+  background: #fbf2dc; border: 3px dashed #8a6438; box-shadow: inset 0 2px 6px rgba(0, 0, 0, .15); }
+.satz-leiste.fertig { border-style: solid; border-color: var(--gold); }
+.satz-leer { color: #8a6f50; font-size: 17px; }
+.satz-punkt { font-family: var(--font); font-size: 28px; font-weight: 700; margin-left: -4px; }
+.satz-pool { display: flex; flex-wrap: wrap; gap: 6px 22px; }
+.satz-gruppe { display: flex; flex-direction: column; gap: 3px; flex: 0 1 auto; }
+.satz-gruppe-name { display: flex; align-items: center; gap: 6px; font-weight: 700; font-size: 14px; color: var(--g); }
+.satz-gruppe-name small { font-weight: 400; color: var(--tinte); }
+.satz-gruppe-karten { display: flex; flex-wrap: wrap; gap: 6px; }
+.satz-karte { --g: #555; display: inline-flex; align-items: center; gap: 7px; font-family: var(--font); font-size: 20px; line-height: 1.1; color: var(--tinte);
+  padding: 7px 12px; min-height: 44px; border-radius: 10px; border: 3px solid var(--g); background: color-mix(in srgb, var(--g) 14%, #fffaf0);
+  box-shadow: 0 3px 0 color-mix(in srgb, var(--g) 70%, #000); cursor: grab; touch-action: none; user-select: none; }
+.satz-karte.benutzt { opacity: .3; box-shadow: none; }
+.satz-geist { position: fixed; z-index: 400; pointer-events: none; transform: translate(-50%, -50%) rotate(-3deg) scale(1.08); opacity: 1 !important; }
+.glied-zeichen { width: 14px; height: 14px; flex: none; background: var(--g); }
+.g-subjekt { --g: #2f68b0; }
+.g-subjekt .glied-zeichen { border-radius: 50%; }
+.g-praedikat { --g: #b5372f; }
+.g-praedikat .glied-zeichen { width: 18px; height: 9px; border-radius: 2px; }
+.g-objekt { --g: #3c8336; }
+.g-objekt .glied-zeichen { clip-path: polygon(50% 0, 100% 100%, 0 100%); }
+.g-zeit { --g: #7343a8; }
+.g-zeit .glied-zeichen { clip-path: polygon(50% 0, 100% 50%, 50% 100%, 0 50%); }
+.g-art { --g: #b8650f; }
+.g-art .glied-zeichen { clip-path: polygon(50% 0, 100% 38%, 82% 100%, 18% 100%, 0 38%); }
+.g-ort { --g: #1d7f80; }
+.g-ort .glied-zeichen { border-radius: 2px; }
+.satz-meldung { margin: 0; }
+.row.satz-knoepfe { justify-content: center; gap: 12px; margin: 0; }
+.satz-ergebnis { display: flex; align-items: center; gap: 18px; padding: 4px 8px; }
+.satz-rolle { width: 200px; height: auto; filter: drop-shadow(0 6px 12px rgba(0, 0, 0, .4)); }
+.satz-werte { margin: 0 0 4px; font-size: 19px; }
+.satz-zeilen { margin: 0; padding-left: 20px; font-size: 16px; line-height: 1.4; }
+.spruch-satz { font-family: var(--font); font-size: 19px; font-weight: 700; margin: 4px 0; padding: 6px 10px; border-radius: 8px; background: #fbf2dc; border-left: 4px solid var(--gold); }
+.buch-grid.sprueche { grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); }
+.spruch-karte { flex-direction: row; text-align: left; gap: 10px; }
+.spruch-karte img { width: 84px; height: auto; flex: none; }
+.spruch-karte span { display: flex; flex-direction: column; gap: 2px; }
+.spruch-karte b { font-family: var(--font); font-size: 18px; }
+.buch-leer { grid-column: 1 / -1; text-align: center; font-size: 18px; color: #8a6f50; }
+@media (max-height: 800px) {
+  .satz-karte { font-size: 18px; padding: 5px 10px; min-height: 40px; }
+  .satz-kopf img { height: 46px; } .satz-leiste { min-height: 60px; } .satz-rolle { width: 160px; }
+  .satz-tuer-bild { width: min(170px, 22vw); }
+}
+.spruch-zeilen { margin: 4px 0; padding-left: 16px; font-size: 13px; line-height: 1.3; }
+.info-head > div { min-width: 0; }
+.info-name.lang { font-size: 17px; }
+.hilfe-bild { display: inline-block; width: 64px; height: 56px; background: center / contain no-repeat; }
+.hilfe-bild.begleiter { background-image: url("assets/ui/begleiter/eule.webp"); }
+.hilfe-bild.brief { background-image: url("assets/ui/satzschmiede/brief.webp"); }
+.hilfe-bild.spruchrolle { background-image: url("assets/ui/satzschmiede/spruchrolle.webp"); }
+.hilfe-bild.wochenrune { background-image: url("assets/ui/satzschmiede/wochenrune.webp"); }

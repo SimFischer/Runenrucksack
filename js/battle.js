@@ -14,7 +14,11 @@ const MAX_TIME = 60;
 export function makeFighter(name, placed, defs, day, opts = {}) {
   const rng = opts.rng || Math.random;
   const info = opts.info || analyze(placed, defs);
-  const items = placed.map((p) => ({ uid: p.uid, def: info.get(p.uid).def, t: 0 }));
+  // Spruchrolle: „sofort“ löst gleich aus, „in der dritten Runde“ / „am Ende des Kampfes“ beginnt später
+  const items = placed.map((p) => {
+    const def = info.get(p.uid).def;
+    return { uid: p.uid, def, t: def.sofort ? def.abklingzeit : -(def.verzoegerung || 0) };
+  });
   let maxHp = baseHp(day) + (opts.leben || 0), block = 0, tempo = opts.tempo || 0, glueck = 0;
   for (const { def } of items) {
     maxHp += def.leben || 0;

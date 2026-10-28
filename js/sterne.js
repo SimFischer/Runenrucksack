@@ -26,7 +26,7 @@ export function compoundPartner(def, bag, defs, recipes) {
 
 // Kann dieser Gegenstand durch ein gleiches aufsteigen? Siegel und Taschen verbinden sich nie.
 export function canMerge(def, stern = 1) {
-  if (!def || def.art === 'siegel' || def.art === 'tasche' || def.art === 'begleiter') return false;
+  if (!def || def.art === 'siegel' || def.art === 'tasche' || def.art === 'begleiter' || def.art === 'spruch') return false;
   if (isRune(def)) return !!def.steigerung && !!nextLevelId(def);
   return stern < MAX_STERN;
 }
@@ -80,7 +80,7 @@ const stufeVon = (p, d) => (isRune(d) ? d.stufe || 1 : sternOf(p));
 // Zielstufe beim Schmied oder null (Siegel, Taschen, schon ★★★ oder höher, Rune ohne Steigerung).
 export function schmiedZiel(p, defs) {
   const d = defs[p?.id];
-  if (!d || d.art === 'siegel' || d.art === 'tasche' || d.art === 'begleiter') return null;
+  if (!d || d.art === 'siegel' || d.art === 'tasche' || d.art === 'begleiter' || d.art === 'spruch') return null;
   if (isRune(d) && !(defs[runeBase(d)]?.steigerung && nextLevelId(d))) return null;
   const ziel = stufeVon(p, d) + 1;
   return ziel <= SCHMIED.maxZiel ? ziel : null;
@@ -94,7 +94,7 @@ export function schmiedPreis(p, defs) {
 // Warum es nicht geht: 'art' (Siegel, Tasche, Begleiter) | 'max' | 'heute' | 'gold' | null
 export function schmiedSperre(run, p, defs) {
   const d = defs[p?.id];
-  if (!d || d.art === 'siegel' || d.art === 'tasche' || d.art === 'begleiter') return 'art';
+  if (!d || d.art === 'siegel' || d.art === 'tasche' || d.art === 'begleiter' || d.art === 'spruch') return 'art';
   if (!schmiedZiel(p, defs)) return 'max';
   if (run.schmiedTag === run.day) return 'heute';
   if (run.gold < schmiedPreis(p, defs)) return 'gold';

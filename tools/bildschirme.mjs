@@ -70,7 +70,22 @@ async function laden(profil = null) {
 
 const PROFIL = { v: 1, xp: 420, buch: ['komp:feuer+axt', 'stufe:axt:2'], erfolge: [], figuren: [], designs: [], design: 'leder', stats: { laeufe: 2, siege: 9 }, figurSiege: [], tutorial: true, lernstand: {}, regeln: [], klasse: null };
 
+// Satzschmiede: Profil auf Stufe 3 (mit Adverbialen; die Lehrkraft hat Stufe 3 freigegeben) und mit zwei Sprüchen
+const PROFIL_SATZ = { ...PROFIL, satzschmiedeGesehen: true, lernstand: { satzglieder: { stufe: 3, sicher: 0 } }, klasse: { themen: { satzglieder: 3 } },
+  sprueche: [{ satz: 'Eadrun schlägt den Ork.', verb: 'schlagen', umgestellt: false, werte: 'Schaden 7,5 · alle 4 s' },
+    { satz: 'Sofort schützt die Eule uns.', verb: 'schützen', umgestellt: true, werte: 'Block 11 · alle 4,2 s' }] };
+
 // Lauf starten (Figur Eadrun) bis zum Spielfeld
+const SATZ = `
+      const { zeigeSatzschmiede } = await import(new URL('js/satzschmiede-ui.js', location.href).href);
+      if (__G.PROFIL.sprueche) __G.PROFIL.lernstand.satzglieder = { stufe: 3, sicher: 0 };
+      __G.run.day = 3; zeigeSatzschmiede(() => {}); await __s(500);
+      const satzKarte = async (t) => {
+        const el = [...document.querySelectorAll('#satz-layer .satz-karte')].find((k) => k.textContent.trim() === t && !k.classList.contains('benutzt')
+          && (!document.querySelector('.satz-hinweis') || k.closest('.satz-leiste')));
+        const r = el.getBoundingClientRect(), o = { bubbles: true, clientX: r.x + 8, clientY: r.y + 8, pointerId: 1, isPrimary: true };
+        el.dispatchEvent(new PointerEvent('pointerdown', o)); window.dispatchEvent(new PointerEvent('pointerup', o)); await __s(150);
+      };`;
 const LAUF = `
   await __klick('#btn-known'); await __klick('#btn-new', 500);
   // Figurenwahl abwarten (online laden die Bilder langsamer)
@@ -171,6 +186,30 @@ const BILDSCHIRME = [
       const brief = __G.BOTSCHAFTEN.find((b) => b.id === __G.run.brief.id);
       const falsch = [...document.querySelectorAll('#brief-layer [data-a]')].find((b) => b.textContent !== brief.fragen[0].richtig);
       falsch.click(); await __s(500);` },
+  { name: 'satz-tuer', profil: PROFIL, ohneScroll: true, schritte: `${LAUF}${SATZ}` },
+  { name: 'satz-stufe1', profil: PROFIL, ohneScroll: true, schritte: `${LAUF}${SATZ}
+      await __klick('#satz-layer [data-rein]', 400); await satzKarte('Eadrun'); await satzKarte('schlägt');` },
+  { name: 'satz-stufe3', profil: PROFIL_SATZ, ohneScroll: true, schritte: `${LAUF}${SATZ}
+      await __klick('#satz-layer [data-rein]', 400); for (const t of ['Eadrun', 'schlägt', 'den Ork']) await satzKarte(t);` },
+  { name: 'satz-fehler', profil: PROFIL_SATZ, ohneScroll: true, schritte: `${LAUF}${SATZ}
+      await __klick('#satz-layer [data-rein]', 400); for (const t of ['Eadrun', 'schlägt', 'der Ork']) await satzKarte(t);
+      await __klick('#satz-layer [data-schmieden]', 400);` },
+  { name: 'satz-ergebnis', profil: PROFIL_SATZ, ohneScroll: true, schritte: `${LAUF}${SATZ}
+      await __klick('#satz-layer [data-rein]', 400); for (const t of ['Eadrun', 'schlägt', 'den Ork', 'sofort']) await satzKarte(t);
+      await __klick('#satz-layer [data-schmieden]', 400);` },
+  { name: 'satz-umstellen', profil: PROFIL_SATZ, ohneScroll: true, schritte: `${LAUF}${SATZ}
+      await __klick('#satz-layer [data-rein]', 400); for (const t of ['Eadrun', 'schlägt', 'den Ork', 'sofort']) await satzKarte(t);
+      await __klick('#satz-layer [data-schmieden]', 400); await __klick('#satz-layer [data-umstellen]', 400);
+      for (const t of ['sofort', 'sofort', 'sofort', 'schlägt']) await satzKarte(t);
+      await __klick('#satz-layer [data-pruefen]', 400);` },
+  { name: 'satz-rolle', profil: PROFIL_SATZ, ohneScroll: true, schritte: `${LAUF}${SATZ}
+      await __klick('#satz-layer [data-rein]', 400); for (const t of ['Eadrun', 'schlägt', 'den Ork', 'sofort']) await satzKarte(t);
+      await __klick('#satz-layer [data-schmieden]', 400); await __klick('#satz-layer [data-nehmen]', 600);
+      await __klick('#btn-reroll', 300); const p = __G.run.items.find((q) => q.id === 'spruchrolle');
+      const it = document.querySelector(\`.item[data-uid="\${p.uid}"]\`), rr = it.getBoundingClientRect();
+      for (const t of ['pointerdown', 'pointerup']) it.dispatchEvent(new PointerEvent(t, { bubbles: true, clientX: rr.x + 12, clientY: rr.y + 12, pointerId: 1, isPrimary: true, pointerType: 'touch' }));
+      await __s(400); document.title = JSON.stringify({ area: p.area, satz: p.spruch.satz });` },
+  { name: 'buch-sprueche', profil: PROFIL_SATZ, ohneScroll: true, schritte: `await __klick('#btn-known'); await __klick('#btn-buch', 500); await __klick('.buch-tab[data-seite="sprueche"]', 300);` },
   { name: 'woche-start', profil: PROFIL, ohneScroll: true, schritte: `await __klick('#btn-known'); await __klick('#btn-woche', 500);` },
   { name: 'woche-lauf', profil: PROFIL, ohneScroll: true, schritte: `await __klick('#btn-known'); await __klick('#btn-woche', 500); await __klick('#woche-layer [data-los]', 900);
       for (let i = 0; i < 4; i++) { const b = [...document.querySelectorAll('#modal:not([hidden]) button, .enc-choice')].find((x) => x.offsetParent); if (!b) break; b.click(); await __s(500); }
@@ -266,7 +305,7 @@ const PRUEFEN = (ohneScroll, frei = []) => `
     breit: de.scrollWidth - innerWidth, hoch: ${ohneScroll} ? Math.max(de.scrollHeight, document.body.scrollHeight) - innerHeight : 0,
     emojis: [...new Set(emojis)].slice(0, 12),
     titelschrift: (() => {
-      const LERN = '#aufgabe *, #quick *, #info *, .code-kasten *, .buch-neu *, .buch-card *, .lern, .lern *, .opt-btn, .genus-btn, .enc-q, .enc-hint, .bad-word';
+      const LERN = '#aufgabe *, #quick *, #info *, .satz-karte, .satz-leiste *, .satz-zeilen *, .satz-meldung, .spruch-karte b, .code-kasten *, .buch-neu *, .buch-card *, .lern, .lern *, .opt-btn, .genus-btn, .enc-q, .enc-hint, .bad-word';
       const out = [];
       for (const e of document.querySelectorAll(LERN)) {
         if (e.closest('h2:not(.lern, .enc-q)')) continue; // Überschriften ohne Lerninhalt dürfen die Titelschrift tragen

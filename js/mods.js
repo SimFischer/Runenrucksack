@@ -81,6 +81,8 @@ export function evaluateBag(placed, defs, ctx = {}) {
   for (const p of placed) {
     const i = info.get(p.uid);
     i.boni = [];
+    // Spruchrolle: ihre Werte stehen am Gegenstand (aus dem geschmiedeten Satz)
+    if (p.spruch) { i.def = { ...i.def, ...p.spruch.werte }; i.base = { ...i.base, ...p.spruch.werte }; }
     // Hauptmann Theron: Nomen mit passendem Artikel-Siegel bekommen Startblock.
     if (ctx.siegelStartblock && i.siegel.some((s) => s.ok)) {
       i.def = { ...i.def, startblock: (i.def.startblock || 0) + ctx.siegelStartblock };

@@ -12,15 +12,21 @@ const regelSeite = () => ({
   eintraege: G.THEMEN.themen.flatMap((t) => t.regeln.map((r) => ({ id: `regel:${r.id}`, regel: r, thema: t }))),
 });
 
+// Seite „Sprüche“: alle Sätze aus der Satzschmiede (G.PROFIL.sprueche, nur auf dem Gerät)
+const spruchSeite = () => ({
+  id: 'sprueche', symbol: 'stern', titel: 'Sprüche', text: 'Alle Sätze, die du in der Satzschmiede geschmiedet hast. Sie bleiben nur auf diesem Gerät.',
+  eintraege: (G.PROFIL.sprueche || []).map((s, i) => ({ id: `spruch:${i}`, spruch: s })),
+});
+
 export function zeigeBuch(zurueck = null) {
   document.getElementById('buch-layer')?.remove();
   const box = document.createElement('div');
   box.id = 'buch-layer';
   document.body.append(box);
   const zeichne = () => {
-    const entdeckt = new Set([...G.PROFIL.buch, ...(G.PROFIL.regeln || []).map((id) => `regel:${id}`)]);
+    const entdeckt = new Set([...G.PROFIL.buch, ...(G.PROFIL.regeln || []).map((id) => `regel:${id}`), ...spruchSeite().eintraege.map((e) => e.id)]);
     const gesamt = G.BUCH.eintraege.length;
-    const seiten = [...G.BUCH.seiten, regelSeite()];
+    const seiten = [...G.BUCH.seiten, regelSeite(), spruchSeite()];
     const seite = { ...seiten.find((s) => s.id === seiteAktiv) };
     const stand = seitenStand(seite, entdeckt);
     box.innerHTML = `
@@ -34,11 +40,12 @@ export function zeigeBuch(zurueck = null) {
           const st = seitenStand(s, entdeckt);
           return `<button class="buch-tab${s.id === seiteAktiv ? ' on' : ''}${st.voll ? ' voll' : ''}" data-seite="${s.id}">
             <span>${sym(s.symbol)} ${s.titel}</span>
-            <span class="buch-bar"><i style="width:${Math.round((st.gefunden / st.gesamt) * 100)}%"></i></span>
+            <span class="buch-bar"><i style="width:${st.gesamt ? Math.round((st.gefunden / st.gesamt) * 100) : 0}%"></i></span>
             <small>${st.gefunden}/${st.gesamt}</small></button>`;
         }).join('')}</nav>
         <p class="buch-intro">${seite.text}</p>
-        <div class="buch-grid">${seite.eintraege.map((e) => karte(e, entdeckt.has(e.id))).join('')}</div>
+        <div class="buch-grid${seite.id === 'sprueche' ? ' sprueche' : ''}">${seite.eintraege.map((e) => karte(e, entdeckt.has(e.id))).join('')
+          || (seite.id === 'sprueche' ? '<p class="buch-leer">Noch keine Sprüche. Ab Tag 2 hat die Satzschmiede jeden Morgen geöffnet.</p>' : '')}</div>
       </div>`;
     box.querySelector('[data-close]').onclick = () => { box.remove(); emit('buchZu'); zurueck?.(); };
     box.querySelectorAll('[data-seite]').forEach((b) => { b.onclick = () => { seiteAktiv = b.dataset.seite; zeichne(); }; });
@@ -48,6 +55,10 @@ export function zeigeBuch(zurueck = null) {
 }
 
 function karte(e, da) {
+  if (e.spruch) {
+    return `<div class="buch-eintrag spruch-karte"><img src="assets/ui/satzschmiede/spruchrolle.webp" alt="">
+      <span><b>${e.spruch.satz}</b><small>${e.spruch.werte}${e.spruch.umgestellt ? ' · Umstellprobe bestanden' : ''}</small></span></div>`;
+  }
   if (e.regel) {
     return da ? `<div class="buch-eintrag regel-karte"><span class="regel-emoji">${sym('buch')}</span><b>${e.thema.name}</b><small>${e.regel.text}</small></div>`
       : `<div class="buch-eintrag regel-karte dunkel"><span class="regel-emoji">${sym('menue')}</span><b>???</b><small>${e.thema.name}</small></div>`;

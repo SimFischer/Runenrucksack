@@ -679,6 +679,7 @@
     "ruestung": "Auf der Rüstung des Orks steht ein Satz mit einem Fehler. Tipp ihn an – richtig verbessert startet der Ork geschwächt.",
     "schmied": "Der Schmied macht einen Gegenstand eine Stufe stärker – ganz ohne zweites Exemplar. Das kostet viel Gold und geht nur einmal am Tag.",
     "brief": "Ein Brief! Lies ihn in Ruhe. Die Antworten stehen im Text – such die passende Stelle.",
+    "satzschmiede": "In der Satzschmiede baust du einen Satz aus Karten. Frag dich: Wer tut etwas? Was tut er? Das Prädikat steht an zweiter Stelle.",
     "wuerfeln": "Drei Würfe am Tag kosten 1 Gold, jeder weitere 2. Überleg gut, ob sich noch ein Wurf lohnt – morgen ist es wieder billig.",
     "stufen": "Jedes Thema hat drei Stufen ★☆☆. Zweimal gleich richtig – dann wird es kniffliger. Ab Stufe 2 gibt es Gold dafür!"
   },
@@ -703,6 +704,34 @@
       "animation": "pulsieren",
       "text": "Jedes Thema hat drei Stufen ★☆☆. Zweimal gleich richtig, dann kommt die nächste. Ein Fehler? Die Aufgabe kommt bald in anderer Form wieder. Stufe 2 gleich richtig: +1, Stufe 3: +2 und das Item glänzt (+10 % im nächsten Kampf).",
       "symbol": "stern"
+    },
+    {
+      "nach": "sammeln",
+      "titel": "Begleiter",
+      "animation": "pulsieren",
+      "text": "Vor dem Aufbruch wählst du ein Begleiter-Tier. Es liegt auf einem Feld im Rucksack und hilft den Gegenständen neben sich – jedes Tier auf seine Art. Verkaufen kann man es nicht.",
+      "symbol": "css:hilfe-bild begleiter"
+    },
+    {
+      "nach": "sammeln",
+      "titel": "Briefe",
+      "animation": "pulsieren",
+      "text": "Manchmal kommt am Morgen ein Brief statt einer Begegnung. Lies ihn und beantworte die Fragen – die Antworten stehen im Text. Für richtige Antworten gibt es eine Belohnung.",
+      "symbol": "css:hilfe-bild brief"
+    },
+    {
+      "nach": "sammeln",
+      "titel": "Satzschmiede",
+      "animation": "pulsieren",
+      "text": "Ab Tag 2 hat jeden Morgen die Satzschmiede geöffnet. Bau aus Satzglied-Karten einen richtigen Satz: Das Prädikat steht an zweiter Stelle. Daraus wird eine Spruchrolle – einmal am Tag.",
+      "symbol": "css:hilfe-bild spruchrolle"
+    },
+    {
+      "nach": "sammeln",
+      "titel": "Rune der Woche",
+      "animation": "pulsieren",
+      "text": "Eine Woche lang spielen alle dieselbe Reise: gleiche Figur, gleiche Läden, gleiche Gegner. Am Ende bekommst du Punkte und ein Siegel aus vier Zeichen für deine Lehrkraft.",
+      "symbol": "css:hilfe-bild wochenrune"
     }
   ]
 }

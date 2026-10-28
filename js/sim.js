@@ -16,6 +16,8 @@ import { neuesProfil, entdecke, merkeAntwort, laufStand, laufAbschluss, rangVon 
 import { Battle, makeFighter, runToEnd } from './battle.js';
 import { begleiterDefs } from './begleiter.js';
 import { waehleBrief, werteAus } from './botschaften.js';
+import { karten, pruefeSatz, spruchWerte, schmiedeVerben, schmiedeStern, SPRUCH_DEF } from './satzschmiede.js';
+import { applyMod } from './mods.js';
 
 export function prepareData(raw) {
   const defs = {};
@@ -24,8 +26,12 @@ export function prepareData(raw) {
   for (const d of compounds) defs[d.id] = d;
   for (const d of buildRuneLevels(defs)) defs[d.id] = d;
   for (const d of begleiterDefs(raw.begleiter || [])) defs[d.id] = d;
+  defs[SPRUCH_DEF.id] = SPRUCH_DEF;
   return { ...raw, defs, compounds, buch: baueBuch(defs, raw.items, raw.recipes) };
 }
+
+// Spruchrolle: Werte stehen am Gegenstand
+const defVon = (p, defs) => (p.spruch ? { ...defs[p.id], ...p.spruch.werte } : defs[p.id]);
 
 // Grobe Stärke eines Items pro Sekunde (zum Einkaufen).
 function worth(d) {
@@ -84,8 +90,8 @@ function shop(run, data, rng, skill, opts = {}) {
         if (!spot && vorsichtig) continue;
         if (!spot) {
           // Rucksack voll: schwächstes Item verkaufen, wenn das neue besser ist
-          const weakest = bag.filter((p) => !p.fluch).sort((a, b) => worth(defs[a.id]) - worth(defs[b.id]))[0];
-          if (!weakest || worth(defs[weakest.id]) * 1.3 >= worth(o.d)) continue;
+          const weakest = bag.filter((p) => !p.fluch).sort((a, b) => worth(defVon(a, defs)) - worth(defVon(b, defs)))[0];
+          if (!weakest || worth(defVon(weakest, defs)) * 1.3 >= worth(o.d)) continue;
           run.items = run.items.filter((p) => p !== weakest);
           run.gold += sellValue(defs[weakest.id], weakest.stern || 1);
           spot = findSpot(run.items.filter((p) => p.area === 'bag'), defs, o.d, bagGrid(run));
@@ -123,7 +129,7 @@ function verbinde(run, data, rng, skill, p) {
   });
 }
 
-function morning(run, data, rng, skill) {
+function morning(run, data, rng, skill, opts = {}) {
   const { defs } = data;
   for (const step of run.queue) {
     if (step === 'unterklasse') {
@@ -141,6 +147,22 @@ function morning(run, data, rng, skill) {
           if (b.typ === 'gold') run.gold += b.menge;
           else verbinde(run, data, rng, skill, placeNew(run, defs, b.id));
         }
+      }
+    }
+    // Satzschmiede (opts.satzschmiede, Stufe 1–3): Figur + Prädikat, ab Stufe 2 mit Objekt, ab Stufe 3 mit
+    // Zeit-Adverbiale und Umstellprobe. Mit Wahrscheinlichkeit skill gelingt der Satz.
+    if (step === 'satzschmiede' && data.satzschmiede && data.wortschatz && opts.satzschmiede && rng() < skill) {
+      const daten = data.satzschmiede, stufe = opts.satzschmiede;
+      const inf = pickOne(schmiedeVerben(run, defs, daten), rng);
+      const pool = karten({ daten, ws: data.wortschatz, figur: { kurz: 'Figur' }, verben: [inf], stufe });
+      const v = data.wortschatz.verben.find((x) => x.infinitiv === inf);
+      const leiste = [pool.find((k) => k.wer === 'figur'), pool.find((k) => k.glied === 'praedikat' && k.text === v.praesens.er)];
+      if (stufe >= 2) leiste.push(pool.find((k) => k.glied === 'objekt' && !k.falsch));
+      if (stufe >= 3) leiste.push(pool.find((k) => k.glied === 'zeit' && k.text === 'am Ende des Kampfes'));
+      const r = pruefeSatz(leiste.filter(Boolean), { daten, ws: data.wortschatz });
+      if (r.gueltig) {
+        const w = spruchWerte(r, { daten, verbDef: defs[daten.verben[inf].item], stern: schmiedeStern(run, defs, inf, daten), applyMod, umgestellt: stufe >= 3 });
+        placeNew(run, defs, 'spruchrolle', null, { spruch: { satz: r.satz, werte: w.werte, zeilen: w.zeilen }, stern: w.stufe });
       }
     }
     if (step === 'begegnung') {
@@ -179,7 +201,7 @@ export function simulateRun(data, rng, opts = {}) {
   const ctxData = { heroes: data.heroes, fates: data.fates, begleiter: data.begleiter };
   const days = [];
   while (!run.over) {
-    morning(run, data, rng, skill);
+    morning(run, data, rng, skill, opts);
     run.wuerfeTag = 0;
     shop(run, data, rng, skill, opts);
     const ctx = playerContext(run, ctxData);

@@ -6,6 +6,7 @@ import { placeWaiting } from './sterne.js';
 import { baueBuch } from './buch.js';
 import { neuesProfil } from './fortschritt.js';
 import { begleiterDefs } from './begleiter.js';
+import { SPRUCH_DEF } from './satzschmiede.js';
 
 export const G = {
   ITEMS: [],      // Items im Laden (items.json)
@@ -36,10 +37,11 @@ const SAVE_KEY = 'runenrucksack.lauf.v2';
 
 export async function loadData() {
   const get = (f) => fetch(f).then((r) => r.json());
-  const [itemData, enemyData, recipes, regions, heroes, encounters, exercises, tutorial, ach, registry, wortschatz, themen, lehrkraft, bilder, begleiterJson, botschaften] = await Promise.all([
+  const [itemData, enemyData, recipes, regions, heroes, encounters, exercises, tutorial, ach, registry, wortschatz, themen, lehrkraft, bilder, begleiterJson, botschaften, satzschmiede] = await Promise.all([
     get('items.json'), get('enemies.json'), get('recipes.json'), get('regions.json'), get('heroes.json'),
     get('encounters.json'), get('exercises.json'), get('tutorial.json'), get('achievements.json'), get('registry.json'), get('wortschatz.json'), get('themen.json'), get('lehrkraft.json').catch(() => ({})),
     get('assets/zuordnung.json').catch(() => null), get('begleiter.json').catch(() => ({ begleiter: [] })), get('botschaften.json').catch(() => ({ briefe: [] })),
+    get('satzschmiede.json').catch(() => null),
   ]);
   G.ITEMS = itemData.items;
   G.RAR = itemData.seltenheiten;
@@ -52,6 +54,8 @@ export async function loadData() {
   G.BEGLEITER = begleiterJson.begleiter;
   G.BOTSCHAFTEN = botschaften.briefe;
   for (const d of begleiterDefs(G.BEGLEITER)) G.DEFS[d.id] = d;
+  G.SATZSCHMIEDE = satzschmiede;
+  G.DEFS[SPRUCH_DEF.id] = SPRUCH_DEF;
   G.ENEMIES = enemyData.gegner;
   G.REGIONS = regions.gebiete;
   G.HEROES = heroes.helden;

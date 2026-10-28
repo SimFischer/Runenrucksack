@@ -1,0 +1,45 @@
+{
+  "_hinweis": "Satzschmiede: Aus Satzglied-Karten wird ein Satz, der zu einer Spruchrolle wird. verben: Verb-Rollen, aus denen man Sprüche schmieden kann (nur solche, die zu einer Person passen) – je Verb die passenden Objekte (im richtigen Fall) und Adverbiale. Nur diese Kombinationen sind gültig, so entstehen keine unsinnigen Sätze. falscherFall: Karten mit dem falschen Fall (Nominativ statt Akkusativ). adverbiale: Art (zeit, art, ort) und Wirkung. subjektBonus: was das Subjekt dem Spruch gibt (Figur, ich, wir, Begleiter). sternAbTag: Sternstufe, die eine Spruchrolle mindestens hat (ab Tag …) – sonst die der Verb-Rolle im Rucksack; die Umstellprobe gibt einen Stern dazu. stufen: welche Satzglieder auf welcher Stufe des Themas Satzglieder vorkommen.",
+  "verben": {
+    "schlagen": { "item": "schlagen", "objekte": ["den Ork", "die Orks", "den Schild-Ork"], "zeit": ["sofort", "in der dritten Runde", "am Ende des Kampfes"], "art": ["mit voller Kraft", "blitzschnell"], "ort": ["am Waldrand", "auf der Brücke"] },
+    "stechen": { "item": "stechen", "objekte": ["den Ork", "die Orks", "den Schild-Ork"], "zeit": ["sofort", "in der dritten Runde", "am Ende des Kampfes"], "art": ["blitzschnell", "vorsichtig"], "ort": ["am Waldrand", "auf der Brücke"] },
+    "schießen": { "item": "schiessen", "objekte": ["auf den Ork", "auf die Orks", "auf den Schild-Ork"], "zeit": ["sofort", "in der dritten Runde", "am Ende des Kampfes"], "art": ["blitzschnell", "vorsichtig"], "ort": ["am Waldrand", "auf der Brücke"] },
+    "stürmen": { "item": "stuermen", "objekte": ["auf den Ork", "auf die Orks"], "zeit": ["sofort", "in der dritten Runde", "am Ende des Kampfes"], "art": ["mit voller Kraft", "blitzschnell"], "ort": ["am Waldrand", "auf der Brücke"] },
+    "schützen": { "item": "schuetzen", "objekte": ["mich", "uns"], "zeit": ["sofort", "in der dritten Runde", "am Ende des Kampfes"], "art": ["mit voller Kraft", "vorsichtig"], "ort": ["am Waldrand", "auf der Brücke"] },
+    "heilen": { "item": "heilen", "objekte": ["mich", "uns"], "zeit": ["sofort", "in der dritten Runde", "am Ende des Kampfes"], "art": ["vorsichtig", "blitzschnell"], "ort": ["am Waldrand", "auf der Brücke"] }
+  },
+  "grundverben": ["schlagen", "schützen", "heilen"],
+  "objekte": ["den Ork", "die Orks", "den Schild-Ork", "auf den Ork", "auf die Orks", "auf den Schild-Ork", "mich", "uns"],
+  "falscherFall": { "der Ork": "den Ork", "der Schild-Ork": "den Schild-Ork", "auf der Ork": "auf den Ork", "ich": "mich", "wir": "uns" },
+  "adverbiale": {
+    "sofort": { "typ": "zeit", "text": "löst gleich zu Beginn aus", "wirkung": { "sofort": true } },
+    "in der dritten Runde": { "typ": "zeit", "text": "beginnt etwas später, dafür +25 %", "wirkung": { "verzoegerung": 1.5, "prozent": 25 } },
+    "am Ende des Kampfes": { "typ": "zeit", "text": "beginnt erst spät, dafür +50 %", "wirkung": { "verzoegerung": 3, "prozent": 50 } },
+    "mit voller Kraft": { "typ": "art", "text": "+25 %, aber 10 % langsamer", "wirkung": { "prozent": 25, "abklingzeit": 10 } },
+    "blitzschnell": { "typ": "art", "text": "20 % schneller", "wirkung": { "abklingzeit": -20 } },
+    "vorsichtig": { "typ": "art", "text": "+3 Startblock", "wirkung": { "startblock": 3 } },
+    "am Waldrand": { "typ": "ort", "text": "ein Satzglied mehr: +10 %", "wirkung": { "prozent": 10 } },
+    "auf der Brücke": { "typ": "ort", "text": "ein Satzglied mehr: +10 %", "wirkung": { "prozent": 10 } }
+  },
+  "objektBonus": { "text": "ein Satzglied mehr: +10 %", "prozent": 10 },
+  "subjektBonus": {
+    "figur": { "text": "deine Figur legt ihre Kraft hinein: +15 %", "prozent": 15 },
+    "ich": { "text": "du selbst: +10 %", "prozent": 10 },
+    "wir": { "text": "ihr zusammen: +10 % und 10 % schneller", "prozent": 10, "abklingzeit": -10 },
+    "begleiter": {
+      "eule": { "text": "die kluge Eule: +15 %", "prozent": 15 },
+      "igel": { "text": "der Igel rollt sich ein: +3 Startblock", "startblock": 3 },
+      "pony": { "text": "das flinke Pony: 15 % schneller", "abklingzeit": -15 },
+      "fuchs": { "text": "der schlaue Fuchs: +10 % Glück", "glueck": 10 },
+      "rabe": { "text": "der scharfäugige Rabe: +10 %", "prozent": 10 },
+      "falke": { "text": "der schnelle Falke: +20 %", "prozent": 20 }
+    }
+  },
+  "sternAbTag": { "2": 2, "6": 3 },
+  "umstellBonus": { "text": "Umstellprobe bestanden: eine Sternstufe stärker" },
+  "stufen": {
+    "1": { "glieder": ["subjekt", "praedikat"], "text": "Subjekt und Prädikat" },
+    "2": { "glieder": ["subjekt", "praedikat", "objekt"], "text": "dazu ein Objekt" },
+    "3": { "glieder": ["subjekt", "praedikat", "objekt", "zeit", "art", "ort"], "text": "dazu Adverbiale und die Umstellprobe" }
+  }
+}

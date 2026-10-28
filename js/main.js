@@ -25,6 +25,7 @@ import { frageImSpiel, wortschatz, einstellungen } from './aufgaben/spiel.js';
 import { BEGLEITER_PREFIX, begleiterFrei, istBegleiter } from './begleiter.js';
 import { stufenBereich, stufeFuer, aufgabenStand, schaetzeLernstand, themaAn } from './aufgaben/wahl.js';
 import { zeigeBrief } from './brief-ui.js';
+import { zeigeSatzschmiede } from './satzschmiede-ui.js';
 import { wochenKnopfHtml, zeigeWochenStart, zeigeWochenErgebnis } from './wochenrune-ui.js';
 import { verbSatz, verbSatzInhalt, PERSONEN_FOLGE, kurzName } from './aufgaben/verbsatz.js';
 import { runEncounter } from './encounters.js';
@@ -306,6 +307,8 @@ function continueFlow() {
   else if (step === 'begegnung') runEncounter(next, render);
   // Brief statt Begegnung – hat die Lehrkraft das Leseverständnis ausgeschaltet, kommt doch eine Begegnung
   else if (step === 'brief') (themaAn(einstellungen(), 'lesen') && G.BOTSCHAFTEN?.length ? zeigeBrief(next, laufRng(G.run, 'brief')) : runEncounter(next, render));
+  // Satzschmiede: nur wenn das Thema Satzglieder eingeschaltet ist, einmal am Tag
+  else if (step === 'satzschmiede') (themaAn(einstellungen(), 'satzglieder') && G.SATZSCHMIEDE && !G.run.tutorial && G.run.satzschmiedeTag !== G.run.day ? zeigeSatzschmiede(next, render) : next());
   else next(); // z. B. „verschmelzen“ aus älteren Spielständen – Komposita entstehen jetzt sofort
 }
 
@@ -573,7 +576,9 @@ function renderInfo() {
   const inBag = selected.src === 'bag';
   const ana = inBag ? bagInfo.get(selected.uid) : null;
   const pl = selected.uid ? placedOf(selected.uid) : null;
-  const def = ana ? ana.def : starDef(base, pl?.stern || 1, pl?.kraftStern || 1);
+  // Spruchrolle: Werte kommen aus dem geschmiedeten Satz
+  const roh = pl?.spruch ? { ...base, ...pl.spruch.werte } : starDef(base, pl?.stern || 1, pl?.kraftStern || 1);
+  const def = ana ? ana.def : roh;
   const s = sizeOf(base, 0);
   const rar = G.RAR[base.seltenheit] || {};
 
@@ -587,7 +592,7 @@ function renderInfo() {
     <div class="info-head">
       <div class="info-emoji">${icon}</div>
       <div>
-        <div class="info-name">${title}</div>
+        <div class="info-name${base.name.length > 10 ? ' lang' : ''}">${title}</div>
         <div class="info-rar" style="color:${istBegleiter(base) ? 'var(--gold-dunkel)' : rar.farbe}">${istBegleiter(base) ? 'Begleiter' : rar.name || ''} · ${s.w}×${s.h}${istBegleiter(base) ? '' : ` · ${artLabel(base)}`}</div>
       </div>
     </div>`);
@@ -597,14 +602,14 @@ function renderInfo() {
   for (const [key, label, f] of STAT_ROWS) {
     if (key === 'abklingzeit' && !def.abklingzeit) continue;
     if (!def[key]) continue;
-    const diff = def[key] - ((ana?.base || starDef(base, pl?.stern || 1, pl?.kraftStern || 1))[key] || 0);
+    const diff = def[key] - ((ana?.base || roh)[key] || 0);
     const extra = Math.abs(diff) > 1e-9 ? ` <span class="${diff > 0 === (key !== 'abklingzeit') ? 'plus' : 'minus'}">(${diff > 0 ? '+' : '−'}${fmt(Math.round(Math.abs(diff) * 10) / 10)})</span>` : '';
     ul.insertAdjacentHTML('beforeend', `<li><span>${label}</span><b>${f(def[key])}${extra}</b></li>`);
   }
   if (ul.children.length) box.append(ul);
 
   const notes = [];
-  if (!['siegel', 'rune', 'tasche', 'begleiter'].includes(base.art) && !base.abklingzeit) notes.push('Passiv: wirkt den ganzen Kampf, solange es im Rucksack liegt.');
+  if (!['siegel', 'rune', 'tasche', 'begleiter', 'spruch'].includes(base.art) && !base.abklingzeit) notes.push('Passiv: wirkt den ganzen Kampf, solange es im Rucksack liegt.');
   if (base.abklingzeit && base.tempo) notes.push('Tempo: Dieses Item lädt schneller auf.');
   if (base.aura?.tempo) notes.push(`Wirkt außerdem auf den ganzen Rucksack: +${base.aura.tempo} % Tempo.`);
   if (base.aura?.glueck) notes.push(`Wirkt außerdem auf den ganzen Rucksack: +${base.aura.glueck} % Glück.`);
@@ -659,6 +664,7 @@ function collectNotes(base, ref) {
   const out = [];
   if (istBegleiter(base)) return [`<p class="gram">${base.text}</p>`];
   const p = ref.uid ? placedOf(ref.uid) : null;
+  if (p?.spruch) return [`<p class="spruch-satz">${p.spruch.satz}</p>`, `<ul class="spruch-zeilen">${p.spruch.zeilen.map((z) => `<li>${z}</li>`).join('')}</ul>`];
   const stern = p?.stern || 1;
   if (canMerge(base, stern) && !isRune(base)) {
     const next = starDef(base, stern + 1);
@@ -681,7 +687,7 @@ function collectNotes(base, ref) {
 function artLabel(d) {
   return {
     traeger: 'Nomen · Träger', nomen: 'Nomen', kraft: 'Nomen · Kraft', kompositum: 'Kompositum',
-    verb: 'Verb', siegel: 'Artikel-Siegel', rune: 'Adjektiv-Rune', tasche: 'Tasche',
+    verb: 'Verb', siegel: 'Artikel-Siegel', rune: 'Adjektiv-Rune', tasche: 'Tasche', spruch: 'Satz',
   }[d.art] || '';
 }
 

@@ -12,10 +12,12 @@ const data = prepareData({
   items: json('items.json').items, recipes: json('recipes.json'), regions: json('regions.json').gebiete,
   enemies: json('enemies.json').gegner, heroes: H.helden, fates: H.schicksalsrunen,
   encounters: json('encounters.json'), exercises: json('exercises.json'), begleiter: json('begleiter.json').begleiter, botschaften: json('botschaften.json').briefe,
+  satzschmiede: json('satzschmiede.json'), wortschatz: json('wortschatz.json'),
 });
 
 test('200 Zufallsläufe: Siegquote pro Tag, Siege und Spielzeit', (t) => {
-  const r = summarize(simulateMany(data, 200, 1));
+  // Satzschmiede auf Stufe 2 (ohne Klassen-Code die höchste Stufe)
+  const r = summarize(simulateMany(data, 200, 1, { satzschmiede: 2 }));
   t.diagnostic('Tag:            ' + Object.keys(r.siegquoteProTag).map((d) => d.padStart(4)).join(''));
   t.diagnostic('Siegquote %:    ' + Object.values(r.siegquoteProTag).map((v) => String(v).padStart(4)).join(''));
   t.diagnostic('Tag erreicht %: ' + Object.values(r.erreichtProTag).map((v) => String(v).padStart(4)).join(''));
@@ -83,5 +85,15 @@ test('Ränge: Rang 2 nach etwa 2 Läufen, Rang 5 (Hüter der Sprache) nach etwa 
     t.diagnostic(`Karriere ${seed}: Rang 2 nach ${ab(2)}, Rang 3 nach ${ab(3)}, Rang 4 nach ${ab(4)}, Rang 5 nach ${ab(5)} Läufen`);
     assert.ok(ab(2) >= 1 && ab(2) <= 3, `Rang 2 nach ${ab(2)} Läufen`);
     assert.ok(ab(5) >= 22 && ab(5) <= 31, `Rang 5 nach ${ab(5)} Läufen`);
+  }
+});
+
+// Satzschmiede: Die Spruchrolle ist eine freiwillige Belohnung – sie darf helfen, aber das Spiel nicht kippen.
+test('Satzschmiede: Siege mit und ohne Spruchrollen ähnlich', (t) => {
+  const r = Object.fromEntries([0, 1, 2, 3].map((s) => [s, summarize(simulateMany(data, 150, 3, { satzschmiede: s })).siegeDurchschnitt]));
+  t.diagnostic('Siege nach Stufe der Satzschmiede (0 = aus): ' + Object.entries(r).map(([s, v]) => `${s}: ${v.toFixed(2)}`).join(' · '));
+  for (const s of [1, 2, 3]) {
+    assert.ok(r[s] >= 6 && r[s] <= 9, `Stufe ${s}: ${r[s]}`);
+    assert.ok(Math.abs(r[s] - r[0]) <= 1, `Stufe ${s} weicht zu stark ab: ${r[s]} gegenüber ${r[0]}`);
   }
 });

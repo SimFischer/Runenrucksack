@@ -22,7 +22,7 @@ const DECIMAL_KEYS = new Set(['kaelte', 'betaeubung']);
 export const DIRS = [[1, 0], [0, 1], [-1, 0], [0, -1]];
 
 // Begleiter haben zwar einen Artikel („die Eule“), sind aber kein Ziel für Siegel, Runen oder Verb-Rollen.
-export const isNoun = (d) => !!d.artikel && d.art !== 'siegel' && d.art !== 'rune' && d.art !== 'begleiter';
+export const isNoun = (d) => !!d.artikel && d.art !== 'siegel' && d.art !== 'rune' && d.art !== 'begleiter' && d.art !== 'spruch';
 export const isRune = (d) => d.art === 'rune';
 export const isVerb = (d) => d.art === 'verb';
 // Runen und Verben drehen ihren Pfeil in vier Richtungen, andere längliche Items legen sich quer.
