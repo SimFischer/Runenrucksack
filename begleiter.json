@@ -1,0 +1,59 @@
+{
+  "_hinweis": "Begleiter-Tiere: Vor jedem Lauf wählt man nach der Figur einen freigeschalteten Begleiter. Er liegt als 1×1-Gegenstand im Rucksack (kostet Platz), verbindet sich nie und lässt sich nicht verkaufen. freischaltung nur über den Rang (wie Figuren), damit der Heldencode reicht. wirkung: nachbarNomenProzent (benachbarte Nomen stärker), nachbarTempo (benachbarte Gegenstände lösen so viel Prozent schneller aus), startblock (Startblock, sobald etwas daneben liegt), regelVorab (so oft pro Lauf zeigt der Begleiter bei einer Aufgabe die Regel vorab), ruestungMarkieren (zeigt vor dem Kampf das falsche Wort auf der Ork-Rüstung), siegGold (Gold je Sieg), freiWuerfeProTag (kostenlose Würfe pro Tag), ersterAngriffDoppelt (der erste Angriff im Kampf trifft doppelt). Kampf-Wirkungen gelten nur, wenn der Begleiter im Rucksack liegt.",
+  "begleiter": [
+    {
+      "id": "eule",
+      "name": "Eule",
+      "artikel": "die",
+      "rolle": "kluge Helferin",
+      "text": "Einmal pro Lauf zeigt dir die Eule bei einer Aufgabe die passende Regel – kostenlos. Nomen neben ihr werden 10 % stärker.",
+      "freischaltung": null,
+      "wirkung": { "regelVorab": 1, "nachbarNomenProzent": 10 }
+    },
+    {
+      "id": "igel",
+      "name": "Igel",
+      "artikel": "der",
+      "rolle": "stacheliger Beschützer",
+      "text": "Liegt etwas neben dem Igel, rollt er sich zusammen: 3 Startblock zu Beginn jedes Kampfes.",
+      "freischaltung": null,
+      "wirkung": { "startblock": 3 }
+    },
+    {
+      "id": "pony",
+      "name": "Pony",
+      "artikel": "das",
+      "rolle": "flinker Freund",
+      "text": "Gegenstände neben dem Pony lösen 10 % schneller aus.",
+      "freischaltung": { "rang": 2 },
+      "wirkung": { "nachbarTempo": 10 }
+    },
+    {
+      "id": "fuchs",
+      "name": "Fuchs",
+      "artikel": "der",
+      "rolle": "schlauer Händlerfreund",
+      "text": "Einmal am Tag darfst du kostenlos neu würfeln.",
+      "freischaltung": { "rang": 3 },
+      "wirkung": { "freiWuerfeProTag": 1 }
+    },
+    {
+      "id": "rabe",
+      "name": "Rabe",
+      "artikel": "der",
+      "rolle": "scharfäugiger Späher",
+      "text": "Vor jedem Kampf zeigt der Rabe das falsche Wort auf der Ork-Rüstung – verbessern musst du es selbst. Nach jedem Sieg bringt er 1 Gold.",
+      "freischaltung": { "rang": 4 },
+      "wirkung": { "ruestungMarkieren": true, "siegGold": 1 }
+    },
+    {
+      "id": "falke",
+      "name": "Falke",
+      "artikel": "der",
+      "rolle": "schneller Jäger",
+      "text": "Der erste Angriff in jedem Kampf trifft doppelt.",
+      "freischaltung": { "rang": 5 },
+      "wirkung": { "ersterAngriffDoppelt": true }
+    }
+  ]
+}

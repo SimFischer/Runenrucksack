@@ -40,6 +40,10 @@ export async function frageImSpiel(opts) {
       bereich: opts.bereich, format: opts.format, felder: felderJetzt(), itemNomen });
   const t = thema(aufgabe.thema);
   emit('tipp', { key: 'stufen' });
+  if (opts.zielMarkieren) aufgabe.zielMarkiert = true; // Begleiter Rabe
+  // Begleiter Eule: einmal pro Lauf die passende Regel vorab zeigen
+  const eule = run.begleiter === 'eule' && !run.euleGenutzt && aufgabe.regel && !run.tutorial
+    ? { text: ws.regelText(aufgabe.regel), nutzen: () => { run.euleGenutzt = true; } } : null;
   const ergebnis = await stelleAufgabe(aufgabe, {
     anker: opts.anker,
     beteiligt: opts.beteiligt,
@@ -52,6 +56,7 @@ export async function frageImSpiel(opts) {
     trotzdem: opts.trotzdem,
     einVersuch: opts.einVersuch,
     onRegel: (id) => emit('regelGesehen', { id }),
+    eule,
   });
   if (!ergebnis.abgebrochen) {
     run.lernen ||= { richtig: 0, falsch: 0 };

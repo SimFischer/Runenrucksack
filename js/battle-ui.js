@@ -54,6 +54,7 @@ export function startNight(done) {
   const bag = itemsIn('bag');
   const player = makeFighter(hero()?.name || 'Dein Rucksack', bag, G.DEFS, run.day, {
     info: evaluateBag(bag, G.DEFS, ctx), leben: ctx.leben, tempo: ctx.tempo, selbstschaden: ctx.selbstschaden, rng,
+    ersterAngriffDoppelt: ctx.ersterAngriffDoppelt,
   });
   selfHit = ctx.selbstschaden;
   const foe = makeFighter(enemy.name, enemy.items, G.DEFS, run.day, { rng });
@@ -243,6 +244,7 @@ function showEvent(ev) {
     } else if (ev.blocked > 0) { text = 'geblockt'; cls = 'block'; }
   } else if (ev.type === 'block') { text = `+${ev.amount} Block`; cls = 'block'; }
   else if (ev.type === 'heal') { text = `+${ev.amount}`; cls = 'heal'; }
+  else if (ev.type === 'falke') { text = 'Falke: doppelter Treffer!'; cls = 'glueck'; }
   else if (ev.type === 'status') {
     const secs = ev.kind === 'kaelte' || ev.kind === 'betaeubung';
     text = `+${secs ? fmt(ev.amount) + ' s' : ev.amount}`;
@@ -290,7 +292,8 @@ function armorErgebnis(ok) {
 function openArmor() {
   const run = G.run;
   if (armor.satz) {
-    frageImSpiel({ art: 'ork', format: 'fehler', einVersuch: true, nein: 'Lieber nicht',
+    // Begleiter Rabe im Rucksack: Er zeigt das falsche Wort – verbessern muss das Kind es selbst.
+    frageImSpiel({ art: 'ork', format: 'fehler', einVersuch: true, nein: 'Lieber nicht', zielMarkieren: !!playerCtx().ruestungMarkieren,
       kopf: `<span class="af-wer">Rüstung · nur ein Versuch!</span>` }).then((r) => {
       if (r.abgebrochen) return;
       const a = r.aufgabe;

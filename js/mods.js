@@ -1,6 +1,7 @@
 // Boni, die über Siegel und Runen hinausgehen: Figur, Unterklasse, Schicksalsrune, Begegnungen, Taschen.
 // evaluateBag() liefert für jedes Item die wirksamen Werte (wie grammar.analyze) plus eine Liste der Boni.
-import { analyze, EFFECT_KEYS } from './grammar.js';
+import { analyze, EFFECT_KEYS, isNoun } from './grammar.js';
+import { begleiterAufNachbarn, begleiterWirkung } from './begleiter.js';
 
 export const GLANZ_BONUS = 10; // Prozent
 
@@ -37,7 +38,7 @@ function applyEffekt(ctx, e = {}, day = 1) {
   if (e.runenFaktor) ctx.runeMult *= e.runenFaktor;
 }
 
-// Spieler-Kontext für Kampf und Info-Feld. data: { heroes, fates } aus heroes.json.
+// Spieler-Kontext für Kampf und Info-Feld. data: { heroes, fates } aus heroes.json, begleiter aus begleiter.json.
 export function playerContext(run, data = {}) {
   const ctx = { mods: [], siegelBonus: undefined, runeMult: 1, tempo: 0, leben: 0, hero: null, fate: null, unterklasse: null };
   const hero = data.heroes?.find((h) => h.id === run?.hero);
@@ -54,6 +55,10 @@ export function playerContext(run, data = {}) {
   // Verfluchte Kobold-Geschenke schaden zu Kampfbeginn.
   ctx.selbstschaden = 2 * (run?.items || []).filter((p) => p.area === 'bag' && p.fluch).length;
   ctx.taschenFelder = run?.taschenFelder || {};
+  // Begleiter im Rucksack: Wirkungen für den Kampf (Falke) und die Ork-Rüstung (Rabe)
+  const bw = begleiterWirkung(run, data.begleiter, true);
+  if (bw.ersterAngriffDoppelt) ctx.ersterAngriffDoppelt = true;
+  if (bw.ruestungMarkieren) ctx.ruestungMarkieren = true;
   return ctx;
 }
 
@@ -101,5 +106,7 @@ export function evaluateBag(placed, defs, ctx = {}) {
       }
     }
   }
+  // Begleiter wirken auf ihre Nachbarn (Eule: Nomen stärker, Pony: schneller, Igel: Startblock)
+  begleiterAufNachbarn(info, placed, defs, { applyMod, isNoun });
   return info;
 }

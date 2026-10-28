@@ -5,6 +5,7 @@ import { playerContext } from './mods.js';
 import { placeWaiting } from './sterne.js';
 import { baueBuch } from './buch.js';
 import { neuesProfil } from './fortschritt.js';
+import { begleiterDefs } from './begleiter.js';
 
 export const G = {
   ITEMS: [],      // Items im Laden (items.json)
@@ -35,10 +36,10 @@ const SAVE_KEY = 'runenrucksack.lauf.v2';
 
 export async function loadData() {
   const get = (f) => fetch(f).then((r) => r.json());
-  const [itemData, enemyData, recipes, regions, heroes, encounters, exercises, tutorial, ach, registry, wortschatz, themen, lehrkraft, bilder] = await Promise.all([
+  const [itemData, enemyData, recipes, regions, heroes, encounters, exercises, tutorial, ach, registry, wortschatz, themen, lehrkraft, bilder, begleiterJson] = await Promise.all([
     get('items.json'), get('enemies.json'), get('recipes.json'), get('regions.json'), get('heroes.json'),
     get('encounters.json'), get('exercises.json'), get('tutorial.json'), get('achievements.json'), get('registry.json'), get('wortschatz.json'), get('themen.json'), get('lehrkraft.json').catch(() => ({})),
-    get('assets/zuordnung.json').catch(() => null),
+    get('assets/zuordnung.json').catch(() => null), get('begleiter.json').catch(() => ({ begleiter: [] })),
   ]);
   G.ITEMS = itemData.items;
   G.RAR = itemData.seltenheiten;
@@ -48,6 +49,8 @@ export async function loadData() {
   G.COMPOUNDS = buildCompounds(G.DEFS, G.RECIPES);
   for (const d of G.COMPOUNDS) G.DEFS[d.id] = d;
   for (const d of buildRuneLevels(G.DEFS)) G.DEFS[d.id] = d;
+  G.BEGLEITER = begleiterJson.begleiter;
+  for (const d of begleiterDefs(G.BEGLEITER)) G.DEFS[d.id] = d;
   G.ENEMIES = enemyData.gegner;
   G.REGIONS = regions.gebiete;
   G.HEROES = heroes.helden;
@@ -121,6 +124,7 @@ export function setPref(key, value) {
 
 // Komposita zeigen das Bild ihres Trägers, gesteigerte Runen das der Grundrune.
 export function bildFuer(def) {
+  if (def.bild) return 'assets/' + def.bild; // Begleiter
   const it = G.BILDER.items || {};
   const p = it[def.id] || it[def.teile?.traeger] || it[def.basis];
   return p ? 'assets/' + p : null;
@@ -139,4 +143,4 @@ export const itemsIn = (area, exceptUid) => G.run.items.filter((p) => p.area ===
 export const gridOf = (area) => (area === 'bag' ? bagGrid(G.run) : STORE_GRID);
 export const region = () => regionOf(G.run.day, G.REGIONS);
 export const hero = () => G.HEROES.find((h) => h.id === G.run.hero);
-export const playerCtx = () => playerContext(G.run, { heroes: G.HEROES, fates: G.FATES });
+export const playerCtx = () => playerContext(G.run, { heroes: G.HEROES, fates: G.FATES, begleiter: G.BEGLEITER });

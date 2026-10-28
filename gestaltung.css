@@ -558,3 +558,13 @@ h2 .amboss { width: 40px; height: 26px; margin-right: 6px; }
 .help-emoji .laterne.gross { width: 30px; height: 44px; margin-top: 12px; }
 .help-emoji .laterne.gross::before { width: 14px; height: 12px; margin-left: -7px; top: -14px; }
 .help-emoji .amboss.gross { width: 64px; height: 40px; }
+
+/* ---------- Begleiter ---------- */
+.begleiter-karte .figur-bild img { object-fit: contain; padding: 8px; }
+.figur-karte.gesperrt.begleiter-karte .figur-bild img { filter: brightness(0) opacity(.55); }
+.figur-detail-bild.gesperrt img { filter: brightness(0) opacity(.55); }
+.af-tippwort.rabe { outline: 3px dashed #4a3a8c; outline-offset: 2px; background: rgba(110, 90, 200, .15); }
+.af-rabe, .af-eule { display: flex; align-items: center; gap: 8px; justify-content: center; font-weight: 700; }
+.af-rabe img, .af-eule img, [data-eule] img { height: 34px; width: auto; }
+.af-eule { background: rgba(232, 178, 58, .18); border: 2px solid var(--gold); border-radius: 12px; padding: 6px 10px; margin: 6px 0; text-align: left; }
+.sam-bild img { object-fit: contain; }

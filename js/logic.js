@@ -12,7 +12,8 @@ export const CFG = {
 export const income = (day) => 8 + day;
 // Neu würfeln: die ersten Würfe pro Tag sind billig, jeder weitere teurer. Der Zähler beginnt jeden Tag neu.
 export const WUERFEL = { billig: 3, preis: 1, teuer: 2 };
-export const wuerfelPreis = (run) => ((run.wuerfe || 0) < WUERFEL.billig ? WUERFEL.preis : WUERFEL.teuer);
+// Kostenlose Würfe (Begleiter Fuchs) kommen zuerst und zählen nicht zu den billigen.
+export const wuerfelPreis = (run) => (run.freiWuerfe > 0 ? 0 : (run.wuerfe || 0) < WUERFEL.billig ? WUERFEL.preis : WUERFEL.teuer);
 export const ARMOR_BONUS = 0.15; // Rüstungsfehler richtig verbessert: Gegner startet mit 15 % weniger Leben
 export const baseHp = (day) => Math.round(60 + 14 * (day - 1) + 2.5 * (day - 1) ** 2);
 // Sternstufen: Zwei gleiche Gegenstände verbinden sich sofort zu einem der nächsten Stufe.
@@ -227,6 +228,18 @@ export function newRun(items, regions, opts = {}) {
   }
   // Start-Items der Figur
   for (const s of opts.hero?.start || []) run.items.push({ uid: run.nextUid++, id: s.id, area: 'bag', x: s.x, y: s.y, rot: s.rot || 0 });
+  // Begleiter (opts.begleiter: Gegenstands-Definition aus js/begleiter.js): 1×1 auf den ersten freien Platz im Rucksack
+  if (opts.begleiter) {
+    const b = opts.begleiter, w = b.wirkung || {};
+    const defs = Object.fromEntries([...items, b].map((d) => [d.id, d]));
+    for (const [area, grid] of [['bag', bagGrid(run)], ['store', STORE_GRID]]) {
+      const spot = findSpot(run.items.filter((p) => p.area === area), defs, b, grid);
+      if (spot) { run.items.push({ uid: run.nextUid++, id: b.id, area, ...spot, rot: 0 }); break; }
+    }
+    run.begleiter = b.begleiter;
+    if (w.siegGold) run.siegGold = w.siegGold;
+    if (w.freiWuerfeProTag) run.freiWuerfe = run.freiWuerfeProTag = w.freiWuerfeProTag;
+  }
   rollShop(run, items, regions, true, rng);
   return run;
 }
@@ -283,8 +296,8 @@ export function randomShopItem(items, weights, rng = Math.random, run = null) {
 export function reroll(run, items, regions, rng = Math.random) {
   const preis = wuerfelPreis(run);
   if (run.gold < preis) return false;
-  run.gold -= preis;
-  run.wuerfe = (run.wuerfe || 0) + 1;
+  if (run.freiWuerfe > 0) run.freiWuerfe--;
+  else { run.gold -= preis; run.wuerfe = (run.wuerfe || 0) + 1; }
   rollShop(run, items, regions, false, rng);
   return true;
 }
@@ -293,13 +306,14 @@ export function reroll(run, items, regions, rng = Math.random) {
 export function finishBattle(run, items, regions, won, enemyName, rng = Math.random) {
   run.history.push({ day: run.day, won, enemy: enemyName });
   for (const p of run.items) delete p.glanz; // Glanz gilt nur für einen Kampf
-  if (won) run.wins++;
+  if (won) { run.wins++; run.gold += run.siegGold || 0; } // Begleiter Rabe: Gold je Sieg
   else { run.hearts--; run.losses++; }
   if (run.hearts <= 0) { run.over = 'lost'; return; }
   if (run.day >= CFG.lastDay) { run.over = 'won'; return; }
   run.day++;
   run.gold += income(run.day) + (run.goldBonus || 0);
   run.wuerfe = 0;
+  run.freiWuerfe = run.freiWuerfeProTag || 0;
   rollShop(run, items, regions, false, rng);
   for (const s of run.shop) if (s) s.locked = false;
   run.queue = [];

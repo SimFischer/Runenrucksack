@@ -1,6 +1,7 @@
 // Sammlung: alle Figuren und Rucksack-Designs (später auch Erfolge); gesperrte mit Hinweis, wie man sie bekommt.
 import { G, figurBild, saveProfil } from './state.js';
-import { figurFrei, designFrei, bedingungText } from './fortschritt.js';
+import { figurFrei, designFrei, bedingungText, rangVon } from './fortschritt.js';
+import { begleiterFrei } from './begleiter.js';
 import { toast } from './ui.js';
 import { sym } from './symbole.js';
 
@@ -19,7 +20,8 @@ export function zeigeSammlung(zurueck = null) {
   box.id = 'sammlung-layer';
   document.body.append(box);
   const ctx = fortschrittCtx();
-  const tabs = [['figuren', 'Figuren'], ['designs', 'Rucksack-Designs'], ...(G.ACH.erfolge ? [['erfolge', 'Erfolge']] : [])];
+  const rang = rangVon(G.PROFIL.xp, G.ACH.raenge).nr;
+  const tabs = [['figuren', 'Figuren'], ['begleiter', 'Begleiter'], ['designs', 'Rucksack-Designs'], ...(G.ACH.erfolge ? [['erfolge', 'Erfolge']] : [])];
   const zeichne = () => {
     let inhalt = '';
     if (tab === 'figuren') {
@@ -31,6 +33,14 @@ export function zeigeSammlung(zurueck = null) {
           <div class="sam-bild">${bild}${frei ? '' : `<span class="sam-schloss">${sym('schloss')}</span>`}${sieg}</div>
           <b>${h.name}</b><small>${h.volk}</small>
           <p>${frei ? h.staerke : bedingungText(h.freischaltung, ctx)}</p></div>`;
+      }).join('');
+    } else if (tab === 'begleiter') {
+      inhalt = G.BEGLEITER.map((b) => {
+        const frei = begleiterFrei(b, rang);
+        return `<div class="sam-karte${frei ? '' : ' gesperrt'}">
+          <div class="sam-bild"><img src="assets/ui/begleiter/${b.id}.webp" alt="">${frei ? '' : `<span class="sam-schloss">${sym('schloss')}</span>`}</div>
+          <b>${frei ? b.name : '???'}</b><small>${frei ? b.rolle : ''}</small>
+          <p>${frei ? b.text : bedingungText(b.freischaltung, ctx)}</p></div>`;
       }).join('');
     } else if (tab === 'designs') {
       inhalt = G.ACH.designs.map((d) => {
@@ -49,6 +59,7 @@ export function zeigeSammlung(zurueck = null) {
       }).join('');
     }
     const zahl = tab === 'figuren' ? `${G.HEROES.filter((h) => figurFrei(G.PROFIL, h)).length} von ${G.HEROES.length}`
+      : tab === 'begleiter' ? `${G.BEGLEITER.filter((b) => begleiterFrei(b, rang)).length} von ${G.BEGLEITER.length}`
       : tab === 'designs' ? `${G.ACH.designs.filter((d) => designFrei(G.PROFIL, d)).length} von ${G.ACH.designs.length}`
         : `${G.PROFIL.erfolge.length} von ${G.ACH.erfolge.length}`;
     box.innerHTML = `<div class="buch-card sam-card">

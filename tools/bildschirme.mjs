@@ -77,7 +77,10 @@ const LAUF = `
   let karte = null;
   for (let t = 0; t < 30 && !karte; t++) { karte = [...document.querySelectorAll('.hero-card, .figur-karte')].find((k) => k.textContent.includes('Eadrun')); if (!karte) await __s(100); }
   await __klick(karte, 500);
-  for (let k = 0; k < 2; k++) {
+  for (let k = 0; k < 3; k++) {
+    // Nach der Figur kommt die Begleiterwahl: den Igel antippen, dann aufbrechen
+    const bk = document.querySelector('.begleiter-karte[data-begleiter="igel"]');
+    if (bk && !document.querySelector('#figur-detail:not([hidden]) [data-los]')) { bk.click(); await __s(400); }
     const los = [...document.querySelectorAll('button')].find((b) => b.offsetParent && /aufbrechen/i.test(b.textContent));
     if (los) { los.click(); await __s(700); }
   }
@@ -109,6 +112,25 @@ const BILDSCHIRME = [
   { name: 'start-erstbesuch', profil: null, ohneScroll: true, schritte: '' },
   { name: 'start', profil: PROFIL, ohneScroll: true, schritte: `await __klick('#btn-known');` },
   { name: 'figurenwahl', profil: PROFIL, ohneScroll: true, schritte: `await __klick('#btn-known'); await __klick('#btn-new', 600);` },
+  { name: 'begleiterwahl', profil: PROFIL, ohneScroll: true, schritte: `await __klick('#btn-known'); await __klick('#btn-new', 600);
+      let karte = null;
+      for (let t = 0; t < 30 && !karte; t++) { karte = [...document.querySelectorAll('.figur-karte')].find((k) => k.textContent.includes('Eadrun')); if (!karte) await __s(100); }
+      await __klick(karte, 400);
+      await __klick([...document.querySelectorAll('button')].find((b) => b.offsetParent && /aufbrechen/i.test(b.textContent)), 600);` },
+  { name: 'begleiter-detail', profil: PROFIL, ohneScroll: true, schritte: `await __klick('#btn-known'); await __klick('#btn-new', 600);
+      let karte = null;
+      for (let t = 0; t < 30 && !karte; t++) { karte = [...document.querySelectorAll('.figur-karte')].find((k) => k.textContent.includes('Eadrun')); if (!karte) await __s(100); }
+      await __klick(karte, 400);
+      await __klick([...document.querySelectorAll('button')].find((b) => b.offsetParent && /aufbrechen/i.test(b.textContent)), 600);
+      await __klick('.begleiter-karte[data-begleiter="pony"]', 500);` },
+  { name: 'begleiter-gesperrt', profil: PROFIL, ohneScroll: true, schritte: `await __klick('#btn-known'); await __klick('#btn-new', 600);
+      let karte = null;
+      for (let t = 0; t < 30 && !karte; t++) { karte = [...document.querySelectorAll('.figur-karte')].find((k) => k.textContent.includes('Eadrun')); if (!karte) await __s(100); }
+      await __klick(karte, 400);
+      await __klick([...document.querySelectorAll('button')].find((b) => b.offsetParent && /aufbrechen/i.test(b.textContent)), 600);
+      await __klick('.begleiter-karte[data-begleiter="falke"]', 500);` },
+  { name: 'begleiter-sammlung', profil: PROFIL, ohneScroll: false, schritte: `await __klick('#btn-known'); await __klick('#btn-sammlung', 500);
+      await __klick('#sammlung-layer [data-tab="begleiter"]', 400);` },
   { name: 'figur-detail', profil: PROFIL, ohneScroll: true, schritte: `await __klick('#btn-known'); await __klick('#btn-new', 600);
       const k = [...document.querySelectorAll('.hero-card, .figur-karte')].find((x) => x.textContent.includes('Borga')); await __klick(k, 600);` },
   { name: 'spielfeld', profil: PROFIL, ohneScroll: true, schritte: LAUF },
@@ -128,6 +150,13 @@ const BILDSCHIRME = [
       __G.run.gold = 5; const it = document.querySelector('#grid-bag .item'), rr = it.getBoundingClientRect(); for (const t of ['pointerdown', 'pointerup']) it.dispatchEvent(new PointerEvent(t, { bubbles: true, clientX: rr.x + 12, clientY: rr.y + 12, pointerId: 1, isPrimary: true, pointerType: 'touch' })); await __s(300); await __klick('#amboss', 600);` },
   { name: 'hilfe', profil: PROFIL, ohneScroll: false, schritte: `${LAUF} await __klick('#btn-menu', 400); await __klick('#modal [data-act="help"]', 500);
       for (const e of document.querySelectorAll('#help-layer, #help-layer *')) if (e.scrollHeight > e.clientHeight + 4) e.scrollTop = e.scrollHeight;` },
+  { name: 'begleiter-rucksack', profil: PROFIL, ohneScroll: true, schritte: `${LAUF}
+      __G.run.begleiter = 'eule';
+      __G.run.items.push({ uid: 990, id: 'begleiter-eule', area: 'bag', x: 2, y: 1, rot: 0 });
+      await __klick('#btn-reroll', 300);
+      const it = document.querySelector('#grid-bag .item[data-uid="990"]'), rr = it.getBoundingClientRect();
+      for (const t of ['pointerdown', 'pointerup']) it.dispatchEvent(new PointerEvent(t, { bubbles: true, clientX: rr.x + 12, clientY: rr.y + 12, pointerId: 1, isPrimary: true, pointerType: 'touch' }));
+      await __s(400);` },
   { name: 'kampf', profil: PROFIL, ohneScroll: true, frei: ['#btn-start-battle', '#armor-word', '#fighter-player .f-figur', '#fighter-enemy .f-figur', '#fighter-player .f-rucksack', '#fighter-enemy .f-rucksack', '#fighter-player .f-band', '#fighter-enemy .f-band', '#battle .vs'], schritte: `${KAMPF(true)} await __s(300);` },
   { name: 'kampf-gross', profil: PROFIL, ohneScroll: true, frei: ['#btn-start-battle', '#armor-word', '#fighter-player .f-figur', '#fighter-enemy .f-figur', '#fighter-player .f-rucksack', '#fighter-enemy .f-rucksack', '#fighter-player .f-band', '#fighter-enemy .f-band', '#battle .vs'], schritte: `${LAUF}
       // größter Rucksack: 5×4 und beide Taschen

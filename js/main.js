@@ -22,6 +22,7 @@ import {
 } from './ui.js';
 import { startNight, zeigeKampfErgebnis } from './battle-ui.js';
 import { frageImSpiel, wortschatz, einstellungen } from './aufgaben/spiel.js';
+import { BEGLEITER_PREFIX, begleiterFrei, istBegleiter } from './begleiter.js';
 import { stufenBereich, stufeFuer, aufgabenStand, schaetzeLernstand } from './aufgaben/wahl.js';
 import { verbSatz, verbSatzInhalt, PERSONEN_FOLGE, kurzName } from './aufgaben/verbsatz.js';
 import { runEncounter } from './encounters.js';
@@ -167,6 +168,7 @@ function continueSaved() {
 function showHeroes() {
   const box = $('hero-cards');
   box.innerHTML = '';
+  document.querySelector('#heroes .figuren-titel').textContent = 'Wähle deine Figur';
   $('figur-detail').hidden = true;
   for (const h of G.HEROES) {
     const frei = figurFrei(G.PROFIL, h);
@@ -202,12 +204,59 @@ function zeigeFigur(h, frei) {
       <p class="figur-faehigkeit">${bedingungText(h.freischaltung, fortschrittCtx())}</p>
     </div>`;
   tafel.hidden = false;
-  tafel.querySelector('[data-los]')?.addEventListener('click', () => startNewRun(h));
+  tafel.querySelector('[data-los]')?.addEventListener('click', () => showBegleiter(h));
 }
 
-function startNewRun(h) {
+// Nach der Figur: Begleiter wählen – gleiche Karten wie bei den Figuren, gesperrte als Silhouette mit Hinweis.
+const begleiterBild = (id) => `assets/ui/begleiter/${id}.webp`;
+const rangNr = () => rangVon(G.PROFIL.xp, G.ACH.raenge).nr;
+function showBegleiter(h) {
+  const box = $('hero-cards');
+  box.innerHTML = '';
+  $('figur-detail').hidden = true;
+  document.querySelector('#heroes .figuren-titel').textContent = 'Wähle deinen Begleiter';
+  for (const b of G.BEGLEITER) {
+    const frei = begleiterFrei(b, rangNr());
+    const card = document.createElement('button');
+    card.className = 'figur-karte begleiter-karte' + (frei ? '' : ' gesperrt');
+    card.dataset.begleiter = b.id;
+    card.innerHTML = `
+      <div class="figur-bild"><img src="${begleiterBild(b.id)}" alt="">${frei ? '' : `<span class="figur-schloss">${sym('schloss')}</span>`}</div>
+      <div class="figur-name">${frei ? b.name : '???'}</div>
+      <div class="figur-rolle">${frei ? b.rolle : bedingungText(b.freischaltung, fortschrittCtx())}</div>`;
+    card.onclick = (e) => { e.stopPropagation(); zeigeBegleiter(h, b, frei); };
+    box.append(card);
+  }
+  showScreen('heroes');
+  emit('begleiterWahl');
+}
+
+function zeigeBegleiter(h, b, frei) {
+  const tafel = $('figur-detail');
+  document.querySelectorAll('.figur-karte').forEach((k) => k.classList.toggle('gewaehlt', k.dataset.begleiter === b.id));
+  tafel.innerHTML = frei ? `
+    <div class="figur-detail-bild"><img src="${begleiterBild(b.id)}" alt=""></div>
+    <div class="figur-detail-text">
+      <h2 class="titel">${fullName(b)}</h2>
+      <p class="figur-herkunft">${b.rolle} · liegt im Rucksack (1 Feld)</p>
+      <p class="figur-faehigkeit">${b.text}</p>
+      <div class="row"><button class="btn big primary" data-los>Mit ${b.artikel === 'das' ? 'dem' : b.artikel === 'die' ? 'der' : 'dem'} ${b.name} aufbrechen</button><button class="btn" data-zurueck>Andere Figur</button></div>
+    </div>` : `
+    <div class="figur-detail-bild gesperrt"><img src="${begleiterBild(b.id)}" alt=""></div>
+    <div class="figur-detail-text">
+      <h2 class="titel">${sym('schloss')} ???</h2>
+      <p class="figur-faehigkeit">${bedingungText(b.freischaltung, fortschrittCtx())}</p>
+      <div class="row"><button class="btn" data-zurueck>Andere Figur</button></div>
+    </div>`;
+  tafel.hidden = false;
+  tafel.querySelector('[data-los]')?.addEventListener('click', () => startNewRun(h, b));
+  tafel.querySelector('[data-zurueck]').onclick = showHeroes;
+}
+
+function startNewRun(h, b = null) {
   if (!h?.id) { showHeroes(); return; }
-  G.run = newRun(G.ITEMS, G.REGIONS, { hero: h, fates: G.FATES, freieItems: freieItems(G.PROFIL, G.ITEMS, fortschrittCtx()) });
+  G.run = newRun(G.ITEMS, G.REGIONS, { hero: h, fates: G.FATES, freieItems: freieItems(G.PROFIL, G.ITEMS, fortschrittCtx()),
+    begleiter: b ? G.DEFS[BEGLEITER_PREFIX + b.id] : null });
   schaetzeLernstand(G.PROFIL, rangVon(G.PROFIL.xp, G.ACH.raenge).nr, G.THEMEN.themen.map((t) => t.id));
   selected = null;
   showGame();
@@ -522,7 +571,7 @@ function renderInfo() {
       <div class="info-emoji">${icon}</div>
       <div>
         <div class="info-name">${title}</div>
-        <div class="info-rar" style="color:${rar.farbe}">${rar.name || ''} · ${s.w}×${s.h} · ${artLabel(base)}</div>
+        <div class="info-rar" style="color:${istBegleiter(base) ? 'var(--gold-dunkel)' : rar.farbe}">${istBegleiter(base) ? 'Begleiter' : rar.name || ''} · ${s.w}×${s.h}${istBegleiter(base) ? '' : ` · ${artLabel(base)}`}</div>
       </div>
     </div>`);
 
@@ -538,7 +587,7 @@ function renderInfo() {
   if (ul.children.length) box.append(ul);
 
   const notes = [];
-  if (!['siegel', 'rune', 'tasche'].includes(base.art) && !base.abklingzeit) notes.push('Passiv: wirkt den ganzen Kampf, solange es im Rucksack liegt.');
+  if (!['siegel', 'rune', 'tasche', 'begleiter'].includes(base.art) && !base.abklingzeit) notes.push('Passiv: wirkt den ganzen Kampf, solange es im Rucksack liegt.');
   if (base.abklingzeit && base.tempo) notes.push('Tempo: Dieses Item lädt schneller auf.');
   if (base.aura?.tempo) notes.push(`Wirkt außerdem auf den ganzen Rucksack: +${base.aura.tempo} % Tempo.`);
   if (base.aura?.glueck) notes.push(`Wirkt außerdem auf den ganzen Rucksack: +${base.aura.glueck} % Glück.`);
@@ -582,7 +631,7 @@ function renderInfo() {
     if (canRotate(base)) btn(isRune(base) || isVerb(base) ? '⟳ Pfeil drehen' : '⟳ Drehen', () => rotateInPlace(uid));
     if (selected.src === 'bag') btn(`${sym('truhe')} Ins Lager`, () => moveAuto(uid, 'store'));
     else btn('In den Rucksack', () => moveAuto(uid, 'bag'));
-    btn(`Verkaufen <span class="price">+${sellValue(G.DEFS[placedOf(uid).id], placedOf(uid).stern || 1)} ${sym('gold')}</span>`, () => sell(uid), 'danger');
+    if (!istBegleiter(base)) btn(`Verkaufen <span class="price">+${sellValue(G.DEFS[placedOf(uid).id], placedOf(uid).stern || 1)} ${sym('gold')}</span>`, () => sell(uid), 'danger');
     if (schmiedZiel(placedOf(uid), G.DEFS) && !G.run.tutorial) btn('<span class="amboss klein"></span> Schmied', () => zeigeSchmied(uid));
   }
   box.append(actions);
@@ -591,6 +640,7 @@ function renderInfo() {
 // Sternstufe, Sammelstand und mögliches Kompositum für das Info-Feld.
 function collectNotes(base, ref) {
   const out = [];
+  if (istBegleiter(base)) return [`<p class="gram">${base.text}</p>`];
   const p = ref.uid ? placedOf(ref.uid) : null;
   const stern = p?.stern || 1;
   if (canMerge(base, stern) && !isRune(base)) {
@@ -957,6 +1007,7 @@ function buyTasche(slot) {
 function sell(uid) {
   const p = placedOf(uid);
   const def = G.DEFS[p.id];
+  if (istBegleiter(def)) { toast(`${fullName(def)} bleibt bei dir – Begleiter verkauft man nicht.`); render(); return; }
   const wert = sellValue(def, p.stern || 1);
   G.run.items = G.run.items.filter((i) => i !== p);
   G.run.gold += wert;
@@ -1397,7 +1448,7 @@ function updateTarget() {
     drag.preview = pv;
     return;
   }
-  if (drag.ref.src !== 'shop') {
+  if (drag.ref.src !== 'shop' && !istBegleiter(drag.def)) {
     const a = $('amboss').getBoundingClientRect(), rand = 14;
     if (drag.px >= a.left - rand && drag.px <= a.right + rand && drag.py >= a.top - rand && drag.py <= a.bottom + rand) {
       drag.target = { schmied: true };

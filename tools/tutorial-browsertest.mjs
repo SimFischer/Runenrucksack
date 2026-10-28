@@ -59,6 +59,7 @@ const warteAuf = async (sel) => {
 const tap = async (sel) => {
   const r = await warteAuf(sel);
   if (!r) throw new Error('nicht gefunden: ' + sel);
+  await sleep(120);
   await touch('touchStart', [{ x: r.left + r.width / 2, y: r.top + r.height / 2, id: 1 }]); await touch('touchEnd', []); await sleep(250);
 };
 const drag = async (sel, tx, ty) => {
@@ -91,6 +92,8 @@ const expect = async (part) => {
   if (!t.includes(part)) { ok = false; console.log(`✗ erwartet „${part}“, gesehen „${t}“`); } else console.log(`✓ ${part}`);
 };
 const check = (cond, text) => { if (!cond) ok = false; console.log(`${cond ? '✓' : '✗'} ${text}`); };
+// Bis 2 s warten, bis nichts mehr verdeckt ist (die Sprechblase ordnet sich alle 300 ms neu)
+const ohneUeberdeckung = async () => { let u = ''; for (let i = 0; i < 10; i++) { u = await ueberdeckung(); if (!u) return u; await sleep(200); } return u; };
 // Offene Frage: Fenster nicht über dem Rucksack, Fenwicks Sprechblase verdeckt weder Fenster noch beteiligte Items.
 const ueberdeckung = () => ev(`(() => {
   const r = (e) => e && e.getBoundingClientRect();
@@ -158,7 +161,7 @@ try {
       if (!document.elementsFromPoint(px, py).some((e) => e.classList?.contains('item'))) return [px, py]; } return null; })()`);
   await drag('[data-tut="laden-dolch"]', frei[0], frei[1]); await expect('Mehrzahl');
   await sleep(400);
-  { const u = await ueberdeckung(); check(!u, 'Mehrzahl-Frage neben dem Rucksack, nichts verdeckt' + (u ? ': ' + u : '')); }
+  { const u = await ohneUeberdeckung(); check(!u, 'Mehrzahl-Frage neben dem Rucksack, nichts verdeckt' + (u ? ': ' + u : '')); }
   // Abbrechen: Der Dolch liegt wieder im Laden, das Tutorial geht beim Sammeln weiter
   await tap('#quick [data-no]'); await sleep(600);
   check(await ev(`!!document.querySelector('[data-tut="laden-dolch"]') && !document.getElementById('quick')`), 'Abbrechen beim Verbinden: Dolch wieder im Laden');
@@ -172,7 +175,7 @@ try {
   for (let i = 0; i < 6 && !(await ev('!!document.getElementById("quick")')); i++) await tap('#grid-bag [data-tut="item-schlagen"]');
   check(await ev(`document.querySelector('#quick')?.textContent.includes('Feuerschwert')`), 'Frage gilt dem Feuerschwert (nicht dem Dolch)');
   await sleep(400);
-  { const u = await ueberdeckung(); check(!u, 'Verb-Frage neben dem Rucksack, nichts verdeckt' + (u ? ': ' + u : '')); }
+  { const u = await ohneUeberdeckung(); check(!u, 'Verb-Frage neben dem Rucksack, nichts verdeckt' + (u ? ': ' + u : '')); }
   await foto('tutorial-verb-frage');
   // Abbrechen darf das Tutorial nicht blockieren: Hinweis, dann noch einmal drehen
   await tap('#quick [data-no]'); await sleep(500);
@@ -211,6 +214,9 @@ try {
   await tap('#tut-finale [data-go]');
   check(await ev('!document.getElementById("heroes").hidden && document.getElementById("tut-layer").hidden'), 'Figurenwahl ohne Tutorial-Overlay');
   await tap('.figur-karte'); await tap('#figur-detail [data-los]');
+  // Nach der Figur: Begleiter wählen
+  check(await ev('!!document.querySelector(".begleiter-karte")'), 'Begleiterwahl nach der Figur');
+  await tap('.begleiter-karte:not(.gesperrt)'); await tap('#figur-detail [data-los]');
   const run = JSON.parse(await ev('localStorage.getItem("runenrucksack.lauf.v2")'));
   check(!run.tutorial && run.gold === 12 && run.shop.filter(Boolean).length >= 5, 'normaler Lauf ohne Tutorial-Reste');
 

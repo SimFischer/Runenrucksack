@@ -223,7 +223,7 @@ export const sternVon = (p) => p?.stern || G.DEFS[p?.id]?.stufe || 1;
 export function itemEl(def, rot, size, stern = 1) {
   const s = sizeOf(def, rot);
   const el = document.createElement('div');
-  const passive = !def.abklingzeit && def.art !== 'siegel' && def.art !== 'rune';
+  const passive = !def.abklingzeit && def.art !== 'siegel' && def.art !== 'rune' && def.art !== 'begleiter';
   el.className = `item r-${def.seltenheit}` + (passive ? ' passive' : '');
   el.style.setProperty('--rar', G.RAR[def.seltenheit]?.farbe || '#9a8f7a');
   el.style.width = s.w * size - 6 + 'px';

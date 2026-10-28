@@ -15,7 +15,7 @@ export default {
       satz.innerHTML = '';
       a.woerter.forEach((w, i) => {
         const b = document.createElement('button');
-        b.className = 'af-tippwort' + (markiert.has(i) ? ' markiert' : '');
+        b.className = 'af-tippwort' + (markiert.has(i) ? ' markiert' : '') + (a.zielMarkiert && a.ziele.includes(i) && !markiert.has(i) ? ' rabe' : '');
         b.textContent = w + (i === a.woerter.length - 1 && a.satzEnde ? a.satzEnde : '');
         b.onclick = () => {
           if (a.modus === 'verbessern') { waehle(i); return; }
@@ -37,6 +37,7 @@ export default {
     };
     zeichne();
     el.append(satz);
+    if (a.zielMarkiert) el.insertAdjacentHTML('beforeend', '<p class="af-hinweis af-rabe"><img src="assets/ui/begleiter/rabe.webp" alt=""> Der Rabe zeigt dir das falsche Wort. Verbessern musst du es selbst.</p>');
     if (a.modus !== 'verbessern') {
       const fertig = knopf('✓ Fertig', 'primary af-fertig-knopf');
       fertig.onclick = () => melde([...markiert].sort((x, y) => x - y));

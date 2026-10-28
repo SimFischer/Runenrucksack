@@ -14,6 +14,7 @@ import { playerContext, evaluateBag } from './mods.js';
 import { baueBuch, entdeckungenIn } from './buch.js';
 import { neuesProfil, entdecke, merkeAntwort, laufStand, laufAbschluss, rangVon } from './fortschritt.js';
 import { Battle, makeFighter, runToEnd } from './battle.js';
+import { begleiterDefs } from './begleiter.js';
 
 export function prepareData(raw) {
   const defs = {};
@@ -21,6 +22,7 @@ export function prepareData(raw) {
   const compounds = buildCompounds(defs, raw.recipes);
   for (const d of compounds) defs[d.id] = d;
   for (const d of buildRuneLevels(defs)) defs[d.id] = d;
+  for (const d of begleiterDefs(raw.begleiter || [])) defs[d.id] = d;
   return { ...raw, defs, compounds, buch: baueBuch(defs, raw.items, raw.recipes) };
 }
 
@@ -157,8 +159,10 @@ function morning(run, data, rng, skill) {
 export function simulateRun(data, rng, opts = {}) {
   const skill = opts.skill ?? 0.75;
   const hero = pickOne(data.heroes, rng);
-  const run = newRun(data.items, data.regions, { hero, fates: data.fates, rng });
-  const ctxData = { heroes: data.heroes, fates: data.fates };
+  // Begleiter: zufällig (ohne begleiter.json im Datensatz keiner)
+  const begleiter = data.begleiter?.length ? data.defs['begleiter-' + pickOne(data.begleiter, rng).id] : null;
+  const run = newRun(data.items, data.regions, { hero, fates: data.fates, rng, begleiter });
+  const ctxData = { heroes: data.heroes, fates: data.fates, begleiter: data.begleiter };
   const days = [];
   while (!run.over) {
     morning(run, data, rng, skill);
@@ -168,6 +172,7 @@ export function simulateRun(data, rng, opts = {}) {
     const bag = run.items.filter((p) => p.area === 'bag');
     const player = makeFighter('p', bag, data.defs, run.day, {
       info: evaluateBag(bag, data.defs, ctx), leben: ctx.leben, tempo: ctx.tempo, selbstschaden: ctx.selbstschaden, rng,
+      ersterAngriffDoppelt: ctx.ersterAngriffDoppelt,
     });
     const foeDef = pickEnemy(run.day, data.regions, data.enemies, rng);
     const enemy = makeEnemy(run.day, foeDef, enemyPool(data.items, data.compounds, run.day), data.defs, rng);

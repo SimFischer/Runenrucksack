@@ -10,7 +10,7 @@ const MAX_TIME = 60;
 
 // placed: Items im Rucksack; Siegel und Runen werden über analyze() eingerechnet.
 // opts: info (fertige Auswertung, z. B. mit Boni der Figur), leben, tempo (in %), startHp (Anteil 0–1),
-// selbstschaden (zu Kampfbeginn), rng.
+// selbstschaden (zu Kampfbeginn), ersterAngriffDoppelt (Begleiter Falke), rng.
 export function makeFighter(name, placed, defs, day, opts = {}) {
   const rng = opts.rng || Math.random;
   const info = opts.info || analyze(placed, defs);
@@ -33,6 +33,7 @@ export function makeFighter(name, placed, defs, day, opts = {}) {
     name, maxHp, hp, block, tempo: tempo / 100, glueck: glueck / 100, rng,
     gift: 0, brand: 0, kaelte: 0, betaeubt: 0, regeneration: 0,
     items: items.filter((i) => i.def.abklingzeit > 0),
+    ersterAngriffDoppelt: !!opts.ersterAngriffDoppelt,
   };
 }
 
@@ -115,7 +116,12 @@ export class Battle {
       me.regeneration += d.regeneration * m;
       ev.push({ type: 'status', side: key, kind: 'regeneration', amount: d.regeneration * m });
     }
-    if (d.schaden) this.hurt(foeKey, foe, d.schaden * m, 'schaden', ev, false);
+    if (d.schaden) {
+      // Begleiter Falke: Der erste Angriff im Kampf trifft doppelt.
+      const f = me.ersterAngriffDoppelt ? 2 : 1;
+      if (f > 1) { me.ersterAngriffDoppelt = false; ev.push({ type: 'falke', side: key, uid: it.uid }); }
+      this.hurt(foeKey, foe, d.schaden * m * f, 'schaden', ev, false);
+    }
     if (d.gift) { foe.gift += d.gift * m; ev.push({ type: 'status', side: foeKey, kind: 'gift', amount: d.gift * m }); }
     if (d.brand) { foe.brand += d.brand * m; ev.push({ type: 'status', side: foeKey, kind: 'brand', amount: d.brand * m }); }
     if (d.kaelte) { foe.kaelte += d.kaelte * m; ev.push({ type: 'status', side: foeKey, kind: 'kaelte', amount: d.kaelte * m }); }

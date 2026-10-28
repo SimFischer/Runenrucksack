@@ -14,7 +14,7 @@ const sterne = (s) => '★'.repeat(s) + `<i>${'☆'.repeat(3 - s)}</i>`;
 export function stelleAufgabe(a, opts = {}) {
   const format = FORMATE[a.format];
   return new Promise((fertig) => {
-    let versuche = 0, vorher = null, pleite = false;
+    let versuche = 0, vorher = null, pleite = false, euleText = '';
     const gross = format.gross(a) || !opts.anker; // ohne Item als Anker: in der Mitte
     offen?.(); // ein noch offenes Fenster nicht hängen lassen: gilt als abgebrochen
     const ebene = document.createElement('div');
@@ -40,11 +40,14 @@ export function stelleAufgabe(a, opts = {}) {
         <div class="af-inhalt"></div>
         ${vorher ? `<p class="af-rueck falsch">✗ ${a.merke}</p>` : ''}
         ${pleite ? '<p class="af-rueck falsch">Kein Gold mehr für einen weiteren Versuch.</p>' : ''}
+        ${euleText ? `<p class="af-eule"><img src="assets/ui/begleiter/eule.webp" alt=""> ${euleText}</p>` : ''}
         <div class="af-fuss"><span class="cost">${kosten}</span>
           ${pleite && opts.trotzdem ? '<button class="btn small primary" data-trotzdem>Trotzdem verbinden</button>' : ''}
+          ${opts.eule && !euleText ? '<button class="btn small" data-eule><img class="sym" src="assets/ui/begleiter/eule.webp" alt=""> Eule fragen</button>' : ''}
           ${opts.nein ? `<button class="btn small quick-no" data-nein>${opts.nein}</button>` : ''}</div>`;
       if (!pleite) format.darstelle(karte.querySelector('.af-inhalt'), a, melde, vorher);
       karte.querySelector('[data-nein]')?.addEventListener('click', () => schliessen({ abgebrochen: true, versuche }));
+      karte.querySelector('[data-eule]')?.addEventListener('click', () => { euleText = opts.eule.text; opts.eule.nutzen(); zeichne(); });
       karte.querySelector('[data-trotzdem]')?.addEventListener('click', () => schliessen({ richtig: false, trotzdem: true, versuche }));
       platziere();
     };
