@@ -1081,6 +1081,96 @@
         472,
         503
       ]
+    },
+    "ui/begleiter/eule.webp": {
+      "sheet": "ui/../begleiter.webp",
+      "ausschnitt": [
+        36,
+        57,
+        381,
+        441
+      ]
+    },
+    "ui/begleiter/pony.webp": {
+      "sheet": "ui/../begleiter.webp",
+      "ausschnitt": [
+        515,
+        12,
+        484,
+        493
+      ]
+    },
+    "ui/begleiter/rabe.webp": {
+      "sheet": "ui/../begleiter.webp",
+      "ausschnitt": [
+        1055,
+        76,
+        460,
+        438
+      ]
+    },
+    "ui/begleiter/fuchs.webp": {
+      "sheet": "ui/../begleiter.webp",
+      "ausschnitt": [
+        48,
+        515,
+        490,
+        483
+      ]
+    },
+    "ui/begleiter/igel.webp": {
+      "sheet": "ui/../begleiter.webp",
+      "ausschnitt": [
+        585,
+        602,
+        363,
+        367
+      ]
+    },
+    "ui/begleiter/falke.webp": {
+      "sheet": "ui/../begleiter.webp",
+      "ausschnitt": [
+        995,
+        518,
+        535,
+        483
+      ]
+    },
+    "ui/satzschmiede/amboss.webp": {
+      "sheet": "ui/../satzschmiede.webp",
+      "ausschnitt": [
+        138,
+        23,
+        609,
+        515
+      ]
+    },
+    "ui/satzschmiede/wochenrune.webp": {
+      "sheet": "ui/../satzschmiede.webp",
+      "ausschnitt": [
+        941,
+        67,
+        502,
+        452
+      ]
+    },
+    "ui/satzschmiede/brief.webp": {
+      "sheet": "ui/../satzschmiede.webp",
+      "ausschnitt": [
+        126,
+        561,
+        629,
+        407
+      ]
+    },
+    "ui/satzschmiede/spruchrolle.webp": {
+      "sheet": "ui/../satzschmiede.webp",
+      "ausschnitt": [
+        840,
+        545,
+        647,
+        412
+      ]
     }
   },
   "figuren": {
@@ -1171,6 +1261,20 @@
       "haendler": "ui/begegnung/haendler.webp",
       "hirtin": "ui/begegnung/hirtin.webp",
       "kobold": "ui/begegnung/kobold.webp"
+    },
+    "begleiter": {
+      "eule": "ui/begleiter/eule.webp",
+      "pony": "ui/begleiter/pony.webp",
+      "rabe": "ui/begleiter/rabe.webp",
+      "fuchs": "ui/begleiter/fuchs.webp",
+      "igel": "ui/begleiter/igel.webp",
+      "falke": "ui/begleiter/falke.webp"
+    },
+    "satzschmiede": {
+      "amboss": "ui/satzschmiede/amboss.webp",
+      "wochenrune": "ui/satzschmiede/wochenrune.webp",
+      "brief": "ui/satzschmiede/brief.webp",
+      "spruchrolle": "ui/satzschmiede/spruchrolle.webp"
     }
   }
 }

@@ -68,6 +68,8 @@ const UI_SHEETS = [
   // Nachlieferung, liegt direkt in assets/roh/
   { datei: '../anfuehrer-besiegt.webp', gruppe: 'besiegt', max: 560, reihen: [['pluenderer', 'haeuptling']] },
   { datei: '../begegnungen.webp', gruppe: 'begegnung', max: 420, reihen: [['eule', 'zwerg', 'wirtin'], ['haendler', 'hirtin', 'kobold']] },
+  { datei: '../begleiter.webp', gruppe: 'begleiter', max: 360, reihen: [['eule', 'pony', 'rabe'], ['fuchs', 'igel', 'falke']] },
+  { datei: '../satzschmiede.webp', gruppe: 'satzschmiede', max: 420, reihen: [['amboss', 'wochenrune'], ['brief', 'spruchrolle']] },
 ];
 const UI_EINZELN = [
   { datei: 'tafel-rahmen.png', id: 'tafel-rahmen', breite: 724, qualitaet: 0.9, zuschneiden: true }, // für border-image
