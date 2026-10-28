@@ -89,6 +89,16 @@ Man trifft eine Figur am Wegesrand und wählt aus zwei bis drei Boni. Jede Begeg
 
 Neue Einträge im Buch der Wörter, Fortschritt bei Figuren und Rang, Heldencode und Rucksack-Code für die Arena.
 
+### Morgen: Brief statt Begegnung (Leseverständnis)
+
+Ab Tag 2 bringt ein Bote manchmal einen versiegelten Brief (nie zwei Tage hintereinander). Der Text bleibt beim Antworten sichtbar; die Fragen prüfen Information finden, Schlussfolgern und Wortbedeutung. Falsch beantwortet? Die passende Stelle wird markiert – das Kind sieht, wo die Antwort stand. Das Thema „Leseverständnis“ hat eigene Stufen: Wer zweimal alles richtig hat, bekommt schwierigere Briefe.
+
+### Morgen: Satzschmiede (Satzglieder)
+
+Nach Begegnung oder Brief hat die Satzschmiede geöffnet – freiwillig, einmal am Tag. Aus farbigen Satzglied-Karten (Form-Zeichen statt nur Farbe) baut das Kind einen Satz. Nur sinnvolle Sätze sind möglich: Jedes Verb kennt seine passenden Objekte und Adverbiale. Der Satz wird zur Spruchrolle, und jedes Satzglied hat eine sichtbare Aufgabe: Prädikat = was passiert, Subjekt = wer (die Figur oder der Begleiter gibt einen Bonus), Objekt = Ziel, Adverbiale der Zeit = wann, der Art und Weise = wie stark oder schnell, des Ortes = kleiner Bonus. So wird Grammatik zur Spielmechanik statt zur Abfrage.
+
+Auf Stufe 3 folgt die **Umstellprobe**: Wer den Satz umstellt und das Prädikat an zweiter Stelle lässt, macht die Spruchrolle stärker – „Satzglieder kann man umstellen, das Prädikat bleibt an zweiter Stelle.“ Ein falscher Satz ist nie stärker als ein richtiger: Er ergibt gar keine Rolle, nur eine Erklärung.
+
 ## Rucksack und Items
 
 Jede Wortart ist eine Item-Sorte mit eigener Form und Rolle, und die Stern-Felder der Items sind grammatische Beziehungen. Ein Adjektiv-Stern muss auf ein Nomen zeigen, ein Artikel wirkt nur beim passenden Genus.
@@ -186,6 +196,10 @@ Das Kombinieren ist die größte Stärke des Spiels, und es belohnt sofort wie i
 
 Nur die Träger werden als Bild gemalt (etwa 10–15 Bilder). Die Kräfte legt der Code als Effekt darüber: Flammen, grüne Gifttropfen, Eiskristalle, Blitzfunken, farbiges Leuchten. So entstehen hunderte Kombinationen mit wenigen generierten Bildern, und jede sieht anders aus.
 
+## Begleiter-Tiere
+
+Nach der Figur wählt das Kind einen Begleiter: Eule und Igel von Anfang an, Pony, Fuchs, Rabe und Falke mit steigendem Rang. Das Tier liegt auf einem Feld im Rucksack und hilft seinen Nachbarn (Eule: Nomen, Pony: Tempo, Igel: Startblock) oder dem ganzen Lauf (Fuchs: kostenlos würfeln, Rabe: Fehler auf der Ork-Rüstung markieren und Gold je Sieg, Falke: erster Angriff doppelt). Damit wird die Platzfrage im Rucksack spannender, und jüngere Kinder bekommen mit Eule und Igel eine sanfte Lernhilfe.
+
 ## Startfiguren
 
 Jede Figur steht für ein Volk und einen Spielstil, sodass man jede einmal ausprobieren will. Zu Beginn sind zwei Figuren frei, die übrigen werden freigeschaltet.
@@ -264,6 +278,10 @@ Das Spiel erzeugt einen kurzen Heldencode, den die Kinder ins Heft schreiben. So
 - „Neu beginnen“ im Menü löscht den Stand auf dem iPad (mit Sicherheitsabfrage).
 - Fälschen ist möglich, aber unwichtig: Es gibt nichts zu gewinnen außer Spaß.
 
+### Rune der Woche
+
+Eine Woche lang spielen alle dieselbe Reise: Figur, Begleiter, Schicksalsrune, Läden, Gegner, Begegnungen und Briefe stehen fest (Seed aus Kalenderwoche und Klassen-Code). Am Ende gibt es Punkte und ein Ergebnis-Siegel aus vier Zeichen, das Woche und Punkte enthält und Tippfehler erkennt. Die Lehrkraft tippt Kürzel und Siegel am Beamer ein und sieht die Rangliste – ohne Server, ohne Konten. Es zählen Siege, Herzen, erreichter Tag und Aufgaben beim ersten Versuch richtig, damit sich sorgfältiges Lesen lohnt.
+
 ### Klassenarena
 
 - **Duell:** Ein Kind gibt den Rucksack-Code eines anderen ein und kämpft gegen dessen Rucksack.
@@ -296,7 +314,8 @@ Spaß hat Vorrang, aber eine Regel ist unverhandelbar: Eine grammatisch falsche 
 ### Lehrkraft-Modus
 
 - **„Für Lehrkräfte“** im Startmenü, geschützt mit einem Lehrkraft-Code aus `lehrkraft.json` (kein Passwort, kein Server).
-- Themen an- und ausschalten und je Thema die **höchste Stufe** festlegen. Ohne Einstellung: alle Themen, Stufe 1–2.
+- Themen an- und ausschalten und je Thema die **höchste Stufe** festlegen. Ohne Einstellung: alle Themen, Stufe 1–2. Dazu gehören auch „Leseverständnis“ (Briefe) und „Satzglieder“ (Satzschmiede, Stufe 3 mit Adverbialen und Umstellprobe).
+- **Rune der Woche prüfen:** Kürzel und Ergebnis-Siegel eintippen, die Rangliste erscheint sortiert.
 - Daraus entsteht ein **Klassen-Code** wie `THEMEN-3DFTS-R8UD8`. Die Kinder tippen ihn bei „Heldencode eingeben“ ein; er wird auf dem iPad gespeichert (nicht im Heldencode) – auf einem anderen iPad tippt man ihn noch einmal ein.
 - Alle Wörter und Themen stehen in **JSON-Dateien**. Neue Wörter, etwa aus dem aktuellen Lesetext, lassen sich ohne Programmieren ergänzen; `tools/pruefliste.mjs` erzeugt eine sortierbare Prüfliste zum Abhaken, mit allen Sätzen (unsichere markiert).
 - Später denkbar: **Turniermodus** für die Klassenarena am Beamer, **Champion-Rucksack** per Code als festen Gegner.

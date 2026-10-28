@@ -49,21 +49,62 @@ Nach Änderungen: `node --test` prüft, dass jeder Schritt erreichbar ist und h�
 ## So läuft ein Lauf
 
 1. **Figur wählen:** Borga Eisenfaust (Komposita +20 %, Start mit Axt und Feuer) oder Eadrun die Reiterin (Schriftrollen 20 % schneller, Start mit Speer und „stürmen“). Später kommen Faelith, Theron und Ysolde dazu (siehe „Fortschritt zwischen den Läufen“).
+   Danach wählt man ein **Begleiter-Tier** (siehe „Begleiter-Tiere“).
 2. **Schicksalsrune:** Eine von sechs zufälligen Regeln gilt für den ganzen Lauf, z. B. „Feuer-Komposita doppelt so stark“ oder „Laden hat 6 Plätze“.
 3. **Zehn Tage, zwei Gebiete:** Kleinwurzel (Tag 1–5, Boss: Ork-Plünderer) und Hrossmark (Tag 6–10, Boss: Wolfsreiter-Häuptling). Beim Gebietswechsel gibt es einen Übergangsbildschirm, in Hrossmark wählt man eine **Unterklasse**.
 4. **Jeder Tag:**
-   - **Morgen:** Begegnung am Wegesrand (drei zur Wahl).
+   - **Morgen:** Begegnung am Wegesrand (drei zur Wahl) – ab Tag 2 manchmal stattdessen ein **Brief**. Danach hat ab Tag 2 die **Satzschmiede** geöffnet (freiwillig).
    - **Tag:** Laden mit 5 Items, Neu würfeln (3 Würfe am Tag zu 1 Gold, danach 2 Gold), Reservieren, Verkaufen, Verschieben, Drehen. **Händler-Vertrauen** (Laternen am Laden, 5 Stufen, 6/9/12/15 Gold, eine Stufe pro Tag) macht seltenere Gegenstände häufiger. **Schmied** (Amboss am Laden): einen Gegenstand für 3 × Grundpreis × Zielstufe um eine Sternstufe aufwerten, einmal am Tag, bis ★★★, nach einer Aufgabe; Abbrechen kostet nichts. Alles Verbinden passiert sofort: zwei gleiche werden zur nächsten Sternstufe, ein Kristall neben einem Träger zum Kompositum. Das Abzeichen „1/2“ mit „= sofort ★★“ zeigt Items, von denen man schon eins hat.
    - **Nacht:** Automatischer Kampf. Vorher kann man den Fehler auf der Ork-Rüstung verbessern (ein Versuch, richtig: Ork startet mit 15 % weniger Leben).
 5. **Ende:** nach dem 10. Kampf („Reise geschafft“, mit Sternen nach Siegen) oder wenn alle 5 Herzen weg sind. Danach: Lernbericht, Erfahrung und Rang, neue Freischaltungen und Erfolge, der Heldencode (6 Zeichen) zum Abschreiben ins Heft.
 
 Im Spielmenü kann man den **Lauf unterbrechen**: Der Lauf bleibt auf diesem iPad gespeichert und geht im Startmenü mit „Weiterspielen“ genau dort weiter.
 
+## Begleiter-Tiere
+
+Nach der Figur wählt das Kind ein Tier (`begleiter.json`, Bilder in `assets/ui/begleiter/`). Es liegt als 1×1-Gegenstand im Rucksack, lässt sich verschieben, aber nicht verkaufen, verschmelzen oder schmieden. Was es kann, steht in `wirkung`:
+
+| Tier | Freischaltung | Wirkung |
+| --- | --- | --- |
+| Eule | von Anfang an | Regelkarte vorab bei Aufgaben („Eule fragen“), Nomen daneben +10 % |
+| Igel | von Anfang an | Gegenstände daneben +3 Startblock |
+| Pony | Rang 2 | Gegenstände daneben 10 % schneller |
+| Fuchs | Rang 3 | einmal am Tag kostenlos neu würfeln |
+| Rabe | Rang 4 | markiert das falsche Wort auf der Ork-Rüstung, +1 Gold je Sieg |
+| Falke | Rang 5 | der erste Angriff im Kampf wirkt doppelt |
+
+Kampf-Wirkungen gelten nur, wenn das Tier im Rucksack liegt (nicht im Lager). Logik: `js/begleiter.js`, Tests: `tests/begleiter.test.mjs`.
+
+## Botschaften lesen (Leseverständnis)
+
+Ab Tag 2 kommt am Morgen mit 50 % Wahrscheinlichkeit (nie zweimal hintereinander) statt der Begegnung ein Brief. Er öffnet sich auf einer Pergamenttafel: links der Text (60–120 Wörter), rechts nacheinander 1–2 Fragen (Information finden, Schlussfolgern, Wortbedeutung). Richtig: Gegenstand oder Gold aus dem Brief. Falsch: 1 Gold Trost, die Stelle im Text wird markiert („Hier steht es: …“).
+
+- `botschaften.json`: 33 Briefe (Kleinwurzel und Hrossmark, Schwierigkeit 1–3) mit Absender, Text, Fragen, Antworten, Textstelle und Belohnung.
+- Thema **Leseverständnis** (`lesen` in `themen.json`) mit eigenem Lernstand: zwei Briefe hintereinander ganz richtig → schwierigere Briefe. Die Lehrkraft kann das Thema ausschalten, dann kommt immer eine Begegnung.
+- `node tools/pruefliste.mjs` listet alle Briefe mit Fragen zum Abhaken. Logik: `js/botschaften.js`, Darstellung: `js/brief-ui.js`.
+
+## Rune der Woche
+
+Im Startmenü startet **Rune der Woche** einen Lauf, der eine Woche lang für alle gleich ist: Figur, Begleiter, Schicksalsrune, Läden (auch beim Neu würfeln), Gegner, Begegnungen und Briefe hängen nur von der Kalenderwoche ab – mit Klassen-Code zusätzlich von dessen Themen. Am Ende gibt es Punkte (Siege × 100, übrige Herzen × 40, erreichter Tag × 20, Aufgaben gleich richtig × 5) und ein **Ergebnis-Siegel** aus 4 Zeichen, das Woche und Punkte enthält und jeden Tippfehler erkennt. Auf dem Gerät wird der beste Versuch der Woche gemerkt.
+
+Die Lehrkraft tippt im Bereich „Für Lehrkräfte“ unter **Rune der Woche prüfen** Kürzel und Siegel ein und sieht die Rangliste (zum Zeigen am Beamer, nichts wird gespeichert). Logik: `js/wochenrune.js` (Kalenderwoche, Seed, Punkte, Siegel), fester Zufall: `laufRng` in `js/logic.js`.
+
+## Satzschmiede (Satzglieder)
+
+Ab Tag 2 hat am Morgen (nach Begegnung oder Brief) die Satzschmiede geöffnet – freiwillig, höchstens eine Spruchrolle am Tag. Das Kind tippt Satzglied-Karten an oder zieht sie in die Satzleiste. Jede Satzglied-Art hat eine Farbe und ein Form-Zeichen: Subjekt (Kreis, blau), Prädikat (Balken, rot), Objekt (Dreieck, grün), Adverbiale der Zeit (Raute, lila), der Art und Weise (Fünfeck, orange), des Ortes (Quadrat, türkis). Dazu kommen falsche Karten: falsche Personalform („du schlägst“) und falscher Fall („der Ork“, „ich“ als Objekt).
+
+- **Gültig** ist ein Aussagesatz mit dem Prädikat an zweiter Stelle, Subjekt und Prädikat passen zusammen, das Objekt steht im richtigen Fall – und Objekt und Adverbiale passen zum Verb (`satzschmiede.json`: „heilen“ geht mit „mich“ und „uns“, nicht mit „den Ork“). Ein falscher Satz ergibt eine freundliche Erklärung und keine Spruchrolle.
+- **Spruchrolle** (2×1, Bild `assets/ui/satzschmiede/spruchrolle.webp`): Prädikat = Wirkung (Schaden, Block oder Heilung wie die Verb-Rolle – in deren Sternstufe im Rucksack, mindestens ★★ ab Tag 2 und ★★★ ab Tag 6, damit die Rolle bis zum Ende nützlich bleibt), Subjekt = Bonus (Figur +15 %, „wir“ schneller, Begleiter nach seiner Art), Objekt +10 %, Zeit = wann sie startet („sofort“, „in der dritten Runde“ etwas später +25 %, „am Ende des Kampfes“ spät +50 % – Kämpfe dauern nur etwa 10 Sekunden), Art und Weise = Stärke oder Tempo, Ort +10 %. Das Info-Feld zeigt den Satz und jede Zeile der Wirkung. Spruchrollen verschmelzen nicht.
+- **Umstellprobe** (Stufe 3): Nach dem Schmieden kann das Kind den Satz umstellen („Sofort schlägt Borga den Ork.“). Bleibt das Prädikat an zweiter Stelle, bekommt die Rolle einen Stern mehr (höchstens ★★★★). Laut Simulation verändert die Satzschmiede die Siege kaum (`tests/balance.test.mjs`).
+- **Verben:** die Verb-Rollen im Rucksack, die zu einer Person passen (schlagen, stechen, schießen, stürmen, schützen, heilen), höchstens zwei; ohne solche Rolle die Grundverben schlagen und schützen.
+- **Stufen** im Thema **Satzglieder** (der Lernstand ist derselbe wie bei den Satzglied-Aufgaben): 1 Subjekt und Prädikat, 2 dazu Objekte, 3 dazu Adverbiale und Umstellprobe. Zweimal gleich ein richtiger Satz → nächste Stufe. Ohne Klassen-Code gilt wie bei allen Themen höchstens Stufe 2; die Lehrkraft kann Stufe 3 freigeben oder das Thema ausschalten (dann bleibt die Schmiede zu).
+- Alle geschmiedeten Sätze stehen im Buch der Wörter auf der Seite **Sprüche** (nur auf dem Gerät). Logik: `js/satzschmiede.js`, Darstellung: `js/satzschmiede-ui.js`, Tests: `tests/satzschmiede.test.mjs` (alle Kartenfolgen bis 4 Karten).
+
 ## Fortschritt zwischen den Läufen
 
 | Was | So funktioniert es |
 | --- | --- |
-| **Buch der Wörter** (📚 im Spiel, Startmenü, Menü) | Seiten Komposita, Sternstufen, Steigerungen, Sätze, Schätze – 317 Einträge, automatisch aus `items.json` und `recipes.json`. Unentdeckt: dunkle Silhouette mit „???“; entdeckt: Bild, Name, Artikel, Wirkung, Lernhinweis. Fortschrittsbalken pro Seite. Neue Entdeckungen werden kurz eingeblendet. Das Buch bleibt auf dem iPad. |
+| **Buch der Wörter** (📚 im Spiel, Startmenü, Menü) | Seiten Komposita, Sternstufen, Steigerungen, Sätze, Schätze – 317 Einträge, automatisch aus `items.json` und `recipes.json`. Unentdeckt: dunkle Silhouette mit „???“; entdeckt: Bild, Name, Artikel, Wirkung, Lernhinweis. Fortschrittsbalken pro Seite. Neue Entdeckungen werden kurz eingeblendet. Dazu die Seiten „Regeln“ (Regelkarten) und „Sprüche“ (alle Sätze aus der Satzschmiede). Das Buch bleibt auf dem iPad. |
 | **Erfahrung und Ränge** | Am Ende jedes Laufs: 10 pro Sieg, 5 pro neuer Entdeckung, 2 pro Frage beim ersten Versuch richtig. Lehrling (0) → Wanderer (350) → Runenkundige (1200) → Wortmeister (2600) → Hüter der Sprache (4000). Laut Simulation Rang 2 nach 2 Läufen, Rang 5 nach etwa 26. |
 | **Freischaltungen** (nur über den Rang, damit sie im Heldencode stecken) | Faelith die Bogenschützin (Wanderer; Bogen-Komposita +30 %, sieht mögliche Komposita im Laden von Weitem), Hauptmann Theron (Runenkundige; +3 Startblock für Nomen mit passendem Siegel), Ritterin Ysolde (Wortmeister; Runen wirken auf zwei Nomen). Drachenfeuerschwert und Runenstein ab Runenkundige, Runenkrone ab Wortmeister. |
 | **Rucksack-Designs** | Leder, Zwergenstahl (Wanderer), Elbenseide (Runenkundige), Reiterleder (Wortmeister), Silberbanner (Hüter der Sprache) – nur Optik, Auswahl in der **Sammlung** (Startmenü). |
@@ -140,6 +181,9 @@ Alle Inhalte stehen in JSON-Dateien. Jede Datei hat oben ein Feld `_hinweis`, da
 | `enemies.json` | Die Orks: Vorlieben beim Packen und die falschen Wörter auf ihren Rüstungen |
 | `regions.json` | Die Gebiete: Tage, Farben, Wortfeld, Gegner, Boss |
 | `heroes.json` | Startfiguren mit Bonus, Start-Items und Unterklassen; die sechs Schicksalsrunen |
+| `begleiter.json` | Begleiter-Tiere: Name, Artikel, Rolle, Text, Freischaltung (Rang), Wirkung |
+| `botschaften.json` | Briefe: Gebiet, Schwierigkeit, Absender, Text, Fragen mit Antworten, Textstelle und Belohnung |
+| `satzschmiede.json` | Satzschmiede: Verben mit passenden Objekten und Adverbialen, falsche Fälle, Wirkung jedes Satzglieds, Stufen |
 | `tutorial.json` | Tutorial „Der erste Tag“: Schritte, Texte, Hilfe-Karten für „So geht's“, Erste-Mal-Tipps |
 | `achievements.json` | Erfahrung, Ränge, Rucksack-Designs, Erfolge |
 | `registry.json` | Feste Nummern für alte, lange Codes und Klassen-Codes (nur mit `node tools/registry.mjs` ergänzen) |
