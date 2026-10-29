@@ -45,11 +45,14 @@ export function baenderEinpassen(root, versuch = 0) {
       // Sockel beginnen unter den Sternen
       const r0 = box(it);
       leiste.style.top = Math.max(st ? box(st).bottom - r0.top + 2 : 0, 4) - (it.clientTop || 0) + 'px';
-      let m = parseFloat(leiste.style.getPropertyValue('--mulde')) || 12;
-      while (m > 6 && box(leiste).bottom > band - 1) {
-        m -= 1;
-        leiste.style.setProperty('--mulde', m + 'px');
-      }
+      // Fassungsgröße aus dem freien Platz zwischen Sternen und Band (bei kleinen Karten enger zusammen)
+      const n = leiste.children.length;
+      const frei = band - box(leiste).top - 2;
+      const klein = frei < n * 14;
+      leiste.classList.toggle('eng', klein);
+      const extra = klein ? 2 + (n - 1) * 1 : 6 + (n - 1) * 3;
+      const m = Math.max(5, Math.min(parseFloat(leiste.style.getPropertyValue('--mulde')) || 12, Math.floor((frei - extra) / n)));
+      leiste.style.setProperty('--mulde', m + 'px');
     }
     bildInDieMitte(it, band);
   }

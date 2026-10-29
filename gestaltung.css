@@ -771,3 +771,5 @@ h2 .amboss { width: 40px; height: 26px; margin-right: 6px; }
 .item .label.phrase { font-size: inherit; }
 .sockel-leiste { left: 2px; top: max(18%, calc(var(--mulde) + 6px)); bottom: auto; transform: none; flex-direction: column; gap: 3px; padding: 3px 2px; border-radius: 99px; }
 .mark-fluch { right: 4px; top: calc(var(--abz, 18px) + 6px); bottom: auto; }
+.sockel-leiste.eng { gap: 1px; padding: 1px; }
+.sockel-leiste.eng .mulde { box-shadow: inset 0 1px 1px rgba(0, 0, 0, .6); }
