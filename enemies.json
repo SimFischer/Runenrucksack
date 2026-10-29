@@ -1,8 +1,9 @@
 {
-  "_hinweis": "Computer-Gegner. uebung: nur im Tutorial, mit festen Gegenständen (ausruestung). vorliebe gewichtet, welche Wirkungen der Gegner beim Packen bevorzugt. faehigkeit: Boss-Fähigkeit (stehlen: nimmt einmal die Wirkung des stärksten Gegenstands; wolf: bei halbem Leben ein zusätzlicher Angriff). boss: Anführer am letzten Tag eines Gebiets (siehe regions.json). fehler: falsch geschriebene Wörter auf der Rüstung – vor jedem Kampf wird eines zufällig gewählt. optionen enthält genau eine richtige Schreibung (richtig).",
+  "_hinweis": "Computer-Gegner. uebung: nur im Tutorial, mit festen Gegenständen (ausruestung). vorliebe gewichtet, welche Wirkungen der Gegner beim Packen bevorzugt. staerke: Faktor auf das Gold des Gegnertyps (gleicht Typen aus, die einen ausgewogenen Rucksack zu leicht oder zu schwer schlagen). faehigkeit: Boss-Fähigkeit (stehlen: nimmt einmal die Wirkung des stärksten Gegenstands; wolf: bei halbem Leben ein zusätzlicher Angriff). boss: Anführer am letzten Tag eines Gebiets (siehe regions.json). fehler: falsch geschriebene Wörter auf der Rüstung – vor jedem Kampf wird eines zufällig gewählt. optionen enthält genau eine richtige Schreibung (richtig).",
   "gegner": [
     {
       "id": "spaeher",
+      "staerke": 0.91,
       "name": "Späher-Ork",
       "emoji": "👺",
       "vorliebe": {
@@ -54,6 +55,7 @@
     },
     {
       "id": "schildork",
+      "staerke": 1.07,
       "name": "Schild-Ork",
       "emoji": "👹",
       "vorliebe": {
@@ -106,6 +108,7 @@
     },
     {
       "id": "schamane",
+      "staerke": 1.01,
       "name": "Ork-Schamane",
       "emoji": "🧌",
       "vorliebe": {
@@ -159,13 +162,14 @@
     },
     {
       "id": "wolfsreiter",
+      "staerke": 0.86,
       "name": "Wolfsreiter",
       "emoji": "🐺",
       "vorliebe": {
         "schaden": 3,
         "brand": 2,
         "tempo": 2,
-        "betaeubung": 2
+        "betaeubung": 1
       },
       "fehler": [
         {

@@ -7,6 +7,9 @@ const COLD_SLOW = 0.6;             // Kälte: Items laden nur mit 60 % Tempo
 const STUN_MAX = 2;                // Betäubung höchstens 2 s am Stück
 const FATIGUE_START = 25;          // ab hier verlieren beide jede Sekunde mehr Leben
 const MAX_TIME = 60;
+// Block sammelt sich nicht unbegrenzt: höchstens ein Anteil des Lebens, und jede Sekunde verfällt ein Teil.
+export const BLOCK = { max: 0.5, verfall: 0.1 };
+const blockMax = (me) => Math.round(me.maxHp * BLOCK.max);
 
 // placed: Items im Rucksack; Siegel und Runen werden über analyze() eingerechnet.
 // opts: info (fertige Auswertung, z. B. mit Boni der Figur), leben, tempo (in %), startHp (Anteil 0–1),
@@ -33,6 +36,7 @@ export function makeFighter(name, placed, defs, day, opts = {}) {
     glueck += def.aura?.glueck || 0;
   }
   const hp = Math.round(maxHp * (opts.startHp ?? 1)) - (opts.selbstschaden || 0);
+  block = Math.min(block, Math.round(maxHp * BLOCK.max));
   return {
     name, maxHp, hp, block, tempo: tempo / 100, glueck: glueck / 100, rng,
     gift: 0, brand: 0, kaelte: 0, betaeubt: 0, regeneration: 0,
@@ -107,6 +111,7 @@ export class Battle {
       this.tickTimer -= 1;
       for (const key of ['player', 'enemy']) {
         const me = this.sides[key];
+        if (me.block > 0) me.block = Math.floor(me.block * (1 - BLOCK.verfall));
         if (me.gift > 0) this.hurt(key, me, me.gift, 'gift', ev, true);
         if (me.brand > 0) { this.hurt(key, me, me.brand, 'brand', ev, true); me.brand--; }
         if (me.regeneration > 0) {
@@ -140,7 +145,7 @@ export class Battle {
     const luck = me.glueck + (d.glueck || 0) / 100;
     const m = luck > 0 && me.rng() < luck ? 2 : 1;
     ev.push({ type: 'trigger', side: key, uid: it.uid, crit: m > 1 });
-    if (d.block) { me.block += d.block * m; ev.push({ type: 'block', side: key, amount: d.block * m }); }
+    if (d.block) { me.block = Math.min(blockMax(me), me.block + d.block * m); ev.push({ type: 'block', side: key, amount: d.block * m }); }
     if (d.heilung) {
       me.hp = Math.min(me.maxHp, me.hp + d.heilung * m);
       ev.push({ type: 'heal', side: key, amount: d.heilung * m });

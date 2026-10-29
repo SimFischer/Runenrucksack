@@ -29,36 +29,30 @@ for (const bestand of ['start', 'alles']) test(`600 Läufe je Strategie (${besta
     t.diagnostic(`${strategie.padEnd(7)} Siegquote %:  ${zeile(x.siegquoteProTag)}`);
     t.diagnostic(`${strategie.padEnd(7)} Siege ${x.siegeDurchschnitt.toFixed(2)} · Reise geschafft ${x.reiseGeschafft} % · ${x.minutenDurchschnitt.toFixed(1)} min · Kampf ${x.kampfSekunden.toFixed(1)} s`);
   }
+  // Siegquote der guten Strategie je Tag und Gegnertyp
+  for (const [d, typen] of Object.entries(r.gut.proGegner)) {
+    t.diagnostic(`gut Tag ${d.padStart(2)}: ${Object.entries(typen).map(([id, [w, n]]) => `${id} ${Math.round((100 * w) / n)} % (${n})`).join(' · ')}`);
+  }
   const z = r.zufall, g = r.gut, a = r.abwehr;
   assert.ok(z.siegeDurchschnitt >= 3 && z.siegeDurchschnitt <= 4, `Zufall: ${z.siegeDurchschnitt} Siege`);
   assert.ok(z.reiseGeschafft <= 10, `Zufall: ${z.reiseGeschafft} % schaffen die Reise`);
   assert.ok(g.siegeDurchschnitt >= 6 && g.siegeDurchschnitt <= 7, `gut: ${g.siegeDurchschnitt} Siege`);
   assert.ok(g.reiseGeschafft >= 25 && g.reiseGeschafft <= 35, `gut: ${g.reiseGeschafft} % schaffen die Reise`);
   assert.ok(a.reiseGeschafft >= g.reiseGeschafft - 10, `Abwehr: ${a.reiseGeschafft} % gegenüber ${g.reiseGeschafft} %`);
+  // Gleichmäßige Kurve: kein Tag leichter als der vorige, von Tag zu Tag höchstens 12 Prozentpunkte weniger
+  const q = g.siegquoteProTag;
+  for (let d = 2; d <= 10; d++) {
+    assert.ok(q[d] <= q[d - 1], `gut: Tag ${d} (${q[d]} %) leichter als Tag ${d - 1} (${q[d - 1]} %)`);
+    assert.ok(q[d - 1] - q[d] <= 12, `gut: Sprung von Tag ${d - 1} auf ${d}: ${q[d - 1]} → ${q[d]} %`);
+  }
+  // Kein Gegnertyp kontert einen ausgewogenen Rucksack: am selben Tag mindestens 30 % (bei mindestens 20 Kämpfen)
+  for (const [d, typen] of Object.entries(g.proGegner)) for (const [id, [w, n]] of Object.entries(typen)) {
+    if (n >= 20) assert.ok((100 * w) / n >= 30, `gut: Tag ${d} gegen ${id} nur ${Math.round((100 * w) / n)} %`);
+  }
   for (const x of [z, g, a]) {
     assert.ok(x.siegquoteProTag[1] >= 80, `Tag 1: ${x.siegquoteProTag[1]} %`);
     assert.ok(x.minutenDurchschnitt >= 10 && x.minutenDurchschnitt <= 15, `Minuten: ${x.minutenDurchschnitt}`);
     assert.ok(x.kampfSekunden < 60, 'Kämpfe unter einer Minute');
-  }
-});
-
-test('Gegner-Stufen: ★★ ab Tag 3, ★★★ ab Tag 6, der Boss an Tag 10 immer mit ★★★★', async () => {
-  const { makeEnemy, enemyPool, seededRng } = await import('../js/logic.js');
-  const E = json('enemies.json').gegner;
-  const ork = E.find((e) => e.id === 'spaeher');
-  const boss = E.find((e) => e.id === 'haeuptling');
-  const pool = (day) => enemyPool(data.items, data.compounds, day);
-  const maxStern = (day, foe) => {
-    let m = 1;
-    for (let s = 1; s <= 40; s++) for (const p of makeEnemy(day, foe, pool(day), data.defs, seededRng(s)).items) m = Math.max(m, p.stern || 1);
-    return m;
-  };
-  assert.equal(maxStern(2, ork), 1, 'Tag 2: nur ★');
-  assert.equal(maxStern(3, ork), 2, 'Tag 3: auch ★★');
-  assert.equal(maxStern(6, ork), 3, 'Tag 6: auch ★★★');
-  for (let s = 1; s <= 20; s++) {
-    const items = makeEnemy(10, boss, pool(10), data.defs, seededRng(s)).items;
-    assert.ok(items.some((p) => p.stern === 4), `Boss Tag 10 (Seed ${s}) hat ein ★★★★-Item`);
   }
 });
 

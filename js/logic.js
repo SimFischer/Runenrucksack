@@ -355,6 +355,12 @@ export function finishBattle(run, items, regions, won, enemyName, rng = null) {
 // ---------- Gegner ----------
 
 export const COMPOUNDS_FROM_DAY = 4; // ab diesem Tag bringen Orks auch Komposita mit
+// Gegnerstärke als durchgehende Kurve: Faktor auf das Gegner-Gold je Tag (1 = Grundformel). Boss-Tage sind eingerechnet,
+// damit die Siegquote von Tag zu Tag gleichmäßig sinkt (Ziel und Prüfung: tests/balance.test.mjs).
+export const GEGNER_KURVE = [0.98, 1.19, 1.36, 1.045, 0.8, 1.06, 0.93, 0.89, 0.88, 1.0];
+// Dieselbe Kurve für einen Lauf nur mit dem Startpaket; dazwischen wird nach dem Anteil des Bestands gemischt.
+export const GEGNER_KURVE_START = [0.98, 1.3, 1.4, 0.98, 0.6, 1.17, 0.98, 0.99, 0.99, 1.02];
+export const gegnerKurve = (day, anteil = 1) => (GEGNER_KURVE_START[day - 1] ?? 1) * (1 - anteil) + (GEGNER_KURVE[day - 1] ?? 1) * anteil;
 // Gegner-Gold nach Bestand: Mit kleinem Bestand (Neuling, nur Startpaket) findet man seltener Paare und gute
 // Kombinationen – die Gegner bekommen dann etwas weniger Gold. anteil = freigeschaltete Gegenstände / alle mit Freischaltung.
 export const bestandFaktor = (anteil) => GEGNER_KLUG.bestandMin + (1 - GEGNER_KLUG.bestandMin) * Math.max(0, Math.min(1, anteil));
@@ -385,16 +391,20 @@ export function enemyBudget(day, boss) {
   return Math.floor((cumulativeGold(day) + 8) * (0.92 - 0.035 * (day - 1)) * klug * anfang) + (boss ? (day >= CFG.lastDay ? GEGNER_KLUG.endbossPlus : GEGNER_KLUG.bossPlus) : 0);
 }
 
-// Ab diesen Tagen bringen Orks auch Gegenstände mit Sternstufe mit (★★ ab Tag 3, ★★★ ab Tag 6);
+// Ab diesen Tagen bringen Orks auch Gegenstände mit Sternstufe mit (★★ ab Tag 2, ★★★ ab Tag 6);
 // der Boss am letzten Tag hat immer ein legendäres ★★★★-Item dabei.
-export const GEGNER_STERNE_AB = { 2: 3, 3: 6 };
+export const GEGNER_STERNE_AB = { 2: 2, 3: 6 };
+// Wie viele Gegenstände einer Sternstufe ein Gegner an einem Tag höchstens trägt: erst einer, dann allmählich mehr.
+export const GEGNER_STERNE_PRO_TAG = { 2: 1, 3: 0.5 };
+export const gegnerSterneMax = (day, stern) => (day < GEGNER_STERNE_AB[stern] ? 0 : 1 + Math.floor((day - GEGNER_STERNE_AB[stern]) * GEGNER_STERNE_PRO_TAG[stern]));
 export const GEGNER_LEGENDAER_TAG = 10;
 // Ein Item der Stufe s kostet den Gegner so viel wie 2^(s-1) einfache – wie beim Verbinden von zwei gleichen.
 export const sternPreis = (preis, stern = 1) => preis * 2 ** (stern - 1);
 
 // items: Angebot des Gegners (freigeschalteter Bestand); bossItems: woraus der Boss sein legendäres Item wählt (alles)
 export function makeEnemy(day, enemy, items, defs, rng = Math.random, bossItems = items) {
-  let budget = Math.floor(enemyBudget(day, enemy.boss) * (enemy.budgetFaktor || 1));
+  // Kurve je Tag (ohne Sprünge beim Gebietswechsel), Stärke des Gegnertyps (enemies.json) und Bestand des Laufs
+  let budget = Math.floor(enemyBudget(day, enemy.boss) * gegnerKurve(day, enemy.anteil ?? 1) * (enemy.staerke || 1) * (enemy.budgetFaktor || 1));
   const weights = rarityWeights(day, gegnerHaendler(day));
   const grid = rectGrid(CFG.bagCols, CFG.bagRows);
   const placed = [];
@@ -425,7 +435,8 @@ export function makeEnemy(day, enemy, items, defs, rng = Math.random, bossItems 
 
   for (let tries = 0; tries < 80 && budget > 0; tries++) {
     const cheapest = placed.length ? Math.min(...placed.map(priceOf)) : 0;
-    const affordable = offers.filter((o) => o.preis <= budget + cheapest);
+    const zahl = (s) => placed.filter((p) => (p.stern || 1) === s).length;
+    const affordable = offers.filter((o) => o.preis <= budget + cheapest && (o.stern === 1 || zahl(o.stern) < gegnerSterneMax(day, o.stern)));
     if (!affordable.length) break;
     const cand = pickWeighted(affordable.map((o) => [o, score(o.d) / o.stern]), rng);
     if (!cand) break;

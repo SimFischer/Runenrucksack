@@ -49,7 +49,7 @@ export function startNight(done) {
   const foeDef = tut || pickEnemy(run.day, G.REGIONS, G.ENEMIES, laufRng(run, 'gegner'));
   enemy = tut
     ? { ...tut, items: tut.ausruestung.map((a, i) => ({ uid: i + 1, rot: 0, ...a })) }
-    : makeEnemy(run.day, { ...foeDef, budgetFaktor: bestandFaktor((run.freieItems || []).length / G.ITEMS.filter((d) => d.freischaltung).length) }, enemyPool(G.ITEMS, G.COMPOUNDS, run.day, run.freieItems || []), G.DEFS, laufRng(run, 'gegner-rucksack'), enemyPool(G.ITEMS, G.COMPOUNDS, run.day));
+    : makeEnemy(run.day, { ...foeDef, ...bestandVon(run) }, enemyPool(G.ITEMS, G.COMPOUNDS, run.day, run.freieItems || []), G.DEFS, laufRng(run, 'gegner-rucksack'), enemyPool(G.ITEMS, G.COMPOUNDS, run.day));
   // Rüstung mit Fehler: im Tutorial ein festes Wort, sonst ein Satz mit einem Fehler (Aufgabenformat „Fehler finden“)
   armor = !foeDef.fehler?.length ? null : tut ? { ...pickOne(foeDef.fehler), status: 'offen' } : { satz: true, status: 'offen' };
 
@@ -227,6 +227,12 @@ function wackeln(side) {
   const p = $('fighter-' + side).querySelector('.f-figur');
   if (!p) return;
   p.classList.remove('hit'); void p.offsetWidth; p.classList.add('hit');
+}
+
+// Bestand des Laufs für die Gegnerstärke: Anteil der freigeschalteten Gegenstände
+function bestandVon(run) {
+  const anteil = Math.min(1, (run.freieItems || []).length / Math.max(1, G.ITEMS.filter((d) => d.freischaltung).length));
+  return { anteil, budgetFaktor: bestandFaktor(anteil) };
 }
 
 // Boss-Fähigkeit für den Kampf (eigene Kopie, damit „erledigt“ nicht im Gegner hängen bleibt)

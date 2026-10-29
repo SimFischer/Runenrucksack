@@ -39,7 +39,7 @@ export function prepareData(raw) {
 }
 
 // Zufallsstrategie: Wie oft zieht sie einen Kristall zufällig auf einen passenden Träger, wie sicher löst sie Aufgaben?
-export const GUT_ZUFALL = { kristall: 0.05, skill: 0.5 };
+export const GUT_ZUFALL = { kristall: 0.05, skill: 0.45 };
 
 // Spruchrolle: Werte stehen am Gegenstand
 const defVon = (p, defs) => (p.spruch ? { ...defs[p.id], ...p.spruch.werte } : defs[p.id]);
@@ -310,7 +310,7 @@ export function simulateRun(data, rng, opts = {}) {
     });
     const foeDef = pickEnemy(run.day, data.regions, data.enemies, rng);
     const anteil = run.freieItems.length / Math.max(1, data.items.filter((d) => d.freischaltung).length);
-    const enemy = makeEnemy(run.day, { ...foeDef, budgetFaktor: bestandFaktor(anteil) }, enemyPool(data.items, data.compounds, run.day, run.freieItems), data.defs, rng, enemyPool(data.items, data.compounds, run.day));
+    const enemy = makeEnemy(run.day, { ...foeDef, anteil: Math.min(1, anteil), budgetFaktor: bestandFaktor(Math.min(1, anteil)) }, enemyPool(data.items, data.compounds, run.day, run.freieItems), data.defs, rng, enemyPool(data.items, data.compounds, run.day));
     const armor = rng() < skill;
     merkeAntwort(run, 'rechtschreibung', armor, true);
     if (armor) laufStand(run).orkFehler++;
@@ -320,7 +320,7 @@ export function simulateRun(data, rng, opts = {}) {
     const foe = makeFighter('e', enemy.items, data.defs, run.day, { startHp: armor ? 1 - ARMOR_BONUS : 1, rng, klug: enemy.klug, faehigkeit });
     const battle = new Battle(player, foe);
     const won = runToEnd(battle) === 'win';
-    days.push({ day: run.day, won, time: battle.time, boss: !!foeDef.boss,
+    days.push({ day: run.day, won, time: battle.time, boss: !!foeDef.boss, gegner: foeDef.id,
       gold: run.gold, haendler: haendlerStufe(run), schmied: run.schmiedTag === run.day ? 1 : 0, wuerfe: run.wuerfeTag || 0 });
     finishBattle(run, data.items, data.regions, won, enemy.name, rng);
   }
@@ -363,7 +363,15 @@ export function summarize(results) {
   }
   const jeTag = (k, stellen = 1) => Object.fromEntries(Object.entries(perDay).map(([d, v]) => [d, +(v[k] / v.kaempfe).toFixed(stellen)]));
   const avg = (f) => results.reduce((s, r) => s + f(r), 0) / results.length;
+  // Siegquote je Tag und Gegnertyp: { tag: { gegner: [Siege, Kämpfe] } }
+  const proGegner = {};
+  for (const r of results) for (const d of r.days) {
+    const g = ((proGegner[d.day] ||= {})[d.gegner] ||= [0, 0]);
+    g[1]++;
+    if (d.won) g[0]++;
+  }
   return {
+    proGegner,
     siegquoteProTag: Object.fromEntries(Object.entries(perDay).map(([d, v]) => [d, Math.round((100 * v.siege) / v.kaempfe)])),
     erreichtProTag: Object.fromEntries(Object.entries(perDay).map(([d, v]) => [d, Math.round((100 * v.kaempfe) / results.length)])),
     goldProTag: jeTag('gold'),          // ungenutztes Gold am Tagesende (vor dem Kampf)
