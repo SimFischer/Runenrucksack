@@ -95,8 +95,13 @@ export function waehleAufgabe(opts) {
     : opts.format ? stufeMitFormat(thema) || [1, 2, 3].find((s) => mitFormat(thema, s)) : stufeFuer(profil, einst, thema, opts.bereich || [1, 3]);
   const benutzt = new Set(stand.benutzt[thema] || []);
   if (wiederholung) benutzt.add(wiederholung.wort);
-  const ctx = { ws, rng, felder: opts.felder || [], benutzt, itemNomen: opts.itemNomen, nichtFormat: wiederholung?.format };
-  const inhalt = erzeugeInhalt(themen, thema, stufe, ctx, opts.format);
+  // Dasselbe Format höchstens zweimal hintereinander
+  const zuletzt = stand.formate || [];
+  const ohneFormat = zuletzt.length >= 2 && zuletzt.at(-1) === zuletzt.at(-2) ? zuletzt.at(-1) : null;
+  const ctx = { ws, rng, felder: opts.felder || [], benutzt, itemNomen: opts.itemNomen, nichtFormat: wiederholung?.format, ohneFormat };
+  let inhalt = erzeugeInhalt(themen, thema, stufe, ctx, opts.format);
+  for (let i = 0; i < 4 && !opts.format && ohneFormat && inhalt.format === ohneFormat; i++) inhalt = erzeugeInhalt(themen, thema, stufe, ctx);
+  stand.formate = [...zuletzt, inhalt.format].slice(-4);
   const aufgabe = FORMATE[inhalt.format].erzeuge(inhalt, rng);
   if (wiederholung) stand.wiederholen = stand.wiederholen.filter((w) => w !== wiederholung);
   return aufgabe;

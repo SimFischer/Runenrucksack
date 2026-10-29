@@ -6,7 +6,7 @@ import { placeNew } from './sterne.js';
 import { merkeAntwort } from './fortschritt.js';
 import { aufgabenStand, lernstandVon, maxStufe } from './aufgaben/wahl.js';
 import { einstellungen } from './aufgaben/spiel.js';
-import { waehleBrief, werteAus, verbucheBrief, THEMA_LESEN } from './botschaften.js';
+import { waehleBriefMerk, werteAus, verbucheBrief, THEMA_LESEN } from './botschaften.js';
 import { toast, bump, fullName } from './ui.js';
 import { sym } from './symbole.js';
 
@@ -19,8 +19,9 @@ function briefHeute(rng) {
   const run = G.run;
   if (run.brief?.tag === run.day) return G.BOTSCHAFTEN.find((b) => b.id === run.brief.id) || null;
   const stufe = Math.max(1, Math.min(lernstandVon(G.PROFIL, THEMA_LESEN).stufe, maxStufe(einstellungen(), THEMA_LESEN)));
-  const b = waehleBrief(G.BOTSCHAFTEN, { gebiet: region().id, stufe, gelesen: run.gelesen || [], rng });
-  if (b) { run.brief = { tag: run.day, id: b.id }; save(); }
+  const w = waehleBriefMerk(G.BOTSCHAFTEN, { gebiet: region().id, stufe, merkliste: G.PROFIL.briefeGelesen || [], gelesen: run.gelesen || [], rng });
+  const b = w.brief;
+  if (b) { run.brief = { tag: run.day, id: b.id }; G.PROFIL.briefeGelesen = w.merkliste; saveProfil(); save(); }
   return b;
 }
 

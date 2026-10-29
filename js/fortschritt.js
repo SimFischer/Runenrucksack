@@ -65,11 +65,19 @@ export function merkeAntwort(run, regel, richtig, ersterVersuch) {
 
 // ---------- Erfahrung und Rang ----------
 
+// Rang mit Unterstufe: Jeder Rang hat drei Stufen (Lehrling I, II, III). nr: Rang-Nummer (1–5), unterNr: fortlaufend.
+const ROEMISCH = ['I', 'II', 'III'];
 export function rangVon(xp, raenge) {
   let i = 0;
   for (let k = 0; k < raenge.length; k++) if (xp >= raenge[k].ab) i = k;
-  const naechster = raenge[i + 1] || null;
-  return { nr: i + 1, ...raenge[i], naechster, bisNaechster: naechster ? naechster.ab - xp : 0 };
+  const r = raenge[i], weiter = raenge[i + 1];
+  const spanne = (weiter ? weiter.ab : r.ab + 1500) - r.ab;
+  const stufe = Math.min(3, Math.floor(((xp - r.ab) * 3) / spanne) + 1);
+  const naechster = stufe < 3 ? { name: `${r.name} ${ROEMISCH[stufe]}`, ab: Math.round(r.ab + (spanne * stufe) / 3) }
+    : weiter ? { name: `${weiter.name} I`, ab: weiter.ab } : null;
+  return { nr: i + 1, ...r, grundName: r.name, name: `${r.name} ${ROEMISCH[stufe - 1]}`, stufe, unterNr: i * 3 + stufe,
+    stufeAb: Math.round(r.ab + (spanne * (stufe - 1)) / 3),
+    naechster, bisNaechster: naechster ? naechster.ab - xp : 0 };
 }
 
 export function erfahrungFuer(run, regeln) {
@@ -104,8 +112,10 @@ export function laufAbschluss(profil, run, data) {
   plus(s, 'sterne4', p.sterne4);
   plus(s, 'richtig', p.erster);
   if (gewonnen && run.hero && !profil.figurSiege.includes(run.hero)) profil.figurSiege.push(run.hero);
+  // Wie oft mit jeder Figur geschafft (nur auf dem Gerät, für das Pokal-Abzeichen auf der Figurenkarte)
+  if (gewonnen && run.hero) { profil.figurSiegeZahl ||= {}; profil.figurSiegeZahl[run.hero] = (profil.figurSiegeZahl[run.hero] || 0) + 1; }
   const nachher = rangVon(profil.xp, ach.raenge);
-  return { xp, vorher, nachher, aufgestiegen: nachher.nr > vorher.nr, gewonnen, neu: [...p.neu] };
+  return { xp, vorher, nachher, aufgestiegen: nachher.unterNr > vorher.unterNr, gewonnen, neu: [...p.neu] };
 }
 
 // ---------- Freischaltungen ----------
@@ -114,6 +124,7 @@ export function laufAbschluss(profil, run, data) {
 
 export function erfuellt(bed, profil, ctx) {
   if (!bed) return true;
+  if (bed.xp) return profil.xp >= bed.xp;
   if (bed.rang) return rangVon(profil.xp, ctx.achievements.raenge).nr >= bed.rang;
   if (bed.gewonnen) return (profil.stats.gewonnen || 0) >= bed.gewonnen;
   if (bed.buch) return profil.buch.length >= bed.buch;
@@ -128,6 +139,7 @@ export function erfuellt(bed, profil, ctx) {
 
 // Kindgerechter Hinweis, wie man etwas bekommt.
 export function bedingungText(bed, ctx) {
+  if (bed.xp) return `Wird frei bei ${bed.xp} Erfahrung (Rang „${rangVon(bed.xp, ctx.achievements.raenge).name}“).`;
   if (bed.rang) return `Erreiche den Rang „${ctx.achievements.raenge[bed.rang - 1].name}“.`;
   if (bed.gewonnen) return `Gewinne ${bed.gewonnen} ${bed.gewonnen === 1 ? 'Lauf' : 'Läufe'} (alle zehn Tage geschafft).`;
   if (bed.buch) return `Entdecke ${bed.buch} Einträge im Buch der Wörter.`;
@@ -137,9 +149,13 @@ export function bedingungText(bed, ctx) {
 }
 
 // Neu erfüllte Freischaltungen ins Profil übernehmen (Figuren und Designs bleiben für immer frei).
-// data: { heroes, achievements, buch }. Ergebnis: { figuren: [...], designs: [...] } – nur die neuen.
-export function pruefeFreischaltungen(profil, data) {
-  const neu = { figuren: [], designs: [] };
+// data: { heroes, achievements, buch, begleiter, items }. Ergebnis: { figuren, designs, begleiter, items } – nur die neuen.
+// Begleiter und Items ergeben sich direkt aus der Erfahrung: neu sind die, deren Schwelle seit xpVorher erreicht wurde.
+export function pruefeFreischaltungen(profil, data, xpVorher = null) {
+  const neu = { figuren: [], designs: [], begleiter: [], items: [] };
+  const geradeErreicht = (bed) => xpVorher != null && bed?.xp > xpVorher && bed.xp <= profil.xp;
+  for (const b of data.begleiter || []) if (geradeErreicht(b.freischaltung)) neu.begleiter.push(b.id);
+  for (const d of data.items || []) if (geradeErreicht(d.freischaltung)) neu.items.push(d.id);
   for (const h of data.heroes) {
     if (!h.freischaltung || profil.figuren.includes(h.id)) continue;
     if (erfuellt(h.freischaltung, profil, data)) { profil.figuren.push(h.id); neu.figuren.push(h.id); }

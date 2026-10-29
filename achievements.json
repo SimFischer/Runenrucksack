@@ -1,5 +1,5 @@
 {
-  "_hinweis": "Fortschritt zwischen den Läufen. erfahrung: Erfahrungspunkte am Ende eines Laufs (pro Sieg, pro neuer Entdeckung im Buch der Wörter, pro Grammatik-Frage beim ersten Versuch richtig). raenge: ab = nötige Erfahrung insgesamt. designs: Rucksack-Designs (nur Optik); freischaltung nur über den Rang – Figuren und Designs ergeben sich aus der Erfahrung im Heldencode. erfolge: bedingung ist eine von: stat (Zähler im Profil: laeufe, siege, gewonnen, ohneFehler, orkFehler, saetze, komposita, sterne4, richtig) mit min; buch (Anzahl Einträge); muster (Buch-Einträge, deren id den Text enthält) mit min oder alle; seite (volle Buchseite); figurSiege: \"alle\" (mit jeder Figur einen Lauf gewonnen); rang.",
+  "_hinweis": "Fortschritt zwischen den Läufen. erfahrung: Erfahrungspunkte am Ende eines Laufs (pro Sieg, pro neuer Entdeckung im Buch der Wörter, pro Grammatik-Frage beim ersten Versuch richtig). raenge: ab = nötige Erfahrung insgesamt; jeder Rang hat drei Unterstufen (I–III). designs: Rucksack-Designs (nur Optik, Bild assets/ui/rucksack-<id>.webp); freischaltung über die Erfahrung (xp) – Figuren und Designs ergeben sich aus der Erfahrung im Heldencode. erfolge: bedingung ist eine von: stat (Zähler im Profil: laeufe, siege, gewonnen, ohneFehler, orkFehler, saetze, komposita, sterne4, richtig) mit min; buch (Anzahl Einträge); muster (Buch-Einträge, deren id den Text enthält) mit min oder alle; seite (volle Buchseite); figurSiege: \"alle\" (mit jeder Figur einen Lauf gewonnen); rang.",
   "erfahrung": {
     "sieg": 10,
     "entdeckung": 5,
@@ -50,7 +50,7 @@
       "emoji": "⚒️",
       "text": "Genietete Stahlplatten aus Duramar.",
       "freischaltung": {
-        "rang": 2
+        "xp": 300
       }
     },
     {
@@ -59,7 +59,7 @@
       "emoji": "🍃",
       "text": "Leichter, grün schimmernder Stoff aus Lindrael.",
       "freischaltung": {
-        "rang": 3
+        "xp": 1050
       }
     },
     {
@@ -68,7 +68,7 @@
       "emoji": "🐎",
       "text": "Gegerbtes Leder mit Pferdeknoten aus Hrossmark.",
       "freischaltung": {
-        "rang": 4
+        "xp": 1950
       }
     },
     {
@@ -77,7 +77,7 @@
       "emoji": "🏳️",
       "text": "Silberne Stickerei der Reiherritter.",
       "freischaltung": {
-        "rang": 5
+        "xp": 3100
       }
     }
   ],

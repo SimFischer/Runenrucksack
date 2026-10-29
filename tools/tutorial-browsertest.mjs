@@ -133,7 +133,7 @@ try {
   await tap('#grid-bag [data-tut="item-schwert"]'); await expect('Lager');
   await tap('#tut-next'); await expect('Feuer-Kristall');
   const sw = await rect('#grid-bag [data-tut="item-schwert"]');
-  await drag('[data-tut="laden-feuer"]', sw.left - c / 2, sw.top + c / 2); await expect('sofort zum Feuerschwert');
+  await drag('[data-tut="laden-feuer"]', sw.left + c / 2, sw.top + c / 2); await expect('sofort zum Feuerschwert');
   check(await ev(`!!document.querySelector('#quick .quick-card') && document.getElementById('modal').hidden`), 'kleines Frage-Fenster am Schwert (kein großes Fenster)');
   await tap('#quick [data-k="0"]'); // „der“ – falsch
   check((await ev(`document.querySelector('#quick .quick-fb')?.textContent || ''`)).includes('Das letzte Wort'), 'Erklärung nach falschem Artikel');

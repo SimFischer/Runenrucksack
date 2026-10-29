@@ -251,23 +251,25 @@ function kobold(enc) {
   if (!run.begegnung.kobold) { run.begegnung.kobold = pickOne(entries).item; save(); }
   const entry = entries.find((e) => e.item === run.begegnung.kobold) || entries[0];
   const def = G.DEFS[entry.item];
-  const falscherName = entry.teile.join('');
   closeModal();
   const kopf = `<span class="af-wer">${figur(enc.id, 'af-wer-bild')}${enc.name}</span><span class="glowing" style="--glow:#a259d9">${iconHtml(def, 'ic small')}</span>`;
-  frageImSpiel({ inhalt: koboldInhalt(entry, { rng: Math.random }), kopf, nein: 'Ich finde ihn nicht' }).then((r) => {
-    const ok = !!r.richtig;
-    const p = gewinn(def.id, ok ? {} : { fluch: falscherName });
+  const inhalt = koboldInhalt(entry, { rng: Math.random });
+  frageImSpiel({ inhalt, kopf, nein: 'Ich finde ihn nicht', einVersuch: true }).then((r) => {
+    const ok = !!r.richtig && r.ersterVersuch !== false;
+    // Richtig: der epische Gegenstand. Falsch: nur ein gewöhnlicher Gegenstand aus dem Laden-Angebot
+    const normal = shopPool(run, G.ITEMS, G.REGIONS).filter((d) => d.seltenheit === 'gewoehnlich' && d.abklingzeit);
+    const trost = ok ? def : pickOne(normal.length ? normal : [def]);
+    const p = gewinn(trost.id);
     if (!p) { toast('Kein Platz im Rucksack – der Kobold zieht beleidigt ab.'); finish(enc.id); return; }
     if (ok) showReward(enc, `Name repariert! ${fullName(def)} ist jetzt ganz normal stark.`);
     else {
       save();
       rerender();
       const card = openModal(`
-        <div class="big-emoji">${iconHtml(def, 'ic big')}</div>
+        <div class="big-emoji">${iconHtml(trost, 'ic big')}</div>
         <h2>Hihi!</h2>
-        <p>Du bekommst „${falscherName}“ – aber der Fehler im Namen macht es frech:
-        Es kostet dich zu Beginn jedes Kampfes 2 Leben, solange es im Rucksack liegt.</p>
-        <p class="feedback">Richtig wäre: ${entry.richtig}. ${entry.erklaerung}</p>
+        <p>Der Kobold behält ${fullName(def)}. Du bekommst nur ${nameAkk(trost)}.</p>
+        <p class="feedback">Richtig wäre: ${entry.richtig}. ${inhalt.merke}</p>
         <div class="row"><button class="btn primary" data-ok>Weiter</button></div>`);
       card.querySelector('[data-ok]').onclick = () => finish(enc.id);
     }

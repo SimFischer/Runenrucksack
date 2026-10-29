@@ -136,8 +136,8 @@
     },
     {
       "id": "kristall",
-      "text": "Kauf den Feuer-Kristall und leg ihn direkt links neben das Schwert.",
-      "tipp": "Zieh das Feuer auf das leuchtende Feld links vom Schwert.",
+      "text": "Zieh den Feuer-Kristall aus dem Laden direkt auf dein Schwert.",
+      "tipp": "Das Schwert leuchtet, sobald du das Feuer ziehst. Lass es genau darauf los.",
       "ziel": [
         "laden-feuer",
         "rucksack"
@@ -156,7 +156,7 @@
       "hand": {
         "typ": "ziehen",
         "von": "laden-feuer",
-        "nach": "links-von:schwert"
+        "nach": "auf:schwert"
       },
       "falsch": [
         {
@@ -164,7 +164,7 @@
             "item": "feuer",
             "bereich": "store"
           },
-          "text": "Fast! Das Feuer gehört in den Rucksack, nicht ins Lager.",
+          "text": "Fast! Zieh das Feuer direkt auf das Schwert.",
           "zuruecksetzen": true
         },
         {
@@ -172,13 +172,14 @@
             "item": "feuer",
             "bereich": "bag"
           },
-          "text": "Fast! Schieb das Feuer direkt links neben das Schwert."
+          "text": "Fast! Zieh das Feuer direkt auf das Schwert – nicht daneben.",
+          "zuruecksetzen": true
         }
       ],
       "hilfe": {
         "titel": "Kraft-Kristalle",
         "animation": "ziehen",
-        "text": "Leg einen Kristall links neben oder über einen Gegenstand. Sofort entsteht ein Kompositum.",
+        "text": "Zieh einen Kristall auf einen Gegenstand wie Schwert, Bogen oder Schild. Sofort entsteht ein Kompositum.",
         "symbol": "brand"
       }
     },
@@ -196,7 +197,7 @@
       "hilfe": {
         "titel": "Verschmelzen",
         "animation": "pulsieren",
-        "text": "Feuer + Schwert = das Feuerschwert – sofort, sobald der Kristall richtig liegt. Das letzte Wort bestimmt den Artikel.",
+        "text": "Feuer + Schwert = das Feuerschwert – sofort, wenn du den Kristall auf das Schwert ziehst. Das letzte Wort bestimmt den Artikel.",
         "symbol": "stern"
       }
     },

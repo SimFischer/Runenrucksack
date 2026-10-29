@@ -327,7 +327,15 @@ const THEMEN = {
 
   steigerung(stufe, format, ctx) {
     const { ws, rng } = ctx;
-    const quelle = ws.adjektive.filter((a) => a.schwierigkeit === stufe);
+    // Stufe 3: unregelmäßige Formen und Formen im Satz mit Deklination („Das ist der ___ Weg.“)
+    const quelle = ws.adjektive.filter((a) => a.schwierigkeit === stufe || (stufe === 3 && a.attributiv));
+    if (stufe === 3 && rng() < 0.5) {
+      const a = waehle(quelle.filter((x) => x.attributiv), (x) => 'a:' + x.positiv, ctx);
+      const t = a.attributiv;
+      return { format: 'luecke', frage: `Welche Form von „${a.positiv}“ passt in den Satz?`, satz: t.satz.replace(t.form, '___'),
+        optionen: optionen(t.form, t.falsch, rng), richtig: t.form, wort: 'a:' + a.positiv, regel: 'steigerung-unregel',
+        merke: `Vor einem Nomen bekommt der Superlativ eine Endung: ${t.satz}` };
+    }
     const regel = { 1: 'steigerung-regel', 2: 'steigerung-umlaut', 3: 'steigerung-unregel' }[stufe];
     if (format === 'regel') {
       const bsp = nimmFrisch(ws.adjektive.filter((a) => a.schwierigkeit === 2), ctx, 3, (a) => 'a:' + a.positiv);
@@ -341,12 +349,12 @@ const THEMEN = {
         merke: as.map((a) => `${a.positiv} – ${a.komparativ}`).join(', ') + '.' };
     }
     const a = waehle(quelle, (x) => 'a:' + x.positiv, ctx);
-    const art = rng() < 0.5 ? 'komparativ' : 'superlativ';
+    const art = rng() < 0.35 ? 'komparativ' : 'superlativ'; // mehr Superlativ
     const richtig = a[art];
     const merke = `${ws.regelText(regel)} Hier: ${a.positiv} – ${a.komparativ} – ${a.superlativ}.`;
     const basis = { wort: 'a:' + a.positiv, regel, merke };
     if (format === 'buchstaben') return { ...basis, format, frage: `${art === 'komparativ' ? 'Komparativ' : 'Superlativ'} von „${a.positiv}“: Ergänze.`, ...luecken(richtig.replace('am ', ''), a.positiv, rng), vorsatz: art === 'superlativ' ? 'am' : '' };
-    if (format === 'eintippen') return { ...basis, format, frage: `Schreibe den Komparativ: ${a.positiv} → …`, loesung: a.komparativ };
+    if (format === 'eintippen') return { ...basis, format, frage: `Schreibe den ${art === 'komparativ' ? 'Komparativ' : 'Superlativ'}: ${a.positiv} → ${art === 'superlativ' ? 'am …' : '…'}`, loesung: richtig.replace('am ', '') };
     return { ...basis, format: 'luecke', frage: `Steigere „${a.positiv}“.`, satz: a.saetze[art].replace(richtig, '___'), optionen: optionen(richtig, falscheSteigerung(a, art), rng), richtig };
   },
 
@@ -517,7 +525,9 @@ export function mitRegeln(ws, themen) {
 // Einen Inhalt erzeugen. format: gewünschtes Format (sonst zufällig aus den erlaubten der Stufe).
 export function erzeugeInhalt(themen, thema, stufe, ctx, format = null) {
   const t = themen.themen.find((x) => x.id === thema);
-  const erlaubt = t.stufen[stufe - 1].formate.filter((f) => !ctx.nichtFormat || f !== ctx.nichtFormat || t.stufen[stufe - 1].formate.length === 1);
+  const alleF = t.stufen[stufe - 1].formate;
+  const ohne = alleF.filter((f) => f !== ctx.nichtFormat && f !== ctx.ohneFormat);
+  const erlaubt = ohne.length ? ohne : alleF;
   const f = format && erlaubt.includes(format) ? format : zufall(erlaubt, ctx.rng);
   const inhalt = THEMEN[thema](stufe, f, ctx);
   return { ...inhalt, thema, stufe };
@@ -565,21 +575,14 @@ export function satzOrdnenInhalt(ctx) {
 }
 
 // Kobold: Name des Geschenks mit fehlenden Buchstaben (dort, wo der Kobold den Fehler versteckt hat).
+// Kobold: Der verdrehte Name steht da, das Kind tippt den ganzen Namen richtig ein. Hat der Eintrag eine Fassung
+// mit zwei versteckten Fehlern (zwei), kommt meist diese.
 export function koboldInhalt(eintrag, ctx) {
-  const richtig = eintrag.richtig, falsch = eintrag.teile.join('');
-  // Lücke genau an der Fehlerstelle: gleicher Anfang und gleiches Ende abziehen, zwei bis drei Buchstaben
-  let vorn = 0;
-  while (vorn < richtig.length && richtig[vorn] === falsch[vorn]) vorn++;
-  let hinten = 0;
-  while (hinten < Math.min(richtig.length, falsch.length) - vorn && richtig.at(-1 - hinten) === falsch.at(-1 - hinten)) hinten++;
-  let von = vorn, bis = richtig.length - hinten;
-  // Nur ein Buchstabe anders oder fehlend: den Nachbarn dazunehmen (bei Doppelbuchstaben beide: Ha-mm-er)
-  if (bis - von === 0 || (bis - von === 1 && richtig[von] === richtig[von - 1])) von = Math.max(0, von - 1);
-  if (bis - von < 2) bis = Math.min(richtig.length, von + 2);
-  const luecke = [];
-  for (let i = von; i < Math.min(bis, von + 3); i++) luecke.push(i);
-  return { format: 'buchstaben', frage: `Der Kobold hat den Namen verdreht. Ergänze die fehlenden Buchstaben.`, ziel: richtig, luecken: luecke,
-    tasten: tasten(luecke.map((i) => richtig[i]), ctx.rng), wort: 'k:' + richtig, regel: 'doppel-kurz', thema: 'doppel', stufe: 2, merke: `${eintrag.erklaerung} Richtig: ${richtig}.` };
+  const zwei = eintrag.zwei && ctx.rng() < 0.7;
+  const falsch = zwei ? eintrag.zwei : eintrag.teile.join('');
+  return { format: 'eintippen', frage: `Der Kobold hat „${falsch}“ geschrieben. ${zwei ? 'Darin stecken zwei Fehler. ' : 'Darin steckt ein Fehler. '}Schreib den Namen richtig.`,
+    loesung: eintrag.richtig, falsch, wort: 'k:' + eintrag.richtig, regel: 'doppel-kurz', thema: 'doppel', stufe: 3,
+    merke: `${zwei ? eintrag.erklaerung2 : eintrag.erklaerung} Richtig: ${eintrag.richtig}.` };
 }
 
 // Ork-Rüstung: kurzer Satz mit einem Rechtschreibfehler (antippen und verbessern), passend zum Thema.

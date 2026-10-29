@@ -15,24 +15,26 @@ const data = prepareData({
   satzschmiede: json('satzschmiede.json'), wortschatz: json('wortschatz.json'),
 });
 
-// Zwei Strategien (js/sim.js): „zufall“ kauft irgendetwas Bezahlbares, „gut“ sammelt gleiche Gegenstände, baut
-// Komposita, nutzt die Sockel und den Händler. Ziele: Zufall 4–5 Siege und höchstens 15 % schaffen die Reise (Endboss
-// besiegt), gut 7–8 Siege und 40–50 %; Tag 1 für beide mindestens 80 %. Satzschmiede: Zufall Stufe 1, gut Stufe 3.
+// Drei Strategien (js/sim.js): „zufall“ kauft irgendetwas Bezahlbares, „gut“ sammelt gleiche Gegenstände, baut
+// Komposita, nutzt die Sockel und den Händler, „abwehr“ spielt ebenso, setzt aber auf Schutz und Heilung.
+// Ziele: Zufall 3–4 Siege, höchstens 10 % schaffen die Reise (Endboss besiegt); gut 6–7 Siege, 25–35 %;
+// Abwehr höchstens 10 Prozentpunkte unter gut; Tag 1 für alle mindestens 80 %. Satzschmiede: Zufall Stufe 1, sonst 3.
 test('600 Läufe je Strategie: Siege, Reise geschafft, Tag 1 und Spielzeit', (t) => {
   const zeile = (o) => Object.values(o).map((v) => String(v).padStart(4)).join('');
   const r = {};
-  for (const strategie of ['zufall', 'gut']) {
-    r[strategie] = summarize(simulateMany(data, 600, 5, { strategie, satzschmiede: strategie === 'gut' ? 3 : 1 }));
+  for (const strategie of ['zufall', 'gut', 'abwehr']) {
+    r[strategie] = summarize(simulateMany(data, 600, 5, { strategie, satzschmiede: strategie === 'zufall' ? 1 : 3 }));
     const x = r[strategie];
     t.diagnostic(`${strategie.padEnd(7)} Siegquote %:  ${zeile(x.siegquoteProTag)}`);
     t.diagnostic(`${strategie.padEnd(7)} Siege ${x.siegeDurchschnitt.toFixed(2)} · Reise geschafft ${x.reiseGeschafft} % · ${x.minutenDurchschnitt.toFixed(1)} min · Kampf ${x.kampfSekunden.toFixed(1)} s`);
   }
-  const z = r.zufall, g = r.gut;
-  assert.ok(z.siegeDurchschnitt >= 4 && z.siegeDurchschnitt <= 5, `Zufall: ${z.siegeDurchschnitt} Siege`);
-  assert.ok(z.reiseGeschafft <= 15, `Zufall: ${z.reiseGeschafft} % schaffen die Reise`);
-  assert.ok(g.siegeDurchschnitt >= 7 && g.siegeDurchschnitt <= 8, `gut: ${g.siegeDurchschnitt} Siege`);
-  assert.ok(g.reiseGeschafft >= 40 && g.reiseGeschafft <= 50, `gut: ${g.reiseGeschafft} % schaffen die Reise`);
-  for (const x of [z, g]) {
+  const z = r.zufall, g = r.gut, a = r.abwehr;
+  assert.ok(z.siegeDurchschnitt >= 3 && z.siegeDurchschnitt <= 4, `Zufall: ${z.siegeDurchschnitt} Siege`);
+  assert.ok(z.reiseGeschafft <= 10, `Zufall: ${z.reiseGeschafft} % schaffen die Reise`);
+  assert.ok(g.siegeDurchschnitt >= 6 && g.siegeDurchschnitt <= 7, `gut: ${g.siegeDurchschnitt} Siege`);
+  assert.ok(g.reiseGeschafft >= 25 && g.reiseGeschafft <= 35, `gut: ${g.reiseGeschafft} % schaffen die Reise`);
+  assert.ok(a.reiseGeschafft >= g.reiseGeschafft - 10, `Abwehr: ${a.reiseGeschafft} % gegenüber ${g.reiseGeschafft} %`);
+  for (const x of [z, g, a]) {
     assert.ok(x.siegquoteProTag[1] >= 80, `Tag 1: ${x.siegquoteProTag[1]} %`);
     assert.ok(x.minutenDurchschnitt >= 10 && x.minutenDurchschnitt <= 15, `Minuten: ${x.minutenDurchschnitt}`);
     assert.ok(x.kampfSekunden < 60, 'Kämpfe unter einer Minute');

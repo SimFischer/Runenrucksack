@@ -1,11 +1,19 @@
 {
-  "_hinweis": "Namen für den Zwielichtigen Kobold: teile = verdrehter Name in Wortteilen, fehler = Index des falschen Teils, richtig = Item-Name. Alle anderen Aufgaben entstehen aus wortschatz.json und themen.json.",
+  "_hinweis": "Namen für den Zwielichtigen Kobold (nur epische Gegenstände): teile = verdrehter Name mit einem Fehler in Wortteilen, fehler = Index des falschen Teils, richtig = Item-Name, erklaerung = Merkhilfe; zwei = Name mit zwei versteckten Fehlern (typische Fallen: Doppelkonsonant, Dehnungs-h, ie, ä/e, d/t, sp/st), erklaerung2 dazu. Das Kind tippt den ganzen Namen richtig ein. Alle anderen Aufgaben entstehen aus wortschatz.json und themen.json.",
   "kobold": [
     { "item": "drachenschuppe", "teile": ["Drachen", "schupe"], "fehler": 1, "richtig": "Drachenschuppe", "erklaerung": "Schuppe schreibt man mit pp." },
     { "item": "feuer+hammer", "teile": ["Feuer", "hamer"], "fehler": 1, "richtig": "Feuerhammer", "erklaerung": "Hammer schreibt man mit mm." },
-    { "item": "blitz+hammer", "teile": ["Bliz", "hammer"], "fehler": 0, "richtig": "Blitzhammer", "erklaerung": "Blitz schreibt man mit tz." },
-    { "item": "mond+laterne", "teile": ["Mond", "latterne"], "fehler": 1, "richtig": "Mondlaterne", "erklaerung": "Laterne schreibt man mit einem t." },
-    { "item": "eis+speer", "teile": ["Eis", "schpeer"], "fehler": 1, "richtig": "Eisspeer", "erklaerung": "Speer schreibt man mit Sp – man spricht schp, schreibt aber sp." },
-    { "item": "gift+speer", "teile": ["Gieft", "speer"], "fehler": 0, "richtig": "Giftspeer", "erklaerung": "Gift schreibt man mit kurzem i – ohne ie." }
+    { "item": "blitz+hammer", "teile": ["Bliz", "hammer"], "fehler": 0, "richtig": "Blitzhammer", "erklaerung": "Blitz schreibt man mit tz.", "zwei": "Blizhamer", "erklaerung2": "Blitz schreibt man mit tz, Hammer mit mm." },
+    { "item": "mond+laterne", "teile": ["Mond", "latterne"], "fehler": 1, "richtig": "Mondlaterne", "erklaerung": "Laterne schreibt man mit einem t.", "zwei": "Montlatterne", "erklaerung2": "Mond endet auf d (die Monde), Laterne hat nur ein t." },
+    { "item": "eis+speer", "teile": ["Eis", "schpeer"], "fehler": 1, "richtig": "Eisspeer", "erklaerung": "Speer schreibt man mit Sp – man spricht schp, schreibt aber sp.", "zwei": "Eisschpehr", "erklaerung2": "Speer schreibt man mit Sp und mit ee – ohne h." },
+    { "item": "gift+speer", "teile": ["Gieft", "speer"], "fehler": 0, "richtig": "Giftspeer", "erklaerung": "Gift schreibt man mit kurzem i – ohne ie.", "zwei": "Gieftspehr", "erklaerung2": "Gift hat ein kurzes i ohne e, Speer schreibt man mit ee und ohne h." },
+    { "item": "gold+hammer", "teile": ["Golt", "hammer"], "fehler": 0, "richtig": "Goldhammer", "erklaerung": "Gold endet auf d – verlängere: golden.", "zwei": "Golthamer", "erklaerung2": "Gold endet auf d (golden), Hammer schreibt man mit mm." },
+    { "item": "stein+laterne", "teile": ["Schtein", "laterne"], "fehler": 0, "richtig": "Steinlaterne", "erklaerung": "Stein schreibt man mit St – man spricht scht, schreibt aber st.", "zwei": "Schteinlatterne", "erklaerung2": "Stein schreibt man mit St, Laterne mit einem t." },
+    { "item": "sturm+speer", "teile": ["Sturm", "schpeer"], "fehler": 1, "richtig": "Sturmspeer", "erklaerung": "Speer schreibt man mit Sp.", "zwei": "Schturmschpeer", "erklaerung2": "Sturm schreibt man mit St, Speer mit Sp." },
+    { "item": "eis+laterne", "teile": ["Eis", "latärne"], "fehler": 1, "richtig": "Eislaterne", "erklaerung": "Laterne schreibt man mit e – es gibt kein verwandtes Wort mit a.", "zwei": "Eislattärne", "erklaerung2": "Laterne hat nur ein t und ein e statt ä." },
+    { "item": "mond+speer", "teile": ["Mont", "speer"], "fehler": 0, "richtig": "Mondspeer", "erklaerung": "Mond endet auf d – verlängere: die Monde.", "zwei": "Montspehr", "erklaerung2": "Mond endet auf d (die Monde), Speer schreibt man ohne h." },
+    { "item": "horn", "teile": ["Hohrn"], "fehler": 0, "richtig": "Horn", "erklaerung": "Horn schreibt man ohne Dehnungs-h." },
+    { "item": "gift+hammer", "teile": ["Gift", "hamer"], "fehler": 1, "richtig": "Gifthammer", "erklaerung": "Hammer schreibt man mit mm.", "zwei": "Giefthamer", "erklaerung2": "Gift hat ein kurzes i ohne e, Hammer schreibt man mit mm." },
+    { "item": "blitz+speer", "teile": ["Bliz", "speer"], "fehler": 0, "richtig": "Blitzspeer", "erklaerung": "Blitz schreibt man mit tz.", "zwei": "Blizspier", "erklaerung2": "Blitz schreibt man mit tz, Speer mit ee statt ie." }
   ]
 }

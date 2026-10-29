@@ -131,12 +131,15 @@ export function falscheFormen(v, person) {
 export function falscheSteigerung(a, stufe) {
   const p = a.positiv;
   const ohneUmlaut = (s) => s.replace(/[äöü]/, (c) => ({ ä: 'a', ö: 'o', ü: 'u' }[c]));
+  // Ablenker mit gleichem Wortanfang (kürzer / kurzer / kürzerer / kürzeste); Zweifelsfälle (gesünder und
+  // gesunder sind beide richtig) kommen nie als falsche Antwort vor.
+  const zweifel = (x) => !(a.zweifel || []).includes(x);
   if (stufe === 'komparativ') {
-    const k = [p + 'er', ohneUmlaut(a.komparativ), `mehr ${p}`, a.komparativ + 'er', umlaut(p) && umlaut(p) + 'er'];
-    return ohneDoppelte(k, a.komparativ).filter((x) => !x.includes('undefined'));
+    const k = [p + 'er', ohneUmlaut(a.komparativ), a.komparativ + 'er', umlaut(p) && umlaut(p) + 'er', a.superlativ.slice(3).replace(/n$/, '')];
+    return ohneDoppelte(k, a.komparativ).filter((x) => x && !x.includes('undefined') && zweifel(x));
   }
-  const s = [`am ${p}sten`, `am ${p}esten`, `am ${ohneUmlaut(a.superlativ.slice(3))}`, `am ${a.komparativ}sten`, `am meisten ${p}`];
-  return ohneDoppelte(s, a.superlativ);
+  const s = [`am ${p}sten`, `am ${p}esten`, `am ${ohneUmlaut(a.superlativ.slice(3))}`, `am ${a.komparativ}sten`, `am ${a.komparativ}en`];
+  return ohneDoppelte(s, a.superlativ).filter(zweifel);
 }
 
 // Alle richtigen Wortformen (für den Test „falsche Antworten sind nie zufällig ein anderes echtes Wort“).

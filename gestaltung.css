@@ -686,7 +686,8 @@ h2 .amboss { width: 40px; height: 26px; margin-right: 6px; }
 .hilfe-bild.wochenrune { background-image: url("assets/ui/satzschmiede/wochenrune.webp"); }
 
 /* ---------- Sockel: Mulden für Artikel-Siegel und Adjektiv-Runen ---------- */
-.sockel-leiste { position: absolute; left: 4px; top: 4px; display: flex; gap: 3px; z-index: 3; pointer-events: none; }
+.sockel-leiste { position: absolute; left: 50%; bottom: -7px; transform: translateX(-50%); display: flex; gap: 4px; z-index: 3; pointer-events: none;
+  padding: 2px 4px; border-radius: 99px; background: linear-gradient(180deg, #9a7a4a, #5a3d1e); box-shadow: 0 2px 3px rgba(0, 0, 0, .5), inset 0 1px 0 rgba(255, 230, 180, .5); }
 .mulde { width: var(--mulde); height: var(--mulde); display: grid; place-items: center; font-family: var(--font); font-weight: 700;
   font-size: calc(var(--mulde) * .55); line-height: 1; color: #fff; background: rgba(40, 24, 10, .55);
   box-shadow: inset 0 2px 3px rgba(0, 0, 0, .6), 0 1px 0 rgba(255, 255, 255, .35); }
@@ -698,3 +699,44 @@ h2 .amboss { width: 40px; height: 26px; margin-right: 6px; }
 .preview.sockel { background: rgba(255, 214, 90, .35); border-color: var(--gold-hell); }
 .satz-bestellung { margin: 0; font-size: 17px; line-height: 1.35; padding: 6px 12px; border-radius: 10px; background: #fbf2dc; border-left: 4px solid var(--gold); }
 .satz-bestellung small { color: var(--gold-dunkel); font-weight: 700; white-space: nowrap; }
+.design-wahl .sam-karte { cursor: pointer; font: inherit; color: inherit; }
+.design-wahl .sam-karte.an { outline: 4px solid var(--gold); }
+.design-wahl .sam-design { width: 180px; height: 135px; }
+
+/* ---------- Menü ---------- */
+.menue-knopf { display: inline-flex; align-items: center; gap: 6px; font-weight: 900; }
+.menue-knopf .sym { width: 26px; height: 26px; }
+.modal-card.menue-karte { width: min(760px, calc(100vw - 32px)); max-height: calc(var(--hoehe, 100vh) - 32px); box-sizing: border-box; overflow: hidden;
+  display: flex; flex-direction: column; align-items: stretch; gap: 10px; text-align: center; }
+.menue-karte h2 { margin: 0; }
+.menue-status { margin: 0; font-size: 15px; color: var(--tinte); }
+.menue-haupt { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; }
+.menue-haupt .btn { width: 100%; min-width: 0; }
+.menue-symbole { display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); gap: 8px; }
+.menue-symbol { display: flex; flex-direction: column; align-items: center; gap: 4px; padding: 8px 4px; min-width: 0; font-size: 14px; line-height: 1.15; white-space: normal; }
+.menue-symbol .sym.gross { width: 44px; height: 44px; }
+.menue-schalter { display: flex; align-items: center; justify-content: center; gap: 12px; font-weight: 700; }
+.schalter { display: inline-flex; align-items: center; gap: 8px; border: 2px solid #8a6438; border-radius: 99px; padding: 3px 12px 3px 3px; background: #d9c7a5; cursor: pointer; font: inherit; font-weight: 700; color: var(--tinte); }
+.schalter i { width: 26px; height: 26px; border-radius: 50%; background: #fff; box-shadow: 0 1px 3px rgba(0, 0, 0, .4); }
+.schalter.an { background: #7fbf5a; flex-direction: row-reverse; padding: 3px 3px 3px 12px; }
+.menue-loeschen { align-self: center; background: none; border: none; color: #8e2c20; text-decoration: underline; font: inherit; font-size: 13px; cursor: pointer; margin-top: 4px; }
+
+/* Pokal-Abzeichen in der Ecke der Figurenkarte */
+.figur-karte { position: relative; }
+.figur-pokal { position: absolute; right: 6px; top: 6px; z-index: 2; display: inline-flex; align-items: center; gap: 2px; padding: 2px 6px 2px 3px;
+  border-radius: 99px; background: rgba(40, 24, 10, .75); border: 1px solid var(--gold); pointer-events: none; }
+.figur-pokal .sym { width: 22px; height: 22px; }
+.figur-pokal b { color: var(--gold-hell); font-size: 14px; }
+.sam-sieg .sym { width: 26px; height: 26px; }
+.rang-feier-emoji .feier-bild { max-height: 150px; max-width: 200px; object-fit: contain; }
+.feier-design { width: 200px; height: 150px; margin: 0 auto; }
+.mulde img { width: 100%; height: 100%; object-fit: contain; }
+.mulde.leuchtet { background: #ffe58a; box-shadow: 0 0 0 2px #fff, 0 0 12px 4px #ffcf40; animation: mulde-puls .8s ease-in-out infinite alternate; }
+@keyframes mulde-puls { to { transform: scale(1.25); } }
+.item.ziel-passt { box-shadow: 0 0 0 3px #ffd65a, 0 0 18px #ffcf40; z-index: 4; }
+.item.ziel-nein { filter: grayscale(1) opacity(.45); }
+/* Kompositum-Hinweis im Laden: Band über dem Angebot */
+.slot { position: relative; }
+.komp-band { position: absolute; left: 50%; top: -4px; transform: translateX(-50%); z-index: 5; white-space: nowrap; cursor: pointer;
+  font-family: var(--font); font-size: 13px; font-weight: 700; color: #fff; padding: 2px 10px; border: 2px solid #ffe58a; border-radius: 99px;
+  background: linear-gradient(180deg, #3f8f62, #24603f); box-shadow: 0 2px 4px rgba(0, 0, 0, .5), 0 0 10px rgba(255, 220, 120, .6); }

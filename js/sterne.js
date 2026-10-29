@@ -2,10 +2,10 @@
 // - Zwei gleiche Gegenstände (gleiche id, gleiche Sternstufe) werden zu einem der nächsten Stufe – beim Kaufen,
 //   beim Ablegen direkt auf ein gleiches Item und bei Belohnungen. Das neue Item liegt dort, wo das schon
 //   vorhandene lag; gibt es dazu wieder ein gleiches, geht es weiter (Kette).
-// - Ein Kraft-Kristall direkt links neben oder über einem Träger wird mit ihm zum Kompositum.
+// - Ein Kraft-Kristall, den man auf einen Träger zieht, wird mit ihm zum Kompositum.
 // Vorher eine Grammatik-Frage: Kompositum → Artikel, Nomen → Mehrzahl, Verben → Präteritum, Runen → Steigerung.
 import { MAX_STERN, sternOf, bagGrid, STORE_GRID, findSpot, shuffle, SCHMIED, schmiedKosten } from './logic.js';
-import { isRune, runeBase, nextLevelId, pluralOf, findFusions } from './grammar.js';
+import { isRune, runeBase, nextLevelId, pluralOf, compoundId } from './grammar.js';
 import { istSockelTeil, sockelUebertragen } from './sockel.js';
 import { rahmenSatz } from './aufgaben/saetze.js';
 
@@ -167,12 +167,21 @@ export function findeVerbindung(run, defs, recipes, check) {
       : partnerOf(run.items, defs, p);
     if (alt) return { typ: 'paar', neu: p, alt };
   }
-  if (p.area === 'bag' && recipes) {
-    const f = findFusions(run.items.filter((q) => q.area === 'bag'), defs, recipes)
-      .find((x) => x.kraft.uid === p.uid || x.traeger.uid === p.uid);
-    if (f) return { typ: 'kompositum', kraft: f.kraft, traeger: f.traeger, id: f.id };
+  // Kristall auf einen Träger gezogen (check.auf: uid des Trägers) → Kompositum
+  if (check.auf && recipes) {
+    const t = run.items.find((q) => q.uid === check.auf);
+    const id = t && kompositumAus(p, t, defs, recipes);
+    if (id) return { typ: 'kompositum', kraft: p, traeger: t, id };
   }
   return null;
+}
+
+// Wird aus Kristall k und Träger t ein Kompositum? → seine id oder null
+export function kompositumAus(k, t, defs, recipes) {
+  const r = recipes.komposita;
+  if (!r.kraefte[k.id] || !r.traeger.includes(t.id)) return null;
+  const id = compoundId(k.id, t.id);
+  return defs[id] ? id : null;
 }
 
 export function fuehreAus(run, a, defs) {
@@ -249,6 +258,12 @@ export function frageFuer(a, defs, rng = Math.random, ws = null) {
 // kommt es in Rucksack oder Lager. Gibt false zurück, wenn es nirgends hinpasst – dann muss es weg
 // (beim Kauf: Gold zurück).
 export function nichtVerbinden(run, defs, a) {
+  // Gekaufter Kristall, der doch nicht verbunden wird: Der Kauf wird zurückgenommen
+  if (a.typ === 'kompositum') {
+    if (a.kraft.area !== 'neu') return true;
+    run.items = run.items.filter((p) => p !== a.kraft);
+    return false;
+  }
   if (a.typ !== 'paar' || a.neu.area !== 'neu') return true;
   if (placeWaiting(run, defs, a.neu)) return true;
   run.items = run.items.filter((p) => p !== a.neu);

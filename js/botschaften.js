@@ -13,6 +13,16 @@ export function waehleBrief(briefe, { gebiet, stufe, gelesen = [], rng = Math.ra
   return liste.length ? liste[Math.floor(rng() * liste.length)] : null;
 }
 
+// Mit Merkliste auf dem Gerät: Ein Brief kommt erst wieder, wenn alle Briefe seines Gebiets und seiner Stufe dran
+// waren – dann beginnt die Liste für diese Gruppe von vorn. Ergebnis: { brief, merkliste (neu, mit dem gewählten Brief) }
+export function waehleBriefMerk(briefe, { gebiet, stufe, merkliste = [], gelesen = [], rng = Math.random }) {
+  const gruppe = briefe.filter((b) => b.gebiet === gebiet && b.schwierigkeit === stufe);
+  let merk = merkliste;
+  if (gruppe.length && gruppe.every((b) => merk.includes(b.id) || gelesen.includes(b.id))) merk = merk.filter((id) => !gruppe.some((b) => b.id === id));
+  const brief = waehleBrief(briefe, { gebiet, stufe, gelesen: [...new Set([...merk, ...gelesen])], rng });
+  return { brief, merkliste: brief && !merk.includes(brief.id) ? [...merk, brief.id] : merk };
+}
+
 // Antworten auswerten: antworten = gewählte Antwort je Frage (in Reihenfolge).
 // Ergebnis: { belohnungen (für jede richtige Antwort ihre Belohnung, bei einem Fehler zusätzlich der Trost),
 //   falsch: [{ frage, textstelle }] (diese Stellen werden im Text markiert), alleRichtig }

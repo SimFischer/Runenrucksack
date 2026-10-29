@@ -5,7 +5,7 @@ import { begleiterFrei } from './begleiter.js';
 import { toast } from './ui.js';
 import { sym } from './symbole.js';
 
-export const fortschrittCtx = () => ({ achievements: G.ACH, buch: G.BUCH, heroes: G.HEROES });
+export const fortschrittCtx = () => ({ achievements: G.ACH, buch: G.BUCH, heroes: G.HEROES, begleiter: G.BEGLEITER, items: G.ITEMS });
 
 // Gewähltes Rucksack-Design anwenden (nur Optik).
 export function wendeDesignAn() {
@@ -36,7 +36,7 @@ export function zeigeSammlung(zurueck = null) {
       }).join('');
     } else if (tab === 'begleiter') {
       inhalt = G.BEGLEITER.map((b) => {
-        const frei = begleiterFrei(b, rang);
+        const frei = begleiterFrei(b, G.PROFIL.xp);
         return `<div class="sam-karte${frei ? '' : ' gesperrt'}">
           <div class="sam-bild"><img src="assets/ui/begleiter/${b.id}.webp" alt="">${frei ? '' : `<span class="sam-schloss">${sym('schloss')}</span>`}</div>
           <b>${frei ? b.name : '???'}</b><small>${frei ? b.rolle : ''}</small>
@@ -59,7 +59,7 @@ export function zeigeSammlung(zurueck = null) {
       }).join('');
     }
     const zahl = tab === 'figuren' ? `${G.HEROES.filter((h) => figurFrei(G.PROFIL, h)).length} von ${G.HEROES.length}`
-      : tab === 'begleiter' ? `${G.BEGLEITER.filter((b) => begleiterFrei(b, rang)).length} von ${G.BEGLEITER.length}`
+      : tab === 'begleiter' ? `${G.BEGLEITER.filter((b) => begleiterFrei(b, G.PROFIL.xp)).length} von ${G.BEGLEITER.length}`
       : tab === 'designs' ? `${G.ACH.designs.filter((d) => designFrei(G.PROFIL, d)).length} von ${G.ACH.designs.length}`
         : `${G.PROFIL.erfolge.length} von ${G.ACH.erfolge.length}`;
     box.innerHTML = `<div class="buch-card sam-card">
@@ -78,5 +78,25 @@ export function zeigeSammlung(zurueck = null) {
       };
     });
   };
+  zeichne();
+}
+
+// Vor dem Lauf (nach Figur und Begleiter): Rucksack-Design wählen – nur, wenn schon mehr als eines frei ist.
+export function zeigeDesignWahl(weiter) {
+  const frei = G.ACH.designs.filter((d) => designFrei(G.PROFIL, d));
+  if (frei.length < 2) { weiter(); return; }
+  const box = document.createElement('div');
+  box.id = 'sammlung-layer';
+  const zeichne = () => {
+    box.innerHTML = `<div class="buch-card sam-card design-wahl">
+      <header class="buch-head"><h2>Welcher Rucksack kommt mit?</h2><button class="btn primary big" data-los>Aufbrechen</button></header>
+      <div class="sam-grid">${frei.map((d) => `<button class="sam-karte${G.PROFIL.design === d.id ? ' an' : ''}" data-design="${d.id}">
+        <div class="sam-design" data-design-vorschau="${d.id}"></div><b>${d.name}</b><p>${d.text}</p></button>`).join('')}</div></div>`;
+    box.querySelectorAll('[data-design]').forEach((b) => {
+      b.onclick = () => { G.PROFIL.design = b.dataset.design; saveProfil(); wendeDesignAn(); zeichne(); };
+    });
+    box.querySelector('[data-los]').onclick = () => { box.remove(); weiter(); };
+  };
+  document.body.append(box);
   zeichne();
 }

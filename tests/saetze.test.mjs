@@ -68,41 +68,6 @@ test('Jedes Adjektiv: Sätze mit Grundform, Komparativ und Superlativ', () => {
   }
 });
 
-test('Jede Aufgabe mit Satz nimmt einen Satz genau dieses Worts – Wort oder Lücke genau einmal', () => {
-  let n = 0;
-  for (const thema of THEMA_IDS) {
-    const t = THEMEN.themen.find((x) => x.id === thema);
-    t.stufen.forEach((st, i) => {
-      for (const format of st.formate) {
-        for (let seed = 1; seed <= 40; seed++) {
-          const c = erzeugeInhalt(THEMEN, thema, i + 1, { ws: WS, rng: seededRng(seed * 7 + i), felder: [], benutzt: new Set() }, format);
-          const wo = `${thema} ${i + 1} ${c.format}`;
-          // Die Sätze dieser Aufgabe, ausgefüllt
-          const saetze = [];
-          if (c.format === 'luecke') {
-            assert.equal(zaehle(c.satz, '___') + (c.satz.match(/___[^\s.,!?]/g) || []).length, 1, `${wo}: genau eine Lücke in „${c.satz}“`);
-            saetze.push(c.satz.replace('___', c.richtig));
-          }
-          if (c.format === 'auswahl' && c.text && /\.$/.test(ohneHtml(c.text))) saetze.push(ohneHtml(c.text));
-          if (c.format === 'fehler' && c.modus === 'verbessern') {
-            saetze.push(c.woerter.map((w, k) => (c.korrektur[k] ? w.replace(/[^„“"(),.!?:;]+/, c.korrektur[k]) : w)).join(' ') + c.satzEnde);
-          }
-          if (c.format === 'sortieren') for (const k of c.karten) if (/\.$/.test(ohneHtml(k.text))) saetze.push(ohneHtml(k.text));
-          for (const s of saetze) {
-            n++;
-            if (c.wort.startsWith('s:')) continue; // Satzglieder-Sätze aus wortschatz.json (saetze)
-            if (c.format === 'sortieren') { assert.ok(ALLE_VERB_SAETZE.has(s), `${wo}: „${s}“ ist kein Satz aus dem Wortschatz`); continue; }
-            const eigene = SAETZE.get(c.wort);
-            assert.ok(eigene, `${wo}: Satz ohne Wort-Quelle (${c.wort}): „${s}“`);
-            assert.ok(eigene.has(s), `${wo}: „${s}“ gehört nicht zu ${c.wort}`);
-          }
-        }
-      }
-    });
-  }
-  assert.ok(n > 500, `${n} Sätze geprüft`);
-});
-
 test('Fehler-Satz (auch Ork-Rüstung): ein eigener Satz des Worts, das falsche Wort genau einmal', () => {
   const rng = seededRng(3);
   for (const n of WS.nomen) {

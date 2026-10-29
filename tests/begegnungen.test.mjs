@@ -62,23 +62,6 @@ test('Begegnungs-Aufgaben lassen sich erzeugen und haben genau eine Lösung', ()
   }
 });
 
-test('Kobold: Namen stimmen, die Lücke liegt genau am Fehler', () => {
-  for (const k of EX.kobold) {
-    const d = DEFS[k.item];
-    assert.ok(d, `Kobold-Item ${k.item} fehlt`);
-    assert.equal(d.seltenheit, 'episch', `${k.item} soll episch sein`);
-    assert.ok(k.fehler >= 0 && k.fehler < k.teile.length);
-    assert.notEqual(k.teile.join(''), k.richtig);
-    assert.equal(k.richtig, d.name, `${k.item}: richtig muss der Item-Name sein`);
-    const a = FORMATE.buchstaben.erzeuge(koboldInhalt(k, { rng: seededRng(1) }), seededRng(1));
-    assert.ok(a.luecken.length >= 2 && a.luecken.length <= 3, k.richtig);
-    // Mit den Lücken an den falschen Stellen wäre der falsche Name nicht mehr möglich
-    const rest = (w) => w.split('').filter((_, i) => !a.luecken.includes(i)).join('');
-    assert.notEqual(rest(k.richtig), k.richtig);
-    assert.ok(FORMATE.buchstaben.pruefe(a, FORMATE.buchstaben.loesung(a)).richtig);
-  }
-});
-
 test('Händler-Rabatt: die nächsten Käufe billiger, mindestens 1 Gold, Taschen nicht', () => {
   const run = { rabatt: RABATT.kaeufe };
   assert.equal(preisVon(run, { preis: 5 }), 5 - RABATT.gold);

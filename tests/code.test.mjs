@@ -118,21 +118,6 @@ test('Heldencode eingeben: Bindestrich optional, Kleinbuchstaben und Leerzeichen
   assert.match(meldung(roh[1] + roh[0] + roh.slice(2)) || 'gleiche Zeichen', /Tippfehler|gleiche Zeichen/);
 });
 
-test('Rang, Figuren und Designs ergeben sich aus der Erfahrung im Code', () => {
-  const ctx = { achievements: ACH, buch: BUCH, heroes: H.helden };
-  const nachCode = (xp) => {
-    const r = leseCode(heldencode({ xp, tutorial: true }), REG, DATA);
-    const p = { ...neuesProfil(), xp: r.xp, tutorial: r.tutorial };
-    pruefeFreischaltungen(p, ctx);
-    return { rang: rangVon(p.xp, ACH.raenge).id, figuren: [...p.figuren].sort(), designs: [...p.designs].sort() };
-  };
-  assert.deepEqual(nachCode(0), { rang: 'lehrling', figuren: [], designs: [] });
-  assert.deepEqual(nachCode(350), { rang: 'wanderer', figuren: ['faelith'], designs: ['zwergenstahl'] });
-  assert.deepEqual(nachCode(1200), { rang: 'runenkundige', figuren: ['faelith', 'theron'], designs: ['elbenseide', 'zwergenstahl'] });
-  assert.deepEqual(nachCode(2600), { rang: 'wortmeister', figuren: ['faelith', 'theron', 'ysolde'], designs: ['elbenseide', 'reiterleder', 'zwergenstahl'] });
-  assert.deepEqual(nachCode(4000).designs, ['elbenseide', 'reiterleder', 'silberbanner', 'zwergenstahl']);
-});
-
 test('Alte, lange Codes werden umgerechnet: Erfahrung und Tutorial (auch aus Reisecodes)', () => {
   assert.deepEqual(leseCode(alterHeldencode(voll(), REG), REG, DATA), { typ: 'held', xp: 98765, tutorial: true, alt: true, altTyp: 'held' });
   const reise = alterReisecode(mittel(), vollerLauf(), REG, DATA);

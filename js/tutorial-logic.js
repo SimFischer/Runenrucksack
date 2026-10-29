@@ -174,7 +174,8 @@ export function checkStep(step, run, defs, recipes, ev = null) {
       ok = ev?.typ === 'drehen' && baseId(ev.id, defs) === a.item;
       break;
     case 'neben':
-      ok = findFusions(bagItems(run), defs, recipes).some((f) => f.kraft.id === a.kraft && f.traeger.id === a.traeger);
+      // Kristall auf den Träger gezogen (Ereignis aufTraeger) – oder das Kompositum ist schon da
+      ok = (ev?.typ === 'aufTraeger' && ev.kraft === a.kraft && baseId(ev.traeger, defs) === a.traeger) || !!find(run, `${a.kraft}+${a.traeger}`, 'bag');
       break;
     case 'verschmelzen': // das Kompositum entsteht sofort, sobald der Kristall richtig liegt
       ok = !!find(run, a.ergebnis, 'bag');

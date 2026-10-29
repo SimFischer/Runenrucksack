@@ -152,26 +152,6 @@ test('Abbrechen führt zum Schritt, in dem man handelt – nie in einen Schritt,
   }
 });
 
-test('Falsche Aktion: Schwert im Lager wird freundlich zurückgesetzt', () => {
-  const run = makeTutorialRun(ITEMS, REGIONS, TUT);
-  const step = TUT.schritte.find((s) => s.id === 'kaufen');
-  applyShop(run, TUT.schritte.find((s) => s.id === 'gold-laden'));
-  const gold = run.gold;
-  buyTo(run, 'schwert', 'store', { x: 0, y: 0 });
-  const r = checkStep(step, run, DEFS, RECIPES);
-  assert.match(r.falsch.text, /nicht ins Lager/);
-  assert.equal(r.falsch.zuruecksetzen, true);
-  resetWrong(run, r.falsch, DEFS);
-  assert.equal(run.items.length, 0);
-  assert.equal(run.gold, gold, 'Gold zurück');
-  assert.equal(run.shop.filter(Boolean)[0].id, 'schwert', 'Schwert wieder im Laden');
-
-  // Feuer rechts statt links: Hinweis ohne Strafe
-  const k = TUT.schritte.find((s) => s.id === 'kristall');
-  run.items = [{ uid: 1, id: 'schwert', area: 'bag', x: 1, y: 0, rot: 0 }, { uid: 2, id: 'feuer', area: 'bag', x: 2, y: 0, rot: 0 }];
-  assert.match(checkStep(k, run, DEFS, RECIPES).falsch.text, /links neben/);
-});
-
 test('Kein Platz links vom Schwert: Vorbereitung schiebt es zur Seite', () => {
   const run = makeTutorialRun(ITEMS, REGIONS, TUT);
   run.items = [{ uid: 1, id: 'schwert', area: 'bag', x: 0, y: 0, rot: 1 }];

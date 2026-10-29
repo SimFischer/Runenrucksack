@@ -1,5 +1,5 @@
 {
-  "_hinweis": "Startfiguren, Unterklassen und Schicksalsrunen. bonus gilt den ganzen Lauf: filter wählt Items aus (art, id, kraft, traeger, wortfeld), prozent verstärkt ihre Wirkung, abklingzeit verändert die Abklingzeit in Prozent (negativ = schneller). start: Items mit Position im Rucksack. extra: besondere Fähigkeit (fernsicht: Laden zeigt mögliche Komposita mit allem, was man besitzt; siegelStartblock: Startblock für Nomen mit passendem Siegel; runenZiele: 2 = jedes Nomen hat einen Adjektiv-Sockel mehr). rolle: ein Wort für die Figurenwahl, faehigkeit: ein Satz für die Detailtafel. freischaltung: Bedingung, ab der die Figur wählbar ist (rang: Rang-Nummer, gewonnen: gewonnene Läufe, buch: Einträge im Buch der Wörter); ohne freischaltung ist sie von Anfang an frei. effekt (Unterklassen und Schicksalsrunen) kann enthalten: mod (wie bonus), tempo (Prozent für alle Items), lebenProTag, siegelBonus (0.5 = +50 %), runenFaktor, ladenPlaetze, goldProTag.",
+  "_hinweis": "Startfiguren, Unterklassen und Schicksalsrunen. bonus gilt den ganzen Lauf: filter wählt Items aus (art, id, kraft, traeger, wortfeld), prozent verstärkt ihre Wirkung, abklingzeit verändert die Abklingzeit in Prozent (negativ = schneller). start: Items mit Position im Rucksack. extra: besondere Fähigkeit (fernsicht: Laden zeigt mögliche Komposita mit allem, was man besitzt; siegelStartblock: Startblock für Nomen mit passendem Siegel; runenZiele: 2 = jedes Nomen hat einen Adjektiv-Sockel mehr). rolle: ein Wort für die Figurenwahl, faehigkeit: ein Satz für die Detailtafel. freischaltung: Bedingung, ab der die Figur wählbar ist (xp: Erfahrung, rang: Rang-Nummer, gewonnen: gewonnene Läufe, buch: Einträge im Buch der Wörter); ohne freischaltung ist sie von Anfang an frei. effekt (Unterklassen und Schicksalsrunen) kann enthalten: mod (wie bonus), tempo (Prozent für alle Items), lebenProTag, siegelBonus (0.5 = +50 %), runenFaktor, ladenPlaetze, goldProTag.",
   "helden": [
     {
       "id": "borga",
@@ -136,7 +136,7 @@
         "fernsicht": true
       },
       "freischaltung": {
-        "rang": 2
+        "xp": 480
       },
       "start": [
         {
@@ -191,7 +191,7 @@
         "siegelStartblock": 3
       },
       "freischaltung": {
-        "rang": 3
+        "xp": 1250
       },
       "start": [
         {
@@ -246,7 +246,7 @@
         "runenZiele": 2
       },
       "freischaltung": {
-        "rang": 4
+        "xp": 2200
       },
       "start": [
         {

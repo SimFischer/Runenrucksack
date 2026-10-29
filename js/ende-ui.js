@@ -9,7 +9,8 @@ import { themenBericht } from './aufgaben/wahl.js';
 import { sym, bild } from './symbole.js';
 
 const rangBalken = (r) => {
-  const pct = r.naechster ? Math.round(((G.PROFIL.xp - r.ab) / (r.naechster.ab - r.ab)) * 100) : 100;
+  const von = r.stufeAb ?? r.ab;
+  const pct = r.naechster ? Math.round(((G.PROFIL.xp - von) / (r.naechster.ab - von)) * 100) : 100;
   return `<div class="rang-zeile"><span class="rang-emoji">${sym('stern')}</span><span><b>${r.name}</b>
     <span class="rang-bar"><i style="width:${pct}%"></i></span>
     <small>${r.naechster ? `noch ${r.bisNaechster} Erfahrung bis ${r.naechster.name}` : 'Höchster Rang erreicht!'}</small></span></div>`;
@@ -38,6 +39,8 @@ export function zeigeLaufende(run, abschluss, aktionen) {
     ...a.frei.figuren.map((id) => { const h = G.HEROES.find((x) => x.id === id); return `<div class="frei-neu">${figurBild(id) ? `<img src="${figurBild(id)}" alt="">` : ''}<span><small>Neue Figur frei!</small><b>${h.name}</b></span></div>`; }),
     ...(a.erfolge || []).map((id) => { const e = G.ACH.erfolge.find((x) => x.id === id); return `<div class="frei-neu"><span class="frei-emoji">${sym('pokal')}</span><span><small>Neuer Erfolg!</small><b>${e.name}</b></span></div>`; }),
     ...a.frei.designs.map((id) => { const d = G.ACH.designs.find((x) => x.id === id); return `<div class="frei-neu"><span class="frei-emoji">${sym('truhe')}</span><span><small>Neues Rucksack-Design!</small><b>${d.name}</b></span></div>`; }),
+    ...(a.frei.begleiter || []).map((id) => { const b = G.BEGLEITER.find((x) => x.id === id); return `<div class="frei-neu"><img src="assets/ui/begleiter/${id}.webp" alt=""><span><small>Neuer Begleiter!</small><b>${b.name}</b></span></div>`; }),
+    ...(a.frei.items || []).map((id) => `<div class="frei-neu"><span><small>Neu im Laden!</small><b>${G.DEFS[id].name}</b></span></div>`),
   ].join('') : '';
   document.getElementById('tip-bubble')?.remove(); // offene Erste-Mal-Tipps gehören zum Lauf
   const code = a ? aktuellerHeldencode() : null;
@@ -50,7 +53,10 @@ export function zeigeLaufende(run, abschluss, aktionen) {
       <div class="row"><button class="btn primary big" data-act="neu">Neuer Lauf</button><button class="btn" data-act="home">Zum Start</button></div>`,
   { neu: aktionen.neu, home: aktionen.home }, 'wide ende');
   if (code) kopierenAn(card, code);
-  if (a?.aufgestiegen) setTimeout(() => rangFeier(a.nachher), 700);
+  // Feiern nacheinander: neuer Rang, dann jede Freischaltung einzeln
+  const feiern = [...(a?.aufgestiegen ? [() => rangFeier(a.nachher, weiterFeiern)] : []), ...freischaltFeiern(a?.frei)];
+  const weiterFeiern = () => feiern.shift()?.();
+  if (feiern.length) setTimeout(weiterFeiern, 700);
 }
 
 // Lernbericht: Siege, neue Entdeckungen, „Das sitzt schon“ und „Das üben wir noch“ – freundlich, ohne Noten.
@@ -73,7 +79,45 @@ function berichtHtml(run, a) {
 }
 
 // Feier-Einblendung beim Aufstieg in einen neuen Rang.
-export function rangFeier(r) {
+// Eine Feier je Freischaltung: Figur, Begleiter, Rucksack-Design (mit Vorschau) oder neuer Gegenstand im Laden
+function freischaltFeiern(frei) {
+  if (!frei) return [];
+  const eintrag = (titel, name, bildHtml, text) => (weiter) => feier({ titel, name, bildHtml, text }, weiter);
+  return [
+    ...frei.figuren.map((id) => { const h = G.HEROES.find((x) => x.id === id); return eintrag('Neue Figur frei!', h.name, figurBild(id) ? `<img class="feier-bild" src="${figurBild(id)}" alt="">` : sym('stern', 'gross'), h.faehigkeit || h.staerke); }),
+    ...(frei.begleiter || []).map((id) => { const b = G.BEGLEITER.find((x) => x.id === id); return eintrag('Neuer Begleiter frei!', `${b.artikel} ${b.name}`, `<img class="feier-bild" src="assets/ui/begleiter/${id}.webp" alt="">`, b.text); }),
+    ...frei.designs.map((id) => { const d = G.ACH.designs.find((x) => x.id === id); return eintrag('Neues Rucksack-Design!', d.name, `<div class="sam-design feier-design" data-design-vorschau="${id}"></div>`, `${d.text} Du kannst es vor dem nächsten Lauf wählen.`); }),
+    ...(frei.items || []).map((id) => { const d = G.DEFS[id]; return eintrag('Neu im Laden!', `${d.artikel} ${d.name}`, iconHtml(d, 'feier-bild'), 'Ab jetzt kann dieser Gegenstand im Laden auftauchen.'); }),
+  ];
+}
+
+function feier({ titel, name, bildHtml, text }, weiter) {
+  const box = document.createElement('div');
+  box.className = 'rang-feier';
+  box.innerHTML = `<div class="rang-feier-card">
+      <div class="rang-feier-emoji">${bildHtml}</div>
+      <small>${titel}</small>
+      <h2>${name}</h2>
+      <p>${text}</p>
+      <button class="btn primary big">Weiter</button>
+    </div>`;
+  funken(box);
+  document.body.append(box);
+  box.querySelector('button').onclick = () => { box.remove(); weiter?.(); };
+}
+
+function funken(box) {
+  for (let i = 0; i < 24; i++) {
+    const s = document.createElement('span');
+    s.className = 'rang-funke';
+    s.textContent = '★';
+    s.style.setProperty('--w', `${(i / 24) * 360}deg`);
+    s.style.animationDelay = `${(i % 6) * 60}ms`;
+    box.append(s);
+  }
+}
+
+export function rangFeier(r, weiter = null) {
   const box = document.createElement('div');
   box.className = 'rang-feier';
   box.innerHTML = `<div class="rang-feier-card">
@@ -83,14 +127,7 @@ export function rangFeier(r) {
       <p>Du bist aufgestiegen – die Wanderlande staunen.</p>
       <button class="btn primary big">Juhu!</button>
     </div>`;
-  for (let i = 0; i < 24; i++) {
-    const s = document.createElement('span');
-    s.className = 'rang-funke';
-    s.textContent = '★';
-    s.style.setProperty('--w', `${(i / 24) * 360}deg`);
-    s.style.animationDelay = `${(i % 6) * 60}ms`;
-    box.append(s);
-  }
+  funken(box);
   document.body.append(box);
-  box.querySelector('button').onclick = () => box.remove();
+  box.querySelector('button').onclick = () => { box.remove(); weiter?.(); };
 }

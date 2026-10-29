@@ -17,6 +17,8 @@ export const battleControl = {
   start: () => { if (!$('btn-start-battle').hidden) beginBattle(); },
   pause: () => { paused = true; },
   resume: () => { paused = false; },
+  // Zum Hauptmenü im Kampf: Kampf abbrechen, ohne ihn zu werten – der Lauf geht vor diesem Kampf weiter
+  abbrechen: () => { cancelAnimationFrame(rafId); battle = null; paused = false; },
 };
 
 // Feste Bereiche der Kampfszene (siehe gestaltung.css): Mitte 150 px für VS und „Los!“, je Seite eine Spalte

@@ -1,5 +1,5 @@
 {
-  "_hinweis": "Briefe für „Botschaften lesen“ (Thema Leseverständnis). Ein Brief kommt an manchen Morgen statt der Begegnung (etwa jeder dritte Tag, nie zwei Tage hintereinander). gebiet: in welchem Gebiet er kommt. schwierigkeit 1–3 (passend zum Lernstand im Thema lesen). text: 60–120 Wörter, kurze Sätze, Klasse 5. fragen: 1–2 Fragen, art finden (Information im Text), schliessen (Schlussfolgerung), wort (Wortbedeutung aus dem Zusammenhang); antworten 3–4, richtig = genau eine davon, textstelle = wörtliche Stelle im Text, die die Antwort belegt (wird bei einer falschen Antwort markiert); belohnung bei richtiger Antwort: { typ: item, id } oder { typ: gold, menge }. trost: kleine Belohnung, wenn eine Antwort falsch war.",
+  "_hinweis": "Briefe für „Botschaften lesen“ (Thema Leseverständnis). Ein Brief kommt an manchen Morgen statt der Begegnung (etwa jeder dritte Tag, nie zwei Tage hintereinander). gebiet: in welchem Gebiet er kommt. schwierigkeit 1–3 (passend zum Lernstand im Thema lesen). text: 60–120 Wörter, kurze Sätze, Klasse 5. fragen: 1–2 Fragen, art finden (Information im Text), schliessen (Schlussfolgerung), wort (Wortbedeutung), reihenfolge (was zuerst, was danach), zusammenhang (Wort aus dem Zusammenhang verstehen), stimmung (wie fühlt sich der Absender), widerspruch (was passt nicht zusammen); antworten 3–4, richtig = genau eine davon, textstelle = wörtliche Stelle im Text, die die Antwort belegt (wird bei einer falschen Antwort markiert); belohnung bei richtiger Antwort: { typ: item, id } oder { typ: gold, menge }. trost: kleine Belohnung, wenn eine Antwort falsch war. Ein Brief kommt erst wieder, wenn alle Briefe seines Gebiets und seiner Stufe dran waren (Merkliste auf dem Gerät).",
   "briefe": [
     {
       "id": "kw-mila-garten",
@@ -762,6 +762,1666 @@
         }
       ],
       "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "kw-wiebke-schaf",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 1,
+      "absender": "Schäferin Wiebke",
+      "text": "Hilfe! Mein kleines Schaf Flocke ist weg. Gestern Abend war es noch auf der Weide hinter der Mühle. Heute Morgen war das Gatter offen. Flocke ist ganz weiß und hat ein schwarzes Ohr. Sie hat Angst vor lauten Geräuschen. Bitte ruf nicht laut nach ihr, sonst läuft sie weg. Sie mag Äpfel sehr gern. Wenn du sie findest, bring sie bitte zur Mühle. Ich warte dort jeden Abend. Deine Wiebke",
+      "fragen": [
+        {
+          "art": "finden",
+          "frage": "Woran erkennt man Flocke?",
+          "antworten": [
+            "an einem schwarzen Ohr",
+            "an einer roten Glocke",
+            "an einem braunen Fleck am Bein",
+            "an einem langen Schwanz"
+          ],
+          "richtig": "an einem schwarzen Ohr",
+          "textstelle": "Flocke ist ganz weiß und hat ein schwarzes Ohr.",
+          "belohnung": {
+            "typ": "item",
+            "id": "apfel"
+          }
+        },
+        {
+          "art": "schliessen",
+          "frage": "Wie suchst du Flocke am besten?",
+          "antworten": [
+            "leise und mit einem Apfel",
+            "mit einer lauten Trommel",
+            "mit vielen bellenden Hunden"
+          ],
+          "richtig": "leise und mit einem Apfel",
+          "textstelle": "Bitte ruf nicht laut nach ihr, sonst läuft sie weg.",
+          "belohnung": {
+            "typ": "gold",
+            "menge": 2
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "kw-frieda-tagebuch",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 1,
+      "absender": "Frieda aus Kleinwurzel",
+      "text": "Aus meinem Tagebuch: Heute war ein aufregender Tag. Am Morgen habe ich die Hühner gefüttert. Danach bin ich mit Opa zum Bach gegangen. Dort haben wir einen Frosch gesehen, der ganz grün glänzte. Am Mittag gab es Kartoffelsuppe. Am Nachmittag kam eine Heldin durch unser Dorf. Sie trug einen Rucksack voller Schätze. Ich möchte später auch auf Reisen gehen. Vorher muss ich aber noch lesen und rechnen üben. Gute Nacht, liebes Tagebuch! Deine Frieda",
+      "fragen": [
+        {
+          "art": "reihenfolge",
+          "frage": "Was hat Frieda zuerst gemacht?",
+          "antworten": [
+            "die Hühner gefüttert",
+            "mit Opa zum Bach gegangen",
+            "Kartoffelsuppe gegessen",
+            "die Heldin gesehen"
+          ],
+          "richtig": "die Hühner gefüttert",
+          "textstelle": "Am Morgen habe ich die Hühner gefüttert.",
+          "belohnung": {
+            "typ": "item",
+            "id": "brot"
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "kw-aushang-markt",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 1,
+      "absender": "Bürgermeister Edwin (Aushang am Dorfplatz)",
+      "text": "Achtung, liebe Leute aus Kleinwurzel! Am Samstag ist Herbstmarkt auf dem Dorfplatz. Der Markt beginnt, wenn die Kirchturmglocke zehnmal schlägt. Es gibt frisches Brot, Honig und große Kürbisse. Kinder dürfen auf dem Pony von Bauer Kalle reiten. Wer einen Stand möchte, meldet sich bis Freitag bei mir. Bitte bringt eigene Körbe mit. Bei Regen fällt der Markt nicht aus. Dann ziehen wir in die große Scheune. Euer Bürgermeister Edwin",
+      "fragen": [
+        {
+          "art": "finden",
+          "frage": "Wo ist der Markt, wenn es regnet?",
+          "antworten": [
+            "in der großen Scheune",
+            "in der Mühle",
+            "im Gasthaus",
+            "im Wald"
+          ],
+          "richtig": "in der großen Scheune",
+          "textstelle": "Dann ziehen wir in die große Scheune.",
+          "belohnung": {
+            "typ": "item",
+            "id": "honig"
+          }
+        },
+        {
+          "art": "zusammenhang",
+          "frage": "Was ist mit „Stand“ hier gemeint?",
+          "antworten": [
+            "ein Tisch, an dem man etwas verkauft",
+            "ein Platz, an dem man stehen muss",
+            "ein Stall für Ponys"
+          ],
+          "richtig": "ein Tisch, an dem man etwas verkauft",
+          "textstelle": "Wer einen Stand möchte, meldet sich bis Freitag bei mir.",
+          "belohnung": {
+            "typ": "gold",
+            "menge": 2
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "kw-alma-rezept",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 1,
+      "absender": "Kräuterfrau Alma",
+      "text": "Liebe Heldin, lieber Held! Hier ist mein Rezept für Kürbissuppe. Du brauchst einen kleinen Kürbis, eine Zwiebel und etwas Salz. Schneide zuerst den Kürbis in Würfel. Dann schneidest du die Zwiebel klein. Brate beides kurz in einem Topf an. Gieße danach Wasser dazu, bis alles bedeckt ist. Lass die Suppe so lange kochen, bis der Kürbis weich ist. Zum Schluss rührst du sie gut um. Die Suppe wärmt dich in kalten Nächten. Deine Alma",
+      "fragen": [
+        {
+          "art": "reihenfolge",
+          "frage": "Was machst du, bevor du Wasser dazugießt?",
+          "antworten": [
+            "Kürbis und Zwiebel anbraten",
+            "die Suppe umrühren",
+            "die Suppe essen",
+            "Salz kaufen"
+          ],
+          "richtig": "Kürbis und Zwiebel anbraten",
+          "textstelle": "Brate beides kurz in einem Topf an.",
+          "belohnung": {
+            "typ": "item",
+            "id": "kuerbis"
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "kw-kalle-einladung",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 1,
+      "absender": "Bauer Kalle",
+      "text": "Liebe Heldin, lieber Held! Ich lade dich herzlich ein. Morgen feiern wir das Erntefest auf meinem Hof. Es gibt Apfelkuchen, warme Milch und Musik. Meine Tochter spielt auf der Flöte. Danach tanzen alle um das große Feuer. Komm einfach, wenn die Sonne untergeht. Bring gern Freunde mit. Wir haben genug Kuchen für alle. Mein Hof ist leicht zu finden. Er hat ein rotes Dach und steht gleich neben dem Kürbisfeld. Dein Kalle",
+      "fragen": [
+        {
+          "art": "finden",
+          "frage": "Wann soll das Fest anfangen?",
+          "antworten": [
+            "wenn die Sonne untergeht",
+            "am frühen Morgen",
+            "zur Mittagszeit",
+            "um Mitternacht"
+          ],
+          "richtig": "wenn die Sonne untergeht",
+          "textstelle": "Komm einfach, wenn die Sonne untergeht.",
+          "belohnung": {
+            "typ": "item",
+            "id": "apfel"
+          }
+        },
+        {
+          "art": "stimmung",
+          "frage": "Wie fühlt sich Kalle, als er schreibt?",
+          "antworten": [
+            "fröhlich und gastfreundlich",
+            "wütend und streng",
+            "traurig und müde"
+          ],
+          "richtig": "fröhlich und gastfreundlich",
+          "textstelle": "Ich lade dich herzlich ein.",
+          "belohnung": {
+            "typ": "gold",
+            "menge": 2
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "kw-theo-nacht",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 1,
+      "absender": "Nachtwächter Theo",
+      "text": "Liebe Heldin, lieber Held! Ich bin Theo, der Nachtwächter von Kleinwurzel. Jede Nacht laufe ich mit meiner Laterne durch das Dorf. Letzte Nacht habe ich am Waldrand ein Licht gesehen. Es flackerte grün und kam immer näher. Ich habe mich hinter dem Brunnen versteckt. Dann war das Licht plötzlich weg. Am Morgen fand ich dort große Fußspuren. Ich glaube, ein Ork war unterwegs. Sei bitte vorsichtig, wenn du in den Wald gehst. Dein Theo",
+      "fragen": [
+        {
+          "art": "finden",
+          "frage": "Wo hat sich Theo versteckt?",
+          "antworten": [
+            "hinter dem Brunnen",
+            "in der Mühle",
+            "unter einer Brücke",
+            "auf einem Baum"
+          ],
+          "richtig": "hinter dem Brunnen",
+          "textstelle": "Ich habe mich hinter dem Brunnen versteckt.",
+          "belohnung": {
+            "typ": "item",
+            "id": "laterne"
+          }
+        },
+        {
+          "art": "schliessen",
+          "frage": "Warum glaubt Theo, dass ein Ork da war?",
+          "antworten": [
+            "Er fand große Fußspuren.",
+            "Er hörte einen Ork singen.",
+            "Ein Kind hat es ihm erzählt."
+          ],
+          "richtig": "Er fand große Fußspuren.",
+          "textstelle": "Am Morgen fand ich dort große Fußspuren.",
+          "belohnung": {
+            "typ": "gold",
+            "menge": 2
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "kw-pia-missverstaendnis",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 1,
+      "absender": "Schneiderin Pia",
+      "text": "Liebe Heldin, lieber Held! Gestern hast du mir einen Zettel gegeben. Darauf stand: Bitte einen Mantel nähen. Ich habe also einen schönen blauen Mantel genäht. Heute kam dein Begleiter und hat gelacht. Er sagte, du wolltest gar keinen Mantel. Du wolltest nur, dass ich deinen alten Mantel flicke. Er hat nämlich ein Loch am Ärmel. Nun hast du zwei Mäntel! Den neuen schenke ich dir trotzdem. Er hält dich auf der Reise warm. Deine Pia",
+      "fragen": [
+        {
+          "art": "widerspruch",
+          "frage": "Was ist schiefgegangen?",
+          "antworten": [
+            "Pia hat einen neuen Mantel genäht, dabei sollte sie nur den alten flicken.",
+            "Pia hat den Zettel verloren.",
+            "Der Mantel ist zu klein geworden."
+          ],
+          "richtig": "Pia hat einen neuen Mantel genäht, dabei sollte sie nur den alten flicken.",
+          "textstelle": "Du wolltest nur, dass ich deinen alten Mantel flicke.",
+          "belohnung": {
+            "typ": "item",
+            "id": "stiefel"
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "kw-konrad-bienen",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 2,
+      "absender": "Imker Konrad",
+      "text": "Liebe Heldin, lieber Held! Seit drei Tagen sind meine Bienen unruhig. Sie fliegen nicht mehr zu den Blumen auf der Wiese. Stattdessen summen sie aufgeregt um den Bienenstock herum. Gestern habe ich nachgesehen. Hinter dem Stock lag ein zerbrochener Topf voller süßem Sirup. Bestimmt hat ihn ein Ork beim Weglaufen verloren. Die Bienen naschen lieber den Sirup als den Nektar. Davon werden sie aber krank. Ich habe den Topf weggeräumt. Als Dank für deine Hilfe auf der Reise schicke ich dir ein Glas Honig. Dein Konrad",
+      "fragen": [
+        {
+          "art": "schliessen",
+          "frage": "Warum fliegen die Bienen nicht mehr zu den Blumen?",
+          "antworten": [
+            "Sie naschen lieber den Sirup aus dem Topf.",
+            "Die Blumen sind alle verblüht.",
+            "Ein Ork hat die Wiese abgemäht.",
+            "Es ist zu kalt draußen."
+          ],
+          "richtig": "Sie naschen lieber den Sirup aus dem Topf.",
+          "textstelle": "Die Bienen naschen lieber den Sirup als den Nektar.",
+          "belohnung": {
+            "typ": "item",
+            "id": "honig"
+          }
+        },
+        {
+          "art": "zusammenhang",
+          "frage": "Was ist „Nektar“?",
+          "antworten": [
+            "der süße Saft in Blüten",
+            "ein Werkzeug des Imkers",
+            "ein anderes Wort für Bienenstock"
+          ],
+          "richtig": "der süße Saft in Blüten",
+          "textstelle": "Die Bienen naschen lieber den Sirup als den Nektar.",
+          "belohnung": {
+            "typ": "gold",
+            "menge": 2
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "kw-hedda-steckbrief",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 2,
+      "absender": "Dorfschreiberin Hedda (Steckbrief am Rathaus)",
+      "text": "Gesucht wird: der Ork Grubbel. Er ist groß, hat grüne Haut und trägt einen verbeulten Eisenhelm. An seiner linken Hand fehlt ein Finger. Grubbel stiehlt am liebsten Käse und Würste. Zuletzt wurde er an der alten Steinbrücke gesehen. Dort hat er zwei Fässer umgeworfen. Er ist laut, aber eher ängstlich. Vor Hunden läuft er sofort davon. Wer ihn sieht, soll ihn nicht allein fangen. Meldet euch bitte bei der Dorfwache. Hedda, Dorfschreiberin",
+      "fragen": [
+        {
+          "art": "finden",
+          "frage": "Was trägt Grubbel auf dem Kopf?",
+          "antworten": [
+            "einen verbeulten Eisenhelm",
+            "eine rote Mütze",
+            "einen Kranz aus Blättern",
+            "nichts"
+          ],
+          "richtig": "einen verbeulten Eisenhelm",
+          "textstelle": "Er ist groß, hat grüne Haut und trägt einen verbeulten Eisenhelm.",
+          "belohnung": {
+            "typ": "item",
+            "id": "helm"
+          }
+        },
+        {
+          "art": "schliessen",
+          "frage": "Womit könnte man Grubbel vertreiben?",
+          "antworten": [
+            "mit einem bellenden Hund",
+            "mit einem Stück Käse",
+            "mit einem Fass"
+          ],
+          "richtig": "mit einem bellenden Hund",
+          "textstelle": "Vor Hunden läuft er sofort davon.",
+          "belohnung": {
+            "typ": "gold",
+            "menge": 2
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "kw-gustav-weg",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 2,
+      "absender": "Fährmann Gustav",
+      "text": "Liebe Heldin, lieber Held! Du willst zum Kristallsee? So findest du den Weg. Geh vom Dorfplatz aus nach Norden bis zur Mühle. Dort biegst du links ab und folgst dem schmalen Pfad am Bach. Nach einer Weile kommst du an eine umgestürzte Eiche. Klettere nicht darüber, sondern geh rechts um sie herum. Bald hörst du das Rauschen eines kleinen Wasserfalls. Dahinter liegt schon der See. Am Ufer wartet mein Boot auf dich. Ruf einfach dreimal meinen Namen. Dein Gustav",
+      "fragen": [
+        {
+          "art": "reihenfolge",
+          "frage": "Was kommt direkt nach der umgestürzten Eiche?",
+          "antworten": [
+            "das Rauschen eines Wasserfalls",
+            "die Mühle",
+            "der Dorfplatz",
+            "Gustavs Haus"
+          ],
+          "richtig": "das Rauschen eines Wasserfalls",
+          "textstelle": "Bald hörst du das Rauschen eines kleinen Wasserfalls.",
+          "belohnung": {
+            "typ": "item",
+            "id": "eis"
+          }
+        },
+        {
+          "art": "finden",
+          "frage": "Wie sollst du an der Eiche vorbeigehen?",
+          "antworten": [
+            "rechts um sie herum",
+            "über sie hinüber",
+            "links um sie herum",
+            "unter ihr hindurch"
+          ],
+          "richtig": "rechts um sie herum",
+          "textstelle": "Klettere nicht darüber, sondern geh rechts um sie herum.",
+          "belohnung": {
+            "typ": "gold",
+            "menge": 2
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "kw-lorenz-bericht",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 2,
+      "absender": "Brunnenbauer Lorenz",
+      "text": "Bericht über den alten Brunnen: Am Montag haben wir den Brunnen am Dorfplatz geöffnet. Das Wasser schmeckte seit Wochen nach Eisen. Unten im Schacht fanden wir einen rostigen Schild. Wahrscheinlich hat ihn jemand vor langer Zeit hineingeworfen. Wir haben ihn mit einem Seil herausgezogen. Danach haben wir den Brunnen gründlich geputzt. Seit Dienstag ist das Wasser wieder klar und frisch. Den Schild habe ich blank geschliffen. Er ist erstaunlich stabil. Ich schicke ihn dir für deine Reise. Lorenz",
+      "fragen": [
+        {
+          "art": "schliessen",
+          "frage": "Warum schmeckte das Wasser nach Eisen?",
+          "antworten": [
+            "Ein rostiger Schild lag im Brunnen.",
+            "Der Brunnen war zu tief.",
+            "Jemand hatte Salz hineingeworfen.",
+            "Das Seil war gerissen."
+          ],
+          "richtig": "Ein rostiger Schild lag im Brunnen.",
+          "textstelle": "Unten im Schacht fanden wir einen rostigen Schild.",
+          "belohnung": {
+            "typ": "item",
+            "id": "schild"
+          }
+        },
+        {
+          "art": "reihenfolge",
+          "frage": "Was haben sie gemacht, nachdem sie den Schild herausgezogen hatten?",
+          "antworten": [
+            "den Brunnen geputzt",
+            "den Brunnen geöffnet",
+            "Wasser probiert"
+          ],
+          "richtig": "den Brunnen geputzt",
+          "textstelle": "Danach haben wir den Brunnen gründlich geputzt.",
+          "belohnung": {
+            "typ": "gold",
+            "menge": 2
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "kw-brakk-hilferuf",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 2,
+      "absender": "Zwerg Brakk",
+      "text": "Hilfe, schnell! Ich stecke in der alten Silbermine fest. Ein Stein ist auf den Eingang gefallen. Zum Glück bin ich nicht verletzt. Ich habe noch eine Kerze, ein Stück Brot und meine Feldflasche. Durch einen schmalen Spalt kann ich dieses Briefchen hinausschieben. Eine Krähe trägt es zu dir. Bitte hol Werkzeug aus der Schmiede von Grete. Mit einem kräftigen Hammer kannst du den Stein zerschlagen. Beeil dich, meine Kerze wird immer kürzer! Dein Brakk",
+      "fragen": [
+        {
+          "art": "stimmung",
+          "frage": "Wie fühlt sich Brakk?",
+          "antworten": [
+            "besorgt, aber nicht verzweifelt",
+            "fröhlich und entspannt",
+            "gelangweilt"
+          ],
+          "richtig": "besorgt, aber nicht verzweifelt",
+          "textstelle": "Zum Glück bin ich nicht verletzt.",
+          "belohnung": {
+            "typ": "gold",
+            "menge": 2
+          }
+        },
+        {
+          "art": "finden",
+          "frage": "Womit kann man den Stein zerschlagen?",
+          "antworten": [
+            "mit einem kräftigen Hammer",
+            "mit einer Kerze",
+            "mit einem Seil",
+            "mit der Feldflasche"
+          ],
+          "richtig": "mit einem kräftigen Hammer",
+          "textstelle": "Mit einem kräftigen Hammer kannst du den Stein zerschlagen.",
+          "belohnung": {
+            "typ": "item",
+            "id": "hammer"
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "kw-edwin-widerspruch",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 2,
+      "absender": "Bürgermeister Edwin",
+      "text": "Liebe Heldin, lieber Held! Jemand hat das Kürbisfeld zertrampelt. Drei Leute haben mir etwas erzählt. Der Müller sagt, er habe in der Nacht tief geschlafen und nichts gehört. Die Bäckerin sagt, sie habe Hufgetrappel gehört. Der Gärtner behauptet, es sei ein Ork gewesen. Er habe ihn genau gesehen, ganz ohne Licht, mitten in der stockdunklen Nacht. Das kann doch nicht stimmen! Bitte hilf mir herauszufinden, was wirklich passiert ist. Dein Edwin",
+      "fragen": [
+        {
+          "art": "widerspruch",
+          "frage": "Welche Aussage passt nicht zusammen?",
+          "antworten": [
+            "Der Gärtner will den Ork in stockdunkler Nacht genau gesehen haben.",
+            "Die Bäckerin hat Hufgetrappel gehört.",
+            "Der Müller hat tief geschlafen."
+          ],
+          "richtig": "Der Gärtner will den Ork in stockdunkler Nacht genau gesehen haben.",
+          "textstelle": "Er habe ihn genau gesehen, ganz ohne Licht, mitten in der stockdunklen Nacht.",
+          "belohnung": {
+            "typ": "item",
+            "id": "laterne"
+          }
+        },
+        {
+          "art": "zusammenhang",
+          "frage": "Was bedeutet „Hufgetrappel“?",
+          "antworten": [
+            "das Geräusch von laufenden Pferden",
+            "das Bellen eines Hundes",
+            "das Rauschen des Windes"
+          ],
+          "richtig": "das Geräusch von laufenden Pferden",
+          "textstelle": "Die Bäckerin sagt, sie habe Hufgetrappel gehört.",
+          "belohnung": {
+            "typ": "gold",
+            "menge": 2
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "kw-alma-tee",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 2,
+      "absender": "Kräuterfrau Alma",
+      "text": "Liebe Heldin, lieber Held! Du hast mir geschrieben, dass du schlecht schläfst. Probier meinen Kräutertee. Er hilft fast immer. Du brauchst getrocknete Kamille und ein paar Blätter Zitronenmelisse. Gieß heißes, aber nicht kochendes Wasser darüber. Kochendes Wasser macht den Tee bitter. Lass ihn fünf Minuten ziehen und trink ihn langsam. Trink ihn erst kurz vor dem Schlafengehen. Wenn du ihn zu früh trinkst, wirst du schon beim Abendessen müde. Schlaf gut! Deine Alma",
+      "fragen": [
+        {
+          "art": "schliessen",
+          "frage": "Was passiert, wenn du sprudelnd kochendes Wasser nimmst?",
+          "antworten": [
+            "Der Tee schmeckt bitter.",
+            "Der Tee wird süß.",
+            "Die Kräuter werden grün."
+          ],
+          "richtig": "Der Tee schmeckt bitter.",
+          "textstelle": "Kochendes Wasser macht den Tee bitter.",
+          "belohnung": {
+            "typ": "item",
+            "id": "heiltrank"
+          }
+        },
+        {
+          "art": "zusammenhang",
+          "frage": "Was bedeutet hier „ziehen lassen“?",
+          "antworten": [
+            "den Tee eine Weile stehen lassen",
+            "den Tee hinter sich herziehen",
+            "den Tee umrühren"
+          ],
+          "richtig": "den Tee eine Weile stehen lassen",
+          "textstelle": "Lass ihn fünf Minuten ziehen und trink ihn langsam.",
+          "belohnung": {
+            "typ": "gold",
+            "menge": 2
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "kw-hedda-chronik",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 3,
+      "absender": "Dorfschreiberin Hedda",
+      "text": "Liebe Heldin, lieber Held! In der Dorfchronik habe ich etwas Merkwürdiges entdeckt. Vor hundert Jahren wurde Kleinwurzel schon einmal von Orks bedroht. Damals bauten die Leute einen Wall aus Erde und Dornenhecken. Die Orks kamen trotzdem, aber nur ein einziges Mal. Sie stolperten in der Dunkelheit über die Ranken und flohen. Seitdem pflanzt jede Familie im Herbst eine Dornenhecke. Leider haben viele diesen Brauch vergessen. Ich finde, wir sollten ihn wieder aufleben lassen. Deine Hedda",
+      "fragen": [
+        {
+          "art": "schliessen",
+          "frage": "Warum schlägt Hedda vor, wieder Dornenhecken zu pflanzen?",
+          "antworten": [
+            "Früher haben die Hecken die Orks vertrieben.",
+            "Dornenhecken sind besonders schön.",
+            "Die Orks essen gern Beeren.",
+            "Der Wall ist zu hoch."
+          ],
+          "richtig": "Früher haben die Hecken die Orks vertrieben.",
+          "textstelle": "Sie stolperten in der Dunkelheit über die Ranken und flohen.",
+          "belohnung": {
+            "typ": "item",
+            "id": "gift"
+          }
+        },
+        {
+          "art": "zusammenhang",
+          "frage": "Was bedeutet „einen Brauch wieder aufleben lassen“?",
+          "antworten": [
+            "eine alte Gewohnheit wieder pflegen",
+            "ein Tier wieder gesund machen",
+            "einen Wall abreißen"
+          ],
+          "richtig": "eine alte Gewohnheit wieder pflegen",
+          "textstelle": "Seitdem pflanzt jede Familie im Herbst eine Dornenhecke.",
+          "belohnung": {
+            "typ": "gold",
+            "menge": 3
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "kw-fenwick-raetsel",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 3,
+      "absender": "Meister Fenwick",
+      "text": "Liebe Heldin, lieber Held! Mein Lehrling hat aus Versehen drei Zaubertränke vertauscht. Der rote Trank heilt Wunden. Der blaue macht unsichtbar. Der grüne lässt Haare wachsen. Nun stehen drei Flaschen ohne Schild im Regal. Die linke Flasche riecht nach Rosen, wie alle Heiltränke. Die mittlere ist eiskalt, das gilt für jeden Unsichtbarkeitstrank. Die rechte sprudelt. Mein Lehrling meint, die sprudelnde sei der Heiltrank. Kannst du ihm helfen? Dein Fenwick",
+      "fragen": [
+        {
+          "art": "widerspruch",
+          "frage": "Warum irrt sich der Lehrling?",
+          "antworten": [
+            "Der Heiltrank riecht nach Rosen, das ist die linke Flasche.",
+            "Der Heiltrank ist eiskalt.",
+            "Heiltränke sind immer grün."
+          ],
+          "richtig": "Der Heiltrank riecht nach Rosen, das ist die linke Flasche.",
+          "textstelle": "Die linke Flasche riecht nach Rosen, wie alle Heiltränke.",
+          "belohnung": {
+            "typ": "item",
+            "id": "heiltrank"
+          }
+        },
+        {
+          "art": "schliessen",
+          "frage": "Was steckt in der rechten, sprudelnden Flasche?",
+          "antworten": [
+            "der Trank, der Haare wachsen lässt",
+            "der Heiltrank",
+            "der Unsichtbarkeitstrank"
+          ],
+          "richtig": "der Trank, der Haare wachsen lässt",
+          "textstelle": "Die rechte sprudelt.",
+          "belohnung": {
+            "typ": "gold",
+            "menge": 3
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "kw-ida-bericht",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 3,
+      "absender": "Ida, die Dorfwache",
+      "text": "Wachbericht vom Westtor: In der Nacht zum Donnerstag hörten wir ein Kratzen am Tor. Ich schickte Paul auf den Turm, um nachzusehen. Er meldete zwei Gestalten mit Fackeln. Als ich das Horn blies, rannten sie davon. Am Boden lagen ein Sack mit Mehl und eine zerbrochene Leiter. Offenbar wollten sie über die Mauer klettern. Wir haben das Mehl der Bäckerei zurückgegeben. Es war ihr vorgestern gestohlen worden. Die Leiter verbrennen wir. Ida",
+      "fragen": [
+        {
+          "art": "reihenfolge",
+          "frage": "Was geschah, nachdem Ida das Horn geblasen hatte?",
+          "antworten": [
+            "Die Gestalten rannten davon.",
+            "Paul stieg auf den Turm.",
+            "Man hörte ein Kratzen am Tor.",
+            "Das Mehl wurde gestohlen."
+          ],
+          "richtig": "Die Gestalten rannten davon.",
+          "textstelle": "Als ich das Horn blies, rannten sie davon.",
+          "belohnung": {
+            "typ": "item",
+            "id": "horn"
+          }
+        },
+        {
+          "art": "schliessen",
+          "frage": "Wer hatte vermutlich das Mehl der Bäckerei gestohlen?",
+          "antworten": [
+            "die zwei Gestalten am Tor",
+            "Paul",
+            "Ida"
+          ],
+          "richtig": "die zwei Gestalten am Tor",
+          "textstelle": "Am Boden lagen ein Sack mit Mehl und eine zerbrochene Leiter.",
+          "belohnung": {
+            "typ": "gold",
+            "menge": 3
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "kw-grete-stimmung",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 3,
+      "absender": "Grete, die Schmiedin",
+      "text": "Liebe Heldin, lieber Held! Heute ist ein schwarzer Tag für meine Schmiede. Mein Blasebalg ist gerissen, und ohne ihn wird das Feuer nicht heiß genug. Drei Bestellungen muss ich deshalb absagen. Der Hauptmann wird enttäuscht sein, er wartet seit Wochen auf seine Rüstung. Am meisten ärgert mich, dass ich den Riss schon lange bemerkt hatte. Ich habe ihn einfach nicht geflickt. Wenigstens habe ich aus dem Rest Eisen noch einen Dolch geschmiedet. Den schenke ich dir. Grete",
+      "fragen": [
+        {
+          "art": "stimmung",
+          "frage": "Wie fühlt sich Grete?",
+          "antworten": [
+            "verärgert über sich selbst",
+            "stolz und zufrieden",
+            "ängstlich vor dem Hauptmann",
+            "gelangweilt"
+          ],
+          "richtig": "verärgert über sich selbst",
+          "textstelle": "Am meisten ärgert mich, dass ich den Riss schon lange bemerkt hatte.",
+          "belohnung": {
+            "typ": "item",
+            "id": "dolch"
+          }
+        },
+        {
+          "art": "zusammenhang",
+          "frage": "Was ist ein „Blasebalg“?",
+          "antworten": [
+            "ein Gerät, das Luft ins Feuer bläst",
+            "ein Ball zum Spielen",
+            "ein Teil der Rüstung"
+          ],
+          "richtig": "ein Gerät, das Luft ins Feuer bläst",
+          "textstelle": "Mein Blasebalg ist gerissen, und ohne ihn wird das Feuer nicht heiß genug.",
+          "belohnung": {
+            "typ": "gold",
+            "menge": 3
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "kw-bodo-einladung",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 3,
+      "absender": "Gärtner Bodo",
+      "text": "Liebe Heldin, lieber Held! Zum ersten Mal blüht in meinem Garten die Mondlilie. Sie öffnet ihre Blüte nur in einer einzigen Nacht im Jahr. Dabei leuchtet sie silbern wie der Vollmond. Ich lade dich ein, dieses Wunder mit mir anzusehen. Komm heute nach Sonnenuntergang zum Gewächshaus. Bring keine Fackel mit, denn helles Licht lässt die Blüte sofort welken. Wer sie leuchten sieht, hat ein Jahr lang Glück, sagt man. Dein Bodo",
+      "fragen": [
+        {
+          "art": "schliessen",
+          "frage": "Warum sollst du keine Fackel mitbringen?",
+          "antworten": [
+            "Helles Licht lässt die Blüte welken.",
+            "Das Gewächshaus könnte brennen.",
+            "Bodo hat genug Fackeln.",
+            "Die Blüte leuchtet nur im Dunkeln heller."
+          ],
+          "richtig": "Helles Licht lässt die Blüte welken.",
+          "textstelle": "Bring keine Fackel mit, denn helles Licht lässt die Blüte sofort welken.",
+          "belohnung": {
+            "typ": "item",
+            "id": "mond"
+          }
+        },
+        {
+          "art": "zusammenhang",
+          "frage": "Was bedeutet „welken“?",
+          "antworten": [
+            "schlaff werden und vertrocknen",
+            "schneller wachsen",
+            "heller leuchten"
+          ],
+          "richtig": "schlaff werden und vertrocknen",
+          "textstelle": "Bring keine Fackel mit, denn helles Licht lässt die Blüte sofort welken.",
+          "belohnung": {
+            "typ": "gold",
+            "menge": 3
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "kw-paul-missverstaendnis",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 3,
+      "absender": "Paul aus Kleinwurzel",
+      "text": "Liebe Heldin, lieber Held! Ich muss dir etwas Peinliches erzählen. Meine Schwester bat mich, die Ziege zum Markt zu bringen. Ich verstand aber, ich solle die Ziege vom Markt holen. Also lief ich zum Markt und suchte stundenlang nach einer Ziege. Unsere eigene Ziege stand die ganze Zeit zu Hause im Stall. Am Abend lachte das ganze Dorf über mich. Jetzt höre ich immer genau zu, bevor ich losrenne. Dein Paul",
+      "fragen": [
+        {
+          "art": "widerspruch",
+          "frage": "Was hat Paul falsch verstanden?",
+          "antworten": [
+            "Er sollte die Ziege hinbringen, nicht abholen.",
+            "Er sollte eine Kuh holen.",
+            "Er sollte zum Bäcker gehen."
+          ],
+          "richtig": "Er sollte die Ziege hinbringen, nicht abholen.",
+          "textstelle": "Ich verstand aber, ich solle die Ziege vom Markt holen.",
+          "belohnung": {
+            "typ": "item",
+            "id": "karotte"
+          }
+        },
+        {
+          "art": "stimmung",
+          "frage": "Wie fühlt sich Paul jetzt?",
+          "antworten": [
+            "etwas beschämt, aber er hat daraus gelernt",
+            "stolz auf seine Suche",
+            "wütend auf seine Schwester"
+          ],
+          "richtig": "etwas beschämt, aber er hat daraus gelernt",
+          "textstelle": "Jetzt höre ich immer genau zu, bevor ich losrenne.",
+          "belohnung": {
+            "typ": "gold",
+            "menge": 3
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "hm-inga-fohlen",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 1,
+      "absender": "Fohlenhüterin Inga",
+      "text": "Liebe Heldin, lieber Held! Heute Nacht ist ein Fohlen geboren. Es ist braun und hat einen weißen Stern auf der Stirn. Wir haben es Funke genannt. Funke stand schon nach einer Stunde auf seinen dünnen Beinen. Jetzt trinkt es bei seiner Mutter. Morgen darf es zum ersten Mal auf die Weide. Ich passe gut auf, dass kein Wolf in die Nähe kommt. Komm uns bald besuchen! Ich zeige dir Funke. Deine Inga",
+      "fragen": [
+        {
+          "art": "finden",
+          "frage": "Wie heißt das Fohlen?",
+          "antworten": [
+            "Funke",
+            "Stern",
+            "Blitz",
+            "Wolke"
+          ],
+          "richtig": "Funke",
+          "textstelle": "Wir haben es Funke genannt.",
+          "belohnung": {
+            "typ": "item",
+            "id": "hafer"
+          }
+        },
+        {
+          "art": "stimmung",
+          "frage": "Wie fühlt sich Inga?",
+          "antworten": [
+            "glücklich und stolz",
+            "traurig und einsam",
+            "wütend"
+          ],
+          "richtig": "glücklich und stolz",
+          "textstelle": "Komm uns bald besuchen! Ich zeige dir Funke.",
+          "belohnung": {
+            "typ": "gold",
+            "menge": 2
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "hm-runa-aushang",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 1,
+      "absender": "Stallmeisterin Runa (Aushang am Stall)",
+      "text": "Wichtig für alle Reiter! Ab heute gelten neue Stallregeln. Füttert die Pferde nur morgens und abends. Gebt ihnen keine Süßigkeiten, sonst bekommen sie Bauchweh. Karotten und Äpfel sind erlaubt. Schließt nach dem Ausritt immer die Stalltür. Gestern ist der Hengst Donner weggelaufen, weil die Tür offen stand. Wir haben ihn erst am Fluss wiedergefunden. Wer die Regeln befolgt, darf am Sonntag beim großen Rennen mitreiten. Eure Runa",
+      "fragen": [
+        {
+          "art": "finden",
+          "frage": "Was dürfen die Pferde zum Naschen bekommen?",
+          "antworten": [
+            "Karotten und Äpfel",
+            "Kuchen und Bonbons",
+            "Brot und Honig",
+            "gar nichts"
+          ],
+          "richtig": "Karotten und Äpfel",
+          "textstelle": "Karotten und Äpfel sind erlaubt.",
+          "belohnung": {
+            "typ": "item",
+            "id": "karotte"
+          }
+        },
+        {
+          "art": "schliessen",
+          "frage": "Warum ist die Regel mit der Stalltür wichtig?",
+          "antworten": [
+            "Sonst laufen Pferde weg.",
+            "Sonst wird es im Stall zu warm.",
+            "Sonst kommen Hühner herein."
+          ],
+          "richtig": "Sonst laufen Pferde weg.",
+          "textstelle": "Gestern ist der Hengst Donner weggelaufen, weil die Tür offen stand.",
+          "belohnung": {
+            "typ": "gold",
+            "menge": 2
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "hm-hilde-rezept",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 1,
+      "absender": "Köchin Hilde aus der Weißen Feste",
+      "text": "Liebe Heldin, lieber Held! Für lange Ritte backe ich Haferkekse. Hier ist mein Rezept. Du brauchst zwei Hände voll Hafer, einen Löffel Honig und ein Ei. Zuerst rührst du alles in einer Schüssel zusammen. Dann formst du kleine Kugeln. Drück jede Kugel mit dem Daumen flach. Leg die Kekse auf ein heißes Blech. Nach kurzer Zeit werden sie goldbraun. Lass sie gut abkühlen, bevor du sie einpackst. Sonst zerbrechen sie im Rucksack. Deine Hilde",
+      "fragen": [
+        {
+          "art": "reihenfolge",
+          "frage": "Was machst du, nachdem du die Kugeln geformt hast?",
+          "antworten": [
+            "die Kugeln flach drücken",
+            "alles zusammenrühren",
+            "die Kekse einpacken",
+            "Hafer kaufen"
+          ],
+          "richtig": "die Kugeln flach drücken",
+          "textstelle": "Drück jede Kugel mit dem Daumen flach.",
+          "belohnung": {
+            "typ": "item",
+            "id": "hafer"
+          }
+        },
+        {
+          "art": "schliessen",
+          "frage": "Warum sollen die Kekse vor dem Einpacken abkühlen?",
+          "antworten": [
+            "Warme Kekse zerbrechen im Rucksack.",
+            "Warme Kekse schmecken bitter.",
+            "Hilde möchte sie zählen."
+          ],
+          "richtig": "Warme Kekse zerbrechen im Rucksack.",
+          "textstelle": "Sonst zerbrechen sie im Rucksack.",
+          "belohnung": {
+            "typ": "gold",
+            "menge": 2
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "hm-jarl-einladung",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 1,
+      "absender": "Bote Jarl",
+      "text": "Liebe Heldin, lieber Held! Ich bringe dir eine Einladung vom Hauptmann der Weißen Feste. Am Abend des Vollmonds gibt es ein großes Fest im Burghof. Alle mutigen Reisenden sind eingeladen. Es gibt gebratene Äpfel, warmes Brot und viel Musik. Die besten Reiter zeigen ihre Kunststücke. Danach erzählt der Hauptmann von alten Schlachten. Bitte zieh saubere Stiefel an, denn der Boden im Saal ist frisch geputzt. Dein Bote Jarl",
+      "fragen": [
+        {
+          "art": "finden",
+          "frage": "Wo findet das Fest statt?",
+          "antworten": [
+            "im Burghof der Weißen Feste",
+            "am Fluss",
+            "auf der Pferdeweide",
+            "im Wald"
+          ],
+          "richtig": "im Burghof der Weißen Feste",
+          "textstelle": "Am Abend des Vollmonds gibt es ein großes Fest im Burghof.",
+          "belohnung": {
+            "typ": "item",
+            "id": "stiefel"
+          }
+        },
+        {
+          "art": "zusammenhang",
+          "frage": "Was sind „Kunststücke“ hier?",
+          "antworten": [
+            "besondere, schwierige Tricks",
+            "gemalte Bilder",
+            "kleine Stücke Kuchen"
+          ],
+          "richtig": "besondere, schwierige Tricks",
+          "textstelle": "Die besten Reiter zeigen ihre Kunststücke.",
+          "belohnung": {
+            "typ": "gold",
+            "menge": 2
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "hm-mats-tagebuch",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 1,
+      "absender": "Mats, der Hufschmiedlehrling",
+      "text": "Aus meinem Tagebuch: Heute durfte ich zum ersten Mal ein Hufeisen schmieden. Zuerst habe ich das Eisen ins Feuer gelegt. Als es rot glühte, habe ich es auf den Amboss gelegt. Dann habe ich es mit dem Hammer gebogen. Meister Ragnar hat genickt. Das Hufeisen war ein bisschen schief. Trotzdem passte es auf den Huf der alten Stute. Ich bin so stolz! Morgen schmiede ich ein zweites. Mats",
+      "fragen": [
+        {
+          "art": "reihenfolge",
+          "frage": "Was hat Mats zuerst gemacht?",
+          "antworten": [
+            "das Eisen ins Feuer gelegt",
+            "das Eisen gebogen",
+            "das Hufeisen anprobiert",
+            "ein zweites Hufeisen geschmiedet"
+          ],
+          "richtig": "das Eisen ins Feuer gelegt",
+          "textstelle": "Zuerst habe ich das Eisen ins Feuer gelegt.",
+          "belohnung": {
+            "typ": "item",
+            "id": "hammer"
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "hm-brit-hilferuf",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 1,
+      "absender": "Wolfsjägerin Brit",
+      "text": "Hilfe! Ich bin mit meinem Pferd in ein Sumpfloch geraten. Das Pferd ist zum Glück frei gekommen. Aber mein Bogen ist im Schlamm versunken. Ohne ihn kann ich die Wölfe nicht von der Herde fernhalten. Ich warte bei der alten Windmühle am Rand der Steppe. Bitte bring mir einen neuen Bogen, wenn du einen hast. Ich gebe dir dafür meinen besten Pfeil. Er fliegt weiter als alle anderen. Deine Brit",
+      "fragen": [
+        {
+          "art": "finden",
+          "frage": "Was hat Brit im Schlamm verloren?",
+          "antworten": [
+            "ihren Bogen",
+            "ihr Pferd",
+            "ihren Hut",
+            "ihre Pfeile"
+          ],
+          "richtig": "ihren Bogen",
+          "textstelle": "Aber mein Bogen ist im Schlamm versunken.",
+          "belohnung": {
+            "typ": "item",
+            "id": "bogen"
+          }
+        },
+        {
+          "art": "finden",
+          "frage": "Wo wartet Brit?",
+          "antworten": [
+            "bei der alten Windmühle",
+            "in der Weißen Feste",
+            "am Fluss",
+            "im Stall"
+          ],
+          "richtig": "bei der alten Windmühle",
+          "textstelle": "Ich warte bei der alten Windmühle am Rand der Steppe.",
+          "belohnung": {
+            "typ": "gold",
+            "menge": 2
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "hm-selma-missverstaendnis",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 1,
+      "absender": "Händlerin Selma",
+      "text": "Liebe Heldin, lieber Held! Du hattest bei mir einen Sattel bestellt. Ich habe aber Salat verstanden! Darum stehen jetzt zwanzig Köpfe Salat vor deiner Tür. Mein Gehilfe hat sie heute früh gebracht. Es tut mir sehr leid. Den Sattel nähe ich dir natürlich noch. Er ist in drei Tagen fertig. Den Salat darfst du behalten. Vielleicht freuen sich die Pferde darüber. Deine Selma",
+      "fragen": [
+        {
+          "art": "widerspruch",
+          "frage": "Was ist bei der Bestellung schiefgegangen?",
+          "antworten": [
+            "Selma hat Salat statt Sattel verstanden.",
+            "Selma hat den Sattel verloren.",
+            "Der Sattel war zu teuer."
+          ],
+          "richtig": "Selma hat Salat statt Sattel verstanden.",
+          "textstelle": "Ich habe aber Salat verstanden!",
+          "belohnung": {
+            "typ": "item",
+            "id": "zaumzeug"
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "hm-eik-weg",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 2,
+      "absender": "Kundschafter Eik",
+      "text": "Liebe Heldin, lieber Held! So kommst du sicher zum Lager der Wolfsreiter, ohne gesehen zu werden. Reite vom Osttor der Feste bis zum Hügel mit den drei Birken. Dort steigst du ab und führst dein Pferd am Zügel. Folge dem trockenen Bachbett nach Süden. Es ist so tief, dass man dich von oben nicht sieht. Wo das Bachbett endet, liegt ein großer Felsen. Von dort kannst du das Lager beobachten. Bleib still und warte auf mein Zeichen. Eik",
+      "fragen": [
+        {
+          "art": "reihenfolge",
+          "frage": "Was machst du am Hügel mit den drei Birken?",
+          "antworten": [
+            "absteigen und das Pferd führen",
+            "dem Bachbett folgen",
+            "das Lager beobachten",
+            "auf ein Zeichen warten"
+          ],
+          "richtig": "absteigen und das Pferd führen",
+          "textstelle": "Dort steigst du ab und führst dein Pferd am Zügel.",
+          "belohnung": {
+            "typ": "item",
+            "id": "zaumzeug"
+          }
+        },
+        {
+          "art": "schliessen",
+          "frage": "Warum sollst du durch das Bachbett gehen?",
+          "antworten": [
+            "Dort sieht man dich von oben nicht.",
+            "Dort ist der Weg kürzer.",
+            "Dort gibt es Wasser für das Pferd."
+          ],
+          "richtig": "Dort sieht man dich von oben nicht.",
+          "textstelle": "Es ist so tief, dass man dich von oben nicht sieht.",
+          "belohnung": {
+            "typ": "gold",
+            "menge": 2
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "hm-liv-steckbrief",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 2,
+      "absender": "Liv, Schreiberin der Weißen Feste (Steckbrief)",
+      "text": "Gesucht: der Wolfsreiter Skarr. Er reitet einen grauen Wolf mit einem zerrissenen Ohr. Skarr trägt einen Umhang aus Fell und einen Helm mit zwei Hörnern. Er ist der Späher des Häuptlings. Meistens kommt er in der Dämmerung, wenn die Wachen müde sind. Vor zwei Tagen hat er drei Pferde aus der Koppel getrieben. Wer ihn sieht, soll sofort das Horn blasen. Fangt ihn auf keinen Fall allein. Liv, Schreiberin",
+      "fragen": [
+        {
+          "art": "finden",
+          "frage": "Woran erkennt man Skarrs Wolf?",
+          "antworten": [
+            "an einem zerrissenen Ohr",
+            "an einem weißen Fell",
+            "an einem goldenen Halsband",
+            "an seiner Größe"
+          ],
+          "richtig": "an einem zerrissenen Ohr",
+          "textstelle": "Er reitet einen grauen Wolf mit einem zerrissenen Ohr.",
+          "belohnung": {
+            "typ": "item",
+            "id": "horn"
+          }
+        },
+        {
+          "art": "zusammenhang",
+          "frage": "Was ist mit „Dämmerung“ gemeint?",
+          "antworten": [
+            "die Zeit, in der es hell oder dunkel wird",
+            "ein starker Sturm",
+            "die Mittagshitze"
+          ],
+          "richtig": "die Zeit, in der es hell oder dunkel wird",
+          "textstelle": "Meistens kommt er in der Dämmerung, wenn die Wachen müde sind.",
+          "belohnung": {
+            "typ": "gold",
+            "menge": 2
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "hm-arvid-bericht",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 2,
+      "absender": "Turmwächter Arvid",
+      "text": "Bericht vom Nordturm: Am frühen Morgen sah ich Rauch über der Steppe. Zuerst dachte ich an ein Lagerfeuer der Hirten. Doch der Rauch wurde immer dicker und schwärzer. Ich schickte einen Reiter los. Er kam mit schlechten Nachrichten zurück. Das Gras brannte, und der Wind trieb das Feuer auf die Weiden zu. Alle Hirten trieben ihre Herden zum Fluss. Dort waren die Tiere sicher. Am Abend fing es endlich an zu regnen. Arvid",
+      "fragen": [
+        {
+          "art": "reihenfolge",
+          "frage": "Was geschah, nachdem der Reiter zurückkam?",
+          "antworten": [
+            "Die Hirten trieben die Herden zum Fluss.",
+            "Arvid sah Rauch über der Steppe.",
+            "Arvid dachte an ein Lagerfeuer.",
+            "Der Reiter wurde losgeschickt."
+          ],
+          "richtig": "Die Hirten trieben die Herden zum Fluss.",
+          "textstelle": "Alle Hirten trieben ihre Herden zum Fluss.",
+          "belohnung": {
+            "typ": "item",
+            "id": "feuer"
+          }
+        },
+        {
+          "art": "schliessen",
+          "frage": "Warum waren die Tiere am Fluss sicher?",
+          "antworten": [
+            "Feuer kann sich über Wasser nicht ausbreiten.",
+            "Am Fluss gibt es viel Gras.",
+            "Dort waren die Wölfe."
+          ],
+          "richtig": "Feuer kann sich über Wasser nicht ausbreiten.",
+          "textstelle": "Dort waren die Tiere sicher.",
+          "belohnung": {
+            "typ": "gold",
+            "menge": 2
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "hm-tove-sattel",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 2,
+      "absender": "Sattlerin Tove",
+      "text": "Liebe Heldin, lieber Held! Dein Pferd hatte am Rücken eine wunde Stelle. Das lag am alten Sattel. Er war zu eng und drückte bei jedem Schritt. Ich habe dir einen neuen Sattel genäht. Er ist mit weicher Schafwolle gepolstert. Bevor du losreitest, prüf bitte immer den Gurt. Zwischen Gurt und Bauch muss eine flache Hand passen. Ist er zu locker, rutschst du herunter. Ist er zu fest, bekommt dein Pferd kaum Luft. Deine Tove",
+      "fragen": [
+        {
+          "art": "finden",
+          "frage": "Wie fest soll der Gurt sein?",
+          "antworten": [
+            "Eine flache Hand muss dazwischen passen.",
+            "So fest wie möglich.",
+            "Ganz locker, damit es bequem ist."
+          ],
+          "richtig": "Eine flache Hand muss dazwischen passen.",
+          "textstelle": "Zwischen Gurt und Bauch muss eine flache Hand passen.",
+          "belohnung": {
+            "typ": "item",
+            "id": "zaumzeug"
+          }
+        },
+        {
+          "art": "schliessen",
+          "frage": "Warum hatte das Pferd eine wunde Stelle?",
+          "antworten": [
+            "Der alte Sattel war zu eng.",
+            "Es ist durch Dornen geritten.",
+            "Ein Wolf hat es gebissen."
+          ],
+          "richtig": "Der alte Sattel war zu eng.",
+          "textstelle": "Er war zu eng und drückte bei jedem Schritt.",
+          "belohnung": {
+            "typ": "gold",
+            "menge": 2
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "hm-sten-widerspruch",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 2,
+      "absender": "Pfeilmacher Sten",
+      "text": "Liebe Heldin, lieber Held! Ein Händler wollte mir gestern Federn verkaufen. Er sagte, sie seien von einem Adler aus den Bergen. Die Federn waren aber weiß und weich wie Daunen. Adlerfedern sind braun und ganz fest. Außerdem behauptete er, er komme direkt aus den Bergen. Seine Stiefel waren aber voller Sand vom Flussufer. Ich habe die Federn nicht gekauft. Für Pfeile braucht man feste Federn, sonst fliegen sie nicht gerade. Dein Sten",
+      "fragen": [
+        {
+          "art": "widerspruch",
+          "frage": "Woran merkt Sten, dass der Händler schwindelt?",
+          "antworten": [
+            "Die Federn waren weiß und weich, Adlerfedern sind braun und fest.",
+            "Der Händler hatte keinen Hut.",
+            "Die Federn waren zu teuer."
+          ],
+          "richtig": "Die Federn waren weiß und weich, Adlerfedern sind braun und fest.",
+          "textstelle": "Adlerfedern sind braun und ganz fest.",
+          "belohnung": {
+            "typ": "item",
+            "id": "speer"
+          }
+        },
+        {
+          "art": "zusammenhang",
+          "frage": "Was bedeutet „schwindeln“ hier?",
+          "antworten": [
+            "nicht die Wahrheit sagen",
+            "schwindlig werden",
+            "schnell laufen"
+          ],
+          "richtig": "nicht die Wahrheit sagen",
+          "textstelle": "Außerdem behauptete er, er komme direkt aus den Bergen.",
+          "belohnung": {
+            "typ": "gold",
+            "menge": 2
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "hm-runa-stimmung",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 2,
+      "absender": "Stallmeisterin Runa",
+      "text": "Liebe Heldin, lieber Held! Ich schreibe dir mit zitternden Händen. Heute ist meine alte Stute Wolke gestorben. Sie war fünfundzwanzig Jahre alt und hat mich durch so viele Stürme getragen. Am Morgen lag sie ruhig im Stroh, als würde sie schlafen. Die Fohlen standen still um sie herum. Ich bin sehr traurig. Trotzdem bin ich dankbar für die vielen schönen Jahre. Ihre Satteltasche schenke ich dir. Wolke würde sich freuen. Deine Runa",
+      "fragen": [
+        {
+          "art": "stimmung",
+          "frage": "Wie fühlt sich Runa?",
+          "antworten": [
+            "traurig, aber auch dankbar",
+            "wütend auf die Fohlen",
+            "fröhlich und aufgeregt",
+            "gleichgültig"
+          ],
+          "richtig": "traurig, aber auch dankbar",
+          "textstelle": "Trotzdem bin ich dankbar für die vielen schönen Jahre.",
+          "belohnung": {
+            "typ": "item",
+            "id": "satteltasche"
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "hm-hilde-vorrat",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 2,
+      "absender": "Köchin Hilde aus der Weißen Feste",
+      "text": "Liebe Heldin, lieber Held! Der Winter kommt früh in diesem Jahr. Darum legen wir jetzt Vorräte an. Die Äpfel lagern wir im kühlen Keller. Wir legen sie auf Stroh, damit sie sich nicht berühren. Ein fauler Apfel steckt nämlich alle anderen an. Das Fleisch hängen wir in den Rauch über dem Herd. So bleibt es monatelang haltbar. Der Hafer kommt in dicht verschlossene Fässer, damit keine Mäuse hineinkommen. Deine Hilde",
+      "fragen": [
+        {
+          "art": "schliessen",
+          "frage": "Warum dürfen sich die Äpfel nicht berühren?",
+          "antworten": [
+            "Ein fauler Apfel steckt die anderen an.",
+            "Sie werden sonst zu warm.",
+            "Sonst rollen sie weg."
+          ],
+          "richtig": "Ein fauler Apfel steckt die anderen an.",
+          "textstelle": "Ein fauler Apfel steckt nämlich alle anderen an.",
+          "belohnung": {
+            "typ": "item",
+            "id": "apfel"
+          }
+        },
+        {
+          "art": "zusammenhang",
+          "frage": "Was bedeutet „haltbar“?",
+          "antworten": [
+            "lange essbar, ohne zu verderben",
+            "leicht zu tragen",
+            "besonders lecker"
+          ],
+          "richtig": "lange essbar, ohne zu verderben",
+          "textstelle": "So bleibt es monatelang haltbar.",
+          "belohnung": {
+            "typ": "gold",
+            "menge": 2
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "hm-hauptmann-plan",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 3,
+      "absender": "der Hauptmann der Weißen Feste",
+      "text": "Liebe Heldin, lieber Held! Der Häuptling der Wolfsreiter plant einen Angriff. Unser Späher hat seine Befehle belauscht. Zuerst sollen die Wölfe die Pferde auf den Weiden aufschrecken. Während unsere Reiter die Pferde einfangen, greift der Häuptling das Westtor an. Er hofft, dass das Tor dann kaum bewacht ist. Wir werden ihm eine Falle stellen. Die Pferde bringen wir schon heute in die Ställe. So bleiben alle Reiter am Tor. Dein Hauptmann",
+      "fragen": [
+        {
+          "art": "reihenfolge",
+          "frage": "Was soll nach dem Plan des Häuptlings zuerst passieren?",
+          "antworten": [
+            "Die Wölfe schrecken die Pferde auf.",
+            "Der Häuptling greift das Westtor an.",
+            "Die Reiter fangen die Pferde ein.",
+            "Die Pferde kommen in die Ställe."
+          ],
+          "richtig": "Die Wölfe schrecken die Pferde auf.",
+          "textstelle": "Zuerst sollen die Wölfe die Pferde auf den Weiden aufschrecken.",
+          "belohnung": {
+            "typ": "item",
+            "id": "schild"
+          }
+        },
+        {
+          "art": "schliessen",
+          "frage": "Warum bringt der Hauptmann die Pferde schon heute in die Ställe?",
+          "antworten": [
+            "Dann müssen die Reiter keine Pferde einfangen und bleiben am Tor.",
+            "Die Pferde sollen ausruhen.",
+            "Im Stall gibt es mehr Futter."
+          ],
+          "richtig": "Dann müssen die Reiter keine Pferde einfangen und bleiben am Tor.",
+          "textstelle": "So bleiben alle Reiter am Tor.",
+          "belohnung": {
+            "typ": "gold",
+            "menge": 3
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "hm-liv-chronik",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 3,
+      "absender": "Liv, Schreiberin der Weißen Feste",
+      "text": "Liebe Heldin, lieber Held! In den alten Büchern steht, warum die Weiße Feste weiß ist. Früher war sie aus dunklem Stein gebaut. Bei einem Angriff in finsterer Nacht verwechselten die eigenen Reiter die Feste mit einem Felsen. Sie ritten daran vorbei und kamen zu spät zur Hilfe. Danach strichen die Bewohner alle Mauern mit Kalk an. Seitdem leuchtet die Feste sogar bei Mondlicht. Kein Reiter hat sie je wieder verfehlt. Deine Liv",
+      "fragen": [
+        {
+          "art": "schliessen",
+          "frage": "Warum wurde die Feste weiß gestrichen?",
+          "antworten": [
+            "Damit die eigenen Reiter sie auch nachts finden.",
+            "Weil Weiß die Lieblingsfarbe des Königs war.",
+            "Damit die Mauern stärker werden.",
+            "Weil der dunkle Stein zerbröckelte."
+          ],
+          "richtig": "Damit die eigenen Reiter sie auch nachts finden.",
+          "textstelle": "Seitdem leuchtet die Feste sogar bei Mondlicht.",
+          "belohnung": {
+            "typ": "item",
+            "id": "mond"
+          }
+        },
+        {
+          "art": "zusammenhang",
+          "frage": "Was bedeutet „verfehlen“?",
+          "antworten": [
+            "etwas nicht finden oder nicht treffen",
+            "etwas schön finden",
+            "etwas reparieren"
+          ],
+          "richtig": "etwas nicht finden oder nicht treffen",
+          "textstelle": "Kein Reiter hat sie je wieder verfehlt.",
+          "belohnung": {
+            "typ": "gold",
+            "menge": 3
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "hm-jarl-missverstaendnis",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 3,
+      "absender": "Bote Jarl",
+      "text": "Liebe Heldin, lieber Held! Mir ist ein schlimmer Fehler passiert. Der Hauptmann sagte: Bring die Nachricht zum Turm am Fluss. Ich ritt aber zum Turm an der Furt, weil ich Fluss und Furt verwechselt habe. Die Wachen dort wussten von nichts. Erst am Abend kam ich am richtigen Turm an. Zum Glück war noch Zeit, die Brücke zu sichern. Ab jetzt lasse ich mir jeden Auftrag zweimal sagen. Dein Jarl",
+      "fragen": [
+        {
+          "art": "widerspruch",
+          "frage": "Was hat Jarl verwechselt?",
+          "antworten": [
+            "den Turm am Fluss mit dem Turm an der Furt",
+            "den Hauptmann mit einem Wächter",
+            "die Brücke mit dem Tor"
+          ],
+          "richtig": "den Turm am Fluss mit dem Turm an der Furt",
+          "textstelle": "Ich ritt aber zum Turm an der Furt, weil ich Fluss und Furt verwechselt habe.",
+          "belohnung": {
+            "typ": "item",
+            "id": "stiefel"
+          }
+        },
+        {
+          "art": "zusammenhang",
+          "frage": "Was ist eine „Furt“?",
+          "antworten": [
+            "eine flache Stelle, an der man durch einen Fluss gehen kann",
+            "ein hoher Turm",
+            "ein schneller Bote"
+          ],
+          "richtig": "eine flache Stelle, an der man durch einen Fluss gehen kann",
+          "textstelle": "Ich ritt aber zum Turm an der Furt, weil ich Fluss und Furt verwechselt habe.",
+          "belohnung": {
+            "typ": "gold",
+            "menge": 3
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "hm-brit-spuren",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 3,
+      "absender": "Wolfsjägerin Brit",
+      "text": "Liebe Heldin, lieber Held! Ich habe die Spuren im Schnee genau angesehen. Es waren vier Wölfe, aber nur einer trug einen Reiter. Seine Abdrücke waren viel tiefer als die anderen. Die Spuren führten im Kreis um die Koppel herum. Dann verschwanden sie plötzlich am Bach. Ich glaube, die Wolfsreiter wollten nur herausfinden, wie gut die Koppel bewacht ist. Bestimmt kommen sie bald zurück, dann aber mit vielen Wölfen. Deine Brit",
+      "fragen": [
+        {
+          "art": "schliessen",
+          "frage": "Woran erkannte Brit den Wolf mit Reiter?",
+          "antworten": [
+            "Seine Abdrücke waren viel tiefer.",
+            "Er hatte größere Pfoten.",
+            "Er heulte lauter.",
+            "Seine Spuren waren rot."
+          ],
+          "richtig": "Seine Abdrücke waren viel tiefer.",
+          "textstelle": "Seine Abdrücke waren viel tiefer als die anderen.",
+          "belohnung": {
+            "typ": "item",
+            "id": "bogen"
+          }
+        },
+        {
+          "art": "stimmung",
+          "frage": "Wie blickt Brit in die Zukunft?",
+          "antworten": [
+            "besorgt, weil bald mehr Wölfe kommen",
+            "erleichtert, weil die Wölfe weg sind",
+            "gleichgültig"
+          ],
+          "richtig": "besorgt, weil bald mehr Wölfe kommen",
+          "textstelle": "Bestimmt kommen sie bald zurück, dann aber mit vielen Wölfen.",
+          "belohnung": {
+            "typ": "gold",
+            "menge": 3
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "hm-ragnar-bericht",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 3,
+      "absender": "Ragnar, der Hufschmied",
+      "text": "Liebe Heldin, lieber Held! Gestern brachte mir ein Reiter ein lahmes Pferd. Er schwor, er sei nur langsam auf weichem Gras geritten. Doch im Huf steckte ein spitzer Stein aus dem Steinbruch. Dort wächst gar kein Gras, nur Geröll. Ich habe den Stein vorsichtig entfernt und den Huf gekühlt. Das Pferd braucht jetzt eine Woche Ruhe. Dem Reiter habe ich geraten, ehrlich zu sein. Nur so kann man ein Tier richtig behandeln. Dein Ragnar",
+      "fragen": [
+        {
+          "art": "widerspruch",
+          "frage": "Was stimmt an der Geschichte des Reiters nicht?",
+          "antworten": [
+            "Der Stein stammte aus dem Steinbruch, dort wächst kein Gras.",
+            "Das Pferd war gar nicht lahm.",
+            "Ragnar hat keinen Stein gefunden."
+          ],
+          "richtig": "Der Stein stammte aus dem Steinbruch, dort wächst kein Gras.",
+          "textstelle": "Dort wächst gar kein Gras, nur Geröll.",
+          "belohnung": {
+            "typ": "item",
+            "id": "stein"
+          }
+        },
+        {
+          "art": "zusammenhang",
+          "frage": "Was bedeutet „lahm“ bei einem Pferd?",
+          "antworten": [
+            "Es kann nicht richtig laufen.",
+            "Es ist sehr schnell.",
+            "Es ist besonders zahm."
+          ],
+          "richtig": "Es kann nicht richtig laufen.",
+          "textstelle": "Gestern brachte mir ein Reiter ein lahmes Pferd.",
+          "belohnung": {
+            "typ": "gold",
+            "menge": 3
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
+    },
+    {
+      "id": "hm-selma-einladung",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 3,
+      "absender": "Händlerin Selma",
+      "text": "Liebe Heldin, lieber Held! Übermorgen eröffne ich meinen neuen Laden am Markt der Weißen Feste. Die ersten zehn Kunden bekommen ein Geschenk. Du darfst aber schon morgen kommen, denn du hast mir beim Umzug geholfen. Ohne dich hätte ich die schweren Kisten nie in den ersten Stock getragen. Ich habe besondere Waren aus dem Süden: leuchtende Steine, feine Seile und ein Horn, das bis zur Steppe schallt. Deine Selma",
+      "fragen": [
+        {
+          "art": "schliessen",
+          "frage": "Warum darfst du schon vor der Eröffnung kommen?",
+          "antworten": [
+            "Du hast Selma beim Umzug geholfen.",
+            "Du bist der zehnte Kunde.",
+            "Du wohnst neben dem Laden."
+          ],
+          "richtig": "Du hast Selma beim Umzug geholfen.",
+          "textstelle": "Du darfst aber schon morgen kommen, denn du hast mir beim Umzug geholfen.",
+          "belohnung": {
+            "typ": "item",
+            "id": "horn"
+          }
+        },
+        {
+          "art": "stimmung",
+          "frage": "Wie steht Selma zu dir?",
+          "antworten": [
+            "dankbar und freundlich",
+            "misstrauisch",
+            "verärgert"
+          ],
+          "richtig": "dankbar und freundlich",
+          "textstelle": "Ohne dich hätte ich die schweren Kisten nie in den ersten Stock getragen.",
+          "belohnung": {
+            "typ": "gold",
+            "menge": 3
+          }
+        }
+      ],
+      "trost": {
+        "typ": "gold",
+        "menge": 1
+      }
     }
   ]
 }

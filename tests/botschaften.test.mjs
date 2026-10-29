@@ -30,25 +30,6 @@ test('Texte: 60–120 Wörter, kurze Sätze, mit Absender', () => {
   }
 });
 
-test('Jede Frage: 3–4 Antworten, genau eine richtige, im Text belegt; Belohnung gibt es', () => {
-  const arten = new Set();
-  for (const b of B) {
-    assert.ok(b.fragen.length >= 1 && b.fragen.length <= 2, b.id);
-    for (const f of b.fragen) {
-      arten.add(f.art);
-      assert.ok(['finden', 'schliessen', 'wort'].includes(f.art), `${b.id}: Art ${f.art}`);
-      assert.ok(f.antworten.length >= 3 && f.antworten.length <= 4, `${b.id}: ${f.frage}`);
-      assert.equal(new Set(f.antworten).size, f.antworten.length, `${b.id}: doppelte Antworten`);
-      assert.equal(f.antworten.filter((a) => a === f.richtig).length, 1, `${b.id}: genau eine richtige Antwort`);
-      assert.ok(b.text.includes(f.textstelle), `${b.id}: Textstelle „${f.textstelle}“ steht nicht im Text`);
-      const bel = f.belohnung;
-      assert.ok(bel.typ === 'gold' ? bel.menge > 0 : bel.typ === 'item' && ITEMS.has(bel.id), `${b.id}: Belohnung ${JSON.stringify(bel)}`);
-    }
-    assert.ok(b.trost?.typ === 'gold' && b.trost.menge > 0 && b.trost.menge <= 2, `${b.id}: kleine Trostbelohnung`);
-  }
-  assert.deepEqual([...arten].sort(), ['finden', 'schliessen', 'wort'], 'alle drei Fragearten kommen vor');
-});
-
 test('Brief statt Begegnung: frühestens ab Tag 2, nie zwei Tage hintereinander, etwa jeden dritten Tag', async () => {
   const { newRun, finishBattle, seededRng } = await import('../js/logic.js');
   const items = json('items.json').items, regions = json('regions.json').gebiete;

@@ -350,7 +350,8 @@ export function finishBattle(run, items, regions, won, enemyName, rng = null) {
 
 export const COMPOUNDS_FROM_DAY = 4; // ab diesem Tag bringen Orks auch Komposita mit
 // Kluge Gegner (ab abTag): mehr Gold, passende Siegel und Runen in den Sockeln, Verb-Rollen wirken voll.
-export const GEGNER_KLUG = { abTag: 4, budgetProTag: 0.04, sockelChance: 0.55, sockelProTag: 0.08, bossPlus: -10, endbossPlus: -8 };
+// bossPlus / endbossPlus: Extra-Gold für die Bosse, tag1: Anteil des Golds am ersten Tag (gut schaffbar).
+export const GEGNER_KLUG = { abTag: 3, budgetProTag: 0.03, sockelChance: 0.7, sockelProTag: 0.15, bossPlus: 0, endbossPlus: -4, tag1: 0.78 };
 
 export function enemyPool(items, compounds, day) {
   const base = items.filter((d) => d.art !== 'siegel' && d.art !== 'rune' && d.art !== 'tasche');
@@ -368,7 +369,8 @@ export function enemyBudget(day, boss) {
   // Gegner bekommen anfangs fast so viel Gold wie du (plus Start-Items), später anteilig weniger:
   // Du verbesserst deinen Rucksack mit Grammatik (Komposita, Siegel, Runen), die Orks nicht.
   const klug = day >= GEGNER_KLUG.abTag ? 1 + GEGNER_KLUG.budgetProTag * (day - GEGNER_KLUG.abTag + 1) : 1;
-  return Math.floor((cumulativeGold(day) + 8) * (0.92 - 0.035 * (day - 1)) * klug) + (boss ? (day >= CFG.lastDay ? GEGNER_KLUG.endbossPlus : GEGNER_KLUG.bossPlus) : 0);
+  const anfang = day === 1 ? GEGNER_KLUG.tag1 : 1; // Tag 1 bleibt gut schaffbar
+  return Math.floor((cumulativeGold(day) + 8) * (0.92 - 0.035 * (day - 1)) * klug * anfang) + (boss ? (day >= CFG.lastDay ? GEGNER_KLUG.endbossPlus : GEGNER_KLUG.bossPlus) : 0);
 }
 
 // Ab diesen Tagen bringen Orks auch Gegenstände mit Sternstufe mit (★★ ab Tag 3, ★★★ ab Tag 6);

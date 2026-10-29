@@ -93,10 +93,11 @@ const LAUF = `
   let karte = null;
   for (let t = 0; t < 30 && !karte; t++) { karte = [...document.querySelectorAll('.hero-card, .figur-karte')].find((k) => k.textContent.includes('Eadrun')); if (!karte) await __s(100); }
   await __klick(karte, 500);
-  for (let k = 0; k < 3; k++) {
-    // Nach der Figur kommt die Begleiterwahl: den Igel antippen, dann aufbrechen
+  for (let k = 0; k < 5; k++) {
+    // Nach der Figur kommen Begleiterwahl (den Igel antippen) und Design-Wahl, dann die Schicksalsrune
     const bk = document.querySelector('.begleiter-karte[data-begleiter="igel"]');
     if (bk && !document.querySelector('#figur-detail:not([hidden]) [data-los]')) { bk.click(); await __s(400); }
+    const dw = document.querySelector('#sammlung-layer [data-los]'); if (dw) { dw.click(); await __s(600); continue; }
     const los = [...document.querySelectorAll('button')].find((b) => b.offsetParent && /aufbrechen/i.test(b.textContent));
     if (los) { los.click(); await __s(700); }
   }

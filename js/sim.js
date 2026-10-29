@@ -3,6 +3,7 @@
 // Strategien: „zufall“ (Standard) kauft irgendetwas, das es sich leisten kann, würfelt bis zu dreimal neu und verkauft
 // Schwaches für Besseres; „gut“ sammelt gleiche Gegenstände, setzt Siegel und Runen in die Sockel und investiert in den
 // Händler; „vorsichtig“ würfelt höchstens einmal und kauft nur, was noch Platz hat oder sich verbindet.
+// „abwehr“ spielt wie „gut“, bevorzugt aber Block, Heilung, Leben, Startblock und Regeneration.
 // Händler-Vertrauen und Schmied lassen sich für den Vergleich abschalten (opts.haendler, opts.schmied, opts.wuerfelAlt).
 import {
   CFG, newRun, finishBattle, rollShop, pickEnemy, makeEnemy, findSpot, bagGrid, STORE_GRID,
@@ -10,7 +11,7 @@ import {
   HAENDLER, haendlerStufe, vertrauenKosten, vertrauenErhoehen, STERN_FAKTOR, canPlace,
 } from './logic.js';
 import { buildCompounds, buildRuneLevels, isVerb, isNoun, verbTargetCell } from './grammar.js';
-import { partnerOf, compoundPartner, placeNew, verbindeAlles, schmiedZiel, schmiedPreis, schmiedSperre, schmiedAufwerten } from './sterne.js';
+import { partnerOf, compoundPartner, kompositumAus, placeNew, verbindeAlles, schmiedZiel, schmiedPreis, schmiedSperre, schmiedAufwerten } from './sterne.js';
 import { playerContext, evaluateBag } from './mods.js';
 import { baueBuch, entdeckungenIn } from './buch.js';
 import { neuesProfil, entdecke, merkeAntwort, laufStand, laufAbschluss, rangVon } from './fortschritt.js';
@@ -32,6 +33,9 @@ export function prepareData(raw) {
   return { ...raw, defs, compounds, buch: baueBuch(defs, raw.items, raw.recipes) };
 }
 
+// Zufallsstrategie: Wie oft zieht sie einen Kristall zufällig auf einen passenden Träger, wie sicher löst sie Aufgaben?
+export const GUT_ZUFALL = { kristall: 0.05, skill: 0.5 };
+
 // Spruchrolle: Werte stehen am Gegenstand
 const defVon = (p, defs) => (p.spruch ? { ...defs[p.id], ...p.spruch.werte } : defs[p.id]);
 
@@ -41,6 +45,15 @@ function worth(d) {
   if (!d.abklingzeit) return (d.tempo || 0) * 0.25 + (d.leben || 0) * 0.08 + (d.startblock || 0) * 0.08 + (d.glueck || 0) * 0.2;
   const per = (d.schaden || 0) + 0.7 * (d.block || 0) + 0.7 * (d.heilung || 0) + 2.5 * (d.gift || 0) + 1.8 * (d.brand || 0)
     + 1.5 * (d.kaelte || 0) + 6 * (d.betaeubung || 0) + 2 * (d.regeneration || 0);
+  return per / d.abklingzeit;
+}
+
+// Abwehr-Strategie: Schutz, Heilung, Leben und Startblock zählen mehr, Schaden etwas weniger
+function abwehrWert(d) {
+  if (d.art === 'siegel' || d.art === 'rune') return 0;
+  if (!d.abklingzeit) return (d.tempo || 0) * 0.25 + (d.leben || 0) * 0.12 + (d.startblock || 0) * 0.12 + (d.glueck || 0) * 0.2;
+  const per = 0.85 * (d.schaden || 0) + 1.2 * (d.block || 0) + 1.2 * (d.heilung || 0) + 2 * (d.gift || 0) + 1.4 * (d.brand || 0)
+    + 1.5 * (d.kaelte || 0) + 6 * (d.betaeubung || 0) + 3 * (d.regeneration || 0);
   return per / d.abklingzeit;
 }
 
@@ -81,20 +94,10 @@ function verbenRichten(run, defs, rng, skill) {
     }
   }
 }
-// Gute Strategie: Kristall gezielt links neben oder über einen Träger legen (und umgekehrt) – sofort ein Kompositum
-function kompositumSpot(run, data, d) {
-  const { defs, recipes } = data;
-  const bag = run.items.filter((p) => p.area === 'bag');
-  const grid = bagGrid(run);
-  const k = recipes.komposita;
-  const versuche = [];
-  if (d.art === 'kraft' && k.kraefte[d.id]) {
-    for (const t of bag.filter((p) => k.traeger.includes(p.id))) versuche.push({ x: t.x - 1, y: t.y }, { x: t.x, y: t.y - 1 });
-  } else if (k.traeger.includes(d.id)) {
-    for (const c of bag.filter((p) => defs[p.id].art === 'kraft' && k.kraefte[p.id])) versuche.push({ x: c.x + 1, y: c.y }, { x: c.x, y: c.y + 1 });
-  }
-  for (const v of versuche) for (const rot of d.w === d.h ? [0] : [0, 1]) if (canPlace(bag, defs, d, v.x, v.y, rot, grid)) return { ...v, rot };
-  return null;
+// Kristall auf einen Träger ziehen: der stärkste passende Träger im Rucksack (oder null)
+function kraftZiel(run, data, d) {
+  return run.items.filter((p) => p.area === 'bag' && kompositumAus({ id: d.id }, p, data.defs, data.recipes))
+    .sort((x, y) => (y.stern || 1) - (x.stern || 1))[0] || null;
 }
 const starDefOf = (p, defs) => ({ ...defVon(p, defs), ...(p.stern > 1 ? { schaden: (defs[p.id].schaden || 0) * STERN_FAKTOR[p.stern], block: (defs[p.id].block || 0) * STERN_FAKTOR[p.stern], heilung: (defs[p.id].heilung || 0) * STERN_FAKTOR[p.stern] } : {}) });
 
@@ -116,11 +119,13 @@ function schmiedNutzen(run, data, rng, skill) {
 function shop(run, data, rng, skill, opts = {}) {
   const { defs, items, regions } = data;
   const vorsichtig = opts.strategie === 'vorsichtig';
-  const gut = opts.strategie === 'gut';
+  const abwehr = opts.strategie === 'abwehr';
+  const gut = opts.strategie === 'gut' || abwehr;
+  const wert = abwehr ? abwehrWert : worth;
   const zufall = !gut && !vorsichtig;
   // Ein gleiches besitzt man schon: Kaufen verbindet sofort (braucht keinen Platz, spart sogar welchen).
   // Die gute Strategie sammelt gezielt; die Zufallsstrategie kauft irgendetwas Bezahlbares.
-  const value = (d) => (zufall ? rng() : worth(d) * (partnerOf(run.items, defs, { uid: -1, id: d.id }) ? (gut ? 2.5 : 1.3) : 1)
+  const value = (d) => (zufall ? rng() : wert(d) * (partnerOf(run.items, defs, { uid: -1, id: d.id }) ? (gut ? 2.5 : 1.3) : 1)
     * (gut && compoundPartner(d, run.items.filter((p) => p.area === 'bag'), defs, data.recipes) ? 2 : 1));
   for (let round = 0; round < 3; round++) {
     if (gut) sockelKaufen(run, data, rng, skill);
@@ -139,13 +144,24 @@ function shop(run, data, rng, skill, opts = {}) {
           bought = true;
           break;
         }
+        // Kristall direkt auf einen Träger ziehen (gute Strategie immer, Zufall jedes zweite Mal): kaufen und verbinden
+        const traeger = (gut || (zufall && rng() < GUT_ZUFALL.kristall)) && kraftZiel(run, data, o.d);
+        if (traeger) {
+          run.gold -= o.d.preis;
+          run.shop[o.i] = null;
+          const k = { uid: run.nextUid++, id: o.d.id, area: 'neu', x: 0, y: 0, rot: 0 };
+          run.items.push(k);
+          verbinde(run, data, rng, skill, k, { uid: k.uid, auf: traeger.uid });
+          bought = true;
+          break;
+        }
         const bag = run.items.filter((p) => p.area === 'bag');
-        let spot = (gut && kompositumSpot(run, data, o.d)) || findSpot(bag, defs, o.d, bagGrid(run));
+        let spot = findSpot(bag, defs, o.d, bagGrid(run));
         if (!spot && (vorsichtig || zufall)) continue;
         if (!spot) {
           // Rucksack voll: schwächstes Item verkaufen, wenn das neue besser ist
-          const weakest = bag.filter((p) => !p.fluch).sort((a, b) => worth(defVon(a, defs)) - worth(defVon(b, defs)))[0];
-          if (!weakest || worth(defVon(weakest, defs)) * (gut ? 1.1 : 1.3) >= worth(o.d)) continue;
+          const weakest = bag.filter((p) => !p.fluch).sort((a, b) => wert(defVon(a, defs)) - wert(defVon(b, defs)))[0];
+          if (!weakest || wert(defVon(weakest, defs)) * (gut ? 1.1 : 1.3) >= wert(o.d)) continue;
           run.items = run.items.filter((p) => p !== weakest);
           run.gold += sellValue(defs[weakest.id], weakest.stern || 1);
           spot = findSpot(run.items.filter((p) => p.area === 'bag'), defs, o.d, bagGrid(run));
@@ -155,7 +171,10 @@ function shop(run, data, rng, skill, opts = {}) {
         run.shop[o.i] = null;
         const p = { uid: run.nextUid++, id: o.d.id, area: 'bag', ...spot };
         run.items.push(p);
-        verbinde(run, data, rng, skill, p); // liegt es zufällig neben einem Träger? → Kompositum
+        verbinde(run, data, rng, skill, p);
+        // Gute Strategie: ein Kristall aus Lager oder Rucksack kommt auf den neuen Träger
+        const kristall = gut && run.items.find((q) => q.area !== 'neu' && q.uid !== p.uid && kompositumAus(q, p, defs, data.recipes));
+        if (kristall && run.items.includes(p)) verbinde(run, data, rng, skill, kristall, { uid: kristall.uid, auf: p.uid });
         bought = true;
         break;
       }
@@ -174,10 +193,10 @@ function shop(run, data, rng, skill, opts = {}) {
 
 // Zwei gleiche sofort verbinden, auch als Kette (eine falsche erste Antwort kostet 1 Gold).
 // Gleich beim ersten Versuch richtig: Das neue Item glänzt (+10 % im nächsten Kampf), wie im Spiel.
-function verbinde(run, data, rng, skill, p) {
+function verbinde(run, data, rng, skill, p, check = null) {
   if (!p) return;
   let erster = true;
-  const log = verbindeAlles(run, data.defs, data.recipes, [{ uid: p.uid, paar: true }], (a, q) => {
+  const log = verbindeAlles(run, data.defs, data.recipes, [check || { uid: p.uid, paar: true }], (a, q) => {
     if (!q) return 'richtig';
     erster = rng() <= skill;
     if (!erster) { run.gold = Math.max(0, run.gold - 1); merkeAntwort(run, q.art, false); }
@@ -235,7 +254,7 @@ function morning(run, data, rng, skill, opts = {}) {
       // Die gute Strategie wählt die Begegnung mit der besten Belohnung (Rucksack-Feld vor Item, Rabatt, Gold)
       const wahl = pickEncounters(run, data.encounters, data.regions, rng);
       const rangOf = (eid) => ['feld', 'item', 'mod', 'rabatt', 'gold', 'kobold'].indexOf(data.encounters.begegnungen.find((b) => b.id === eid).belohnung.typ);
-      const id = opts.strategie === 'gut' ? [...wahl].sort((a, b) => rangOf(a) - rangOf(b))[0] : pickOne(wahl, rng);
+      const id = ['gut', 'abwehr'].includes(opts.strategie) ? [...wahl].sort((a, b) => rangOf(a) - rangOf(b))[0] : pickOne(wahl, rng);
       const enc = data.encounters.begegnungen.find((b) => b.id === id);
       const ok = rng() < skill;
       if (!ok) run.gold = Math.max(0, run.gold - 1);
@@ -253,7 +272,9 @@ function morning(run, data, rng, skill, opts = {}) {
       }
       if (b.typ === 'kobold') {
         const e = pickOne(data.exercises.kobold, rng);
-        verbinde(run, data, rng, skill, placeNew(run, defs, e.item, null, ok ? {} : { fluch: e.teile.join('') }));
+        // Falsch: nur ein gewöhnlicher Gegenstand statt des epischen
+        const normal = shopPool(run, data.items, data.regions).filter((d) => d.seltenheit === 'gewoehnlich' && d.abklingzeit);
+        verbinde(run, data, rng, skill, placeNew(run, defs, ok || !normal.length ? e.item : pickOne(normal, rng).id));
       }
     }
   }
@@ -263,7 +284,7 @@ function morning(run, data, rng, skill, opts = {}) {
 // Spielt einen ganzen Lauf. Gibt Siege, Tage und Kampfzeiten zurück.
 export function simulateRun(data, rng, opts = {}) {
   // Die gute Strategie löst auch die Aufgaben sicherer (Rüstungsfehler, Verbinden ohne Fehlversuch)
-  const skill = opts.skill ?? (opts.strategie === 'gut' ? 0.95 : 0.75);
+  const skill = opts.skill ?? (['gut', 'abwehr'].includes(opts.strategie) ? 0.95 : opts.strategie === 'vorsichtig' ? 0.75 : GUT_ZUFALL.skill);
   const hero = pickOne(data.heroes, rng);
   // Begleiter: zufällig (ohne begleiter.json im Datensatz keiner)
   const begleiter = data.begleiter?.length ? data.defs['begleiter-' + pickOne(data.begleiter, rng).id] : null;

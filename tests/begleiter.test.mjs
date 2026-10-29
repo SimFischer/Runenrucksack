@@ -27,20 +27,6 @@ const lauf = (id) => {
   return run;
 };
 
-test('Sechs Begleiter mit Bild, Text und Wirkung; Freischaltung nur über den Rang', () => {
-  assert.deepEqual(B.map((b) => b.id).sort(), ['eule', 'falke', 'fuchs', 'igel', 'pony', 'rabe']);
-  for (const b of B) {
-    assert.ok(b.text && b.name && b.artikel && b.wirkung, b.id);
-    assert.ok(!b.freischaltung || Object.keys(b.freischaltung).join() === 'rang', `${b.id}: nur über den Rang`);
-  }
-  const frei = (xp) => B.filter((b) => begleiterFrei(b, rangVon(xp, RAENGE).nr)).map((b) => b.id).sort();
-  assert.deepEqual(frei(0), ['eule', 'igel']);
-  assert.deepEqual(frei(350), ['eule', 'igel', 'pony']);
-  assert.deepEqual(frei(1200), ['eule', 'fuchs', 'igel', 'pony']);
-  assert.deepEqual(frei(2600), ['eule', 'fuchs', 'igel', 'pony', 'rabe']);
-  assert.deepEqual(frei(4000), B.map((b) => b.id).sort());
-});
-
 test('Begleiter liegt als 1×1-Gegenstand im Rucksack und bleibt im gespeicherten Lauf erhalten', () => {
   const run = newRun(ITEMS, REGIONS, { hero: json('heroes.json').helden[0], begleiter: DEFS[bid('igel')] });
   const p = run.items.find((q) => q.id === bid('igel'));

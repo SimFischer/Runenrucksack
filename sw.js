@@ -1,6 +1,6 @@
 // Offline-Unterstützung: zuerst aus dem Netz laden (damit Änderungen an items.json sofort ankommen),
 // ohne Netz aus dem Zwischenspeicher. Bei neuen Dateien die Versionsnummer erhöhen.
-const CACHE = 'runenrucksack-v17';
+const CACHE = 'runenrucksack-v18';
 const FILES = [
   './',
   'index.html',
@@ -51,6 +51,10 @@ const FILES = [
   'assets/ui/haendlerstand.webp',
   'assets/ui/lager-truhe.webp',
   'assets/ui/rucksack-flaeche.webp',
+  'assets/ui/rucksack-zwergenstahl.webp',
+  'assets/ui/rucksack-elbenseide.webp',
+  'assets/ui/rucksack-reiterleder.webp',
+  'assets/ui/rucksack-silberbanner.webp',
   'assets/ui/symbole/buch.webp',
   'assets/ui/symbole/eule.webp',
   'assets/ui/symbole/gold.webp',

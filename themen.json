@@ -58,9 +58,9 @@
         { "id": "zeit-perfekt", "text": "Das Perfekt bildet man mit haben oder sein und dem Partizip: Er hat geschlagen. Er ist gelaufen." },
         { "id": "zeit-erkennen", "text": "Präsens: jetzt (er reitet). Präteritum: erzählte Vergangenheit (er ritt). Perfekt: haben/sein + Partizip (er ist geritten)." } ] },
     { "id": "steigerung", "name": "Steigerung", "emoji": "📈", "stufen": [
-        { "text": "regelmäßig", "formate": ["luecke", "paare", "regel"] },
-        { "text": "mit Umlaut", "formate": ["luecke", "buchstaben", "paare"] },
-        { "text": "unregelmäßig: gut, viel, gern", "formate": ["luecke", "eintippen", "paare"] } ],
+        { "text": "regelmäßig", "formate": ["luecke", "buchstaben", "regel"] },
+        { "text": "mit Umlaut und Zweifelsfällen", "formate": ["luecke", "buchstaben"] },
+        { "text": "unregelmäßig, im Satz mit Endung", "formate": ["luecke", "eintippen", "buchstaben"] } ],
       "regeln": [
         { "id": "steigerung-regel", "text": "Steigern: schnell – schneller – am schnellsten. Komparativ mit -er, Superlativ mit am …sten." },
         { "id": "steigerung-umlaut", "text": "Viele kurze Adjektive bekommen beim Steigern einen Umlaut: alt – älter – am ältesten." },

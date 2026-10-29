@@ -13,8 +13,8 @@ export function begleiterDefs(liste) {
   }));
 }
 
-// Freigeschaltet? Nur über den Rang (Erfahrung im Heldencode). raengeNr: Rang-Nummer aus rangVon().
-export const begleiterFrei = (b, rangNr) => !b.freischaltung?.rang || rangNr >= b.freischaltung.rang;
+// Freigeschaltet? Nur über die Erfahrung (steckt im Heldencode).
+export const begleiterFrei = (b, xp) => !b.freischaltung?.xp || xp >= b.freischaltung.xp;
 
 // Wirkung des gewählten Begleiters – mit imRucksack nur, wenn er im Rucksack liegt (Kampf-Wirkungen).
 export function begleiterWirkung(run, liste, imRucksack = false) {

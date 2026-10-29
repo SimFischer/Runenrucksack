@@ -351,9 +351,7 @@ export function buildGrid(el, grid, size) {
 export function drawItems(gridEl, grid, placed, size, info, area) {
   const els = {};
   const fusing = new Set();
-  if (area === 'bag') {
-    for (const f of findFusions(placed, G.DEFS, G.RECIPES)) fusing.add(f.kraft.uid).add(f.traeger.uid);
-  }
+
 
   for (const p of placed) {
     const def = G.DEFS[p.id];
@@ -397,7 +395,10 @@ export function sockelZeichnen(it, p, def, size, extraRunen = 0) {
   for (let k = 0; k < Math.max(pl.runen, s.runen.length); k++) {
     const r = document.createElement('span');
     r.className = 'mulde adjektiv' + (s.runen[k] ? ' voll' : '');
-    if (s.runen[k]) r.textContent = '✦';
+    // belegt: das Bild der eingesetzten Rune
+    const src = s.runen[k] && bildFuer(G.DEFS[s.runen[k]]);
+    if (src) r.innerHTML = `<img src="${src}" alt="">`;
+    else if (s.runen[k]) r.textContent = G.DEFS[s.runen[k]].name.charAt(0);
     leiste.append(r);
   }
   it.append(leiste);

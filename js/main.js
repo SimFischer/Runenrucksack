@@ -8,20 +8,20 @@ import {
   GENUS, SIEGEL_BONUS, findFusions, wrongOrderNeighbor, canRotate, nextRot, isNoun, isRune, isVerb, runeBase, starDef, nextLevelId,
 } from './grammar.js';
 import {
-  canMerge, compoundPartner, placeNew, findeVerbindung, fuehreAus, frageFuer, sameKind, nichtVerbinden,
+  canMerge, compoundPartner, placeNew, findeVerbindung, fuehreAus, frageFuer, sameKind, nichtVerbinden, kompositumAus,
   schmiedZiel, schmiedPreis, schmiedSperre, schmiedAufwerten,
 } from './sterne.js';
 import {
   G, loadData, save, loadRun, placedOf, itemsIn, gridOf, region, hero, playerCtx, emit, onEvent, figurBild, hintergrundBild, setPref, saveProfil,
 } from './state.js';
 import { evaluateBag, GLANZ_BONUS } from './mods.js';
-import { istSockelTeil, kannEinsetzen, einsetzen, herausnehmen, sockelVon } from './sockel.js';
+import { istSockelTeil, kannEinsetzen, einsetzen, herausnehmen, sockelVon, sockelPlaetze } from './sockel.js';
 import { sym } from './symbole.js';
 import {
   $, fmt, fullName, genusChip, toast, bump, openModal, closeModal, modal, itemEl, buildGrid, drawItems, mergeAnimation, syncGold, iconHtml,
   openQuick, closeQuick, sternVon, abzeichenHtml,
 } from './ui.js';
-import { startNight, zeigeKampfErgebnis } from './battle-ui.js';
+import { startNight, zeigeKampfErgebnis, battleControl } from './battle-ui.js';
 import { frageImSpiel, wortschatz, einstellungen } from './aufgaben/spiel.js';
 import { BEGLEITER_PREFIX, begleiterFrei, istBegleiter } from './begleiter.js';
 import { stufenBereich, stufeFuer, aufgabenStand, schaetzeLernstand, themaAn } from './aufgaben/wahl.js';
@@ -35,7 +35,7 @@ import { entdeckungenIn } from './buch.js';
 import {
   entdecke, merkeAntwort, laufStand, laufAbschluss, rangVon, pruefeFreischaltungen, figurFrei, freieItems, bedingungText, pruefeErfolge,
 } from './fortschritt.js';
-import { zeigeSammlung, wendeDesignAn, fortschrittCtx } from './sammlung-ui.js';
+import { zeigeSammlung, wendeDesignAn, fortschrittCtx, zeigeDesignWahl } from './sammlung-ui.js';
 import { zeigeBuch, meldeNeu, meldeErfolg } from './buch-ui.js';
 import { zeigeLaufende } from './ende-ui.js';
 import { zeigeCode, zeigeEingabe, uebernehmen, neuBeginnen } from './code-ui.js';
@@ -79,7 +79,8 @@ async function boot() {
   $('haendler-stufe').onclick = zeigeHaendler;
   $('amboss').onclick = onAmboss;
   $('btn-fight').onclick = onFight;
-  $('btn-menu').onclick = openMenu;
+  $('btn-menu').onclick = () => openMenu();
+  $('btn-menu-kampf').onclick = () => { battleControl.pause(); openMenu(true); };
 
   document.addEventListener('pointerdown', onDown, { passive: false });
   window.addEventListener('pointermove', onMove, { passive: false });
@@ -145,7 +146,7 @@ function showStart() {
 function zeigeRang() {
   const r = rangVon(G.PROFIL.xp, G.ACH.raenge);
   const box = $('start-rang');
-  const pct = r.naechster ? Math.round(((G.PROFIL.xp - r.ab) / (r.naechster.ab - r.ab)) * 100) : 100;
+  const pct = r.naechster ? Math.round(((G.PROFIL.xp - r.stufeAb) / (r.naechster.ab - r.stufeAb)) * 100) : 100;
   box.innerHTML = `<span class="rang-emoji">${sym('stern')}</span><span><b>${r.name}</b>
     <span class="rang-bar"><i style="width:${pct}%"></i></span>
     <small>${r.naechster ? `${G.PROFIL.xp} Erfahrung · noch ${r.bisNaechster} bis ${r.naechster.name}` : `${G.PROFIL.xp} Erfahrung · höchster Rang!`}</small></span>`;
@@ -170,6 +171,13 @@ function continueSaved() {
 
 // Vor jedem Lauf: Figur wählen. Karten zeigen nur Bild, Name und Rolle; Antippen öffnet die Detailtafel.
 // Gesperrte Figuren sind dunkle Silhouetten mit Schloss und einer Zeile, wie man sie freischaltet.
+// Pokal in der Kartenecke: Mit dieser Figur wurde die Reise schon geschafft (ab zweimal mit Anzahl)
+function pokalAbzeichen(id) {
+  if (!G.PROFIL.figurSiege.includes(id)) return '';
+  const n = G.PROFIL.figurSiegeZahl?.[id] || 1;
+  return `<span class="figur-pokal" title="Reise mit dieser Figur geschafft">${sym('pokal')}${n > 1 ? `<b>${n}</b>` : ''}</span>`;
+}
+
 function showHeroes() {
   const box = $('hero-cards');
   box.innerHTML = '';
@@ -182,6 +190,7 @@ function showHeroes() {
     card.dataset.held = h.id;
     card.innerHTML = `
       <div class="figur-bild">${figurBild(h.id) ? `<img src="${figurBild(h.id)}" alt="">` : ''}${frei ? '' : `<span class="figur-schloss">${sym('schloss')}</span>`}</div>
+      ${pokalAbzeichen(h.id)}
       <div class="figur-name">${frei ? h.kurz : '???'}</div>
       <div class="figur-rolle">${frei ? h.rolle : bedingungText(h.freischaltung, fortschrittCtx())}</div>`;
     card.onclick = (e) => { e.stopPropagation(); zeigeFigur(h, frei); };
@@ -221,7 +230,7 @@ function showBegleiter(h) {
   $('figur-detail').hidden = true;
   document.querySelector('#heroes .figuren-titel').textContent = 'Wähle deinen Begleiter';
   for (const b of G.BEGLEITER) {
-    const frei = begleiterFrei(b, rangNr());
+    const frei = begleiterFrei(b, G.PROFIL.xp);
     const card = document.createElement('button');
     card.className = 'figur-karte begleiter-karte' + (frei ? '' : ' gesperrt');
     card.dataset.begleiter = b.id;
@@ -254,7 +263,7 @@ function zeigeBegleiter(h, b, frei) {
       <div class="row"><button class="btn" data-zurueck>Andere Figur</button></div>
     </div>`;
   tafel.hidden = false;
-  tafel.querySelector('[data-los]')?.addEventListener('click', () => startNewRun(h, b));
+  tafel.querySelector('[data-los]')?.addEventListener('click', () => zeigeDesignWahl(() => startNewRun(h, b)));
   tafel.querySelector('[data-zurueck]').onclick = showHeroes;
 }
 
@@ -504,19 +513,15 @@ function renderShop() {
     // Ketten-Symbol: ergibt mit etwas im Rucksack ein Kompositum
     const fern = playerCtx().fernsicht;
     const cp = compoundPartner(def, fern ? G.run.items.filter((p) => p.area !== 'neu') : itemsIn('bag'), G.DEFS, G.RECIPES);
-    if (fern && cp) {
-      const l = document.createElement('span');
-      l.className = 'fern';
-      l.textContent = '→ ' + G.DEFS[cp.id].name;
-      l.title = 'Faelith sieht es von Weitem';
-      holder.append(l);
-    }
+    // Band über dem Angebot: „→ Eisdolch“. Antippen lässt den passenden Gegenstand aufleuchten.
     if (cp) {
-      const chain = document.createElement('span');
-      chain.className = 'chain';
-      chain.innerHTML = sym('stern');
-      chain.title = fern ? 'Ergibt mit etwas, das du besitzt, ein Kompositum' : 'Ergibt mit etwas in deinem Rucksack ein Kompositum';
-      holder.append(chain);
+      const band = document.createElement('button');
+      band.className = 'komp-band';
+      band.textContent = '→ ' + G.DEFS[cp.id].name;
+      band.title = fern ? 'Ergibt mit etwas, das du besitzt, ein Kompositum' : 'Ergibt mit etwas in deinem Rucksack ein Kompositum';
+      band.onpointerdown = (e) => e.stopPropagation();
+      band.onclick = (e) => { e.stopPropagation(); partnerZeigen(cp.mit.id); };
+      slot.prepend(band);
     }
 
     const price = document.createElement('div');
@@ -726,15 +731,14 @@ function grammarNotes(base, ana, ref) {
     if (ks > 1) out.push({ cls: 'ok', html: `Aus einem ${'★'.repeat(ks)}-Kristall: Die Kraft wirkt ${fmt(STERN_FAKTOR[ks])}-fach.` });
   }
   if (base.art === 'kraft') {
-    const fus = ref.src === 'bag' && findFusions(bag, G.DEFS, G.RECIPES).find((f) => f.kraft.uid === ref.uid);
-    const wrong = ref.src === 'bag' && !fus && wrongOrderNeighbor(placedOf(ref.uid), bag, G.DEFS, G.RECIPES);
+    const fus = null, wrong = null; // Kristalle werden auf den Träger gezogen (kein Legen nebeneinander mehr)
     if (fus) {
       out.push({ cls: 'ok', html: `✓ Liegt richtig: ${base.name} + ${G.DEFS[fus.traeger.id].name} = <b>${G.DEFS[fus.id].name}</b>. Zieh den Kristall noch einmal hierher, dann verbinden sich beide.` });
     } else if (wrong) {
       const t = G.DEFS[wrong.id];
       out.push({ cls: 'bad', html: `✗ Liegt rechts neben oder unter ${dativ(t)}. So entstünde „${t.name}${base.name.toLowerCase()}“. Das Bestimmungswort steht vorne: Lege ${fullName(base)} links neben oder über das Item.` });
     } else {
-      out.push({ html: `Lege ${fullName(base)} direkt links neben oder über einen Träger (Schwert, Bogen, Schild …). Dann entsteht sofort das Kompositum.` });
+      out.push({ html: `Zieh ${fullName(base)} auf einen Träger (Schwert, Bogen, Schild …). Dann entsteht sofort das Kompositum.` });
     }
   }
   if (base.art === 'siegel') {
@@ -757,7 +761,13 @@ function grammarNotes(base, ana, ref) {
   if (ana && isNoun(base)) {
     if (ana.siegel.some((s) => s.ok)) out.push({ cls: 'ok', html: `✓ Siegel ${genusChip(base.artikel)} im Sockel: mehr Wirkung` });
     if (ana.adjektive.length) out.push({ cls: 'ok', html: `✓ Im Sockel: <b>${ana.phrase}</b>` });
-    if (!ana.siegel.length || !ana.runen.length) out.push({ html: 'Freie Sockel: Zieh ein passendes Siegel oder eine Rune auf diesen Gegenstand.' });
+  }
+  // Sockel-Übersicht für alle Nomen (auch im Lager)
+  if (isNoun(base) && ref.uid) {
+    const p = placedOf(ref.uid), s = sockelVon(p), pl = sockelPlaetze(base, p.stern || 1, extraRunen());
+    const adj = Array.from({ length: pl.runen }, (_, k) => (s.runen[k] ? 'belegt' : 'frei'));
+    out.push({ html: `<b>Sockel:</b> Artikel ${s.siegel ? 'belegt' : 'frei'} · ${adj.length > 1 ? adj.map((x, k) => `Adjektiv ${k + 1} ${x}`).join(' · ') : `Adjektiv ${adj[0]}`}`
+      + (s.siegel && s.runen.length >= pl.runen ? '' : '<br><small>Zieh ein passendes Siegel oder eine Rune auf diesen Gegenstand.</small>') });
   }
   return out;
 }
@@ -1038,6 +1048,54 @@ async function setzeEin(ref, hostUid) {
   emit('eingesetzt', { id, ziel: host.id });
 }
 
+// Beim Ziehen: passende Träger (für Kristalle) und passende freie Sockel (für Siegel und Runen) leuchten,
+// unpassende Nomen werden ausgegraut.
+function zieleZeigen(def) {
+  const kristall = !!G.RECIPES.komposita.kraefte[def.id];
+  const teil = istSockelTeil(def);
+  if (!kristall && !teil) return;
+  for (const p of G.run.items.filter((q) => q.area === 'bag' || q.area === 'store')) {
+    const el = itemNode(p.uid);
+    if (!el) continue;
+    if (kristall) { if (kompositumAus({ id: def.id }, p, G.DEFS, G.RECIPES)) el.classList.add('ziel-passt'); continue; }
+    if (!isNoun(G.DEFS[p.id])) continue;
+    const ok = kannEinsetzen(p, G.DEFS, def.id, extraRunen()).ok;
+    el.classList.add(ok ? 'ziel-passt' : 'ziel-nein');
+    if (ok) el.querySelector(`.mulde.${def.art === 'siegel' ? 'artikel' : 'adjektiv'}:not(.voll)`)?.classList.add('leuchtet');
+  }
+}
+
+// Den Partner eines Kompositums im Rucksack (oder Lager) kurz aufleuchten lassen
+function partnerZeigen(id) {
+  const p = G.run.items.find((q) => q.id === id && q.area === 'bag') || G.run.items.find((q) => q.id === id && q.area === 'store');
+  const el = p && itemNode(p.uid);
+  if (!el) return;
+  el.classList.add('ziel-passt', 'pulse');
+  setTimeout(() => el.classList.remove('ziel-passt', 'pulse'), 1600);
+}
+
+// Kristall auf einen Träger gezogen (aus Laden, Lager oder Rucksack): Aufgabe, dann sofort das Kompositum.
+// Aus dem Laden wird er dabei gekauft; bei „Nicht verbinden“ wird der Kauf zurückgenommen.
+function aufTraeger(ref, traegerUid) {
+  const run = G.run;
+  let uid = ref.uid, kauf = null;
+  if (ref.src === 'shop') {
+    const def = G.DEFS[run.shop[ref.slot].id];
+    const preis = preisVon(run, def), rabatt = preis < def.preis;
+    if (run.gold < preis) { toast('Zu wenig Gold'); render(); return; }
+    const p = placeNew(run, G.DEFS, def.id, { area: 'neu', x: 0, y: 0 });
+    run.gold -= preis;
+    if (rabatt) run.rabatt--;
+    run.shop[ref.slot] = null;
+    bump('stat-gold');
+    kauf = { slot: ref.slot, id: def.id, preis, rabatt };
+    uid = p.uid;
+  }
+  emit('aufTraeger', { kraft: placedOf(uid).id, traeger: placedOf(traegerUid).id });
+  pruefe({ uid, auf: traegerUid, kauf });
+  render();
+}
+
 // Siegel oder Rune aus dem Sockel ins Lager zurücklegen
 function nimmHeraus(uid, wo) {
   const run = G.run, host = placedOf(uid);
@@ -1109,37 +1167,58 @@ function onFight() {
   emit('kampfStart');
 }
 
-function openMenu() {
+// Menü: oben der Stand, dann die drei großen Knöpfe, darunter gleich große Symbolknöpfe, der Schalter für die
+// Erste-Mal-Tipps und ganz unten klein „Neu beginnen“. Im Kampf ist der Kampf so lange angehalten.
+function openMenu(imKampf = false) {
   const run = G.run, l = run.lernen;
+  const zurueck = () => openMenu(imKampf);
+  const knopf = (act, symbol, text) => `<button class="btn menue-symbol" data-act="${act}">${sym(symbol, 'gross')}<span>${text}</span></button>`;
   modal(`
-    <div class="big-emoji">${sym('truhe', 'gross')}</div>
     <h2>Menü</h2>
-    <p>${region().name} · Tag ${run.day} · ${run.wins} Siege · ${run.hearts} Herzen</p>
-    ${l.richtig + l.falsch ? `<p>Grammatik-Aufgaben: ${l.richtig} richtig, ${l.falsch} daneben</p>` : ''}
-    <div class="row">
-      <button class="btn primary" data-act="close">Weiterspielen</button>
-      ${run.tutorial ? '' : '<button class="btn" data-act="pause">Lauf unterbrechen</button>'}
-      <button class="btn danger" data-act="new">Neuer Lauf</button>
+    <p class="menue-status">${region().name} · Tag ${run.day} · ${run.wins} Siege · ${run.hearts} Herzen${l.richtig + l.falsch ? ` · Aufgaben: ${l.richtig} richtig, ${l.falsch} daneben` : ''}</p>
+    <div class="menue-haupt">
+      <button class="btn primary big" data-act="weiter">Weiterspielen</button>
+      ${run.tutorial ? '' : '<button class="btn big" data-act="haupt">Zum Hauptmenü</button>'}
+      ${imKampf ? '' : '<button class="btn big danger" data-act="new">Neuer Lauf</button>'}
     </div>
-    <div class="row">
-      <button class="btn small" data-act="buch">${sym('buch')} Buch der Wörter</button>
-      <button class="btn small" data-act="sammlung">${sym('pokal')} Sammlung</button>
-      <button class="btn small" data-act="code">${sym('schloss')} Heldencode</button>
-      <button class="btn small" data-act="help">${sym('menue')} So geht's</button>
-      <button class="btn small" data-act="tutorial">${sym('stern')} Tutorial wiederholen</button>
-      <button class="btn small" data-act="tips">Erste-Mal-Tipps: ${tipsOn() ? 'an' : 'aus'}</button>
-      <button class="btn small" data-act="neustart">Neu beginnen</button>
-    </div>`, {
+    <div class="menue-symbole">
+      ${knopf('buch', 'buch', 'Buch der Wörter')}${knopf('sammlung', 'pokal', 'Sammlung')}${knopf('code', 'schloss', 'Heldencode')}
+      ${knopf('help', 'menue', 'So geht’s')}${imKampf ? '' : knopf('tutorial', 'stern', 'Tutorial')}
+    </div>
+    <div class="menue-schalter">Erste-Mal-Tipps
+      <button class="schalter${tipsOn() ? ' an' : ''}" data-act="tips" role="switch" aria-checked="${tipsOn()}"><i></i><span>${tipsOn() ? 'an' : 'aus'}</span></button></div>
+    <button class="menue-loeschen" data-act="neustart">Fortschritt löschen und neu beginnen …</button>`, {
+    weiter: () => { if (imKampf) battleControl.resume(); },
     new: () => confirmNew(),
     tutorial: startTutorial,
-    help: () => showHelp(openMenu),
-    buch: () => zeigeBuch(openMenu),
-    sammlung: () => zeigeSammlung(openMenu),
-    code: () => zeigeCode({ zurueck: G.run?.tutorial ? null : openMenu }), // im Tutorial führt Fenwick weiter
-    // Unterbrechen: Der Lauf bleibt auf diesem iPad gespeichert (Weiterspielen im Startmenü)
-    pause: () => { save(); showStart(); toast('Dein Lauf ist auf diesem iPad gespeichert.'); },
+    help: () => showHelp(zurueck),
+    buch: () => zeigeBuch(zurueck),
+    sammlung: () => zeigeSammlung(zurueck),
+    code: () => zeigeCode({ zurueck: G.run?.tutorial ? null : zurueck }), // im Tutorial führt Fenwick weiter
+    // Zum Hauptmenü: Der Lauf bleibt auf diesem iPad gespeichert (Weiterspielen auf dem Startbildschirm)
+    haupt: () => (imKampf ? zumHauptmenueImKampf() : zumHauptmenue()),
     neustart: () => neuBeginnen(() => { wendeDesignAn(); showAsk(); }),
-    tips: () => { setTips(!tipsOn()); toast(`Erste-Mal-Tipps sind jetzt ${tipsOn() ? 'an' : 'aus'}.`); openMenu(); },
+    tips: () => { setTips(!tipsOn()); zurueck(); },
+  }, 'menue-karte');
+}
+
+function zumHauptmenue() {
+  save();
+  showStart();
+  toast('Dein Lauf ist gespeichert. Mit „Weiterspielen“ geht es weiter.');
+}
+
+// Im Kampf: Der Kampf wird nicht gewertet, der Lauf geht vor diesem Kampf weiter
+function zumHauptmenueImKampf() {
+  modal(`
+    <h2>Kampf verlassen?</h2>
+    <p>Der Kampf wird abgebrochen. Wenn du weiterspielst, beginnt der Tag wieder vor diesem Kampf.</p>
+    <div class="row">
+      <button class="btn" data-act="nein">Weiterkämpfen</button>
+      <button class="btn primary" data-act="ja">Zum Hauptmenü</button>
+    </div>`, {
+    nein: () => battleControl.resume(),
+    ja: () => { battleControl.abbrechen(); zumHauptmenue(); },
   });
 }
 
@@ -1271,7 +1350,7 @@ function dontMerge(a, c) {
       run.gold += c.kauf.preis;
       if (c.kauf.rabatt) run.rabatt = (run.rabatt || 0) + 1;
       if (!run.shop[c.kauf.slot]) run.shop[c.kauf.slot] = { id: c.kauf.id, locked: false };
-      toast('Kein Platz – der Kauf wurde zurückgenommen.');
+      toast(a.typ === 'kompositum' ? 'Nicht verbunden – der Kauf wurde zurückgenommen.' : 'Kein Platz – der Kauf wurde zurückgenommen.');
     } else toast('Kein Platz – das Item bleibt beim Händler.');
   } else if (a.typ === 'paar') {
     if (a.neu.area === 'store' && c?.kauf) toast('Ins Lager gelegt');
@@ -1432,6 +1511,7 @@ function onCancel(e) {
 function startDrag() {
   drag.started = true;
   drag.el.classList.add('dragging');
+  zieleZeigen(drag.def);
   makeGhost();
   if (drag.ref.src !== 'shop') $('shop').classList.add('selling');
 }
@@ -1520,6 +1600,8 @@ function evaluate(area, x, y, s) {
   const hit = overlapping(list, G.DEFS, x, y, s.w, s.h);
   const me = selfUid ? placedOf(selfUid) : { id: drag.def.id };
   if (hit.length === 1 && sameKind(hit[0], me) && canMerge(drag.def, sternVon(me))) return { status: 'merge', mit: hit[0].uid };
+  // Kristall auf einen Träger: Kompositum
+  if (hit.length === 1 && kompositumAus({ id: drag.def.id }, hit[0], G.DEFS, G.RECIPES)) return { status: 'kompositum', traeger: hit[0].uid };
   // Siegel und Runen: auf ein Nomen ziehen und dort einsetzen – im Rucksack belegen sie kein Feld
   if (istSockelTeil(drag.def)) {
     if (hit.length === 1) {
@@ -1546,6 +1628,7 @@ function evaluate(area, x, y, s) {
 
 function endDrag() {
   if (!drag) return;
+  document.querySelectorAll('.ziel-passt, .ziel-nein, .mulde.leuchtet').forEach((x) => x.classList.remove('ziel-passt', 'ziel-nein', 'leuchtet'));
   drag.ghost?.remove();
   drag.preview?.remove();
   drag.el.classList.remove('dragging');
@@ -1567,6 +1650,7 @@ function drop(d) {
     return;
   }
   if (t.status === 'sockel') { setzeEin(d.ref, t.host); return; }
+  if (t.status === 'kompositum') { aufTraeger(d.ref, t.traeger); return; }
   if (t.status === 'merge') {
     // Direkt auf ein gleiches Item gelegt: beide verbinden sich.
     if (d.ref.src === 'shop') { buy(d.ref.slot, null, null, t.mit); return; }
@@ -1602,7 +1686,7 @@ function battleOver(won, enemyName) {
     run.abgeschlossen = true;
     G.abschluss = laufAbschluss(G.PROFIL, run, { achievements: G.ACH });
     G.abschluss.erfolge = pruefeErfolge(G.PROFIL, fortschrittCtx());
-    G.abschluss.frei = pruefeFreischaltungen(G.PROFIL, fortschrittCtx());
+    G.abschluss.frei = pruefeFreischaltungen(G.PROFIL, fortschrittCtx(), G.PROFIL.xp - (G.abschluss.xp?.gesamt || 0));
     saveProfil();
   }
   save();

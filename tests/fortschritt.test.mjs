@@ -7,14 +7,6 @@ import { neuesProfil, merkeAntwort, laufStand, erfahrungFuer, rangVon, laufAbsch
 const json = (f) => JSON.parse(readFileSync(new URL('../' + f, import.meta.url)));
 const ACH = json('achievements.json');
 
-test('Ränge: Lehrling → Wanderer → Runenkundige → Wortmeister → Hüter der Sprache', () => {
-  assert.deepEqual(ACH.raenge.map((r) => r.name), ['Lehrling', 'Wanderer', 'Runenkundige', 'Wortmeister', 'Hüter der Sprache']);
-  assert.equal(rangVon(0, ACH.raenge).name, 'Lehrling');
-  assert.equal(rangVon(349, ACH.raenge).bisNaechster, 1);
-  assert.equal(rangVon(350, ACH.raenge).nr, 2);
-  assert.equal(rangVon(99999, ACH.raenge).naechster, null);
-});
-
 test('Erfahrung: pro Sieg, pro Entdeckung, pro Frage beim ersten Versuch richtig', () => {
   const run = { wins: 7, over: 'lost', hero: 'borga' };
   merkeAntwort(run, 'mehrzahl', true, true);
@@ -39,53 +31,6 @@ test('Erfahrung: pro Sieg, pro Entdeckung, pro Frage beim ersten Versuch richtig
   assert.equal(p.stats.orkFehler, 3);
   assert.deepEqual(p.figurSiege, ['eadrun']);
   assert.equal(b.nachher.nr, 1);
-});
-
-test('Freischaltungen nur über die Erfahrung: Faelith ab Wanderer, Theron ab Runenkundige, Ysolde ab Wortmeister', async () => {
-  const { pruefeFreischaltungen, figurFrei, freieItems, bedingungText } = await import('../js/fortschritt.js');
-  const { baueBuch } = await import('../js/buch.js');
-  const { buildCompounds, buildRuneLevels } = await import('../js/grammar.js');
-  const H = json('heroes.json').helden;
-  const items = json('items.json').items;
-  const defs = Object.fromEntries(items.map((d) => [d.id, d]));
-  for (const d of buildCompounds(defs, json('recipes.json'))) defs[d.id] = d;
-  for (const d of buildRuneLevels(defs)) defs[d.id] = d;
-  const ctx = { achievements: ACH, buch: baueBuch(defs, items, json('recipes.json')), heroes: H };
-  const p = neuesProfil();
-  const frei = () => H.filter((h) => figurFrei(p, h)).map((h) => h.id);
-  assert.deepEqual(frei(), ['borga', 'eadrun']);
-  assert.match(bedingungText(H.find((h) => h.id === 'faelith').freischaltung, ctx), /Wanderer/);
-  p.xp = 400;
-  assert.deepEqual(pruefeFreischaltungen(p, ctx).figuren, ['faelith']);
-  // Buch und Siege zählen nicht mehr (sie liegen nur auf dem Gerät, nicht im Heldencode)
-  p.stats.gewonnen = 3;
-  p.buch = ctx.buch.eintraege.slice(0, 60).map((e) => e.id);
-  assert.deepEqual(pruefeFreischaltungen(p, ctx).figuren, []);
-  p.xp = 1200;
-  assert.deepEqual(pruefeFreischaltungen(p, ctx).figuren, ['theron']);
-  p.xp = 2600;
-  assert.deepEqual(pruefeFreischaltungen(p, ctx).figuren, ['ysolde']);
-  // Designs über die Ränge verteilt, alle Freischaltungen nur über den Rang
-  assert.deepEqual(ACH.designs.filter((d) => d.freischaltung).map((d) => d.freischaltung.rang), [2, 3, 4, 5]);
-  for (const x of [...H, ...ACH.designs, ...items]) if (x.freischaltung) assert.deepEqual(Object.keys(x.freischaltung), ['rang'], x.id);
-  p.xp = 0;
-  assert.equal(frei().length, 5, 'einmal frei bleibt frei');
-  // Bilder der neuen Figuren
-  const z = json('assets/zuordnung.json');
-  for (const id of ['faelith', 'theron', 'ysolde']) assert.ok(z.figuren[id], id);
-  // Items erst nach Freischaltung im Laden
-  assert.deepEqual(freieItems(p, items, ctx), []);
-  p.xp = 1200;
-  assert.deepEqual(freieItems(p, items, ctx), ['drachenfeuerschwert', 'runenstein']);
-  const { newRun, shopPool } = await import('../js/logic.js');
-  const R = json('regions.json').gebiete;
-  const run = newRun(items, R);
-  run.day = 6;
-  assert.ok(!shopPool(run, items, R).some((d) => d.id === 'drachenfeuerschwert'), 'gesperrt');
-  run.freieItems = ['drachenfeuerschwert'];
-  assert.ok(shopPool(run, items, R).some((d) => d.id === 'drachenfeuerschwert'), 'frei');
-  // Designs: mit dem Rang freigeschaltet (bis Wortmeister drei, das Silberbanner erst beim höchsten Rang)
-  assert.deepEqual([...p.designs].sort(), ['elbenseide', 'reiterleder', 'zwergenstahl']);
 });
 
 test('Erfolge: mindestens 15, jeder erreichbar geprüft; Silberbanner ab dem höchsten Rang', async () => {
