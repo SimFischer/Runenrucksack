@@ -3,7 +3,76 @@ import { sizeOf } from './logic.js';
 import { GENUS, findFusions, isRune, isVerb, isNoun, verbTargetCell, phraseFor, runeFits } from './grammar.js';
 import { sockelPlaetze, sockelVon } from './sockel.js';
 import { G, bildFuer, getPref } from './state.js';
-import { sym } from './symbole.js';
+import { sym, symbolPfad } from './symbole.js';
+
+// Kraft eines Kompositums als kleines Zustands-Symbol (statt des großen Kristalls)
+const KRAFT_SYMBOL = { feuer: 'brand', gift: 'gift', eis: 'kaelte', blitz: 'betaeubung', stein: 'block', mond: 'heilung', gold: 'glueck', sturm: 'tempo' };
+
+// Namensband: ganze Nominalgruppe, der Artikel in seiner Genusfarbe. Die Größe passt baenderEinpassen() an.
+function namensBand(l, text, artikel) {
+  const esc = (t) => t.replace(/&/g, '&amp;').replace(/</g, '&lt;');
+  const mitArtikel = artikel && text.startsWith(artikel + ' ');
+  l.innerHTML = mitArtikel ? `<span class="band-art" style="color:${GENUS[artikel].farbe}">${artikel}</span> ${esc(text.slice(artikel.length + 1))}` : esc(text);
+}
+
+// Nach dem Zeichnen, für jede Karte: Namensband so groß wie möglich, höchstens zwei (bei schmalen Karten drei)
+// Zeilen, nie abgeschnitten (kleiner statt gekürzt); Sterne, Sockel und Bild rücken in ihre festen Bereiche.
+export function baenderEinpassen(root, versuch = 0) {
+  const box = (e) => e?.getBoundingClientRect();
+  // Noch nicht sichtbar (z. B. Kampf wird erst eingeblendet): kurz danach noch einmal
+  const erste = root.querySelector('.item');
+  if (erste && !box(erste).width) { if (versuch < 80) setTimeout(() => baenderEinpassen(root, versuch + 1), 50); return; }
+  const ueber = (a, b) => a && b && a.right > b.left && b.right > a.left && a.bottom > b.top && b.bottom > a.top;
+  for (const it of root.querySelectorAll('.item')) {
+    const l = it.querySelector('.label');
+    if (l) {
+      // schmale, hohe Karten (z. B. ein Bogen) dürfen drei Zeilen haben
+      const r = box(it), zeilen = r.height > r.width * 1.5 ? 3 : 2;
+      let px = 13;
+      l.style.fontSize = px + 'px';
+      while (px > 7 && (l.scrollWidth > l.clientWidth + 1 || box(l).height > px * 1.05 * zeilen + 4)) {
+        px -= 0.5;
+        l.style.fontSize = px + 'px';
+      }
+    }
+    // Sterne und Kraft-Abzeichen teilen sich die obere Reihe: notfalls werden die Sterne kleiner
+    const st = it.querySelector('.stars'), abz = it.querySelector('.badge');
+    let sp = parseFloat(st?.style.fontSize) || 0;
+    while (st && abz && sp > 6 && ueber(box(st), box(abz))) { sp -= 1; st.style.fontSize = sp + 'px'; }
+    const band = l ? box(l).top : box(it).bottom - 3;
+    const leiste = it.querySelector('.sockel-leiste');
+    if (leiste) {
+      // Sockel beginnen unter den Sternen
+      const r0 = box(it);
+      leiste.style.top = Math.max(st ? box(st).bottom - r0.top + 2 : 0, 4) - (it.clientTop || 0) + 'px';
+      let m = parseFloat(leiste.style.getPropertyValue('--mulde')) || 12;
+      while (m > 6 && box(leiste).bottom > band - 1) {
+        m -= 1;
+        leiste.style.setProperty('--mulde', m + 'px');
+      }
+    }
+    bildInDieMitte(it, band);
+  }
+}
+
+// Das Bild bekommt genau die freie Mitte: unter Sternen und Abzeichen, über dem Namensband, rechts der Sockel
+function bildInDieMitte(it, band) {
+  const img = it.querySelector('.item-img');
+  if (!img) return;
+  const r = it.getBoundingClientRect(), rand = it.clientLeft || 0;
+  const unten = (sel) => { const e = it.querySelector(sel); return e ? e.getBoundingClientRect().bottom - r.top : 0; };
+  const leiste = it.querySelector('.sockel-leiste');
+  const oben = Math.max(unten('.stars'), unten('.badge'), 4) + 1;
+  const links = (leiste ? leiste.getBoundingClientRect().right - r.left : rand + 3) + 1;
+  const rechts = r.width - rand - 3;
+  const tief = band - r.top - 1;
+  const w = Math.max(10, rechts - links), h = Math.max(10, tief - oben);
+  const quer = img.style.transform.includes('rotate');
+  img.style.left = links - rand + w / 2 + 'px';
+  img.style.top = oben - rand + h / 2 + 'px';
+  img.style.width = (quer ? h : w) + 'px';
+  img.style.height = (quer ? w : h) + 'px';
+}
 
 export const $ = (id) => document.getElementById(id);
 export const fmt = (n) => n.toLocaleString('de-DE', { maximumFractionDigits: 1 });
@@ -25,8 +94,8 @@ export function iconHtml(def, cls = 'ic') {
 // Abzeichen eines Items: bei Komposita das Bild des Kristalls, bei der Krone ein Zeichen.
 export function abzeichenHtml(def) {
   if (!def?.abzeichen) return '';
-  const kraft = def.teile?.kraft && G.DEFS[def.teile.kraft];
-  if (kraft) return iconHtml(kraft, 'abz-img');
+  const kraft = def.teile?.kraft;
+  if (kraft) return KRAFT_SYMBOL[kraft] ? `<img class="abz-img" src="${symbolPfad(KRAFT_SYMBOL[kraft])}" alt="">` : iconHtml(G.DEFS[kraft], 'abz-img');
   return /\p{Extended_Pictographic}/u.test(def.abzeichen) ? '' : def.abzeichen; // Emoji-Abzeichen aus items.json entfallen
 }
 export const genusChip = (g) => `<span class="genus" style="--genus:${GENUS[g].farbe}">${g}</span>`;
@@ -240,7 +309,7 @@ export function itemEl(def, rot, size, stern = 1) {
     const st = document.createElement('span');
     st.className = 'stars';
     st.textContent = '★'.repeat(stern);
-    st.style.fontSize = Math.max(12, Math.round(size * 0.2)) + 'px';
+    st.style.fontSize = Math.max(8, Math.round(size * 0.15)) + 'px';
     el.append(st);
   }
 
@@ -252,8 +321,9 @@ export function itemEl(def, rot, size, stern = 1) {
     img.src = src;
     img.alt = '';
     img.draggable = false;
-    img.style.width = def.w * size - 12 + 'px';
-    img.style.height = def.h * size - 12 + 'px';
+    const rand = size >= 56 ? Math.round(size * 0.22) : 6;
+    img.style.width = def.w * size - 12 - rand + 'px';
+    img.style.height = def.h * size - 12 - rand * 1.4 + 'px';
     if ((rot || 0) % 2 && def.w !== def.h) img.style.transform = 'translate(-50%, -50%) rotate(90deg)';
     img.onerror = () => { el.classList.remove('has-img'); img.remove(); };
     el.classList.add('has-img');
@@ -307,13 +377,13 @@ export function itemEl(def, rot, size, stern = 1) {
     const b = document.createElement('span');
     b.className = 'badge';
     b.innerHTML = abzeichenHtml(def);
-    b.style.fontSize = Math.round(size * 0.26) + 'px';
+    b.style.setProperty('--abz', Math.max(11, Math.round(size * 0.24)) + 'px');
     el.append(b);
   }
-  if (size >= 70) {
+  if (size >= 56) {
     const l = document.createElement('span');
     l.className = 'label';
-    l.textContent = def.name;
+    namensBand(l, def.name, null);
     el.append(l);
   }
   return el;
@@ -378,6 +448,7 @@ export function drawItems(gridEl, grid, placed, size, info, area) {
   }
 
   if (info) drawRuneLines(gridEl, grid, placed, size, info);
+  baenderEinpassen(gridEl);
   return els;
 }
 
@@ -387,7 +458,7 @@ export function sockelZeichnen(it, p, def, size, extraRunen = 0) {
   const s = sockelVon(p), pl = sockelPlaetze(def, p.stern || 1, extraRunen);
   const leiste = document.createElement('span');
   leiste.className = 'sockel-leiste';
-  leiste.style.setProperty('--mulde', Math.max(12, Math.round(size * 0.2)) + 'px');
+  leiste.style.setProperty('--mulde', Math.max(10, Math.round(size * (def.w * def.h === 1 ? 0.15 : 0.18))) + 'px');
   const a = document.createElement('span');
   a.className = 'mulde artikel' + (s.siegel ? ' voll' : '');
   if (s.siegel) { a.style.setProperty('--genus', GENUS[G.DEFS[s.siegel].genus].farbe); a.textContent = G.DEFS[s.siegel].genus; }
@@ -405,7 +476,7 @@ export function sockelZeichnen(it, p, def, size, extraRunen = 0) {
   const adjs = s.runen.map((id) => G.DEFS[id]).filter((r) => runeFits(r, def));
   const phrase = phraseFor(adjs, def, !!s.siegel);
   const l = it.querySelector('.label');
-  if (phrase && l) { l.textContent = phrase; l.classList.add('phrase'); }
+  if (phrase && l) { namensBand(l, phrase, s.siegel ? def.artikel : null); l.classList.add('phrase'); }
   if (phrase) it.title = phrase;
 }
 

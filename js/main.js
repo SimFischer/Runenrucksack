@@ -18,7 +18,7 @@ import { evaluateBag, GLANZ_BONUS } from './mods.js';
 import { istSockelTeil, kannEinsetzen, einsetzen, herausnehmen, sockelVon, sockelPlaetze } from './sockel.js';
 import { sym } from './symbole.js';
 import {
-  $, fmt, fullName, genusChip, toast, bump, openModal, closeModal, modal, itemEl, buildGrid, drawItems, mergeAnimation, syncGold, iconHtml,
+  $, fmt, fullName, genusChip, toast, bump, openModal, closeModal, modal, itemEl, buildGrid, drawItems, mergeAnimation, syncGold, iconHtml, baenderEinpassen,
   openQuick, closeQuick, sternVon, abzeichenHtml,
 } from './ui.js';
 import { startNight, zeigeKampfErgebnis, battleControl } from './battle-ui.js';
@@ -546,6 +546,7 @@ function renderShop() {
     slot.append(holder, price, lock);
     box.append(slot);
   });
+  baenderEinpassen(box);
 }
 
 const STAT_ROWS = [

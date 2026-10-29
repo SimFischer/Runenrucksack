@@ -754,3 +754,20 @@ h2 .amboss { width: 40px; height: 26px; margin-right: 6px; }
 .sam-paket-items span { display: flex; flex-direction: column; align-items: center; width: 82px; font-size: 13px; text-align: center; }
 .sam-paket-items .sam-item { width: 52px; height: 52px; object-fit: contain; }
 .sam-paket.gesperrt .sam-item { filter: brightness(0) opacity(.5); }
+
+/* ---------- Gegenstandskarte: feste Bereiche, nichts überlappt ----------
+   oben links Sterne · oben rechts Kraft-Abzeichen · Mitte Bild · unten Namensband · links Sockel */
+.item .stars { top: 2px; left: 4px; right: auto; transform: none; letter-spacing: 0; z-index: 3; }
+.item .badge { top: 3px; right: 3px; width: var(--abz, 18px); height: var(--abz, 18px); border-radius: 50%; z-index: 3;
+  background: radial-gradient(circle at 35% 30%, #5a4a3a, #2a1c10); border: 1px solid rgba(255, 230, 180, .7); box-shadow: 0 1px 2px rgba(0, 0, 0, .5); }
+.item .badge .abz-img { width: 78%; height: 78%; object-fit: contain; }
+.item .item-img { top: calc(50% - 4%); }
+.item.glow .item-img { filter: drop-shadow(0 0 4px var(--glow)); }
+.item .kraft-fx { background: radial-gradient(circle at 50% 45%, color-mix(in srgb, var(--glow) 26%, transparent), transparent 65%); }
+.item .label, .item.has-img .label { left: 0; right: 0; bottom: 0; padding: 1px 4px 2px; border-radius: 0 0 6px 6px; z-index: 3;
+  background: rgba(255, 246, 226, .92); border-top: 1px solid rgba(0, 0, 0, .12); color: var(--tinte);
+  white-space: normal; overflow: visible; text-overflow: clip; line-height: 1.05; overflow-wrap: anywhere; hyphens: auto; }
+.item .label .band-art { font-weight: 900; }
+.item .label.phrase { font-size: inherit; }
+.sockel-leiste { left: 2px; top: max(18%, calc(var(--mulde) + 6px)); bottom: auto; transform: none; flex-direction: column; gap: 3px; padding: 3px 2px; border-radius: 99px; }
+.mark-fluch { right: 4px; top: calc(var(--abz, 18px) + 6px); bottom: auto; }
