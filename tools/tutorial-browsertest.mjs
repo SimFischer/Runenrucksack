@@ -202,7 +202,7 @@ try {
   await expect('Buch der Wörter');
   await tap('#btn-buch-spiel'); await expect('Feuerschwert steht schon drin');
   check(await ev(`[...document.querySelectorAll('#buch-layer .buch-eintrag:not(.dunkel) b')].some((b) => b.textContent.includes('Feuerschwert'))`), 'Feuerschwert ist im Buch entdeckt');
-  check(await ev(`document.querySelectorAll('#buch-layer .buch-eintrag.dunkel').length > 10`), 'unentdeckte Einträge als dunkle Silhouetten');
+  check(await ev(`document.querySelectorAll('#buch-layer .buch-eintrag.dunkel').length >= 5`), 'unentdeckte Einträge als dunkle Silhouetten (nur aus dem Startpaket)');
   await tap('#buch-layer [data-close]'); await expect('Heldencode');
   await tap('#btn-menu'); await tap('#modal [data-act="code"]'); await expect('Schreib den Code');
   check(await ev(`/^[2-9A-Z]{3}-[2-9A-Z]{3}$/.test(document.querySelector('#code-layer [data-code]').textContent) && !document.querySelector('#code-layer svg')`), 'Heldencode mit 6 Zeichen, ohne QR-Code');

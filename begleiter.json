@@ -25,7 +25,7 @@
       "artikel": "das",
       "rolle": "flinker Freund",
       "text": "Gegenstände neben dem Pony lösen 10 % schneller aus.",
-      "freischaltung": { "xp": 120 },
+      "freischaltung": { "xp": 140 },
       "wirkung": { "nachbarTempo": 10 }
     },
     {
@@ -34,7 +34,7 @@
       "artikel": "der",
       "rolle": "schlauer Händlerfreund",
       "text": "Einmal am Tag darfst du kostenlos neu würfeln.",
-      "freischaltung": { "xp": 660 },
+      "freischaltung": { "xp": 770 },
       "wirkung": { "freiWuerfeProTag": 1 }
     },
     {
@@ -43,7 +43,7 @@
       "artikel": "der",
       "rolle": "scharfäugiger Späher",
       "text": "Vor jedem Kampf zeigt der Rabe das falsche Wort auf der Ork-Rüstung – verbessern musst du es selbst. Nach jedem Sieg bringt er 1 Gold.",
-      "freischaltung": { "xp": 1450 },
+      "freischaltung": { "xp": 1660 },
       "wirkung": { "ruestungMarkieren": true, "siegGold": 1 }
     },
     {
@@ -52,7 +52,7 @@
       "artikel": "der",
       "rolle": "schneller Jäger",
       "text": "Der erste Angriff in jedem Kampf trifft doppelt.",
-      "freischaltung": { "xp": 2500 },
+      "freischaltung": { "xp": 2720 },
       "wirkung": { "ersterAngriffDoppelt": true }
     }
   ]

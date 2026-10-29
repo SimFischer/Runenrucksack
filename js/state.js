@@ -7,6 +7,7 @@ import { baueBuch } from './buch.js';
 import { neuesProfil } from './fortschritt.js';
 import { begleiterDefs } from './begleiter.js';
 import { SPRUCH_DEF } from './satzschmiede.js';
+import { paketeAnwenden } from './pakete.js';
 
 export const G = {
   ITEMS: [],      // Items im Laden (items.json)
@@ -37,16 +38,20 @@ const SAVE_KEY = 'runenrucksack.lauf.v2';
 
 export async function loadData() {
   const get = (f) => fetch(f).then((r) => r.json());
-  const [itemData, enemyData, recipes, regions, heroes, encounters, exercises, tutorial, ach, registry, wortschatz, themen, lehrkraft, bilder, begleiterJson, botschaften, satzschmiede] = await Promise.all([
+  const [itemData, enemyData, recipes, regions, heroes, encounters, exercises, tutorial, ach, registry, wortschatz, themen, lehrkraft, bilder, begleiterJson, botschaften, satzschmiede, pakete] = await Promise.all([
     get('items.json'), get('enemies.json'), get('recipes.json'), get('regions.json'), get('heroes.json'),
     get('encounters.json'), get('exercises.json'), get('tutorial.json'), get('achievements.json'), get('registry.json'), get('wortschatz.json'), get('themen.json'), get('lehrkraft.json').catch(() => ({})),
     get('assets/zuordnung.json').catch(() => null), get('begleiter.json').catch(() => ({ begleiter: [] })), get('botschaften.json').catch(() => ({ briefe: [] })),
     get('satzschmiede.json').catch(() => null),
+    get('gegenstandspakete.json').catch(() => null),
   ]);
   G.ITEMS = itemData.items;
   G.RAR = itemData.seltenheiten;
   G.WORTFELDER = itemData.wortfelder || {};
   G.RECIPES = recipes;
+  // Gegenstandspakete: Paket-Items bekommen ihre Freischaltung (Erfahrungsschwelle)
+  G.PAKETE = pakete;
+  paketeAnwenden(G.ITEMS, pakete);
   for (const d of G.ITEMS) G.DEFS[d.id] = d;
   G.COMPOUNDS = buildCompounds(G.DEFS, G.RECIPES);
   for (const d of G.COMPOUNDS) G.DEFS[d.id] = d;

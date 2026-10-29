@@ -36,6 +36,7 @@ import {
   entdecke, merkeAntwort, laufStand, laufAbschluss, rangVon, pruefeFreischaltungen, figurFrei, freieItems, bedingungText, pruefeErfolge,
 } from './fortschritt.js';
 import { zeigeSammlung, wendeDesignAn, fortschrittCtx, zeigeDesignWahl } from './sammlung-ui.js';
+import { pfadItems } from './pakete.js';
 import { zeigeBuch, meldeNeu, meldeErfolg } from './buch-ui.js';
 import { zeigeLaufende } from './ende-ui.js';
 import { zeigeCode, zeigeEingabe, uebernehmen, neuBeginnen } from './code-ui.js';
@@ -279,8 +280,11 @@ function startWochenrune(l) {
 
 function startNewRun(h, b = null, extra = {}) {
   if (!h?.id) { showHeroes(); return; }
-  G.run = newRun(G.ITEMS, G.REGIONS, { hero: h, fates: G.FATES, freieItems: extra.freieItems || freieItems(G.PROFIL, G.ITEMS, fortschrittCtx()),
-    begleiter: b ? G.DEFS[BEGLEITER_PREFIX + b.id] : null, rng: extra.rng });
+  // Bestand: freigeschaltete Gegenstände, dazu das größere Paket eines höheren Pfads (G.PROFIL.pfad)
+  const frei = extra.freieItems || [...new Set([...freieItems(G.PROFIL, G.ITEMS, fortschrittCtx()), ...pfadItems(G.PAKETE, G.PROFIL.pfad || 'lehrling')])];
+  G.run = newRun(G.ITEMS, G.REGIONS, { hero: h, fates: G.FATES, freieItems: frei,
+    begleiter: b ? G.DEFS[BEGLEITER_PREFIX + b.id] : null, rng: extra.rng, neuImLaden: extra.woche ? [] : G.PROFIL.neuImLaden || [] });
+  if (G.PROFIL.neuImLaden?.length && !extra.woche) { delete G.PROFIL.neuImLaden; saveProfil(); }
   if (extra.woche) G.run.woche = extra.woche;
   schaetzeLernstand(G.PROFIL, rangVon(G.PROFIL.xp, G.ACH.raenge).nr, G.THEMEN.themen.map((t) => t.id));
   selected = null;
@@ -1687,6 +1691,8 @@ function battleOver(won, enemyName) {
     G.abschluss = laufAbschluss(G.PROFIL, run, { achievements: G.ACH });
     G.abschluss.erfolge = pruefeErfolge(G.PROFIL, fortschrittCtx());
     G.abschluss.frei = pruefeFreischaltungen(G.PROFIL, fortschrittCtx(), G.PROFIL.xp - (G.abschluss.xp?.gesamt || 0));
+    // Neu im Laden: Im nächsten Lauf erscheint mindestens einer davon
+    if (G.abschluss.frei.items.length) G.PROFIL.neuImLaden = [...G.abschluss.frei.items];
     saveProfil();
   }
   save();

@@ -1,5 +1,5 @@
 // Nacht: Kampfanzeige mit Lebensbalken, Abklingzeiten und Schadenszahlen.
-import { CFG, makeEnemy, pickEnemy, rectGrid, pickOne, shuffle, ARMOR_BONUS, enemyPool, seededRng, laufRng } from './logic.js';
+import { CFG, makeEnemy, pickEnemy, rectGrid, pickOne, shuffle, ARMOR_BONUS, enemyPool, seededRng, laufRng, bestandFaktor } from './logic.js';
 import { Battle, makeFighter, runToEnd } from './battle.js';
 import { analyze } from './grammar.js';
 import { G, itemsIn, gridOf, region, hero, playerCtx, emit, figurBild, gegnerBild } from './state.js';
@@ -49,7 +49,7 @@ export function startNight(done) {
   const foeDef = tut || pickEnemy(run.day, G.REGIONS, G.ENEMIES, laufRng(run, 'gegner'));
   enemy = tut
     ? { ...tut, items: tut.ausruestung.map((a, i) => ({ uid: i + 1, rot: 0, ...a })) }
-    : makeEnemy(run.day, foeDef, enemyPool(G.ITEMS, G.COMPOUNDS, run.day), G.DEFS, laufRng(run, 'gegner-rucksack'));
+    : makeEnemy(run.day, { ...foeDef, budgetFaktor: bestandFaktor((run.freieItems || []).length / G.ITEMS.filter((d) => d.freischaltung).length) }, enemyPool(G.ITEMS, G.COMPOUNDS, run.day, run.freieItems || []), G.DEFS, laufRng(run, 'gegner-rucksack'), enemyPool(G.ITEMS, G.COMPOUNDS, run.day));
   // Rüstung mit Fehler: im Tutorial ein festes Wort, sonst ein Satz mit einem Fehler (Aufgabenformat „Fehler finden“)
   armor = !foeDef.fehler?.length ? null : tut ? { ...pickOne(foeDef.fehler), status: 'offen' } : { satz: true, status: 'offen' };
 

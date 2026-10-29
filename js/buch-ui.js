@@ -1,6 +1,8 @@
 // Buch der Wörter: Bildschirm mit Seiten, Fortschrittsbalken und Karten; Einblendung bei neuen Entdeckungen.
 import { G, emit } from './state.js';
 import { seitenStand } from './buch.js';
+import { freieItems } from './fortschritt.js';
+import { imBestand } from './pakete.js';
 import { iconHtml, genusChip, abzeichenHtml } from './ui.js';
 import { sym } from './symbole.js';
 
@@ -25,8 +27,11 @@ export function zeigeBuch(zurueck = null) {
   document.body.append(box);
   const zeichne = () => {
     const entdeckt = new Set([...G.PROFIL.buch, ...(G.PROFIL.regeln || []).map((id) => `regel:${id}`), ...spruchSeite().eintraege.map((e) => e.id)]);
-    const gesamt = G.BUCH.eintraege.length;
-    const seiten = [...G.BUCH.seiten, regelSeite(), spruchSeite()];
+    const gesamt = G.BUCH.eintraege.filter((e) => !e.def || imBestand(e.def, freieItems(G.PROFIL, G.ITEMS, { achievements: G.ACH, buch: G.BUCH, heroes: G.HEROES }), G.DEFS)).length;
+    // Gesperrte Gegenstände (Pakete, die noch nicht frei sind) erscheinen noch nicht im Buch
+    const frei = freieItems(G.PROFIL, G.ITEMS, { achievements: G.ACH, buch: G.BUCH, heroes: G.HEROES });
+    const sichtbar = (e) => !e.def || imBestand(e.def, frei, G.DEFS);
+    const seiten = [...G.BUCH.seiten.map((s) => ({ ...s, eintraege: s.eintraege.filter(sichtbar) })), regelSeite(), spruchSeite()];
     const seite = { ...seiten.find((s) => s.id === seiteAktiv) };
     const stand = seitenStand(seite, entdeckt);
     box.innerHTML = `

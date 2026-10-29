@@ -8,7 +8,7 @@
 import {
   CFG, newRun, finishBattle, rollShop, pickEnemy, makeEnemy, findSpot, bagGrid, STORE_GRID,
   growBag, attachTasche, enemyPool, shopPool, pickEncounters, pickOne, sellValue, seededRng, ARMOR_BONUS, reroll, wuerfelPreis,
-  HAENDLER, haendlerStufe, vertrauenKosten, vertrauenErhoehen, STERN_FAKTOR, canPlace,
+  HAENDLER, haendlerStufe, vertrauenKosten, vertrauenErhoehen, STERN_FAKTOR, canPlace, bestandFaktor,
 } from './logic.js';
 import { buildCompounds, buildRuneLevels, isVerb, isNoun, verbTargetCell } from './grammar.js';
 import { partnerOf, compoundPartner, kompositumAus, placeNew, verbindeAlles, schmiedZiel, schmiedPreis, schmiedSperre, schmiedAufwerten } from './sterne.js';
@@ -21,8 +21,13 @@ import { waehleBrief, werteAus } from './botschaften.js';
 import { karten, pruefeSatz, spruchWerte, schmiedeVerben, schmiedeStern, schmiedeOffen, SPRUCH_DEF } from './satzschmiede.js';
 import { applyMod } from './mods.js';
 import { istSockelTeil, kannEinsetzen, einsetzen } from './sockel.js';
+import { paketeAnwenden } from './pakete.js';
 
+// raw.pakete (gegenstandspakete.json): Paket-Items bekommen ihre Freischaltung – dann gilt opts.bestand im Lauf
 export function prepareData(raw) {
+  const items = raw.pakete ? raw.items.map((d) => ({ ...d })) : raw.items;
+  paketeAnwenden(items, raw.pakete);
+  raw = { ...raw, items };
   const defs = {};
   for (const d of raw.items) defs[d.id] = d;
   const compounds = buildCompounds(defs, raw.recipes);
@@ -48,12 +53,12 @@ function worth(d) {
   return per / d.abklingzeit;
 }
 
-// Abwehr-Strategie: Schutz, Heilung, Leben und Startblock zählen mehr, Schaden etwas weniger
+// Abwehr-Strategie: Schutz, Heilung, Leben und Startblock zählen so viel wie Schaden (bei „gut“ weniger)
 function abwehrWert(d) {
   if (d.art === 'siegel' || d.art === 'rune') return 0;
-  if (!d.abklingzeit) return (d.tempo || 0) * 0.25 + (d.leben || 0) * 0.12 + (d.startblock || 0) * 0.12 + (d.glueck || 0) * 0.2;
-  const per = 0.85 * (d.schaden || 0) + 1.2 * (d.block || 0) + 1.2 * (d.heilung || 0) + 2 * (d.gift || 0) + 1.4 * (d.brand || 0)
-    + 1.5 * (d.kaelte || 0) + 6 * (d.betaeubung || 0) + 3 * (d.regeneration || 0);
+  if (!d.abklingzeit) return (d.tempo || 0) * 0.25 + (d.leben || 0) * 0.1 + (d.startblock || 0) * 0.1 + (d.glueck || 0) * 0.2;
+  const per = (d.schaden || 0) + 1.0 * (d.block || 0) + 1.0 * (d.heilung || 0) + 2.5 * (d.gift || 0) + 1.8 * (d.brand || 0)
+    + 1.5 * (d.kaelte || 0) + 6 * (d.betaeubung || 0) + 2.5 * (d.regeneration || 0);
   return per / d.abklingzeit;
 }
 
@@ -288,7 +293,9 @@ export function simulateRun(data, rng, opts = {}) {
   const hero = pickOne(data.heroes, rng);
   // Begleiter: zufällig (ohne begleiter.json im Datensatz keiner)
   const begleiter = data.begleiter?.length ? data.defs['begleiter-' + pickOne(data.begleiter, rng).id] : null;
-  const run = newRun(data.items, data.regions, { hero, fates: data.fates, rng, begleiter });
+  // Bestand: „start“ = nur das Startpaket (Neuling), sonst alle Gegenstände
+  const freieItems = opts.bestand === 'start' ? [] : data.items.filter((d) => d.freischaltung).map((d) => d.id);
+  const run = newRun(data.items, data.regions, { hero, fates: data.fates, rng, begleiter, freieItems });
   const ctxData = { heroes: data.heroes, fates: data.fates, begleiter: data.begleiter };
   const days = [];
   while (!run.over) {
@@ -302,7 +309,8 @@ export function simulateRun(data, rng, opts = {}) {
       ersterAngriffDoppelt: ctx.ersterAngriffDoppelt,
     });
     const foeDef = pickEnemy(run.day, data.regions, data.enemies, rng);
-    const enemy = makeEnemy(run.day, foeDef, enemyPool(data.items, data.compounds, run.day), data.defs, rng);
+    const anteil = run.freieItems.length / Math.max(1, data.items.filter((d) => d.freischaltung).length);
+    const enemy = makeEnemy(run.day, { ...foeDef, budgetFaktor: bestandFaktor(anteil) }, enemyPool(data.items, data.compounds, run.day, run.freieItems), data.defs, rng, enemyPool(data.items, data.compounds, run.day));
     const armor = rng() < skill;
     merkeAntwort(run, 'rechtschreibung', armor, true);
     if (armor) laufStand(run).orkFehler++;

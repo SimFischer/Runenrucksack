@@ -50,7 +50,7 @@
       "emoji": "⚒️",
       "text": "Genietete Stahlplatten aus Duramar.",
       "freischaltung": {
-        "xp": 300
+        "xp": 330
       }
     },
     {
@@ -59,7 +59,7 @@
       "emoji": "🍃",
       "text": "Leichter, grün schimmernder Stoff aus Lindrael.",
       "freischaltung": {
-        "xp": 1050
+        "xp": 1130
       }
     },
     {
@@ -68,7 +68,7 @@
       "emoji": "🐎",
       "text": "Gegerbtes Leder mit Pferdeknoten aus Hrossmark.",
       "freischaltung": {
-        "xp": 1950
+        "xp": 2100
       }
     },
     {
@@ -77,7 +77,7 @@
       "emoji": "🏳️",
       "text": "Silberne Stickerei der Reiherritter.",
       "freischaltung": {
-        "xp": 3100
+        "xp": 3400
       }
     }
   ],

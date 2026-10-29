@@ -235,7 +235,8 @@ export function newRun(items, regions, opts = {}) {
     mods: [], // dauerhafte Boni aus Begegnungen
     fate: null, // Schicksalsrune
     unterklasse: null,
-    freieItems: opts.freieItems || [], // freigeschaltete Items (z. B. Drachenfeuerschwert)
+    freieItems: opts.freieItems || [], // freigeschaltete Items (Gegenstandspakete, Drachenfeuerschwert …)
+    neuImLaden: opts.neuImLaden || [], // gerade freigeschaltet: mindestens eins davon kommt in diesem Lauf in den Laden
   };
   if (opts.fates?.length) {
     const fate = pickOne(opts.fates, rng);
@@ -293,6 +294,11 @@ export function rollShop(run, items, regions, force = false, rng = Math.random) 
     if (!force && old && old.locked) { next.push(old); continue; }
     next.push({ id: randomShopItem(pool, weights, rng, sammeln).id, locked: false });
   }
+  // Gerade freigeschaltet: Mindestens einer der neuen Gegenstände erscheint in diesem Lauf im Laden
+  const neu = (run.neuImLaden || []).filter((id) => pool.some((d) => d.id === id));
+  const frei0 = next.map((s, i) => (s && !s.locked ? i : -1)).filter((i) => i >= 0);
+  if (neu.length && !next.some((s) => neu.includes(s?.id)) && frei0.length) next[pickOne(frei0, rng)] = { id: pickOne(neu, rng), locked: false };
+  if (next.some((s) => run.neuImLaden?.includes(s?.id))) run.neuImLaden = [];
   // Mindestens eine Waffe im Angebot, damit man nie ganz ohne Schaden dasteht.
   const hasWeapon = next.some((s) => s && pool.find((d) => d.id === s.id)?.schaden);
   const free = next.map((s, i) => (s && !s.locked ? i : -1)).filter((i) => i >= 0);
@@ -349,13 +355,19 @@ export function finishBattle(run, items, regions, won, enemyName, rng = null) {
 // ---------- Gegner ----------
 
 export const COMPOUNDS_FROM_DAY = 4; // ab diesem Tag bringen Orks auch Komposita mit
+// Gegner-Gold nach Bestand: Mit kleinem Bestand (Neuling, nur Startpaket) findet man seltener Paare und gute
+// Kombinationen – die Gegner bekommen dann etwas weniger Gold. anteil = freigeschaltete Gegenstände / alle mit Freischaltung.
+export const bestandFaktor = (anteil) => GEGNER_KLUG.bestandMin + (1 - GEGNER_KLUG.bestandMin) * Math.max(0, Math.min(1, anteil));
 // Kluge Gegner (ab abTag): mehr Gold, passende Siegel und Runen in den Sockeln, Verb-Rollen wirken voll.
 // bossPlus / endbossPlus: Extra-Gold für die Bosse, tag1: Anteil des Golds am ersten Tag (gut schaffbar).
-export const GEGNER_KLUG = { abTag: 3, budgetProTag: 0.03, sockelChance: 0.7, sockelProTag: 0.15, bossPlus: 0, endbossPlus: -4, tag1: 0.78 };
+export const GEGNER_KLUG = { abTag: 3, budgetProTag: 0.03, sockelChance: 0.7, sockelProTag: 0.15, bossPlus: 0, endbossPlus: -4, tag1: 0.66, bestandMin: 0.94 };
 
-export function enemyPool(items, compounds, day) {
-  const base = items.filter((d) => d.art !== 'siegel' && d.art !== 'rune' && d.art !== 'tasche');
-  return day >= COMPOUNDS_FROM_DAY ? base.concat(compounds) : base;
+// frei: freigeschaltete Items des Laufs (run.freieItems) – Gegner nutzen nur diesen Bestand; null = alles (Bosse)
+export function enemyPool(items, compounds, day, frei = null) {
+  const erlaubt = (d) => frei === null || !d.freischaltung || frei.includes(d.id);
+  const ok = (d) => (d.teile ? items.some((x) => x.id === d.teile.kraft && erlaubt(x)) && items.some((x) => x.id === d.teile.traeger && erlaubt(x)) : erlaubt(d));
+  const base = items.filter((d) => d.art !== 'siegel' && d.art !== 'rune' && d.art !== 'tasche' && ok(d));
+  return day >= COMPOUNDS_FROM_DAY ? base.concat(compounds.filter(ok)) : base;
 }
 
 export function pickEnemy(day, regions, enemies, rng = Math.random) {
@@ -380,8 +392,9 @@ export const GEGNER_LEGENDAER_TAG = 10;
 // Ein Item der Stufe s kostet den Gegner so viel wie 2^(s-1) einfache – wie beim Verbinden von zwei gleichen.
 export const sternPreis = (preis, stern = 1) => preis * 2 ** (stern - 1);
 
-export function makeEnemy(day, enemy, items, defs, rng = Math.random) {
-  let budget = enemyBudget(day, enemy.boss);
+// items: Angebot des Gegners (freigeschalteter Bestand); bossItems: woraus der Boss sein legendäres Item wählt (alles)
+export function makeEnemy(day, enemy, items, defs, rng = Math.random, bossItems = items) {
+  let budget = Math.floor(enemyBudget(day, enemy.boss) * (enemy.budgetFaktor || 1));
   const weights = rarityWeights(day, gegnerHaendler(day));
   const grid = rectGrid(CFG.bagCols, CFG.bagRows);
   const placed = [];
@@ -403,7 +416,7 @@ export function makeEnemy(day, enemy, items, defs, rng = Math.random) {
 
   // Boss am letzten Tag: zuerst ein legendäres ★★★★-Item
   if (enemy.boss && day >= GEGNER_LEGENDAER_TAG) {
-    const legendaer = items.filter((d) => d.abklingzeit && sternPreis(d.preis, 4) <= budget)
+    const legendaer = bossItems.filter((d) => d.abklingzeit && sternPreis(d.preis, 4) <= budget)
       .map((d) => ({ d, stern: 4, preis: sternPreis(d.preis, 4) }));
     const o = pickWeighted(legendaer.map((x) => [x, score(x.d) || 1]), rng);
     const spot = o && randomSpot(placed, defs, o.d, grid, rng);

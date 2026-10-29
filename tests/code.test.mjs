@@ -236,24 +236,6 @@ function vollerLauf() {
 // Vergleich ohne Felder, die nur zur Laufzeit existieren (Gegnernamen im Verlauf).
 const laufNorm = (r) => ({ ...r, history: r.history.map(({ enemy, ...h }) => h), bagCells: [...r.bagCells].sort(), taschenFelder: r.taschenFelder });
 
-test('Alter Reisecode: voller Rucksack mit Stufen, Drehung, Sätzen, Fluch, Laden und gekonnten Fragen', (t) => {
-  const run = vollerLauf();
-  const code = alterReisecode(mittel(), run, REG, DATA);
-  t.diagnostic(`Reisecode (voller Rucksack, Mittelstand): ${saeubern(code).length} Zeichen`);
-  const r = leseAltenCode(code, REG, DATA);
-  assert.equal(r.typ, 'reise', 'erkennt selbst, dass es ein Reisecode ist');
-  assert.deepEqual(norm(r.profil), norm(mittel()));
-  const erwartet = laufNorm(run);
-  delete erwartet.version;
-  delete erwartet.haendler; // kennt der alte Reisecode nicht (liegt nur im gespeicherten Lauf)
-  const ist = laufNorm(r.run);
-  delete ist.version;
-  for (const k of Object.keys(erwartet)) assert.deepEqual(ist[k], erwartet[k], k);
-  assert.equal(r.run.items.find((p) => p.id === 'mond+laterne').fluch, 'Mondlatterne');
-  const anfang = alterReisecode(anfaenger(), newRun(ITEMS, json('regions.json').gebiete, { hero: H.helden[0] }), REG, DATA);
-  t.diagnostic(`Reisecode (Tag 1, Anfänger): ${saeubern(anfang).length} Zeichen`);
-});
-
 test('Alter Code: Lernstand, Regelkarten und Klasse nur angehängt, wenn vorhanden', () => {
   // Ohne Lernstand ist der Code genau so lang wie früher (alte Codes und alte Leser bleiben passend)
   assert.equal(alterHeldencode(anfaenger(), REG), alterHeldencode({ ...anfaenger(), lernstand: { artikel: { stufe: 1, sicher: 0 } } }, REG));

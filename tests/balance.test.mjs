@@ -12,18 +12,19 @@ const data = prepareData({
   items: json('items.json').items, recipes: json('recipes.json'), regions: json('regions.json').gebiete,
   enemies: json('enemies.json').gegner, heroes: H.helden, fates: H.schicksalsrunen,
   encounters: json('encounters.json'), exercises: json('exercises.json'), begleiter: json('begleiter.json').begleiter, botschaften: json('botschaften.json').briefe,
-  satzschmiede: json('satzschmiede.json'), wortschatz: json('wortschatz.json'),
+  satzschmiede: json('satzschmiede.json'), wortschatz: json('wortschatz.json'), pakete: json('gegenstandspakete.json'),
 });
 
 // Drei Strategien (js/sim.js): „zufall“ kauft irgendetwas Bezahlbares, „gut“ sammelt gleiche Gegenstände, baut
 // Komposita, nutzt die Sockel und den Händler, „abwehr“ spielt ebenso, setzt aber auf Schutz und Heilung.
 // Ziele: Zufall 3–4 Siege, höchstens 10 % schaffen die Reise (Endboss besiegt); gut 6–7 Siege, 25–35 %;
 // Abwehr höchstens 10 Prozentpunkte unter gut; Tag 1 für alle mindestens 80 %. Satzschmiede: Zufall Stufe 1, sonst 3.
-test('600 Läufe je Strategie: Siege, Reise geschafft, Tag 1 und Spielzeit', (t) => {
+// Einmal mit dem Startpaket (Neuling, gesperrte Gegenstände fehlen auch den Gegnern) und einmal mit allem.
+for (const bestand of ['start', 'alles']) test(`600 Läufe je Strategie (${bestand === 'start' ? 'Startpaket' : 'alle Gegenstände'}): Siege, Reise geschafft, Tag 1, Spielzeit`, (t) => {
   const zeile = (o) => Object.values(o).map((v) => String(v).padStart(4)).join('');
   const r = {};
   for (const strategie of ['zufall', 'gut', 'abwehr']) {
-    r[strategie] = summarize(simulateMany(data, 600, 5, { strategie, satzschmiede: strategie === 'zufall' ? 1 : 3 }));
+    r[strategie] = summarize(simulateMany(data, 600, 5, { strategie, bestand, satzschmiede: strategie === 'zufall' ? 1 : 3 }));
     const x = r[strategie];
     t.diagnostic(`${strategie.padEnd(7)} Siegquote %:  ${zeile(x.siegquoteProTag)}`);
     t.diagnostic(`${strategie.padEnd(7)} Siege ${x.siegeDurchschnitt.toFixed(2)} · Reise geschafft ${x.reiseGeschafft} % · ${x.minutenDurchschnitt.toFixed(1)} min · Kampf ${x.kampfSekunden.toFixed(1)} s`);

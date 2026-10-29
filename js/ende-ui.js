@@ -40,7 +40,7 @@ export function zeigeLaufende(run, abschluss, aktionen) {
     ...(a.erfolge || []).map((id) => { const e = G.ACH.erfolge.find((x) => x.id === id); return `<div class="frei-neu"><span class="frei-emoji">${sym('pokal')}</span><span><small>Neuer Erfolg!</small><b>${e.name}</b></span></div>`; }),
     ...a.frei.designs.map((id) => { const d = G.ACH.designs.find((x) => x.id === id); return `<div class="frei-neu"><span class="frei-emoji">${sym('truhe')}</span><span><small>Neues Rucksack-Design!</small><b>${d.name}</b></span></div>`; }),
     ...(a.frei.begleiter || []).map((id) => { const b = G.BEGLEITER.find((x) => x.id === id); return `<div class="frei-neu"><img src="assets/ui/begleiter/${id}.webp" alt=""><span><small>Neuer Begleiter!</small><b>${b.name}</b></span></div>`; }),
-    ...(a.frei.items || []).map((id) => `<div class="frei-neu"><span><small>Neu im Laden!</small><b>${G.DEFS[id].name}</b></span></div>`),
+    ...paketeVon(a.frei.items || []).map(({ paket, ids }) => `<div class="frei-neu"><span><small>Neu im Laden!</small><b>${paket ? paket.name : G.DEFS[ids[0]].name}</b></span></div>`),
   ].join('') : '';
   document.getElementById('tip-bubble')?.remove(); // offene Erste-Mal-Tipps gehören zum Lauf
   const code = a ? aktuellerHeldencode() : null;
@@ -87,8 +87,22 @@ function freischaltFeiern(frei) {
     ...frei.figuren.map((id) => { const h = G.HEROES.find((x) => x.id === id); return eintrag('Neue Figur frei!', h.name, figurBild(id) ? `<img class="feier-bild" src="${figurBild(id)}" alt="">` : sym('stern', 'gross'), h.faehigkeit || h.staerke); }),
     ...(frei.begleiter || []).map((id) => { const b = G.BEGLEITER.find((x) => x.id === id); return eintrag('Neuer Begleiter frei!', `${b.artikel} ${b.name}`, `<img class="feier-bild" src="assets/ui/begleiter/${id}.webp" alt="">`, b.text); }),
     ...frei.designs.map((id) => { const d = G.ACH.designs.find((x) => x.id === id); return eintrag('Neues Rucksack-Design!', d.name, `<div class="sam-design feier-design" data-design-vorschau="${id}"></div>`, `${d.text} Du kannst es vor dem nächsten Lauf wählen.`); }),
-    ...(frei.items || []).map((id) => { const d = G.DEFS[id]; return eintrag('Neu im Laden!', `${d.artikel} ${d.name}`, iconHtml(d, 'feier-bild'), 'Ab jetzt kann dieser Gegenstand im Laden auftauchen.'); }),
+    ...paketeVon(frei.items || []).map(({ paket, ids }) => eintrag('Neu im Laden!', paket ? paket.name : `${G.DEFS[ids[0]].artikel} ${G.DEFS[ids[0]].name}`,
+      `<span class="feier-pakete">${ids.map((id) => `<span>${iconHtml(G.DEFS[id], 'feier-item')}<small>${G.DEFS[id].name}</small></span>`).join('')}</span>`,
+      `${paket ? paket.text + ' ' : ''}Im nächsten Lauf findest du ${ids.length > 1 ? 'mindestens einen davon' : 'ihn'} im Laden.`)),
   ];
+}
+
+// Neue Gegenstände nach Paket gruppieren (Gegenstände ohne Paket einzeln)
+function paketeVon(ids) {
+  const gruppen = [];
+  for (const id of ids) {
+    const pid = G.DEFS[id]?.freischaltung?.paket;
+    const g = pid && gruppen.find((x) => x.paket?.id === pid);
+    if (g) g.ids.push(id);
+    else gruppen.push({ paket: pid ? G.PAKETE.pakete.find((p) => p.id === pid) : null, ids: [id] });
+  }
+  return gruppen;
 }
 
 function feier({ titel, name, bildHtml, text }, weiter) {

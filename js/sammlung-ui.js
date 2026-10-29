@@ -1,8 +1,8 @@
 // Sammlung: alle Figuren und Rucksack-Designs (später auch Erfolge); gesperrte mit Hinweis, wie man sie bekommt.
 import { G, figurBild, saveProfil } from './state.js';
-import { figurFrei, designFrei, bedingungText, rangVon } from './fortschritt.js';
+import { figurFrei, designFrei, bedingungText, rangVon, freieItems } from './fortschritt.js';
 import { begleiterFrei } from './begleiter.js';
-import { toast } from './ui.js';
+import { toast, iconHtml } from './ui.js';
 import { sym } from './symbole.js';
 
 export const fortschrittCtx = () => ({ achievements: G.ACH, buch: G.BUCH, heroes: G.HEROES, begleiter: G.BEGLEITER, items: G.ITEMS });
@@ -21,7 +21,8 @@ export function zeigeSammlung(zurueck = null) {
   document.body.append(box);
   const ctx = fortschrittCtx();
   const rang = rangVon(G.PROFIL.xp, G.ACH.raenge).nr;
-  const tabs = [['figuren', 'Figuren'], ['begleiter', 'Begleiter'], ['designs', 'Rucksack-Designs'], ...(G.ACH.erfolge ? [['erfolge', 'Erfolge']] : [])];
+  const tabs = [['figuren', 'Figuren'], ['begleiter', 'Begleiter'], ['gegenstaende', 'Gegenstände'], ['designs', 'Rucksack-Designs'], ...(G.ACH.erfolge ? [['erfolge', 'Erfolge']] : [])];
+  const frei = new Set(freieItems(G.PROFIL, G.ITEMS, ctx));
   const zeichne = () => {
     let inhalt = '';
     if (tab === 'figuren') {
@@ -42,6 +43,17 @@ export function zeigeSammlung(zurueck = null) {
           <b>${frei ? b.name : '???'}</b><small>${frei ? b.rolle : ''}</small>
           <p>${frei ? b.text : bedingungText(b.freischaltung, ctx)}</p></div>`;
       }).join('');
+    } else if (tab === 'gegenstaende') {
+      // Startpaket und Pakete in der Reihenfolge der Freischaltung; gesperrte als Silhouette mit Schwelle
+      const gruppe = (titel, ids, offen, hinweis) => `<div class="sam-paket${offen ? '' : ' gesperrt'}">
+          <header><span>${offen ? titel : `${sym('schloss')} ${titel}`}</span><small>${hinweis}</small></header>
+          <div class="sam-paket-items">${ids.map((id) => G.DEFS[id]).filter(Boolean).map((d) => `<span>${iconHtml(d, 'sam-item')}<small>${offen ? d.name : '???'}</small></span>`).join('')}</div></div>`;
+      const pakete = G.PAKETE?.pakete || [];
+      const einzeln = G.ITEMS.filter((d) => d.freischaltung && !d.freischaltung.paket);
+      const leiter = [...pakete.map((p) => ({ xp: p.xp, html: () => gruppe(p.name, p.items, p.items.every((id) => frei.has(id)), p.items.every((id) => frei.has(id)) ? p.text : bedingungText({ xp: p.xp }, ctx)) })),
+        ...einzeln.map((d) => ({ xp: d.freischaltung.xp || 0, html: () => gruppe(d.name, [d.id], frei.has(d.id), frei.has(d.id) ? 'Legendärer Gegenstand' : bedingungText(d.freischaltung, ctx)) }))]
+        .sort((a, b) => a.xp - b.xp);
+      inhalt = gruppe('Startpaket', G.PAKETE?.start || [], true, 'Von Anfang an im Laden') + leiter.map((x) => x.html()).join('');
     } else if (tab === 'designs') {
       inhalt = G.ACH.designs.map((d) => {
         const frei = designFrei(G.PROFIL, d);
@@ -60,6 +72,7 @@ export function zeigeSammlung(zurueck = null) {
     }
     const zahl = tab === 'figuren' ? `${G.HEROES.filter((h) => figurFrei(G.PROFIL, h)).length} von ${G.HEROES.length}`
       : tab === 'begleiter' ? `${G.BEGLEITER.filter((b) => begleiterFrei(b, G.PROFIL.xp)).length} von ${G.BEGLEITER.length}`
+      : tab === 'gegenstaende' ? `${G.ITEMS.filter((d) => !d.freischaltung || frei.has(d.id)).length} von ${G.ITEMS.length}`
       : tab === 'designs' ? `${G.ACH.designs.filter((d) => designFrei(G.PROFIL, d)).length} von ${G.ACH.designs.length}`
         : `${G.PROFIL.erfolge.length} von ${G.ACH.erfolge.length}`;
     box.innerHTML = `<div class="buch-card sam-card">

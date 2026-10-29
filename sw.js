@@ -1,6 +1,6 @@
 // Offline-Unterstützung: zuerst aus dem Netz laden (damit Änderungen an items.json sofort ankommen),
 // ohne Netz aus dem Zwischenspeicher. Bei neuen Dateien die Versionsnummer erhöhen.
-const CACHE = 'runenrucksack-v18';
+const CACHE = 'runenrucksack-v19';
 const FILES = [
   './',
   'index.html',
@@ -102,6 +102,7 @@ const FILES = [
   'js/wochenrune-ui.js',
   'js/satzschmiede.js',
   'js/sockel.js',
+  'js/pakete.js',
   'js/satzschmiede-ui.js',
   'js/battle-ui.js',
   'js/encounters.js',
@@ -141,6 +142,7 @@ const FILES = [
   'begleiter.json',
   'botschaften.json',
   'satzschmiede.json',
+  'gegenstandspakete.json',
   'registry.json',
   'wortschatz.json',
   'themen.json',

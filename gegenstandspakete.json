@@ -1,0 +1,24 @@
+{
+  "_hinweis": "Gegenstände werden schrittweise freigeschaltet, damit der Laden für Neulinge übersichtlich bleibt. start: das Startpaket (alle Grundmechaniken und alles, was das Tutorial braucht). pakete: kleine thematische Pakete mit eigener Erfahrungsschwelle (xp), eingereiht zwischen Figuren, Begleiter und Designs; nur aus der Erfahrung abgeleitet (steckt im Heldencode). Gegenstände mit eigener freischaltung in items.json (Drachenfeuerschwert, Runenstein, Runenkrone) bleiben eigene Stufen der Leiter. Gegner nutzen nur den freigeschalteten Bestand, Bosse alles. Die Rune der Woche nutzt alle Gegenstände. pfade: höhere Pfade starten mit zusätzlichen Paketen.",
+  "start": ["schwert", "axt", "bogen", "schild", "dolch", "feuer", "eis", "siegel-der", "siegel-die", "siegel-das", "rune-scharf", "rune-schwer", "schlagen", "apfel", "brot"],
+  "pakete": [
+    { "id": "gift-blitz", "name": "Gift und Blitz", "xp": 60, "text": "Zwei neue Kraft-Kristalle und eine flinke Rune.", "items": ["gift", "blitz", "rune-schnell"] },
+    { "id": "ruestung", "name": "Schwere Rüstung", "xp": 230, "text": "Helm und Kettenhemd für alle, die lieber einstecken.", "items": ["helm", "kettenhemd", "rune-stark"] },
+    { "id": "hof-garten", "name": "Hof und Garten", "xp": 430, "text": "Frisches aus Kleinwurzel und eine Tasche für den Garten.", "items": ["kuerbis", "karotte", "gartentasche"] },
+    { "id": "neue-verben", "name": "Neue Verben", "xp": 650, "text": "Drei Verb-Rollen: stechen, schützen und heilen.", "items": ["stechen", "schuetzen", "heilen"] },
+    { "id": "reiterei", "name": "Reiterei", "xp": 890, "text": "Alles für den Ritt durch Hrossmark.", "items": ["speer", "zaumzeug", "satteltasche"] },
+    { "id": "heilkunst", "name": "Heilkunst", "xp": 1260, "text": "Tränke, Honig und eine edle Rune.", "items": ["heiltrank", "honig", "rune-edel"] },
+    { "id": "stein-sturm", "name": "Stein und Sturm", "xp": 1520, "text": "Schwere Schläge und wilder Wind.", "items": ["stein", "sturm", "hammer"] },
+    { "id": "mondzauber", "name": "Mondzauber", "xp": 1800, "text": "Ein Zauberstab, der Mond-Kristall und eine Laterne.", "items": ["stab", "mond", "laterne"] },
+    { "id": "jagd", "name": "Jagd", "xp": 2250, "text": "Schießen, schnelle Stiefel und eine helle Rune.", "items": ["schiessen", "stiefel", "rune-hell"] },
+    { "id": "kueche", "name": "Große Küche", "xp": 2560, "text": "Pfanne, Hafer und eine große Rune.", "items": ["pfanne", "hafer", "rune-gross"] },
+    { "id": "schaetze", "name": "Schätze", "xp": 2880, "text": "Gold, ein Horn und die seltene Drachenschuppe.", "items": ["gold", "horn", "drachenschuppe"] },
+    { "id": "schlachtrufe", "name": "Schlachtrufe", "xp": 3220, "text": "Stürmen, brennen, leuchten – und die gute Rune.", "items": ["stuermen", "brennen", "leuchten", "rune-gut"] }
+  ],
+  "pfade": {
+    "lehrling": { "name": "Pfad des Lehrlings", "pakete": [] },
+    "wanderer": { "name": "Pfad des Wanderers", "pakete": ["gift-blitz", "ruestung"] },
+    "kundschafter": { "name": "Pfad des Kundschafters", "pakete": ["gift-blitz", "ruestung", "hof-garten", "neue-verben", "reiterei", "heilkunst"] },
+    "meister": { "name": "Pfad der Meister", "pakete": ["gift-blitz", "ruestung", "hof-garten", "neue-verben", "reiterei", "heilkunst", "stein-sturm", "mondzauber", "jagd", "kueche"] }
+  }
+}
