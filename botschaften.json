@@ -1,5 +1,5 @@
 {
-  "_hinweis": "Briefe für „Botschaften lesen“ (Thema Leseverständnis). Ein Brief kommt an manchen Morgen statt der Begegnung (etwa jeder dritte Tag, nie zwei Tage hintereinander). gebiet: in welchem Gebiet er kommt. schwierigkeit 1–3 (passend zum Lernstand im Thema lesen). text: 60–120 Wörter, kurze Sätze, Klasse 5. fragen: 1–2 Fragen, art finden (Information im Text), schliessen (Schlussfolgerung), wort (Wortbedeutung), reihenfolge (was zuerst, was danach), zusammenhang (Wort aus dem Zusammenhang verstehen), stimmung (wie fühlt sich der Absender), widerspruch (was passt nicht zusammen); antworten 3–4, richtig = genau eine davon, textstelle = wörtliche Stelle im Text, die die Antwort belegt (wird bei einer falschen Antwort markiert); belohnung bei richtiger Antwort: { typ: item, id } oder { typ: gold, menge }. trost: kleine Belohnung, wenn eine Antwort falsch war. Ein Brief kommt erst wieder, wenn alle Briefe seines Gebiets und seiner Stufe dran waren (Merkliste auf dem Gerät).",
+  "_hinweis": "Briefe für „Botschaften lesen“ (Thema Leseverständnis). Ein Brief kommt an manchen Morgen statt der Begegnung (etwa jeder dritte Tag, nie zwei Tage hintereinander). gebiet: in welchem Gebiet er kommt. schwierigkeit 1–3 (passend zum Lernstand im Thema lesen). text: 60–120 Wörter (Schwierigkeit 3: bis 180), kurze Sätze. hinweis (optional): eine Schwäche der Gegner, die im Brief steht oder sich erschließen lässt – { gegner: id aus enemies.json oder „alle“, kraft: id eines Kraft-Kristalls, prozent }; nach dem Lesen wirken Gegenstände mit dieser Kraft im Kampf gegen diesen Gegner stärker. Ab Schwierigkeit 2 tippt das Kind nach einer richtigen Antwort den Satz an, der sie belegt (textstelle). fragen: 1–2 Fragen, art finden (Information im Text), schliessen (Schlussfolgerung), wort (Wortbedeutung), reihenfolge (was zuerst, was danach), zusammenhang (Wort aus dem Zusammenhang verstehen), stimmung (wie fühlt sich der Absender), widerspruch (was passt nicht zusammen); antworten 3–4, richtig = genau eine davon, textstelle = wörtliche Stelle im Text, die die Antwort belegt (wird bei einer falschen Antwort markiert); belohnung bei richtiger Antwort: { typ: item, id } oder { typ: gold, menge }. trost: kleine Belohnung, wenn eine Antwort falsch war. Ein Brief kommt erst wieder, wenn alle Briefe seines Gebiets und seiner Stufe dran waren (Merkliste auf dem Gerät).",
   "briefe": [
     {
       "id": "kw-mila-garten",
@@ -138,6 +138,7 @@
       "gebiet": "kleinwurzel",
       "schwierigkeit": 2,
       "absender": "Mila aus Kleinwurzel",
+      "hinweis": { "gegner": "alle", "kraft": "eis", "prozent": 15 },
       "text": "Hallo, ich bin es wieder, Mila! Ich habe heute etwas Wichtiges beobachtet. Ein Ork wollte über den zugefrorenen Teich laufen. Als das Eis knackte, ist er schreiend weggerannt. Mein Opa sagt, alle Orks fürchten Eis und Kälte. In ihren Höhlen ist es nämlich immer warm. Ich habe am Teich einen Eis-Kristall gefunden. Er glitzert blau und ist ganz kalt. Vielleicht hilft er dir im Kampf. Ich drücke dir beide Daumen! Deine Mila",
       "fragen": [
         {
@@ -190,6 +191,7 @@
       "gebiet": "kleinwurzel",
       "schwierigkeit": 2,
       "absender": "die Eulenbibliothekarin",
+      "hinweis": { "gegner": "schamane", "kraft": "gift", "prozent": 30 },
       "text": "Uhu, hier schreibt wieder die Eule! Ich habe in einem alten Buch über Orks gelesen. Dort steht: Der Schamane der Orks braut Tränke aus Pilzen. Wer davon trinkt, wird stark, aber auch langsam. Gegen Gift sind die Schamanen aber empfindlich. Schon ein kleiner Tropfen macht sie schwach. Darum schicke ich dir einen Gift-Kristall. Leg ihn neben eine Waffe, dann wird sie giftig. Vorsicht: Fass den Kristall nie mit der Zunge an! Weise Grüße, deine Eule",
       "fragen": [
         {
@@ -524,6 +526,7 @@
       "gebiet": "hrossmark",
       "schwierigkeit": 2,
       "absender": "Finn, der Späher",
+      "hinweis": { "gegner": "alle", "kraft": "mond", "prozent": 15 },
       "text": "Hallo! Ich bin Finn, ein Späher der Weißen Feste. Ich schleiche nachts um das Lager der Orks und beobachte sie. Dabei habe ich etwas Seltsames bemerkt. Bei Vollmond bleiben die Orks in ihren Zelten. Sie fürchten das helle Licht des Mondes. Nur bei Neumond, wenn der Himmel ganz dunkel ist, greifen sie an. Gestern fand ich am Lagerrand einen silbernen Kristall. Er leuchtet wie der Mond. Vielleicht nützt er dir! Dein Finn",
       "fragen": [
         {
@@ -2422,6 +2425,220 @@
         "typ": "gold",
         "menge": 1
       }
+    },
+    {
+      "id": "kw-ole-pluenderer",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 3,
+      "absender": "Schäfer Ole",
+      "hinweis": { "gegner": "pluenderer", "kraft": "blitz", "prozent": 30 },
+      "text": "Hallo, junge Heldin, junger Held! Hier schreibt Ole, der Schäfer vom Krähenhügel. Vor drei Nächten kam der Ork-Plünderer zu meinem Hof. Er trug eine brennende Fackel und lachte laut. Meine Steinmauer hielt ihn nicht auf, er kletterte einfach darüber. Dann zog plötzlich ein Gewitter auf. Beim ersten Donnerschlag ließ er den Sack mit meinen Äpfeln fallen. Als ein Blitz in die Weide neben dem Stall fuhr, rannte er davon, so schnell er konnte. Seitdem schleicht er nur noch in klaren Nächten durchs Tal. Meine Schafe haben übrigens keine Angst vor Gewittern. Sie blöken nur, wenn der Plünderer kommt. Ich lege dir etwas bei, das ich nach dem Gewitter unter der Weide gefunden habe. Es knistert leise in der Hand. Pass gut auf dich auf! Dein Ole",
+      "fragen": [
+        {
+          "art": "schliessen",
+          "frage": "Womit könntest du den Plünderer im Kampf am ehesten schwächen?",
+          "antworten": ["mit Blitz", "mit Feuer", "mit Stein", "mit Äpfeln"],
+          "richtig": "mit Blitz",
+          "textstelle": "Als ein Blitz in die Weide neben dem Stall fuhr, rannte er davon, so schnell er konnte.",
+          "belohnung": { "typ": "item", "id": "blitz" }
+        },
+        {
+          "art": "widerspruch",
+          "frage": "Welche Aussage passt NICHT zu Oles Brief?",
+          "antworten": ["Oles Schafe fürchten sich vor Gewittern.", "Der Plünderer kletterte über die Mauer.", "Der Plünderer trug eine Fackel.", "Der Plünderer kommt jetzt nur noch in klaren Nächten."],
+          "richtig": "Oles Schafe fürchten sich vor Gewittern.",
+          "textstelle": "Meine Schafe haben übrigens keine Angst vor Gewittern.",
+          "belohnung": { "typ": "gold", "menge": 3 }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "kw-tamo-spaeher",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 3,
+      "absender": "Tamo, der Jäger",
+      "hinweis": { "gegner": "spaeher", "kraft": "eis", "prozent": 30 },
+      "text": "Sei gegrüßt! Ich bin Tamo, der Jäger aus dem Birkenwald. Die Späher-Orks sind die schnellsten Läufer, die ich kenne. Kein Hund kann sie einholen, und kein Pfeil trifft sie im Lauf. Letzten Winter jagten sie meinen Bruder bis zum Mühlbach. Der Bach war in der Nacht zugefroren. Mein Bruder kennt das Eis und lief vorsichtig hinüber. Die Späher aber stürmten hinterher. Sie rutschten aus, fielen übereinander und kamen kaum noch vom Fleck. Mein Bruder war längst in Sicherheit, als sie wieder auf den Beinen standen. Ich glaube, ihre Schnelligkeit ist ihre Stärke und zugleich ihre Schwäche. Wer sie bremst, hat schon halb gewonnen. Im Beutel findest du einen Kristall, der so kalt ist, dass meine Finger kribbeln. Leb wohl, dein Tamo",
+      "fragen": [
+        {
+          "art": "schliessen",
+          "frage": "Was hilft nach Tamos Erfahrung am besten gegen Späher-Orks?",
+          "antworten": ["etwas, das sie langsamer macht, zum Beispiel Eis", "ein Hund, der schneller läuft als sie", "viele Pfeile auf einmal", "ein Versteck im Birkenwald"],
+          "richtig": "etwas, das sie langsamer macht, zum Beispiel Eis",
+          "textstelle": "Sie rutschten aus, fielen übereinander und kamen kaum noch vom Fleck.",
+          "belohnung": { "typ": "item", "id": "eis" }
+        },
+        {
+          "art": "zusammenhang",
+          "frage": "Was meint Tamo mit „ihre Schnelligkeit ist ihre Stärke und zugleich ihre Schwäche“?",
+          "antworten": ["Weil sie so schnell rennen, können sie nicht vorsichtig sein.", "Sie sind schnell, aber nicht besonders stark.", "Sie laufen nur im Winter schnell.", "Sie werden beim Laufen schnell müde."],
+          "richtig": "Weil sie so schnell rennen, können sie nicht vorsichtig sein.",
+          "textstelle": "Mein Bruder kennt das Eis und lief vorsichtig hinüber. Die Späher aber stürmten hinterher.",
+          "belohnung": { "typ": "gold", "menge": 3 }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "kw-marlene-schildork",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 3,
+      "absender": "Marlene, die Köhlerin",
+      "hinweis": { "gegner": "schildork", "kraft": "feuer", "prozent": 30 },
+      "text": "Liebe Heldin, lieber Held! Ich bin Marlene und brenne im Wald Holzkohle. Gestern kamen zwei Schild-Orks an meinem Meiler vorbei. Ihre Schilde sind riesig und mit dicken Eisennägeln beschlagen. Schwerter und Äxte prallen daran einfach ab. Doch unter dem Eisen steckt nur altes, trockenes Holz. Als ich ein Scheit nachlegte, flogen Funken aus dem Meiler. Sofort fing der Schild des ersten Orks an zu qualmen. Er warf ihn ins Gras und trampelte wild darauf herum. Der zweite Ork hielt seinen Schild ganz weit vom Meiler weg. Ohne ihre Schilde sind diese Orks gar nicht so gefährlich. Das habe ich aus meinem Versteck gut gesehen. Ich schicke dir einen kleinen Kristall, der immer warm ist. Grüße aus dem rauchigen Wald, deine Marlene",
+      "fragen": [
+        {
+          "art": "schliessen",
+          "frage": "Welche Gegenstände würden gegen Schild-Orks wohl besonders gut wirken?",
+          "antworten": ["Feuer-Gegenstände, zum Beispiel ein Feuerschwert", "Gegenstände aus Eisen, zum Beispiel ein Hammer", "eine besonders scharfe Axt", "ein großer eigener Schild"],
+          "richtig": "Feuer-Gegenstände, zum Beispiel ein Feuerschwert",
+          "textstelle": "Doch unter dem Eisen steckt nur altes, trockenes Holz. Als ich ein Scheit nachlegte, flogen Funken aus dem Meiler. Sofort fing der Schild des ersten Orks an zu qualmen.",
+          "belohnung": { "typ": "item", "id": "feuer" }
+        },
+        {
+          "art": "schliessen",
+          "frage": "Warum hielt der zweite Ork seinen Schild weit vom Meiler weg?",
+          "antworten": ["Er hatte gesehen, was mit dem ersten Schild passiert war.", "Der Schild war ihm zu schwer geworden.", "Er wollte Marlene den Schild schenken.", "Er wollte sich am Meiler wärmen."],
+          "richtig": "Er hatte gesehen, was mit dem ersten Schild passiert war.",
+          "textstelle": "Der zweite Ork hielt seinen Schild ganz weit vom Meiler weg.",
+          "belohnung": { "typ": "gold", "menge": 3 }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "kw-bertram-geruechte",
+      "gebiet": "kleinwurzel",
+      "schwierigkeit": 3,
+      "absender": "Bertram, der Nachtwächter",
+      "text": "Guten Abend! Hier schreibt Bertram, der Nachtwächter von Kleinwurzel. Im Dorf erzählt man sich gerade viele Geschichten. Der Bäcker behauptet, die Orks hätten einen Drachen gezähmt. Gesehen hat er ihn aber nie, er hat es nur vom Müller gehört. Ich selbst stehe jede Nacht auf dem Turm. Letzte Nacht habe ich am Waldrand drei Fackeln gezählt. Sie bewegten sich langsam nach Osten, in Richtung der alten Brücke. Gegen Mitternacht wurde es dort plötzlich hell und laut. Am Morgen fehlten zwei Bretter in der Brücke. Ob die Orks sie gestohlen haben, weiß ich nicht. Vielleicht hat auch der Sturm sie fortgerissen. Bitte glaube nicht alles, was man sich hier erzählt! Prüfe lieber selbst, was wirklich stimmt. Dein Bertram",
+      "fragen": [
+        {
+          "art": "widerspruch",
+          "frage": "Was hat Bertram mit eigenen Augen gesehen – und nicht nur gehört?",
+          "antworten": ["drei Fackeln, die nach Osten zogen", "einen gezähmten Drachen", "Orks, die Bretter aus der Brücke stahlen", "den Müller und den Bäcker am Waldrand"],
+          "richtig": "drei Fackeln, die nach Osten zogen",
+          "textstelle": "Letzte Nacht habe ich am Waldrand drei Fackeln gezählt. Sie bewegten sich langsam nach Osten, in Richtung der alten Brücke.",
+          "belohnung": { "typ": "item", "id": "laterne" }
+        },
+        {
+          "art": "schliessen",
+          "frage": "Warum weiß Bertram nicht sicher, was mit der Brücke passiert ist?",
+          "antworten": ["Er hat nicht gesehen, wer oder was die Bretter fortgenommen hat.", "Er war in dieser Nacht nicht auf dem Turm.", "Der Bäcker hat ihm verboten, darüber zu sprechen.", "Der Drache hat die Brücke versteckt."],
+          "richtig": "Er hat nicht gesehen, wer oder was die Bretter fortgenommen hat.",
+          "textstelle": "Ob die Orks sie gestohlen haben, weiß ich nicht.",
+          "belohnung": { "typ": "gold", "menge": 3 }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "hm-arvid-haeuptling",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 3,
+      "absender": "Arvid, der Pferdeknecht",
+      "hinweis": { "gegner": "haeuptling", "kraft": "feuer", "prozent": 30 },
+      "text": "Heil dir, Heldin oder Held! Ich bin Arvid und hüte die Pferde in der Goldhalle. Vor einer Woche überfiel uns der Wolfsreiter-Häuptling. Er selbst kämpft mit einer schweren Keule. Doch gefährlicher ist sein großer grauer Wolf. Der Häuptling ruft ihn erst, wenn er selbst verwundet ist. Dann springt der Wolf aus dem hohen Gras und beißt zu. In jener Nacht brannte vor unserem Stall ein großes Lagerfeuer. Der Wolf knurrte, aber er kam nicht näher als zehn Schritte heran. Er lief nur im Kreis um die Flammen und jaulte. Der Häuptling schrie vor Wut, doch der Wolf gehorchte ihm nicht. Am Ende zogen beide ab, ohne ein einziges Pferd zu stehlen. Ich lege dir einen Kristall aus der Glut unseres Feuers bei. Mögen deine Pferde immer schnell sein! Dein Arvid",
+      "fragen": [
+        {
+          "art": "schliessen",
+          "frage": "Womit könntest du dich für den Kampf gegen den Häuptling am besten rüsten?",
+          "antworten": ["mit Feuer, das den Wolf fernhält", "mit einer schweren Keule", "mit einem besonders schnellen Pferd", "mit hohem Gras als Versteck"],
+          "richtig": "mit Feuer, das den Wolf fernhält",
+          "textstelle": "Der Wolf knurrte, aber er kam nicht näher als zehn Schritte heran.",
+          "belohnung": { "typ": "item", "id": "feuer" }
+        },
+        {
+          "art": "reihenfolge",
+          "frage": "Was geschah in jener Nacht ganz zuletzt?",
+          "antworten": ["Der Häuptling und der Wolf zogen ab.", "Der Wolf lief um die Flammen.", "Der Häuptling schrie vor Wut.", "Der Wolf knurrte das Feuer an."],
+          "richtig": "Der Häuptling und der Wolf zogen ab.",
+          "textstelle": "Am Ende zogen beide ab, ohne ein einziges Pferd zu stehlen.",
+          "belohnung": { "typ": "gold", "menge": 3 }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "hm-thora-wolfsreiter",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 3,
+      "absender": "Thora, die Mauerbauerin",
+      "hinweis": { "gegner": "wolfsreiter", "kraft": "stein", "prozent": 30 },
+      "text": "Sei gegrüßt! Ich bin Thora und baue Mauern für die Weiße Feste. Die Wolfsreiter greifen immer gleich an. Sie reiten im vollen Galopp heran und stoßen mit ihren langen Lanzen zu. Gegen Holzzäune hilft das wenig, die Lanzen gehen einfach hindurch. Letzten Monat haben wir am Nordtor eine neue Mauer aus Feldsteinen gesetzt. Am nächsten Morgen lagen dort zwölf zerbrochene Lanzen im Gras. An der Mauer selbst fanden wir nur ein paar Kratzer. Seitdem reiten die Wolfsreiter in einem großen Bogen um das Nordtor herum. Sie versuchen es lieber am Osttor, wo noch der alte Zaun steht. Mein Rat an dich: Mach es den Wolfsreitern so schwer wie unsere Mauer. Ich schicke dir einen Splitter von unserem härtesten Feldstein. Deine Thora",
+      "fragen": [
+        {
+          "art": "schliessen",
+          "frage": "Was hilft nach Thoras Bericht am besten gegen Wolfsreiter?",
+          "antworten": ["etwas Hartes, an dem ihre Angriffe abprallen, wie Stein", "ein schneller Gegenangriff mit der Lanze", "ein Holzzaun mit spitzen Pfählen", "ein Ritt in großem Bogen"],
+          "richtig": "etwas Hartes, an dem ihre Angriffe abprallen, wie Stein",
+          "textstelle": "Am nächsten Morgen lagen dort zwölf zerbrochene Lanzen im Gras.",
+          "belohnung": { "typ": "item", "id": "stein" }
+        },
+        {
+          "art": "schliessen",
+          "frage": "Warum greifen die Wolfsreiter jetzt lieber am Osttor an?",
+          "antworten": ["Dort steht noch ein Zaun, durch den ihre Lanzen hindurchgehen.", "Am Osttor wohnt Thora.", "Das Osttor liegt näher an ihrem Lager.", "Am Nordtor liegen zu viele Lanzen im Weg."],
+          "richtig": "Dort steht noch ein Zaun, durch den ihre Lanzen hindurchgehen.",
+          "textstelle": "Sie versuchen es lieber am Osttor, wo noch der alte Zaun steht.",
+          "belohnung": { "typ": "gold", "menge": 3 }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "hm-sigrun-wind",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 3,
+      "absender": "Sigrun, die Windmüllerin",
+      "hinweis": { "gegner": "alle", "kraft": "sturm", "prozent": 15 },
+      "text": "Hallo aus der Windmühle am Pferdehügel! Ich bin Sigrun. Hier oben weht fast immer ein kräftiger Wind. Meine Flügel drehen sich Tag und Nacht, und das Korn wird zu Mehl. Gestern Abend kam eine ganze Horde Orks den Hügel herauf. Sie wollten meine Mehlsäcke holen, das war klar. Doch genau da drehte der Wind und blies ihnen mitten ins Gesicht. Ihre Umhänge flatterten, ihre Fackeln gingen aus, und sie kamen kaum noch vorwärts. Orks sind nämlich schwer und tragen dicke Rüstungen. Bei Gegenwind sind sie langsam wie Schnecken. Ich musste lachen, als der Erste rückwärts den Hang hinunterrollte. Im Säckchen findest du einen Kristall, der ganz von selbst summt und pfeift. Mit windigen Grüßen, deine Sigrun",
+      "fragen": [
+        {
+          "art": "schliessen",
+          "frage": "Welcher Kristall könnte dir nach Sigruns Beobachtung gegen Orks helfen?",
+          "antworten": ["Sturm", "Feuer", "Gold", "Mond"],
+          "richtig": "Sturm",
+          "textstelle": "Doch genau da drehte der Wind und blies ihnen mitten ins Gesicht.",
+          "belohnung": { "typ": "item", "id": "sturm" }
+        },
+        {
+          "art": "wort",
+          "frage": "Was bedeutet „Gegenwind“ in diesem Brief?",
+          "antworten": ["Wind, der einem entgegenweht", "Wind, der einen von hinten schiebt", "ein besonders warmer Wind", "Wind, der nur nachts weht"],
+          "richtig": "Wind, der einem entgegenweht",
+          "textstelle": "Bei Gegenwind sind sie langsam wie Schnecken.",
+          "belohnung": { "typ": "gold", "menge": 3 }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
+    },
+    {
+      "id": "hm-eira-zwei-boten",
+      "gebiet": "hrossmark",
+      "schwierigkeit": 3,
+      "absender": "Eira, Kundschafterin der Weißen Feste",
+      "text": "An die Heldin oder den Helden der Wanderlande! Hier schreibt Eira, Kundschafterin der Weißen Feste. Heute kamen zwei Boten mit Nachrichten über das Orklager. Der erste Bote sagte, das Lager sei leer und die Orks seien nach Süden gezogen. Der zweite Bote sagte, im Lager brennten noch zwanzig Feuer. Beide können nicht recht haben. Also bin ich selbst losgeritten. Vom Hügel aus sah ich Rauch über dem Lager, aber keine Flammen. Die Zelte waren abgebaut, nur die Feuerstellen glühten noch. Im Schlamm fand ich frische Wolfsspuren, alle nach Süden gerichtet. Der erste Bote hatte also recht, der zweite brachte alte Nachrichten. Die Orks sind erst heute früh aufgebrochen. Sei auf der Südstraße besonders vorsichtig! Deine Eira",
+      "fragen": [
+        {
+          "art": "widerspruch",
+          "frage": "Warum können nicht beide Boten recht haben?",
+          "antworten": ["Ein leeres Lager hat keine zwanzig brennenden Feuer.", "Beide Boten kamen aus dem Süden.", "Die Wölfe hatten die Feuer gelöscht.", "Eira kennt den zweiten Boten nicht."],
+          "richtig": "Ein leeres Lager hat keine zwanzig brennenden Feuer.",
+          "textstelle": "Der zweite Bote sagte, im Lager brennten noch zwanzig Feuer.",
+          "belohnung": { "typ": "item", "id": "stiefel" }
+        },
+        {
+          "art": "schliessen",
+          "frage": "Woran erkennt Eira, dass die Orks erst vor kurzem aufgebrochen sind?",
+          "antworten": ["Die Feuerstellen glühten noch.", "Die Zelte standen noch.", "Zwanzig Feuer brannten hell.", "Der erste Bote hat es ihr erzählt."],
+          "richtig": "Die Feuerstellen glühten noch.",
+          "textstelle": "Die Zelte waren abgebaut, nur die Feuerstellen glühten noch.",
+          "belohnung": { "typ": "gold", "menge": 3 }
+        }
+      ],
+      "trost": { "typ": "gold", "menge": 1 }
     }
   ]
 }

@@ -25,15 +25,16 @@ test('Das Item bestimmt das Thema, die Item-Stufe den Stufen-Bereich', () => {
       assert.ok(themen.includes(a.thema), `${art} → ${a.thema}`);
     }
   }
-  // Lernstand im Bereich: Anfänger bekommt bei ★★★ Stufe 2, Profi bei ★★ Stufe 2
+  // Item = Untergrenze, Lernstand = Stufe: Anfänger bekommt bei ★★★ Stufe 2, Profi auch bei ★★ seine Stufe 3
   assert.equal(stufeFuer({ lernstand: {} }, o.einst, 'mehrzahl', stufenBereich(3)), 2);
-  assert.equal(stufeFuer({ lernstand: { mehrzahl: { stufe: 3, sicher: 0 } } }, o.einst, 'mehrzahl', stufenBereich(2)), 2);
+  assert.equal(stufeFuer({ lernstand: { mehrzahl: { stufe: 3, sicher: 0 } } }, o.einst, 'mehrzahl', stufenBereich(2)), 3);
 });
 
-test('Standard ohne Klassen-Code: alle Themen, Stufe 1–2; die Lehrkraft kann begrenzen und abschalten', () => {
-  assert.equal(STANDARD_MAX, 2);
-  assert.equal(maxStufe(null, 'artikel'), 2);
-  assert.equal(stufeFuer({ lernstand: {} }, null, 'artikel', stufenBereich(4)), 2, 'auch ★★★★ bleibt ohne Klasse bei Stufe 2');
+test('Standard ohne Klassen-Code: alle Themen bis Stufe 3; die Lehrkraft kann begrenzen und abschalten', () => {
+  assert.equal(STANDARD_MAX, 3);
+  assert.equal(maxStufe(null, 'artikel'), 3);
+  assert.equal(stufeFuer({ lernstand: {} }, null, 'artikel', stufenBereich(4)), 3, '★★★★ fragt ohne Klasse Stufe 3');
+  assert.equal(stufeFuer({ lernstand: {} }, { themen: { artikel: 2 } }, 'artikel', stufenBereich(4)), 2, 'die Lehrkraft begrenzt');
   const einst = { themen: { mehrzahl: 0, artikel: 1 } };
   for (let k = 0; k < 30; k++) {
     const a = waehleAufgabe(basis({ einst, art: 'nomen', bereich: [1, 3], rng: seededRng(k) }));
@@ -124,4 +125,20 @@ test('Lernstand beim Laufstart neu einschätzen: Startstufe nach Rang, Fehler se
   verbucheAufgabe({ run, profil: p, aufgabe: { ...aufgabe, stufe: 2 }, ergebnis: { richtig: true, ersterVersuch: true }, rng: () => 0 });
   assert.equal(p.lernstand.mehrzahl.geschaetzt, undefined, 'Treffer bestätigt die Stufe');
   assert.equal(p.lernstand.mehrzahl.stufe, 2);
+});
+
+test('Ersatz nach einem Fehlversuch: selbes Thema, feste Stufe, anderes Wort und Format, keine fremde Wiederholung', () => {
+  for (let seed = 1; seed <= 40; seed++) {
+    const rng = seededRng(seed);
+    const run = { aufgaben: { zaehler: 5, benutzt: {}, wiederholen: [{ thema: 'zeitformen', stufe: 1, format: 'luecke', wort: 'v:x', faellig: 0 }] } };
+    const o = basis({ rng, run, profil: { lernstand: { mehrzahl: { stufe: 3, sicher: 0 } } } });
+    const alt = waehleAufgabe({ ...o, kandidaten: ['mehrzahl'], stufe: 2, keineWiederholung: true });
+    assert.equal(alt.stufe, 2, 'feste Stufe statt Lernstand');
+    run.aufgaben.benutzt.mehrzahl = [alt.wort];
+    const neu = waehleAufgabe({ ...o, kandidaten: ['mehrzahl'], stufe: alt.stufe, keineWiederholung: true, nichtFormat: alt.format });
+    assert.equal(neu.thema, 'mehrzahl', 'fällige Wiederholung eines anderen Themas drängt sich nicht vor');
+    assert.equal(neu.stufe, 2);
+    assert.notEqual(neu.wort, alt.wort, 'anderes Wort');
+    assert.notEqual(neu.format, alt.format, 'anderes Format');
+  }
 });

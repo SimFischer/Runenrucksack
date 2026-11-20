@@ -1,8 +1,9 @@
 // Welche Aufgabe kommt? (ohne Darstellung, testbar)
 // - Das Item bestimmt das Thema (nicht das Wort): Nomen → Mehrzahl oder Artikel, Komposita → Komposita,
 //   Verben → Personalformen oder Zeitformen, Runen → Steigerung, Ork-Rüstung → Rechtschreibung.
-// - Die Item-Stufe bestimmt den Bereich der Aufgabenstufe: ★★ = 1–2, ★★★ = 2–3, ★★★★ = 3 (oder zwei Aufgaben).
-// - Der Lernstand des Kindes (pro Thema) bestimmt, wo es in diesem Bereich steht; die Lehrkraft kann begrenzen.
+// - Die Item-Stufe bestimmt die Mindeststufe der Aufgabe: ★★ ab 1, ★★★ ab 2, ★★★★ = 3 (oder zwei Aufgaben).
+// - Der Lernstand des Kindes (pro Thema) bestimmt die Stufe – auch über den Bereich des Items hinaus, damit
+//   sichere Kinder nicht mit leichten Aufgaben unterfordert werden; die Lehrkraft kann begrenzen.
 import { erzeugeInhalt, zufall } from './themen.js';
 import { FORMATE } from './formate/index.js';
 
@@ -21,8 +22,8 @@ export const stufenBereich = (stern) => ({ 2: [1, 2], 3: [2, 3], 4: [3, 3] }[ste
 // Belohnung für „gleich beim ersten Versuch richtig“: Stufe 2 → 1 Gold, Stufe 3 → 2 Gold (und Glanz beim Verbinden).
 export const GOLD_FUER_STUFE = { 2: 1, 3: 2 };
 
-// Standard ohne Klassen-Code: alle Themen der Stufe 1–2.
-export const STANDARD_MAX = 2;
+// Standard ohne Klassen-Code: alle Themen bis Stufe 3 (die Lehrkraft kann begrenzen).
+export const STANDARD_MAX = 3;
 
 // Einstellungen der Lehrkraft: { themen: { id: max 0–3 } } – 0 = aus. Ohne Eintrag gilt STANDARD_MAX.
 export const maxStufe = (einst, thema) => einst?.themen?.[thema] ?? STANDARD_MAX;
@@ -41,10 +42,10 @@ export function schaetzeLernstand(profil, rangNr, themenIds) {
   for (const t of themenIds) if (!profil.lernstand[t]) profil.lernstand[t] = { stufe: start, sicher: 0, geschaetzt: true };
 }
 
-// Stufe für eine Aufgabe: Lernstand im Bereich des Items, höchstens die Höchststufe der Lehrkraft.
+// Stufe für eine Aufgabe: der Lernstand, mindestens die Untergrenze des Items, höchstens die Höchststufe der Lehrkraft.
 export function stufeFuer(profil, einst, thema, bereich) {
   const lern = lernstandVon(profil, thema).stufe;
-  const s = Math.max(bereich[0], Math.min(bereich[1], lern));
+  const s = Math.max(bereich[0], lern);
   return Math.max(1, Math.min(s, maxStufe(einst, thema)));
 }
 
@@ -64,7 +65,8 @@ export function aufgabenStand(run) {
 }
 
 // Eine Aufgabe auswählen und erzeugen. opts: { themen (themen.json), ws, profil, einst, run, art | kandidaten,
-// bereich, rng, felder, itemNomen, format (erzwingen), nurThemen (z. B. für Begegnungen) }
+// bereich, rng, felder, itemNomen, format (erzwingen), nurThemen (z. B. für Begegnungen),
+// stufe (feste Stufe), nichtFormat (anderes Format als …), keineWiederholung (z. B. Ersatz nach einem Fehlversuch) }
 export function waehleAufgabe(opts) {
   const { themen, ws, profil, einst, run, rng } = opts;
   const stand = aufgabenStand(run);
@@ -76,7 +78,7 @@ export function waehleAufgabe(opts) {
   if (!kandidaten.length) kandidaten = ['artikel'];
   // Fällige Wiederholung eines Fehlers: anderes Format, anderes Wort (nicht bei erzwungenem Format)
   let wiederholung = null;
-  if (!opts.format) {
+  if (!opts.format && !opts.keineWiederholung) {
     wiederholung = stand.wiederholen.find((w) => w.faellig <= stand.zaehler && themaAn(einst, w.thema)) || null;
   }
   // Erzwungenes Format (Begegnungen): nur Themen, die es auf einer erlaubten Stufe haben
@@ -92,13 +94,14 @@ export function waehleAufgabe(opts) {
   }
   const thema = wiederholung ? wiederholung.thema : zufall(kandidaten, rng);
   const stufe = wiederholung ? Math.min(wiederholung.stufe, maxStufe(einst, thema)) || 1
+    : opts.stufe ? Math.min(opts.stufe, Math.max(1, maxStufe(einst, thema)))
     : opts.format ? stufeMitFormat(thema) || [1, 2, 3].find((s) => mitFormat(thema, s)) : stufeFuer(profil, einst, thema, opts.bereich || [1, 3]);
   const benutzt = new Set(stand.benutzt[thema] || []);
   if (wiederholung) benutzt.add(wiederholung.wort);
   // Dasselbe Format höchstens zweimal hintereinander
   const zuletzt = stand.formate || [];
   const ohneFormat = zuletzt.length >= 2 && zuletzt.at(-1) === zuletzt.at(-2) ? zuletzt.at(-1) : null;
-  const ctx = { ws, rng, felder: opts.felder || [], benutzt, itemNomen: opts.itemNomen, nichtFormat: wiederholung?.format, ohneFormat };
+  const ctx = { ws, rng, felder: opts.felder || [], benutzt, itemNomen: opts.itemNomen, nichtFormat: wiederholung?.format || opts.nichtFormat, ohneFormat };
   let inhalt = erzeugeInhalt(themen, thema, stufe, ctx, opts.format);
   for (let i = 0; i < 4 && !opts.format && ohneFormat && inhalt.format === ohneFormat; i++) inhalt = erzeugeInhalt(themen, thema, stufe, ctx);
   stand.formate = [...zuletzt, inhalt.format].slice(-4);

@@ -370,7 +370,7 @@ function leseLauf(r, reg, data) {
 
 // ---------- Erweiterung: Lernstand, Regelkarten, Klasse, Aufgaben-Stand ----------
 
-const STANDARD_STUFE = 2; // wie STANDARD_MAX in js/aufgaben/wahl.js
+const STANDARD_STUFE = 3; // wie STANDARD_MAX in js/aufgaben/wahl.js
 const FORMAT_IDS = ['auswahl', 'luecke', 'buchstaben', 'eintippen', 'baukasten', 'sortieren', 'fehler', 'ordnen', 'passtnicht', 'regel', 'paare'];
 const heldErweitert = (profil) => Object.values(profil.lernstand || {}).some((l) => l.stufe > 1 || l.sicher > 0) || (profil.regeln || []).length > 0 || !!profil.klasse;
 const laufErweitert = (run) => !!(run.rabatt || run.aufgaben?.zaehler || run.aufgaben?.wiederholen?.length);

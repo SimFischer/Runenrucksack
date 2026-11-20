@@ -3,7 +3,7 @@
 import { G, saveProfil, emit, region } from '../state.js';
 import { mitRegeln } from './themen.js';
 import { FORMATE } from './formate/index.js';
-import { waehleAufgabe, verbucheAufgabe, lernstandVon, maxStufe, GOLD_FUER_STUFE } from './wahl.js';
+import { waehleAufgabe, verbucheAufgabe, lernstandVon, maxStufe, GOLD_FUER_STUFE, aufgabenStand } from './wahl.js';
 import { stelleAufgabe } from './host.js';
 import { merkeAntwort } from '../fortschritt.js';
 import { bump, toast } from '../ui.js';
@@ -34,17 +34,25 @@ export async function frageImSpiel(opts) {
   const rng = Math.random;
   const ws = wortschatz();
   const itemNomen = opts.itemWort ? ws.nomen.find((n) => n.wort === opts.itemWort) : null;
-  const aufgabe = opts.inhalt
-    ? FORMATE[opts.inhalt.format].erzeuge(opts.inhalt, rng)
-    : waehleAufgabe({ themen: G.THEMEN, ws, profil: G.PROFIL, einst: einstellungen(), run, rng, art: opts.art, kandidaten: opts.kandidaten,
-      bereich: opts.bereich, format: opts.format, felder: felderJetzt(), itemNomen });
-  const t = thema(aufgabe.thema);
+  const waehle = (extra = {}) => waehleAufgabe({ themen: G.THEMEN, ws, profil: G.PROFIL, einst: einstellungen(), run, rng, art: opts.art, kandidaten: opts.kandidaten,
+    bereich: opts.bereich, format: opts.format, felder: felderJetzt(), itemNomen, ...extra });
+  const erste = opts.inhalt ? FORMATE[opts.inhalt.format].erzeuge(opts.inhalt, rng) : waehle();
+  // Nach einem Fehlversuch: neue Aufgabe zum selben Thema auf derselben Stufe, mit anderem Wort und möglichst
+  // anderem Format (nicht bei festen Inhalten wie der Speisekarte, nicht im Tutorial)
+  const naechste = opts.inhalt || run.tutorial ? null : (alt) => {
+    (aufgabenStand(run).benutzt[alt.thema] ||= []).push(alt.wort);
+    try {
+      return waehle({ kandidaten: [alt.thema], stufe: opts.format ? undefined : alt.stufe, keineWiederholung: true, nichtFormat: opts.format ? undefined : alt.format });
+    } catch { return null; }
+  };
+  const t = thema(erste.thema);
   emit('tipp', { key: 'stufen' });
-  if (opts.zielMarkieren) aufgabe.zielMarkiert = true; // Begleiter Rabe
+  if (opts.zielMarkieren) erste.zielMarkiert = true; // Begleiter Rabe
   // Begleiter Eule: einmal pro Lauf die passende Regel vorab zeigen
-  const eule = run.begleiter === 'eule' && !run.euleGenutzt && aufgabe.regel && !run.tutorial
-    ? { text: ws.regelText(aufgabe.regel), nutzen: () => { run.euleGenutzt = true; } } : null;
-  const ergebnis = await stelleAufgabe(aufgabe, {
+  const eule = run.begleiter === 'eule' && !run.euleGenutzt && erste.regel && !run.tutorial
+    ? { text: ws.regelText(erste.regel), nutzen: () => { run.euleGenutzt = true; } } : null;
+  const ergebnis = await stelleAufgabe(erste, {
+    naechste,
     anker: opts.anker,
     beteiligt: opts.beteiligt,
     titel: t?.name || '',
@@ -58,6 +66,7 @@ export async function frageImSpiel(opts) {
     onRegel: (id) => emit('regelGesehen', { id }),
     eule,
   });
+  const aufgabe = ergebnis.aufgabe || erste;
   if (!ergebnis.abgebrochen) {
     run.lernen ||= { richtig: 0, falsch: 0 };
     if (ergebnis.richtig) run.lernen.richtig++;

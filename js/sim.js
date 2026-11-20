@@ -17,7 +17,7 @@ import { baueBuch, entdeckungenIn } from './buch.js';
 import { neuesProfil, entdecke, merkeAntwort, laufStand, laufAbschluss, rangVon } from './fortschritt.js';
 import { Battle, makeFighter, runToEnd } from './battle.js';
 import { begleiterDefs } from './begleiter.js';
-import { waehleBrief, werteAus } from './botschaften.js';
+import { waehleBrief, werteAus, merkeHinweis, hinweisMods } from './botschaften.js';
 import { karten, pruefeSatz, spruchWerte, schmiedeVerben, schmiedeStern, schmiedeOffen, SPRUCH_DEF } from './satzschmiede.js';
 import { applyMod } from './mods.js';
 import { istSockelTeil, kannEinsetzen, einsetzen } from './sockel.js';
@@ -224,6 +224,7 @@ function morning(run, data, rng, skill, opts = {}) {
       const brief = waehleBrief(data.botschaften, { gebiet: data.regions.find((g) => run.day >= g.tage[0] && run.day <= g.tage[1]).id, stufe: 1, gelesen: run.gelesen || [], rng });
       if (brief) {
         run.gelesen = [...(run.gelesen || []), brief.id];
+        merkeHinweis(run, brief);
         const r = werteAus(brief, brief.fragen.map((q) => (rng() < skill ? q.richtig : null)));
         for (const b of r.belohnungen) {
           merkeAntwort(run, 'lesen', r.alleRichtig, true);
@@ -302,13 +303,14 @@ export function simulateRun(data, rng, opts = {}) {
     morning(run, data, rng, skill, opts);
     run.wuerfeTag = 0;
     shop(run, data, rng, skill, opts);
+    const foeDef = pickEnemy(run.day, data.regions, data.enemies, rng);
     const ctx = playerContext(run, ctxData);
+    ctx.mods.push(...hinweisMods(run, foeDef.id)); // Hinweise aus gelesenen Briefen
     const bag = run.items.filter((p) => p.area === 'bag');
     const player = makeFighter('p', bag, data.defs, run.day, {
       info: evaluateBag(bag, data.defs, ctx), leben: ctx.leben, tempo: ctx.tempo, selbstschaden: ctx.selbstschaden, rng,
       ersterAngriffDoppelt: ctx.ersterAngriffDoppelt,
     });
-    const foeDef = pickEnemy(run.day, data.regions, data.enemies, rng);
     const anteil = run.freieItems.length / Math.max(1, data.items.filter((d) => d.freischaltung).length);
     const enemy = makeEnemy(run.day, { ...foeDef, anteil: Math.min(1, anteil), budgetFaktor: bestandFaktor(Math.min(1, anteil)) }, enemyPool(data.items, data.compounds, run.day, run.freieItems), data.defs, rng, enemyPool(data.items, data.compounds, run.day));
     const armor = rng() < skill;

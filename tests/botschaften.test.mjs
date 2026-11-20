@@ -19,10 +19,10 @@ test('Mindestens 30 Briefe, verteilt auf alle Gebiete und Schwierigkeiten 1–3'
   for (const b of B) assert.ok(GEBIETE.includes(b.gebiet), b.id);
 });
 
-test('Texte: 60–120 Wörter, kurze Sätze, mit Absender', () => {
+test('Texte: 60–120 Wörter (Schwierigkeit 3 bis 180), kurze Sätze, mit Absender', () => {
   for (const b of B) {
     const n = woerter(b.text);
-    assert.ok(n >= 60 && n <= 120, `${b.id}: ${n} Wörter`);
+    assert.ok(n >= 60 && n <= (b.schwierigkeit === 3 ? 180 : 120), `${b.id}: ${n} Wörter`);
     assert.ok(b.absender, b.id);
     const saetze = b.text.split(/[.!?]+\s/).filter(Boolean);
     const laengster = Math.max(...saetze.map(woerter));
@@ -71,4 +71,68 @@ test('Briefwahl nach Gebiet und Lernstand; Auswertung mit Belohnung, Trost und m
   assert.equal(verbucheBrief(profil, true).stufe, 2, 'zwei Briefe ganz richtig → nächste Stufe');
   verbucheBrief(profil, false);
   assert.equal(profil.lernstand.lesen.sicher, 0);
+});
+
+test('Belegen: Jede Textstelle steht wörtlich im Brief und gehört zu 1–3 antippbaren Sätzen', async () => {
+  const { saetzeVon, satzInStelle, belegRichtig, mitBeleg, werteAus, BELEG_GOLD } = await import('../js/botschaften.js');
+  for (const b of B) {
+    const saetze = saetzeVon(b.text);
+    assert.equal(saetze.join(' ').replace(/ +/g, ' '), b.text.replace(/ +/g, ' ').trim(), `${b.id}: Sätze ergeben den Text`);
+    for (const f of b.fragen) {
+      assert.ok(b.text.includes(f.textstelle), `${b.id}: Textstelle wörtlich im Text`);
+      const treffer = saetze.filter((s) => satzInStelle(s, f.textstelle)).length;
+      assert.ok(treffer >= 1 && treffer <= 3, `${b.id}: ${treffer} Sätze passen zu „${f.textstelle}“`);
+    }
+  }
+  const ole = B.find((x) => x.id === 'kw-ole-pluenderer');
+  const f = ole.fragen[0];
+  assert.ok(mitBeleg(ole, f), 'Schwierigkeit 3: Beleg verlangt');
+  assert.ok(!mitBeleg(B.find((x) => x.schwierigkeit === 1), f), 'Schwierigkeit 1: kein Beleg');
+  const nr = saetzeVon(ole.text).findIndex((s) => s.startsWith('Als ein Blitz'));
+  assert.ok(belegRichtig(ole, f, nr));
+  assert.ok(!belegRichtig(ole, f, 0), 'Anrede ist kein Beleg');
+  const alle = ole.fragen.map((q) => q.richtig);
+  const mit = werteAus(ole, alle, [true, true]);
+  assert.ok(mit.alleRichtig);
+  assert.equal(mit.belohnungen.filter((x) => x.typ === 'gold' && x.menge === BELEG_GOLD).length, 2, 'je Beleg 1 Gold');
+  const ohne = werteAus(ole, alle, [true, false]);
+  assert.equal(ohne.alleRichtig, false, 'ohne Beleg nicht „ganz richtig“ (kein Aufstieg)');
+  assert.equal(ohne.ohneBeleg, 1);
+  assert.ok(!ohne.belohnungen.includes(ole.trost), 'kein Trost nötig: die Antworten stimmen');
+});
+
+test('Hinweise: gültige Gegner und Kräfte, wirken nur gegen den genannten Gegner und nur mit passender Kraft', async () => {
+  const { merkeHinweis, hinweisMods, hinweiseImKampf } = await import('../js/botschaften.js');
+  const { matches } = await import('../js/mods.js');
+  const items = json('items.json').items;
+  const kraefte = new Set(items.filter((d) => d.art === 'kraft').map((d) => d.id));
+  const E = json('enemies.json');
+  const gegnerListe = (E.gegner || E.enemies || Object.values(E).find(Array.isArray));
+  const regionen = json('regions.json').gebiete;
+  const mit = B.filter((b) => b.hinweis);
+  assert.ok(mit.length >= 6, `${mit.length} Briefe mit Hinweis`);
+  for (const b of mit) {
+    const h = b.hinweis;
+    assert.ok(kraefte.has(h.kraft), `${b.id}: Kraft ${h.kraft}`);
+    assert.ok(h.prozent >= 10 && h.prozent <= 40, `${b.id}: ${h.prozent} %`);
+    if (h.gegner !== 'alle') {
+      assert.ok(gegnerListe.some((e) => e.id === h.gegner), `${b.id}: Gegner ${h.gegner}`);
+      const reg = regionen.find((r) => r.id === b.gebiet);
+      const spaeter = regionen.slice(regionen.indexOf(reg));
+      assert.ok(spaeter.some((r) => r.gegner.includes(h.gegner) || r.boss === h.gegner), `${b.id}: ${h.gegner} kommt nach dem Brief noch vor`);
+    }
+  }
+  const run = {};
+  const ole = B.find((x) => x.id === 'kw-ole-pluenderer');
+  merkeHinweis(run, ole);
+  merkeHinweis(run, ole);
+  assert.equal(run.hinweise.length, 1, 'derselbe Brief zählt einmal');
+  assert.equal(hinweisMods(run, 'spaeher').length, 0, 'gilt nicht gegen andere Gegner');
+  const [mod] = hinweisMods(run, 'pluenderer');
+  assert.ok(matches(mod.filter, { id: 'blitz' }), 'Blitz-Kristall');
+  assert.ok(matches(mod.filter, { id: 'blitz+schwert', teile: { kraft: 'blitz', traeger: 'schwert' } }), 'Blitzschwert');
+  assert.ok(!matches(mod.filter, { id: 'feuer+schwert', teile: { kraft: 'feuer', traeger: 'schwert' } }), 'Feuerschwert nicht');
+  assert.ok(!matches(mod.filter, { id: 'schwert' }), 'Schwert ohne Kraft nicht');
+  assert.deepEqual(hinweiseImKampf(run, 'pluenderer', [{ id: 'schwert' }]).map((x) => x.genutzt), [false]);
+  assert.deepEqual(hinweiseImKampf(run, 'pluenderer', [{ id: 'blitz' }]).map((x) => x.genutzt), [true]);
 });

@@ -10,8 +10,8 @@
         { "id": "artikel-grundwort", "text": "Bei zusammengesetzten Nomen bestimmt das letzte Wort den Artikel: das Feuer + der Wurm → der Feuerwurm." } ] },
     { "id": "mehrzahl", "name": "Mehrzahl", "emoji": "👥", "stufen": [
         { "text": "-e, -n, -en", "formate": ["luecke", "auswahl", "paare", "regel"] },
-        { "text": "Umlaut und -er", "formate": ["luecke", "auswahl", "buchstaben", "paare", "regel"] },
-        { "text": "unverändert, -s und Sonderfälle", "formate": ["luecke", "buchstaben", "eintippen", "regel"] } ],
+        { "text": "Umlaut und -er", "formate": ["buchstaben", "eintippen", "luecke", "paare", "regel"] },
+        { "text": "unverändert, -s und Sonderfälle", "formate": ["eintippen", "buchstaben", "regel"] } ],
       "regeln": [
         { "id": "mehrzahl-e", "text": "Viele Nomen bekommen in der Mehrzahl ein -e: der Hund – die Hunde." },
         { "id": "mehrzahl-n", "text": "Nomen auf -e bekommen in der Mehrzahl oft ein -n: die Blume – die Blumen." },
@@ -42,8 +42,8 @@
         { "id": "gross-nominalisierung", "text": "Steht „das“ oder „beim“ vor einem Verb, wird es zum Nomen und groß geschrieben: das Lesen." } ] },
     { "id": "personalformen", "name": "Personalformen", "emoji": "🙋", "stufen": [
         { "text": "regelmäßige Verben", "formate": ["luecke", "paare", "buchstaben"] },
-        { "text": "Vokalwechsel bei du und er: fährst, liest", "formate": ["luecke", "buchstaben", "auswahl"] },
-        { "text": "sein, haben, werden und andere unregelmäßige", "formate": ["luecke", "eintippen", "paare"] } ],
+        { "text": "Vokalwechsel bei du und er: fährst, liest", "formate": ["buchstaben", "eintippen", "luecke"] },
+        { "text": "sein, haben, werden und andere unregelmäßige", "formate": ["eintippen", "buchstaben", "paare"] } ],
       "regeln": [
         { "id": "person-endung", "text": "Die Endung des Verbs zeigt, wer etwas tut: ich spiel-e, du spiel-st, er spiel-t, wir spiel-en." },
         { "id": "person-vokal", "text": "Manche Verben ändern bei du und er/sie/es ihren Vokal: fahren – du fährst – er fährt." },
@@ -59,39 +59,39 @@
         { "id": "zeit-erkennen", "text": "Präsens: jetzt (er reitet). Präteritum: erzählte Vergangenheit (er ritt). Perfekt: haben/sein + Partizip (er ist geritten)." } ] },
     { "id": "steigerung", "name": "Steigerung", "emoji": "📈", "stufen": [
         { "text": "regelmäßig", "formate": ["luecke", "buchstaben", "regel"] },
-        { "text": "mit Umlaut und Zweifelsfällen", "formate": ["luecke", "buchstaben"] },
-        { "text": "unregelmäßig, im Satz mit Endung", "formate": ["luecke", "eintippen", "buchstaben"] } ],
+        { "text": "mit Umlaut und Zweifelsfällen", "formate": ["buchstaben", "eintippen", "luecke"] },
+        { "text": "unregelmäßig, im Satz mit Endung", "formate": ["eintippen", "buchstaben"] } ],
       "regeln": [
         { "id": "steigerung-regel", "text": "Steigern: schnell – schneller – am schnellsten. Komparativ mit -er, Superlativ mit am …sten." },
         { "id": "steigerung-umlaut", "text": "Viele kurze Adjektive bekommen beim Steigern einen Umlaut: alt – älter – am ältesten." },
         { "id": "steigerung-unregel", "text": "Einige Adjektive sind unregelmäßig: gut – besser – am besten, viel – mehr – am meisten." } ] },
     { "id": "verlaengerung", "name": "Verlängerungsprobe d/t, b/p, g/k", "emoji": "🔍", "stufen": [
         { "text": "häufige Wörter", "formate": ["sortieren", "auswahl"] },
-        { "text": "Buchstaben ergänzen", "formate": ["buchstaben", "fehler"] },
+        { "text": "Buchstaben ergänzen und Wörter schreiben", "formate": ["buchstaben", "fehler", "eintippen"] },
         { "text": "ganze Wörter und Sätze", "formate": ["eintippen", "fehler"] } ],
       "regeln": [
         { "id": "verlaengern", "text": "Am Wortende hört man d und t, b und p, g und k gleich. Verlängere das Wort: Hund – Hunde, darum d." } ] },
     { "id": "ableitung", "name": "Ableitung ä/e und äu/eu", "emoji": "🌿", "stufen": [
         { "text": "häufige Wörter", "formate": ["auswahl"] },
-        { "text": "Buchstaben ergänzen", "formate": ["buchstaben", "fehler"] },
+        { "text": "Buchstaben ergänzen und Wörter schreiben", "formate": ["buchstaben", "fehler", "eintippen"] },
         { "text": "ganze Wörter und Sätze", "formate": ["fehler", "eintippen"] } ],
       "regeln": [
         { "id": "ableiten", "text": "Suche ein verwandtes Wort mit a oder au: Gärtner kommt von Garten, Räuber von rauben – darum ä und äu." } ] },
     { "id": "doppel", "name": "Doppelkonsonant", "emoji": "✌️", "stufen": [
         { "text": "häufige Wörter", "formate": ["auswahl"] },
-        { "text": "Buchstaben ergänzen", "formate": ["buchstaben", "fehler"] },
+        { "text": "Buchstaben ergänzen und Wörter schreiben", "formate": ["buchstaben", "fehler", "eintippen"] },
         { "text": "ganze Wörter und Sätze", "formate": ["eintippen", "fehler"] } ],
       "regeln": [
         { "id": "doppel-kurz", "text": "Nach einem kurzen, betonten Vokal folgen oft zwei gleiche Mitlaute: Ham-mer, Kis-sen, Bet-ten. Sprich langsam in Silben." } ] },
     { "id": "ie", "name": "Langes i: ie", "emoji": "🐝", "stufen": [
         { "text": "häufige Wörter", "formate": ["auswahl"] },
-        { "text": "Buchstaben ergänzen", "formate": ["buchstaben", "fehler"] },
+        { "text": "Buchstaben ergänzen und Wörter schreiben", "formate": ["buchstaben", "fehler", "eintippen"] },
         { "text": "ganze Wörter und Sätze", "formate": ["eintippen", "fehler"] } ],
       "regeln": [
         { "id": "ie-lang", "text": "Ein lang gesprochenes i schreibt man meistens ie: Biene, Spiegel, Brief." } ] },
     { "id": "tzck", "name": "tz und ck", "emoji": "🪝", "stufen": [
         { "text": "häufige Wörter", "formate": ["auswahl"] },
-        { "text": "Buchstaben ergänzen", "formate": ["buchstaben", "fehler"] },
+        { "text": "Buchstaben ergänzen und Wörter schreiben", "formate": ["buchstaben", "fehler", "eintippen"] },
         { "text": "ganze Wörter und Sätze", "formate": ["eintippen", "fehler"] } ],
       "regeln": [
         { "id": "tzck-kurz", "text": "Nach einem kurzen Vokal schreibt man tz statt zz und ck statt kk: Katze, Decke." } ] },
