@@ -300,7 +300,10 @@ Spaß hat Vorrang, aber eine Regel ist unverhandelbar: Eine grammatisch falsche 
 - **Erklärung nach jeder Antwort** mit Merkhilfe – auch nach einer richtigen: „Brot + Korb = Brotkorb: Das Grundwort steht hinten und bestimmt, was es ist.“
 - **Großer Wortschatz statt fester Fragen:** über 500 Nomen mit Artikel, Mehrzahl, Pluralmuster, Silben, Wortfeld, Schwierigkeit und Rechtschreib-Phänomenen, dazu Verben, Adjektive, Komposita, Wortfamilien und Sätze. Mehrdeutige Wörter kommen nicht vor. Falsche Antworten entstehen aus typischen Fehlermustern und sind nie zufällig ein echtes Wort – die Tests prüfen das.
 - **15 Themen mit je drei Stufen** (Artikel, Mehrzahl, Wortarten, Groß/klein, Personalformen, Zeitformen, Steigerung, Verlängerung, Ableitung, Doppelkonsonant, ie, tz/ck, Komposita, Satzglieder, Wortfelder) und **elf Aufgabenformate**, damit dieselbe Regel in verschiedenen Formen geübt wird.
-- **Das Item bestimmt das Thema**, die Item-Stufe den Bereich (★★ = Stufe 1–2, ★★★ = 2–3, ★★★★ = 3). Jede Begegnung hat ihr eigenes Format.
+- **Das Item bestimmt das Thema**, der Lernstand die Stufe, die Item-Stufe nur die Untergrenze (★★ ab 1, ★★★ ab 2, ★★★★ = 3). Jede Begegnung hat ihr eigenes Format.
+- **Kein Ausschlussverfahren:** Nach einem Fehlversuch kommt eine neue Aufgabe zur selben Regel statt derselben mit ausgegrauter Antwort.
+- **Selbst bilden statt wiedererkennen:** Ab Stufe 2 überwiegen Buchstaben ergänzen und Eintippen.
+- **Briefe belegen und nutzen:** Ab Schwierigkeit 2 tippt das Kind den Satz an, der seine Antwort belegt. Manche Briefe verraten Schwächen der Gegner, die im Kampf nur wirken, wenn man sie sich merkt und passend packt.
 - **Lernstand je Thema:** zweimal gleich richtig → nächste Stufe. Statt „nach dreimal richtig nicht mehr fragen“ werden die Themen schwerer.
 - **Verteilte Wiederholung:** Ein Fehler kommt zwei bis vier Aufgaben später wieder – in anderer Form und mit anderem Wort. Jedes Wort höchstens einmal pro Thema und Lauf.
 - **Belohnung für Können:** Stufe 2 gleich richtig +1 Gold, Stufe 3 +2 Gold und Glanz (+10 % im nächsten Kampf). Regelkarten werden im Buch gesammelt.
@@ -314,7 +317,7 @@ Spaß hat Vorrang, aber eine Regel ist unverhandelbar: Eine grammatisch falsche 
 ### Lehrkraft-Modus
 
 - **„Für Lehrkräfte“** im Startmenü, geschützt mit einem Lehrkraft-Code aus `lehrkraft.json` (kein Passwort, kein Server).
-- Themen an- und ausschalten und je Thema die **höchste Stufe** festlegen. Ohne Einstellung: alle Themen, Stufe 1–2. Dazu gehören auch „Leseverständnis“ (Briefe) und „Satzglieder“ (Satzschmiede, Stufe 3 mit Adverbialen und Umstellprobe).
+- Themen an- und ausschalten und je Thema die **höchste Stufe** festlegen. Ohne Einstellung: alle Themen, Stufe 1–3. Dazu gehören auch „Leseverständnis“ (Briefe) und „Satzglieder“ (Satzschmiede, Stufe 3 mit Adverbialen und Umstellprobe).
 - **Rune der Woche prüfen:** Kürzel und Ergebnis-Siegel eintippen, die Rangliste erscheint sortiert.
 - Daraus entsteht ein **Klassen-Code** wie `THEMEN-3DFTS-R8UD8`. Die Kinder tippen ihn bei „Heldencode eingeben“ ein; er wird auf dem iPad gespeichert (nicht im Heldencode) – auf einem anderen iPad tippt man ihn noch einmal ein.
 - Alle Wörter und Themen stehen in **JSON-Dateien**. Neue Wörter, etwa aus dem aktuellen Lesetext, lassen sich ohne Programmieren ergänzen; `tools/pruefliste.mjs` erzeugt eine sortierbare Prüfliste zum Abhaken, mit allen Sätzen (unsichere markiert).

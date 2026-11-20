@@ -11,6 +11,8 @@ export function matches(filter = {}, def) {
   if (filter.art && def.art !== filter.art) return false;
   if (filter.id && def.id !== filter.id) return false;
   if (filter.kraft && def.teile?.kraft !== filter.kraft) return false;
+  // Kraft als Kristall selbst oder als Bestimmungswort eines Kompositums (Hinweise aus Briefen)
+  if (filter.kraftOderKristall && def.id !== filter.kraftOderKristall && def.teile?.kraft !== filter.kraftOderKristall) return false;
   if (filter.traeger && def.id !== filter.traeger && def.teile?.traeger !== filter.traeger) return false;
   if (filter.wortfeld && def.wortfeld !== filter.wortfeld) return false;
   return true;

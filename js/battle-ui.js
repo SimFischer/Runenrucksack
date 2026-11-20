@@ -6,7 +6,8 @@ import { G, itemsIn, gridOf, region, hero, playerCtx, emit, figurBild, gegnerBil
 import { evaluateBag } from './mods.js';
 import { merkeAntwort, laufStand } from './fortschritt.js';
 import { frageImSpiel } from './aufgaben/spiel.js';
-import { $, fmt, buildGrid, drawItems, openModal, closeModal } from './ui.js';
+import { $, fmt, buildGrid, drawItems, openModal, closeModal, toast } from './ui.js';
+import { hinweisMods, hinweiseImKampf } from './botschaften.js';
 import { sym, bild, symbolPfad } from './symbole.js';
 
 let battle = null, enemy = null, speed = 1, rafId = 0, lastFrame = 0, itemEls = {}, onDone = null;
@@ -54,6 +55,8 @@ export function startNight(done) {
   armor = !foeDef.fehler?.length ? null : tut ? { ...pickOne(foeDef.fehler), status: 'offen' } : { satz: true, status: 'offen' };
 
   const ctx = playerCtx();
+  // Hinweise aus Briefen: Schwächen dieses Gegners (nur mit passenden Gegenständen im Rucksack)
+  if (!run.tutorial) ctx.mods = [...ctx.mods, ...hinweisMods(run, foeDef.id)];
   const bag = itemsIn('bag');
   const player = makeFighter(hero()?.name || 'Dein Rucksack', bag, G.DEFS, run.day, {
     info: evaluateBag(bag, G.DEFS, ctx), leben: ctx.leben, tempo: ctx.tempo, selbstschaden: ctx.selbstschaden, rng,
@@ -86,6 +89,7 @@ export function startNight(done) {
   $('btn-skip').disabled = false;
   $('speed').onclick = (e) => { const b = e.target.closest('[data-speed]'); if (b) setSpeed(+b.dataset.speed); };
   for (const id of ['start', 'heroes', 'game', 'battle']) $(id).hidden = id !== 'battle';
+  if (!run.tutorial) meldeHinweise(run, foeDef, bag);
   if (enemy.boss) emit('tipp', { key: 'boss' });
   else if (armor) emit('tipp', { key: 'ruestung' });
 }
@@ -110,6 +114,20 @@ function buildFighter(side, bildHtml, name, sub, placed, grid, info) {
 function setSpeed(s) {
   speed = s;
   document.querySelectorAll('#speed [data-speed]').forEach((b) => b.classList.toggle('active', +b.dataset.speed === s));
+}
+
+// Rückmeldung zu Brief-Hinweisen: genutzt → loben; ungenutzter Hinweis gegen genau diesen Gegner → daran erinnern,
+// ohne die Lösung zu verraten (die steht im Brief). Hinweise gegen alle Gegner meldet das Spiel nur einmal.
+function meldeHinweise(run, foeDef, bag) {
+  for (const { hinweis: h, genutzt } of hinweiseImKampf(run, foeDef.id, bag.map((p) => G.DEFS[p.id]))) {
+    const kraft = G.DEFS[h.kraft]?.name || h.kraft;
+    if (genutzt && (h.gegner !== 'alle' || !h.gelobt)) {
+      h.gelobt = true;
+      toast(`Gut gelesen! Der Tipp von ${h.absender} hilft: Deine ${kraft}-Gegenstände wirken ${h.prozent} % stärker gegen ${foeDef.name}.`);
+    } else if (!genutzt && h.gegner !== 'alle') {
+      toast(`${h.absender} hat dir etwas über ${foeDef.name} geschrieben. Erinnerst du dich, was hier helfen würde?`);
+    }
+  }
 }
 
 function beginBattle() {

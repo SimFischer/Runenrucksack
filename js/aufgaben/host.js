@@ -1,6 +1,8 @@
 // Aufgaben-Fenster: zeigt eine Aufgabe (klein direkt am Item oder groß in der Mitte), nimmt die Antwort an,
 // zeigt nach jeder Antwort eine kurze Erklärung mit Merkhilfe. Falsch: neuer Versuch – ab dem zweiten
-// kostet jeder 1 Gold (im Tutorial nicht). Ergebnis als Promise: { richtig, ersterVersuch, versuche, abgebrochen, trotzdem }.
+// kostet jeder 1 Gold (im Tutorial nicht). Mit opts.naechste(alteAufgabe) kommt nach einem Fehlversuch eine neue
+// Aufgabe zur selben Regel statt derselben mit ausgegrauter Antwort – so hilft bloßes Durchprobieren nicht weiter.
+// Ergebnis als Promise: { richtig, ersterVersuch, versuche, abgebrochen, trotzdem, aufgabe (die zuletzt gestellte), ersetzt }.
 import { FORMATE } from './formate/index.js';
 import { sym } from '../symbole.js';
 import { nebenRucksack } from '../ui.js';
@@ -12,7 +14,8 @@ const sterne = (s) => '★'.repeat(s) + `<i>${'☆'.repeat(3 - s)}</i>`;
 // die beteiligten Items (opts.beteiligt, sonst der Anker) leuchten und sind mit dem Fenster verbunden.
 // opts: { anker, beteiligt, kopf, titel, stufe, zahle() → bool, gold() → Zahl, tutorial, nein (Text) , trotzdem (bool), onRegel(id) }
 export function stelleAufgabe(a, opts = {}) {
-  const format = FORMATE[a.format];
+  let format = FORMATE[a.format];
+  const ersetzt = []; // Aufgaben, die nach einem Fehlversuch durch eine neue ersetzt wurden
   return new Promise((fertig) => {
     let versuche = 0, vorher = null, pleite = false, euleText = '';
     const gross = format.gross(a) || !opts.anker; // ohne Item als Anker: in der Mitte
@@ -27,7 +30,7 @@ export function stelleAufgabe(a, opts = {}) {
     document.body.append(ebene);
     const ankerRect = opts.anker?.getBoundingClientRect?.() || null;
 
-    const schliessen = (ergebnis) => { if (offen === abbrechen) offen = null; ebene.remove(); fertig(ergebnis); };
+    const schliessen = (ergebnis) => { if (offen === abbrechen) offen = null; ebene.remove(); fertig({ ...ergebnis, aufgabe: a, ersetzt }); };
     const abbrechen = () => schliessen({ abgebrochen: true, versuche });
     offen = abbrechen;
 
@@ -38,7 +41,7 @@ export function stelleAufgabe(a, opts = {}) {
         <div class="af-kopf">${opts.kopf || ''}<span class="af-titel">${opts.titel || ''}${a.stufe ? ` <span class="af-stufe" title="Stufe ${a.stufe}">${sterne(a.stufe)}</span>` : ''}</span></div>
         <div class="af-frage">${a.frage}</div>
         <div class="af-inhalt"></div>
-        ${vorher ? `<p class="af-rueck falsch">✗ ${a.merke}</p>` : ''}
+        ${vorher ? `<p class="af-rueck falsch">✗ ${vorher.merke || a.merke}${vorher.neu ? '<br><b>Jetzt eine neue Aufgabe zur selben Regel.</b>' : ''}</p>` : ''}
         ${pleite ? '<p class="af-rueck falsch">Kein Gold mehr für einen weiteren Versuch.</p>' : ''}
         ${euleText ? `<p class="af-eule"><img src="assets/ui/begleiter/eule.webp" alt=""> ${euleText}</p>` : ''}
         <div class="af-fuss"><span class="cost">${kosten}</span>
@@ -76,8 +79,17 @@ export function stelleAufgabe(a, opts = {}) {
       opts.onRegel?.(a.regel);
       if (r.richtig) { geschafft(); return; }
       if (opts.einVersuch) { leiderNicht(); return; }
-      vorher = { antwort, falsch: [...(vorher?.falsch || []), ...(r.falsch || [])] };
-      if (a.format === 'sortieren' || a.format === 'paare') vorher.falsch = r.falsch || [];
+      const neu = !opts.tutorial && opts.naechste?.(a);
+      if (neu) {
+        // Neue Aufgabe statt Ausschlussverfahren: die Merkhilfe der alten bleibt sichtbar
+        ersetzt.push(a);
+        vorher = { antwort, falsch: [], merke: a.merke, neu: true };
+        a = neu;
+        format = FORMATE[a.format];
+      } else {
+        vorher = { antwort, falsch: [...(vorher?.falsch || []), ...(r.falsch || [])] };
+        if (a.format === 'sortieren' || a.format === 'paare') vorher.falsch = r.falsch || [];
+      }
       opts.onFalsch?.();
       zeichne();
     };

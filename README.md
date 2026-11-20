@@ -77,9 +77,12 @@ Kampf-Wirkungen gelten nur, wenn das Tier im Rucksack liegt (nicht im Lager). Lo
 
 ## Botschaften lesen (Leseverständnis)
 
-Ab Tag 2 kommt am Morgen mit 50 % Wahrscheinlichkeit (nie zweimal hintereinander) statt der Begegnung ein Brief. Er öffnet sich auf einer Pergamenttafel: links der Text (60–120 Wörter), rechts nacheinander 1–2 Fragen (Information finden, Schlussfolgern, Wortbedeutung). Richtig: Gegenstand oder Gold aus dem Brief. Falsch: 1 Gold Trost, die Stelle im Text wird markiert („Hier steht es: …“).
+Ab Tag 2 kommt am Morgen mit 50 % Wahrscheinlichkeit (nie zweimal hintereinander) statt der Begegnung ein Brief. Er öffnet sich auf einer Pergamenttafel: links der Text (60–120 Wörter, Schwierigkeit 3 bis 180), rechts nacheinander 1–2 Fragen (Information finden, Schlussfolgern, Wortbedeutung, Reihenfolge, Widerspruch, Stimmung). Richtig: Gegenstand oder Gold aus dem Brief. Falsch: 1 Gold Trost, die Stelle im Text wird markiert („Hier steht es: …“).
 
-- `botschaften.json`: 33 Briefe (Kleinwurzel und Hrossmark, Schwierigkeit 1–3) mit Absender, Text, Fragen, Antworten, Textstelle und Belohnung.
+- **Belegen** (ab Schwierigkeit 2): Nach einer richtigen Antwort tippt das Kind den Satz im Brief an, der sie zeigt (ein Versuch). Gefunden: +1 Gold. Daneben: Die richtige Stelle wird markiert. Nur Briefe mit allen Antworten **und** allen Belegen zählen für den Aufstieg im Thema Leseverständnis.
+- **Hinweise mit Folgen:** Manche Briefe verraten eine Schwäche der Gegner (Feld `hinweis`, z. B. „der Plünderer flieht vor dem Blitz“ – oft nur zu erschließen). Nach dem Lesen wirken Gegenstände mit dieser Kraft (Kristall oder Kompositum) gegen diesen Gegner stärker (+30 %, gegen alle Orks +15 %). Im Laden steht der Hinweis nirgends: Wer ihn nutzen will, muss ihn sich merken und passend packen. Zu Kampfbeginn lobt das Spiel einen genutzten Hinweis oder erinnert an einen ungenutzten, ohne die Lösung zu verraten.
+
+- `botschaften.json`: 81 Briefe (Kleinwurzel und Hrossmark, Schwierigkeit 1–3) mit Absender, Text, Fragen, Antworten, Textstelle und Belohnung.
 - Thema **Leseverständnis** (`lesen` in `themen.json`) mit eigenem Lernstand: zwei Briefe hintereinander ganz richtig → schwierigere Briefe. Die Lehrkraft kann das Thema ausschalten, dann kommt immer eine Begegnung.
 - `node tools/pruefliste.mjs` listet alle Briefe mit Fragen zum Abhaken. Logik: `js/botschaften.js`, Darstellung: `js/brief-ui.js`.
 
@@ -146,7 +149,7 @@ Das Werkzeug hängt neue Einträge **nur hinten an**. Nie Einträge umsortieren,
 | Sternstufen | Zwei gleiche Items (Rucksack + Lager) werden sofort zu ★★ (2,2-fach), ★★★ (5-fach), ★★★★ (11-fach, legendär); vorher eine Aufgabe zum Thema des Items (siehe unten) | zwei Äxte, gestern schlug er |
 | Verben mit Subjekt | Pfeil der Schriftrolle zeigt auf ein Nomen, Frage nach der Personalform; richtig: Rolle voll und das Subjekt schlägt mit, sonst nur halbe Wirkung | Das Feuerschwert schlägt. Die Speere schlagen. |
 
-**Regel für alle Aufgaben:** Der erste Versuch ist kostenlos, jeder weitere kostet 1 Gold; nach jeder Antwort erscheint eine kurze Erklärung mit Merkhilfe. **Eine grammatisch falsche Kombination ist nie stärker als eine richtige** – die Tests prüfen das.
+**Regel für alle Aufgaben:** Der erste Versuch ist kostenlos, jeder weitere kostet 1 Gold; nach jeder Antwort erscheint eine kurze Erklärung mit Merkhilfe. Nach einem Fehlversuch kommt eine **neue Aufgabe zur selben Regel** (anderes Wort, möglichst anderes Format, gleiche Stufe) statt derselben mit ausgegrauter Antwort – so führt bloßes Durchprobieren nicht zum Ziel (nicht im Tutorial und nicht bei festen Inhalten wie der Speisekarte). **Eine grammatisch falsche Kombination ist nie stärker als eine richtige** – die Tests prüfen das.
 
 **Verbinden ohne Bremse:** Die Aufgabe erscheint neben dem Rucksack (über Lager und Infobereich), nie über den Rucksack-Feldern; die beteiligten Items leuchten und sind mit einer dünnen Linie mit dem Fenster verbunden. Mit „Nicht verbinden“ bleiben die Items getrennt.
 
@@ -155,12 +158,12 @@ Das Werkzeug hängt neue Einträge **nur hinten an**. Nie Einträge umsortieren,
 Die Aufgaben entstehen aus `wortschatz.json` (508 Nomen, 137 Verben, 93 Adjektive, 47 Komposita, 41 Wortfamilien, 44 Sätze, Wortfelder der Gebiete) und `themen.json` (15 Themen mit je drei Stufen und Regelkarten). Der Code dazu steht in `js/aufgaben/`.
 
 - **Das Item bestimmt das Thema, nicht das Wort:** Nomen → Mehrzahl oder Artikel, Komposita → Komposita, Verben → Personalformen oder Zeitformen, Runen → Steigerung, Ork-Rüstung → Rechtschreibung. Das Wort ist zufällig, bevorzugt aus dem Wortfeld des Gebiets.
-- **Die Item-Stufe bestimmt den Bereich:** ★★ = Stufe 1–2, ★★★ = Stufe 2–3, ★★★★ = Stufe 3 (ist Stufe 3 nicht erlaubt: zwei Aufgaben).
+- **Der Lernstand bestimmt die Stufe, das Item die Untergrenze:** ★★ ab Stufe 1, ★★★ ab Stufe 2, ★★★★ = Stufe 3 (ist Stufe 3 nicht erlaubt: zwei Aufgaben). Wer ein Thema sicher kann, bekommt auch bei ★★-Items schwere Aufgaben.
 - **Sinnvolle Sätze:** Jedes Wort hat eigene Sätze – Nomen eine Bedeutungsgruppe, zwei Sätze und einen Mehrzahl-Satz; Verben drei Satzrahmen mit wechselnden Personen (daraus Präsens, Präteritum, Perfekt) und einen Satz mit dem Verb als Nomen; Adjektive Sätze mit Grundform, Komparativ und Superlativ. Keine Schablonen mit beliebigen Wörtern; ohne passenden Satz (z. B. für eine Artikel-Lücke) kommt die Aufgabe ohne Satz. Die Sätze stehen in `tools/saetze/*.txt` (ein „?“ markiert unsichere); `node tools/saetze.mjs` prüft sie und trägt sie in `wortschatz.json` ein.
-- **Elf Formate:** Auswahl, Lückensatz, Buchstaben ergänzen (eigene Bildschirmtastatur), Eintippen (nur Stufe 3), Baukasten, Sortieren (Ziehen oder Antippen), Fehler finden, Satz ordnen, Passt nicht, Regel entdecken, Paare.
+- **Elf Formate:** Auswahl, Lückensatz, Buchstaben ergänzen (eigene Bildschirmtastatur), Eintippen (ab Stufe 2; auf Stufe 2 und 3 überwiegen Buchstaben ergänzen und Eintippen statt Antwortknöpfen), Baukasten, Sortieren (Ziehen oder Antippen), Fehler finden, Satz ordnen, Passt nicht, Regel entdecken, Paare.
 - **Lernstand je Thema:** zweimal gleich beim ersten Versuch richtig → nächste Stufe. Ein Fehler kommt als zweite bis vierte Aufgabe danach wieder – in anderer Form, mit anderem Wort. Jedes Wort höchstens einmal pro Thema und Lauf. Der Lernstand bleibt auf dem iPad (auf einem neuen iPad: Startstufe nach Rang, der erste Fehler senkt sie, der erste Treffer bestätigt sie); der Lernbericht zeigt Sterne je Thema, keine Prozente.
 - **Belohnungen:** gleich richtig auf Stufe 2 → +1 Gold, auf Stufe 3 → +2 Gold, und beim Verbinden glänzt das neue Item (+10 % im nächsten Kampf). Jede richtig angewendete Regel wird eine Regelkarte im Buch (Seite „Regeln“).
-- **Für Lehrkräfte** (Startmenü, Code in `lehrkraft.json`): Themen an/aus und höchste Stufe je Thema. Daraus entsteht ein Klassen-Code wie `THEMEN-3DFTS-R8UD8`, den die Kinder bei „Heldencode“ eintippen; er wird auf dem iPad gespeichert (nicht im Heldencode). Ohne Klassen-Code gelten alle Themen mit Stufe 1–2. Der Lehrkraft-Code liegt offen im Repository – er hält Kinder ab, ist aber kein echter Schutz.
+- **Für Lehrkräfte** (Startmenü, Code in `lehrkraft.json`): Themen an/aus und höchste Stufe je Thema. Daraus entsteht ein Klassen-Code wie `THEMEN-3DFTS-R8UD8`, den die Kinder bei „Heldencode“ eintippen; er wird auf dem iPad gespeichert (nicht im Heldencode). Ohne Klassen-Code gelten alle Themen mit Stufe 1–3. Der Lehrkraft-Code liegt offen im Repository – er hält Kinder ab, ist aber kein echter Schutz.
 - **Prüfliste für Lehrkräfte:** `node tools/pruefliste.mjs` erzeugt `wortschatz-pruefliste.html` (sortierbar, mit Häkchen-Spalte, Bedeutungsgruppen und allen Sätzen, unsichere Einträge und Sätze markiert).
 
 ## Inhalte ändern (ohne Programmieren)

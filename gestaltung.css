@@ -587,6 +587,11 @@ h2 .amboss { width: 40px; height: 26px; margin-right: 6px; }
 .brief-antworten { display: flex; flex-direction: column; gap: 8px; }
 .brief-antworten .btn { white-space: normal; text-align: center; }
 @media (max-width: 1100px) { .brief-text { font-size: 17px; padding: 16px 18px; } .brief-frage { font-size: 19px; } }
+/* Belegen: Sätze im Brief antippen */
+.brief-satz.klickbar { cursor: pointer; border-radius: 4px; padding: 1px 0; box-decoration-break: clone; -webkit-box-decoration-break: clone; background-image: linear-gradient(rgba(160, 110, 40, .45), rgba(160, 110, 40, .45)); background-size: 100% 2px; background-position: 0 100%; background-repeat: no-repeat; -webkit-tap-highlight-color: transparent; }
+.brief-satz.klickbar:hover, .brief-satz.klickbar:focus-visible, .brief-satz.klickbar:active { background-color: rgba(255, 224, 138, .7); outline: none; }
+.brief-offen.belegen .brief-text { box-shadow: 0 0 0 4px #e0a526, 0 10px 30px rgba(0, 0, 0, .4); }
+.brief-beleg-auftrag { margin: 0; font-size: 18px; color: var(--tinte); }
 .brief-antworten .opt-btn.right:disabled { filter: none; opacity: 1; background: linear-gradient(180deg, #6fa84a, #3f7a2a); color: #fff; }
 
 /* ---------- Rune der Woche ---------- */

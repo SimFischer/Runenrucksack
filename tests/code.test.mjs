@@ -245,7 +245,7 @@ test('Alter Code: Lernstand, Regelkarten und Klasse nur angehängt, wenn vorhand
   assert.deepEqual(r.regeln, ['ie-lang']);
   assert.equal(r.klasse.themen.artikel, 3);
   assert.equal(r.klasse.themen.ie, 0, 'ausgeschaltet bleibt aus');
-  assert.equal(r.klasse.themen.mehrzahl, 2, 'nicht eingestellt: Standard 1–2');
+  assert.equal(r.klasse.themen.mehrzahl, 3, 'nicht eingestellt: Standard 1–3');
   assert.equal(Object.keys(r.klasse.themen).length, json('themen.json').themen.length);
 });
 
@@ -260,7 +260,7 @@ test('Klassen-Code: THEMEN-…, kurz, exakt dieselben Einstellungen, Tippfehler 
   assert.ok(!istKlassenCode(GOLDEN));
   assert.deepEqual(leseKlassenCode(code, REG), einst);
   // Standard: alle Themen bis Stufe 2
-  assert.ok(Object.values(leseKlassenCode(klassenCode({ themen: {} }, REG), REG).themen).every((m) => m === 2));
+  assert.ok(Object.values(leseKlassenCode(klassenCode({ themen: {} }, REG), REG).themen).every((m) => m === 3));
   // Ein Tippfehler wird erkannt
   const roh = saeubern(code), i = roh.length - 3;
   assert.throws(() => leseKlassenCode(roh.slice(0, i) + (roh[i] === 'A' ? 'B' : 'A') + roh.slice(i + 1), REG), CodeFehler);
